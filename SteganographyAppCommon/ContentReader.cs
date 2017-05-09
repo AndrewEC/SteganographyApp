@@ -10,7 +10,7 @@ namespace SteganographyAppCommon
 
         private Stream source;
         private readonly InputArguments args;
-        public static readonly int ChunkByteSize = 32_768;
+        public static readonly int ChunkByteSize = 131_072;
 
         public int RequiredNumberOfReads { get; private set; }
 

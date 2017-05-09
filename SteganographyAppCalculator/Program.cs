@@ -40,8 +40,7 @@ namespace SteganographyAppCalculator
                 Console.WriteLine("\nRun the program with --help to get more information.");
             }
 
-            Console.WriteLine("\nPress enter to continue...");
-            Console.ReadLine();
+            Console.WriteLine("");
         }
 
         private static void PrintHelp()
@@ -71,14 +70,20 @@ namespace SteganographyAppCalculator
             double binarySpace = 0;
             try
             {
+                int count = 0;
                 foreach (string imagePath in args.CoverImages)
                 {
                     using (var image = Image.Load(imagePath))
                     {
                         binarySpace += (image.Width * image.Height);
+                        DisplayPercent(count, args.CoverImages.Length, "Calculating image storage space");
                     }
                 }
                 binarySpace *= 3;
+                Console.WriteLine("Completing calculating image storage space.");
+
+                Console.WriteLine("\nImages are able to store:");
+                PrintSize(binarySpace);
             }
             catch (Exception e)
             {
@@ -89,9 +94,6 @@ namespace SteganographyAppCalculator
                 }
                 return;
             }
-
-            Console.WriteLine("Images are able to store:");
-            PrintSize(binarySpace);
         }
 
         /// <summary>
@@ -104,10 +106,10 @@ namespace SteganographyAppCalculator
         {
             try
             {
-                Console.WriteLine("Calculating compressed size.");
+                Console.WriteLine("\nCalculating compressed size.");
                 double compressedSpace = GetSize(args, true);
 
-                Console.WriteLine("Calculating uncompressed size.");
+                Console.WriteLine("\nCalculating uncompressed size.");
                 double uncompressedSpace = GetSize(args, false);
 
                 Console.WriteLine("\nCompressed file size is:");
@@ -137,17 +139,31 @@ namespace SteganographyAppCalculator
             int length = 0;
             bool old = args.UseCompression;
             args.UseCompression = compressed;
+            int reads = 0;
             using (var reader = new ContentReader(args))
             {
                 string content = "";
                 while ((content = reader.ReadNextChunk()) != null)
                 {
+                    reads++;
+                    DisplayPercent(reads, reader.RequiredNumberOfReads, "Calculating file size");
                     length += content.Length;
                 }
             }
+            Console.WriteLine("Completed calculting file size");
             args.UseCompression = old;
             length += new ImageStore(args).RequiredContentChunkTableBitSize;
             return length;
+        }
+
+        private static void DisplayPercent(double cur, double max, string prefix)
+        {
+            double percent = cur / max * 100.0;
+            if (percent > 100.0)
+            {
+                percent = 100.0;
+            }
+            Console.Write("{0} :: {1}%\r", prefix, (int)percent);
         }
 
         /// <summary>

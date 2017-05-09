@@ -49,6 +49,8 @@ namespace SteganographyApp
                 }
                 Console.WriteLine("\nRun the program with --help to get more information.");
             }
+
+            Console.WriteLine("");
         }
 
         static void PrintHelp()

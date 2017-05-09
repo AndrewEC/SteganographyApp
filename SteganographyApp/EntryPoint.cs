@@ -70,7 +70,7 @@ namespace SteganographyApp
             store.ResetTo(args.CoverImages[0]);
             Console.WriteLine("Writing content chunk table.");
             store.WriteContentChunkTable(table);
-            Console.Write("Encoding process complete.");
+            Console.WriteLine("Encoding process complete.");
         }
 
         private void StartDecode()
