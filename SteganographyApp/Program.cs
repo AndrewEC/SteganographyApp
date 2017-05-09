@@ -67,10 +67,7 @@ namespace SteganographyApp
             Console.WriteLine("\t\tValue must be either 'true' or 'false'");
             Console.WriteLine("\t--printStack or -ps :: Specifies whether or not to print the full stack trace if an error occurs.");
             Console.WriteLine("\t\tValue must either be 'true' or 'false'");
-            Console.WriteLine("\t--randomSeed or -rs :: Specifies whether or not to randomly read/write the bits to the images.");
-            Console.WriteLine("\t\tIf the argument was specified when writing, then the same random argument value must be provided when reading.");
-            Console.WriteLine("\t\tThe accuracy and repeatability is not guaranteed between different systems.");
-            Console.WriteLine("\t--compress :: -c :: Specifies whether or not to compress/decompress the encoded/decoded content.");
+            Console.WriteLine("\t--compress or -c :: Specifies whether or not to compress/decompress the encoded/decoded content.");
             Console.WriteLine("\t\tValue must be either 'true' or 'false'.");
             Console.WriteLine("");
         }

@@ -35,7 +35,7 @@ namespace SteganographyApp
         {
             var store = new ImageStore(args);
             int start = store.RequiredContentChunkTableBitSize;
-            store.Next(false);
+            store.Next();
             store.WriteAll0(start);
             var table = new List<int>();
             using(var reader = new ContentReader(args))
@@ -51,7 +51,7 @@ namespace SteganographyApp
                         if (wrote < content.Length)
                         {
                             content = content.Substring(wrote);
-                            store.Next(false);
+                            store.Next();
                         }
                         else
                         {
@@ -60,14 +60,14 @@ namespace SteganographyApp
                     }
                 }
             }
-            store.ResetTo(args.CoverImages[0], false);
+            store.ResetTo(args.CoverImages[0]);
             store.WriteContentChunkTable(table);
         }
 
         private void StartDecode()
         {
             var store = new ImageStore(args);
-            store.Next(false);
+            store.Next();
             var chunkTable = store.ReadContentChunkTable();
             var less = 0;
             using (var writer = new ContentWriter(args))
@@ -82,7 +82,7 @@ namespace SteganographyApp
                         if (binary.Length < length)
                         {
                             less += binary.Length;
-                            store.Next(false);
+                            store.Next();
                         }
                         else
                         {

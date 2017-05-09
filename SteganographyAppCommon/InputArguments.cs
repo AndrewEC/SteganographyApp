@@ -140,10 +140,6 @@ namespace SteganographyAppCommon
                             throw new ArgumentParseException(String.Format("Could not parse value for argument {0}", key), e);
                         }
                         break;
-                    case "--randomSeed":
-                    case "-r":
-                        arguments.RandomSeed = value;
-                        break;
                     case "--compress":
                     case "-c":
                         try
@@ -331,7 +327,6 @@ namespace SteganographyAppCommon
         public string[] CoverImages { get; set; }
         public EncodeDecodeAction EncodeOrDecode { get; set; }
         public bool PrintStack { get; set; } = false;
-        public string RandomSeed { get; set; } = "";
         public bool UseCompression { get; set; } = false;
     }
 }

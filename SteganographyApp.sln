@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteganographyApp", "Stegano
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteganographyAppCommon", "SteganographyAppCommon\SteganographyAppCommon.csproj", "{D80D3CBF-241F-4FFC-BA33-180D6D4FC5DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteganographyAppCalculator", "SteganographyAppCalculator\SteganographyAppCalculator.csproj", "{80CE4844-0E11-42E7-B682-CDF4AE46E581}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D80D3CBF-241F-4FFC-BA33-180D6D4FC5DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D80D3CBF-241F-4FFC-BA33-180D6D4FC5DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D80D3CBF-241F-4FFC-BA33-180D6D4FC5DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80CE4844-0E11-42E7-B682-CDF4AE46E581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80CE4844-0E11-42E7-B682-CDF4AE46E581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80CE4844-0E11-42E7-B682-CDF4AE46E581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80CE4844-0E11-42E7-B682-CDF4AE46E581}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
