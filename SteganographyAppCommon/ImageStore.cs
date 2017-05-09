@@ -43,6 +43,13 @@ namespace SteganographyAppCommon
         private int[] colPositions;
 
         /// <summary>
+        /// Callback method for the Clean method to return the
+        /// current progress back to the entry point so progress can be
+        /// formatted and displayed to the user.
+        /// </summary>
+        public delegate void ProgressReport();
+
+        /// <summary>
         /// The x position to start the next read/write operation from.
         /// </summary>
         private int x = 0;
@@ -80,6 +87,18 @@ namespace SteganographyAppCommon
         public int RequiredContentChunkTableBitSize { get; private set; }
 
         /// <summary>
+        /// Readonly property that returns the name of the current image being used in the write
+        /// process.
+        /// </summary>
+        public string CurrentImage
+        {
+            get
+            {
+                return args.CoverImages[currentImageIndex];
+            }
+        }
+
+        /// <summary>
         /// Creates a new instance of the ImageStore and calculates the RequiredContentChunkTableBitSize
         /// value.
         /// </summary>
@@ -99,7 +118,7 @@ namespace SteganographyAppCommon
         /// Will look over all images specified in the InputArguments
         /// and set the LSB in all pixels in all images to 0.
         /// </summary>
-        public void CleanAll()
+        public void CleanAll(ProgressReport report)
         {
             foreach (string imagePath in args.CoverImages)
             {
@@ -130,6 +149,10 @@ namespace SteganographyAppCommon
                         }
                     }
                     image.Save(imagePath);
+                }
+                if(report != null)
+                {
+                    report();
                 }
             }
         }

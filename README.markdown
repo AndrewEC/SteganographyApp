@@ -1,17 +1,16 @@
 SteganographyApp
 =====
 
-Steganography is the art of hiding data in plain view by hiding it inside of other seemingly untouched files such as images, audio and video.
+Steganography is the art of hiding data in plain view by hiding it inside of other seemingly untouched files such as image, audio, and video files.
 
-The apptly named SteganographyApp is a command line utility that hides data inside of one or more images by modifying the least significant bit (LSB) of the RGB values in each individual pixel
+The apptly named SteganographyApp is a command line utility that hides data inside of one or more images by modifying the least significant bit (LSB) of the RGB values in each individual pixel.
 
 Current Features
 ---
 * .Net Core for cross platform support
 * Hiding one file in one or more images
-* Encrypting the file's contents before hiding it
+* Encrypting the file's contents using AES-256 before hiding it
 * Minifying the file's contents using standard GZip compression
-* Supplying random seeds allows to write content to random positions in the image
 * Clean function to clear out any saved data on one or more images that currently contain data
 
 SteganographyAppCalculator

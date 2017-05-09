@@ -10,7 +10,7 @@ namespace SteganographyAppCommon
     /// Stream encapsulation class that reads and encodes data
     /// from the input file.
     /// </summary>
-    public class ContentReader : IDisposable
+    public class ContentReader : AbstractContentIO
     {
 
         /// <summary>
@@ -19,16 +19,6 @@ namespace SteganographyAppCommon
         /// <para>Value of 131,072</para>
         /// </summary>
         public static readonly int ChunkByteSize = 131_072;
-
-        /// <summary>
-        /// A stream to read the data from the input file.
-        /// </summary>
-        private Stream source;
-
-        /// <summary>
-        /// The values parsed from the command line arguments.
-        /// </summary>
-        private readonly InputArguments args;
 
         /// <summary>
         /// Specifies the number of iterations it will take to read the file based on the size
@@ -42,9 +32,8 @@ namespace SteganographyAppCommon
         /// RequiredNumberOfReads property value.
         /// </summary>
         /// <param name="args">The values parsed from the command line values.</param>
-        public ContentReader(InputArguments args)
+        public ContentReader(InputArguments args) : base(args)
         {
-            this.args = args;
             RequiredNumberOfReads = (int)Math.Ceiling(new FileInfo(args.FileToEncode).Length / (double)ChunkByteSize);
         }
 
@@ -57,12 +46,12 @@ namespace SteganographyAppCommon
         /// <returns>A binary string representation of the next availabe ChunkByteSize from the input file.</returns>
         public string ReadNextChunk()
         {
-            if (source == null)
+            if (stream == null)
             {
-                source = File.OpenRead(args.FileToEncode);
+                stream = File.OpenRead(args.FileToEncode);
             }
             byte[] buffer = new byte[ChunkByteSize];
-            int read = source.Read(buffer, 0, buffer.Length);
+            int read = stream.Read(buffer, 0, buffer.Length);
             if (read == 0)
             {
                 return null;
@@ -75,17 +64,6 @@ namespace SteganographyAppCommon
             }
             string data = DataEncoderUtil.Encode(buffer, args.Password, args.UseCompression);
             return data;
-        }
-
-        /// <summary>
-        /// Closes the source read stream if it is open.
-        /// </summary>
-        public void Dispose()
-        {
-            if(source != null)
-            {
-                source.Dispose();
-            }
         }
 
     }

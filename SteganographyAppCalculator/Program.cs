@@ -157,7 +157,7 @@ namespace SteganographyAppCalculator
                     length += content.Length;
                 }
             }
-            Console.WriteLine("Completed calculting file size");
+            Console.WriteLine("Completed calculating file size");
             args.UseCompression = old;
             length += new ImageStore(args).RequiredContentChunkTableBitSize;
             return length;

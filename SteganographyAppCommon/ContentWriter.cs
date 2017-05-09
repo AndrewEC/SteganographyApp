@@ -10,28 +10,15 @@ namespace SteganographyAppCommon
     /// Stream encapsulating class that decodes binary data and writes it
     /// to an output file.
     /// </summary>
-    public class ContentWriter : IDisposable
+    public class ContentWriter : AbstractContentIO
     {
-
-        /// <summary>
-        /// A stream responsible for writing decoded bytes to the destination file.
-        /// </summary>
-        private BinaryWriter destination;
-
-        /// <summary>
-        /// The values parsed from the command line arguments.
-        /// </summary>
-        private readonly InputArguments args;
 
         /// <summary>
         /// Instantiates a new ContentWrite instance and sets the
         /// args field value.
         /// </summary>
         /// <param name="args"></param>
-        public ContentWriter(InputArguments args)
-        {
-            this.args = args;
-        }
+        public ContentWriter(InputArguments args) : base(args) { }
 
         /// <summary>
         /// Takes in an encrypted binary string, decyrypts it using the DataEncoderUtil
@@ -40,30 +27,18 @@ namespace SteganographyAppCommon
         /// <param name="binary">The encrypted binary string read from the storage images.</param>
         public void WriteChunk(string binary)
         {
-            if(destination == null)
+            if(stream == null)
             {
                 if (File.Exists(args.DecodedOutputFile))
                 {
                     File.Delete(args.DecodedOutputFile);
                 }
-                destination = new BinaryWriter(File.Open(args.DecodedOutputFile, FileMode.OpenOrCreate));
+                stream = File.Open(args.DecodedOutputFile, FileMode.OpenOrCreate);
             }
 
             byte[] decoded = DataEncoderUtil.Decode(binary, args.Password, args.UseCompression);
-            destination.Write(decoded);
-            destination.Flush();
-        }
-
-        /// <summary>
-        /// Flushes and closes the destination stream if it has been instantiated.
-        /// </summary>
-        public void Dispose()
-        {
-            if(destination != null)
-            {
-                destination.Flush();
-                destination.Dispose();
-            }
+            stream.Write(decoded, 0, decoded.Length);
+            stream.Flush();
         }
     }
 }

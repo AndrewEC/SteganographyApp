@@ -31,7 +31,7 @@ namespace SteganographyApp
             switch (args.EncodeOrDecode)
             {
                 case EncodeDecodeAction.Clean:
-                    new ImageStore(args).CleanAll();
+                    StartClean();
                     break;
                 case EncodeDecodeAction.Encode:
                     StartEncode();
@@ -40,6 +40,23 @@ namespace SteganographyApp
                     StartDecode();
                     break;
             }
+        }
+
+        /// <summary>
+        /// Starts the cleaning process.
+        /// Uses the image store to reset the LSB values in all the user provided
+        /// images to a value of 0.
+        /// </summary>
+        private void StartClean()
+        {
+            int cleaned = 0;
+            DisplayPercent(cleaned, args.CoverImages.Length, "Cleaning image LSB data");
+            new ImageStore(args).CleanAll(() =>
+            {
+                cleaned++;
+                DisplayPercent(cleaned, args.CoverImages.Length, "Cleaning image LSB data");
+            });
+            Console.WriteLine("Finished cleaning all {0} images.", args.CoverImages.Length);
         }
 
         /// <summary>
@@ -57,6 +74,8 @@ namespace SteganographyApp
             store.Next();
             store.Seek(start);
             var table = new List<int>();
+            var imagesUsed = new List<string>();
+            imagesUsed.Add(store.CurrentImage);
             int chunksRead = 0; //used to display how much data has been read as a percent
             using(var reader = new ContentReader(args))
             {
@@ -74,6 +93,7 @@ namespace SteganographyApp
                         {
                             content = content.Substring(wrote);
                             store.Next();
+                            imagesUsed.Add(store.CurrentImage);
                         }
                         else
                         {
@@ -84,10 +104,26 @@ namespace SteganographyApp
 
                 Console.WriteLine("All input file contents have been encoded.");
             }
+            PrintUnused(imagesUsed);
             store.ResetTo(args.CoverImages[0]);
             Console.WriteLine("Writing content chunk table.");
             store.WriteContentChunkTable(table);
             Console.WriteLine("Encoding process complete.");
+        }
+
+        private void PrintUnused(List<string> imagesUsed)
+        {
+            if(imagesUsed.Count == args.CoverImages.Length)
+            {
+                return;
+            }
+            Console.WriteLine("Not all images were used when encoding/decoding the file contents.");
+            Console.WriteLine("The following files were used:");
+            foreach(string image in imagesUsed)
+            {
+                Console.WriteLine("\t{0}", image);
+            }
+            Console.Write("Any image not specified in the list is not needed to decode the original file.\n");
         }
 
         /// <summary>
@@ -103,6 +139,8 @@ namespace SteganographyApp
             store.Next();
             Console.WriteLine("Reading content chunk table.");
             var chunkTable = store.ReadContentChunkTable();
+            var imagesUsed = new List<string>();
+            imagesUsed.Add(store.CurrentImage);
             var less = 0;
             int chunksWritten = 0; //used to display how much data has been read as a percent
             using (var writer = new ContentWriter(args))
@@ -132,6 +170,7 @@ namespace SteganographyApp
                 }
                 Console.WriteLine("All encoded file contents has been decoded.");
             }
+            PrintUnused(imagesUsed);
             Console.WriteLine("Decoding process complete.");
         }
 
