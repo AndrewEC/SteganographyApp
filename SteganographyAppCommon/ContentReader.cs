@@ -12,9 +12,12 @@ namespace SteganographyAppCommon
         private readonly InputArguments args;
         public static readonly int ChunkByteSize = 32_768;
 
+        public int RequiredNumberOfReads { get; private set; }
+
         public ContentReader(InputArguments args)
         {
             this.args = args;
+            RequiredNumberOfReads = (int)Math.Ceiling(new FileInfo(args.FileToEncode).Length / (double)ChunkByteSize);
         }
 
         public string ReadNextChunk()

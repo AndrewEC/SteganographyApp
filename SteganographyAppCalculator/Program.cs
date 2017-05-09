@@ -58,8 +58,6 @@ namespace SteganographyAppCalculator
             Console.WriteLine("\t--images or -im :: A comma delimited list of paths to images to be either encoded or decoded");
             Console.WriteLine("\t\tThe order of the images affects the encoding and decoding results.");
             Console.WriteLine("\t--passsword or -p :: The password to encrypt the input file when 'encode' was specified in the action argument.");
-            Console.WriteLine("\t--printStack or -ps :: Specifies whether or not to print the full stack trace if an error occurs.");
-            Console.WriteLine("\t\tValue must either be 'true' or 'false'");
             Console.WriteLine();
         }
 

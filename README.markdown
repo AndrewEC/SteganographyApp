@@ -25,10 +25,10 @@ Important Arguments
 Arguments must be specified with and = sign and no spaces.
 
 Example arguments for encoding a file to a set of images: 
-    dotnet .\\SteganographApp =-action=encode --images=001.png,002.png --input=FileToEncode.zip --password=Pass1234 --randomSeed=monkey --compress=true
+    dotnet .\\SteganographApp =-action=encode --images=001.png,002.png --input=FileToEncode.zip --password=Pass1234 --compress=true
 
 Example arguments for decoding data from a set of images to an output file.
-    dotnet .\\SteganpgraphyApp --action=decode --images=001.png,002.png --output=DecodedOutputFile.zip --password=Pass1234 --randomSeed=monkey --compress=true
+    dotnet .\\SteganpgraphyApp --action=decode --images=001.png,002.png --output=DecodedOutputFile.zip --password=Pass1234 --compress=true
 
 --action or -a :: Specifies whether to 'encode' a file to a set of images or 'decode' a set of images to a file.
     Value must be either 'encode', 'decode', or 'clean'.
@@ -44,16 +44,6 @@ Example arguments for decoding data from a set of images to an output file.
     The order of the images affects the encoding and decoding results.
 
 --passsword or -p :: The password to encrypt the input file when 'encode' was specified in the action argument.
-
---validate or -v :: Specifies whether or not to validate the proper arguments have been given.
-    Value must be either 'true' or 'false'
-
---printStack or -ps :: Specifies whether or not to print the full stack trace if an error occurs.
-    Value must either be 'true' or 'false'
-
---randomSeed or -rs :: Specifies whether or not to randomly read/write the bits to the images.
-    If the argument was specified when writing, then the same random argument value must be provided when reading.
-    The accuracy and repeatability is not guaranteed between different systems.
 
 --compress :: -c :: Specifies whether or not to compress/decompress the encoded/decoded content.
     Value must be either 'true' or 'false'.
@@ -71,7 +61,6 @@ This app takes advantage of the following third party nuget packages:
 Software Used
 ---
 
-Visual Studio 2017 Community
- was used to code, build, and test.
+Visual Studio 2017 Community was used to code, build, and test the project.
 
 Gimp was used to verify changes in the image after encoding and cleaning data.

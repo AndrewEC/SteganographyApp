@@ -31,20 +31,24 @@ namespace SteganographyApp
                     {
                         Console.WriteLine(e.StackTrace);
                     }
+
+                    switch(e)
+                    {
+                        case TransformationException t:
+                            Console.WriteLine("This error often occurs as a result of an incorrect password when decrypting a file.");
+                            break;
+                    }
                 }
             }
             catch (ArgumentParseException e)
             {
-                Console.WriteLine("An exception occured:\n\t{0}", e.Message);
+                Console.WriteLine("\nAn exception occured while parsing arguments:\n\t{0}", e.Message);
                 if (e.InnerException != null)
                 {
                     Console.WriteLine("And was caused by:\n\t{0}", e.InnerException.Message);
                 }
                 Console.WriteLine("\nRun the program with --help to get more information.");
             }
-
-            Console.WriteLine("\nPress enter to continue...");
-            Console.ReadLine();
         }
 
         static void PrintHelp()
@@ -63,8 +67,6 @@ namespace SteganographyApp
             Console.WriteLine("\t--images or -im :: A comma delimited list of paths to images to be either encoded or decoded");
             Console.WriteLine("\t\tThe order of the images affects the encoding and decoding results.");
             Console.WriteLine("\t--passsword or -p :: The password to encrypt the input file when 'encode' was specified in the action argument.");
-            Console.WriteLine("\t--validate or -v :: Specifies whether or not to validate the proper arguments have been given.");
-            Console.WriteLine("\t\tValue must be either 'true' or 'false'");
             Console.WriteLine("\t--printStack or -ps :: Specifies whether or not to print the full stack trace if an error occurs.");
             Console.WriteLine("\t\tValue must either be 'true' or 'false'");
             Console.WriteLine("\t--compress or -c :: Specifies whether or not to compress/decompress the encoded/decoded content.");

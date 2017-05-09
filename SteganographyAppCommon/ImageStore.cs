@@ -8,6 +8,12 @@ using System.Text;
 namespace SteganographyAppCommon
 {
 
+    public class ImageProcessingException : Exception
+    {
+        public ImageProcessingException(string message) : base(message) { }
+        public ImageProcessingException(string message, Exception inner) : base(message, inner) { }
+    }
+
     /// <summary>
     /// Static reference class containing the number of available storage bits
     /// provided by images in common resolutions.
@@ -33,7 +39,6 @@ namespace SteganographyAppCommon
         private int currentImageIndex = -1;
         private readonly int ChunkDefinitionBitSize = 32;
         public int RequiredContentChunkTableBitSize { get; private set; }
-        public bool IsLeadingImage { get; private set; }
 
         public ImageStore(InputArguments args)
         {
@@ -212,7 +217,10 @@ namespace SteganographyAppCommon
             x = 0;
             y = 0;
             currentImageIndex++;
-            IsLeadingImage = (currentImageIndex == 0) ? true : false;
+            if(currentImageIndex == args.CoverImages.Length)
+            {
+                throw new ImageProcessingException("There are not enough available store space in the provided images to process this request.");
+            }
 
             using (var image = Image.Load(args.CoverImages[currentImageIndex]))
             {
