@@ -25,10 +25,13 @@ namespace SteganographyAppCommon
     {
 
         /// <summary>
-        /// Reads in a file and transform the file to an encrypted binary string.
+        /// Takes in a raw byte array, compresses, encodes base64, encrypts, and then
+        /// returns as a binary string.
         /// </summary>
-        /// <param name="input">The path to the file to read in</param>
+        /// <param name="bytes">The array of bytes to be encoded as a binary string.</param>
         /// <param name="password">The password used to encrypt the contents of the file.
+        /// <param name="useCompression">Tells the encoder whether or not to compress the input
+        /// byte array.</param>
         /// If an empty string is provided then no encryption will be performed.</param>
         /// <returns>An binary string made up of the base64 bytes read from the file and
         /// possibly passed through an AES cipher.</returns>
@@ -71,6 +74,8 @@ namespace SteganographyAppCommon
         /// <param name="input">The encrypted binary string.</param>
         /// <param name="password">The password used to decrypt the base64 string. If no password is provided
         /// then no decryption will be done to the string.</param>
+        /// <param name="useCompression">Tells the encoder whether or not to uncompress the encoded
+        /// binary string.</param>
         /// <returns>A byte array containing the original decoded bytes of the file inputted during
         /// encoding.</returns>
         /// <exception cref="TransformationException">Thrown if an error

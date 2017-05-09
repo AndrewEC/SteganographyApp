@@ -134,6 +134,13 @@ namespace SteganographyAppCalculator
             }
         }
 
+        /// <summary>
+        /// Calculate the size of the input file.
+        /// </summary>
+        /// <param name="args">The values parsed from the command line arguments.</param>
+        /// <param name="compressed">States whether or not to compress the file or not. Overwrites the current
+        /// value in the args parameter.</param>
+        /// <returns>The size of the file in bits.</returns>
         private static int GetSize(InputArguments args, bool compressed)
         {
             int length = 0;
@@ -156,6 +163,12 @@ namespace SteganographyAppCalculator
             return length;
         }
 
+        /// <summary>
+        /// Displays a message with a completion percent.
+        /// </summary>
+        /// <param name="cur">The current step in the process.</param>
+        /// <param name="max">The value dictating the point of completion.</param>
+        /// <param name="prefix">The message to prefix to the calculated percentage.</param>
         private static void DisplayPercent(double cur, double max, string prefix)
         {
             double percent = cur / max * 100.0;

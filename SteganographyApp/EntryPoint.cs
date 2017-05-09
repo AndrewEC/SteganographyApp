@@ -8,13 +8,24 @@ namespace SteganographyApp
     public class EntryPoint
     {
 
+        /// <summary>
+        /// The model with values parsed from the user's input.
+        /// </summary>
         private readonly InputArguments args;
 
+        /// <summary>
+        /// Instantiates a new InputArguments instance with user provided
+        /// command line values.
+        /// </summary>
+        /// <param name="args">The model with values parsed from the user's input.</param>
         public EntryPoint(InputArguments args)
         {
             this.args = args;
         }
 
+        /// <summary>
+        /// Delegate method to determine which action to take based on the EncodeOrDecode action.
+        /// </summary>
         public void Start()
         {
             switch (args.EncodeOrDecode)
@@ -31,6 +42,12 @@ namespace SteganographyApp
             }
         }
 
+        /// <summary>
+        /// Starts the encoding process.
+        /// Uses the ContentReader and ImageStore to read in chunks of the input file,
+        /// encode the read content, write the content to the images, and then write the
+        /// content chunk table to the leading image.
+        /// </summary>
         private void StartEncode()
         {
             Console.WriteLine("Started encoding file {0}", args.FileToEncode);
@@ -38,7 +55,7 @@ namespace SteganographyApp
             var store = new ImageStore(args);
             int start = store.RequiredContentChunkTableBitSize;
             store.Next();
-            store.WriteAll0(start);
+            store.Seek(start);
             var table = new List<int>();
             int chunksRead = 0; //used to display how much data has been read as a percent
             using(var reader = new ContentReader(args))
@@ -73,6 +90,11 @@ namespace SteganographyApp
             Console.WriteLine("Encoding process complete.");
         }
 
+        /// <summary>
+        /// Starts the decoding process.
+        /// Reads the content chunk table, reads each chunk, decodes it, writes it to
+        /// the output file.
+        /// </summary>
         private void StartDecode()
         {
             Console.WriteLine("Decoding data to file {0}", args.DecodedOutputFile);
@@ -113,6 +135,12 @@ namespace SteganographyApp
             Console.WriteLine("Decoding process complete.");
         }
 
+        /// <summary>
+        /// Displays a message with a completion percent.
+        /// </summary>
+        /// <param name="cur">The current step in the process.</param>
+        /// <param name="max">The value dictating the point of completion.</param>
+        /// <param name="prefix">The message to prefix to the calculated percentage.</param>
         private void DisplayPercent(double cur, double max, string prefix)
         {
             double percent = cur / max * 100.0;
