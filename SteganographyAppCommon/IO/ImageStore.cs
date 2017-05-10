@@ -151,10 +151,7 @@ namespace SteganographyAppCommon.IO
                     }
                     image.Save(imagePath);
                 }
-                if(report != null)
-                {
-                    report();
-                }
+                report?.Invoke();
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-
+using System.IO;
 using SteganographyAppCommon.IO;
 using SteganographyAppCommon.IO.Content;
 using SteganographyAppCommon.Data;
@@ -19,9 +19,9 @@ namespace SteganographyAppCommon.Tests
         {
             args = new InputArguments()
             {
-                FileToEncode = "test.zip",
-                DecodedOutputFile = "testing.zip",
-                CoverImages = new string[] { "001.png" },
+                FileToEncode = "TestAssets/test.zip",
+                DecodedOutputFile = "TestAssets/testing.zip",
+                CoverImages = new string[] { "TestAssets/001.png" },
                 Password = "testing",
                 UseCompression = true
             };
@@ -32,6 +32,10 @@ namespace SteganographyAppCommon.Tests
         public void TearDown()
         {
             store.CleanAll(null);
+            if(File.Exists(args.DecodedOutputFile))
+            {
+                File.Delete(args.DecodedOutputFile);
+            }
         }
 
         [TestMethod]

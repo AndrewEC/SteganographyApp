@@ -16,8 +16,8 @@ namespace SteganographyAppCommon.Tests
         {
             args = new InputArguments
             {
-                FileToEncode = "test.zip",
-                CoverImages = new string[] { "001.png", "002.png" }
+                FileToEncode = "TestAssets/test.zip",
+                CoverImages = new string[] { "TestAssets/001.png", "TestAssets/002.png" }
             };
             store = new ImageStore(args);
         }
@@ -58,9 +58,9 @@ namespace SteganographyAppCommon.Tests
             Assert.AreEqual(65, store.RequiredContentChunkTableBitSize);
 
             args = new InputArguments();
-            args.FileToEncode = "001.png";
+            args.FileToEncode = "TestAssets/001.png";
             store = new ImageStore(args);
-            Assert.AreEqual(263, store.RequiredContentChunkTableBitSize);
+            Assert.AreEqual(65, store.RequiredContentChunkTableBitSize);
         }
 
         [TestMethod]

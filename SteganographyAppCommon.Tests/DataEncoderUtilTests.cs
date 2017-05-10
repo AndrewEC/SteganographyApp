@@ -9,8 +9,8 @@ namespace SteganographyAppCommon.Tests
     public class DataEncoderUtilTests
     {
 
-        private readonly string OutputFilePath = "output.zip";
-        private readonly string InputFile = "test.zip";
+        private readonly string OutputFilePath = "TestAssets/output.zip";
+        private readonly string InputFile = "TestAssets/test.zip";
         private readonly string Password = "testPassword";
 
         [TestCleanup]
