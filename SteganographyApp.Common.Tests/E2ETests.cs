@@ -100,5 +100,40 @@ namespace SteganographyApp.Common.Tests
             }
         }
 
+        [TestMethod]
+        public void TestCompressMismatchProducesBadFile()
+        {
+            store.Next();
+            store.Seek(store.RequiredContentChunkTableBitSize);
+            var writeTable = new List<int>(1);
+            var writeContent = "";
+            using (var reader = new ContentReader(args))
+            {
+                writeContent = reader.ReadNextChunk();
+                int written = store.Write(writeContent);
+                Assert.AreEqual(writeContent.Length, written);
+                writeTable.Add(written);
+                store.ResetTo(args.CoverImages[0]);
+                store.WriteContentChunkTable(writeTable);
+            }
+
+            store.ResetTo(args.CoverImages[0]);
+            var readTable = store.ReadContentChunkTable();
+            Assert.AreEqual(writeTable.Count, readTable.Count);
+
+            string readContent = store.Read(readTable[0]);
+            Assert.AreEqual(writeContent, readContent);
+
+            args.UseCompression = false;
+            using (var writer = new ContentWriter(args))
+            {
+                writer.WriteChunk(readContent);
+            }
+
+            long targetSize = new FileInfo(args.FileToEncode).Length;
+            long actual = new FileInfo(args.DecodedOutputFile).Length;
+            Assert.AreNotEqual(targetSize, actual, "The target file size and actual file size should not match.");
+        }
+
     }
 }
