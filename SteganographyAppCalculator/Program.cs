@@ -113,6 +113,9 @@ namespace SteganographyAppCalculator
 
                 Console.WriteLine("\nEncrypted file size is:");
                 PrintSize(size);
+
+                Console.WriteLine("\n# of images required to store this file at common resolutions:");
+                PrintComparison(size);
             }
             catch (TransformationException e)
             {
@@ -177,6 +180,20 @@ namespace SteganographyAppCalculator
             Console.WriteLine("\t{0} bytes", size / 8);
             Console.WriteLine("\t{0} KB", size / 8 / 1024);
             Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
+        }
+
+        /// <summary>
+        /// Prints how many images at common resolutions it would take to store this content.
+        /// </summary>
+        /// <param name="size">The size of the encoded file in bits.</param>
+        private static void PrintComparison(double size)
+        {
+            Console.WriteLine("\tAt 360p: \t{0}", size / CommonResolutionStorageSpace.P360);
+            Console.WriteLine("\tAt 480p: \t{0}", size / CommonResolutionStorageSpace.P480);
+            Console.WriteLine("\tAt 720p: \t{0}", size / CommonResolutionStorageSpace.P720);
+            Console.WriteLine("\tAt 1080p: \t{0}", size / CommonResolutionStorageSpace.P1080);
+            Console.WriteLine("\tAt 1440p: \t{0}", size / CommonResolutionStorageSpace.P1440);
+            Console.WriteLine("\tAt 4K (2160p): \t{0}", size / CommonResolutionStorageSpace.P2160);
         }
     }
 }
