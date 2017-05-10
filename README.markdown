@@ -5,6 +5,12 @@ Steganography is the art of hiding data in plain view by hiding it inside of oth
 
 The apptly named SteganographyApp is a command line utility that hides data inside of one or more images by modifying the least significant bit (LSB) of the RGB values in each individual pixel.
 
+Important
+---
+When you are hiding data inside in image it is important that the image uses a lossless format.
+Images such as BMP, and PNG, are both lossless and supported by the ImageSharp processing library.
+Using other formats, such as JPG, can loose data whenever the image is re-saved after being modification. Causing data loss and corruption.
+
 Current Features
 ---
 * .Net Core for cross platform support
