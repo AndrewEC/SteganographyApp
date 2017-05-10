@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using SteganographyAppCommon.Data;
+using SteganographyApp.Common.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SteganographyAppCommon.Tests
+namespace SteganographyApp.Common.Tests
 {
     [TestClass]
     public class DataEncoderUtilTests

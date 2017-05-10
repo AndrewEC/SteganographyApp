@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SteganographyAppCommon.IO.Content
+namespace SteganographyApp.Common.IO.Content
 {
     public abstract class AbstractContentIO : IDisposable
     {

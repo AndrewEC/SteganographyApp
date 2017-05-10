@@ -1,6 +1,6 @@
-﻿using SteganographyAppCommon;
-using SteganographyAppCommon.IO;
-using SteganographyAppCommon.IO.Content;
+﻿using SteganographyApp.Common;
+using SteganographyApp.Common.IO;
+using SteganographyApp.Common.IO.Content;
 using System;
 using System.Collections.Generic;
 

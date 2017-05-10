@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
-using SteganographyAppCommon.IO;
-using SteganographyAppCommon.IO.Content;
-using SteganographyAppCommon.Data;
+using SteganographyApp.Common.IO;
+using SteganographyApp.Common.IO.Content;
+using SteganographyApp.Common.Data;
 
-namespace SteganographyAppCommon.Tests
+namespace SteganographyApp.Common.Tests
 {
     [TestClass]
     public class E2ETests
