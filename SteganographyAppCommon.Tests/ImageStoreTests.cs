@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using SteganographyAppCommon.IO;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SteganographyAppCommon.Tests
 {

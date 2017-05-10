@@ -1,11 +1,10 @@
-﻿using System;
-using System.Text;
+﻿using Rijndael256;
+using System;
 using System.IO;
-
-using Rijndael256;
 using System.IO.Compression;
+using System.Text;
 
-namespace SteganographyAppCommon
+namespace SteganographyAppCommon.Data
 {
     /// <summary>
     /// A case class inheriting from Exception that specifies an error occured

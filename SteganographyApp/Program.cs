@@ -1,6 +1,6 @@
-﻿using System;
-
-using SteganographyAppCommon;
+﻿using SteganographyAppCommon;
+using SteganographyAppCommon.Data;
+using System;
 
 namespace SteganographyApp
 {

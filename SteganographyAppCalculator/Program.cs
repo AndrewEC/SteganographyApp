@@ -1,7 +1,9 @@
-﻿using System;
-
-using ImageSharp;
+﻿using ImageSharp;
 using SteganographyAppCommon;
+using SteganographyAppCommon.Data;
+using SteganographyAppCommon.IO;
+using SteganographyAppCommon.IO.Content;
+using System;
 
 namespace SteganographyAppCalculator
 {

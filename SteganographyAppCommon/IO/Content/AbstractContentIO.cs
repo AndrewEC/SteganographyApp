@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
-namespace SteganographyAppCommon
+namespace SteganographyAppCommon.IO.Content
 {
     public abstract class AbstractContentIO : IDisposable
     {
@@ -31,6 +29,7 @@ namespace SteganographyAppCommon
         {
             if(stream != null)
             {
+                stream.Flush();
                 stream.Dispose();
             }
         }

@@ -1,7 +1,8 @@
 ﻿using SteganographyAppCommon;
+using SteganographyAppCommon.IO;
+using SteganographyAppCommon.IO.Content;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SteganographyApp
 {
@@ -111,21 +112,6 @@ namespace SteganographyApp
             Console.WriteLine("Encoding process complete.");
         }
 
-        private void PrintUnused(List<string> imagesUsed)
-        {
-            if(imagesUsed.Count == args.CoverImages.Length)
-            {
-                return;
-            }
-            Console.WriteLine("Not all images were used when encoding/decoding the file contents.");
-            Console.WriteLine("The following files were used:");
-            foreach(string image in imagesUsed)
-            {
-                Console.WriteLine("\t{0}", image);
-            }
-            Console.Write("Any image not specified in the list is not needed to decode the original file.\n");
-        }
-
         /// <summary>
         /// Starts the decoding process.
         /// Reads the content chunk table, reads each chunk, decodes it, writes it to
@@ -165,6 +151,10 @@ namespace SteganographyApp
                             DisplayPercent(chunksWritten, chunkTable.Count, "Decoding file contents"); //used to display how much data has been read as a percent
                             binary = "";
                             stillReading = false;
+                            if(!imagesUsed.Contains(store.CurrentImage))
+                            {
+                                imagesUsed.Add(store.CurrentImage);
+                            }
                         }
                     }
                 }
@@ -188,6 +178,28 @@ namespace SteganographyApp
                 percent = 100.0;
             }
             Console.Write("{0} :: {1}%\r", prefix, (int)percent);
+        }
+
+        /// <summary>
+        /// Utility method to print out a list the list of images that were used in the
+        /// encoding decoding process. Will only print something out it the number of image
+        /// uses was less than the number of images parsed in the arguments.
+        /// </summary>
+        /// <param name="imagesUsed">A list containing the names of the images used in the
+        /// encoding/decoding process.</param>
+        private void PrintUnused(List<string> imagesUsed)
+        {
+            if (imagesUsed.Count == args.CoverImages.Length)
+            {
+                return;
+            }
+            Console.WriteLine("Not all images were used when encoding/decoding the file contents.");
+            Console.WriteLine("The following files were used:");
+            foreach (string image in imagesUsed)
+            {
+                Console.WriteLine("\t{0}", image);
+            }
+            Console.Write("Any image not specified in the list is not needed to decode the original file.\n");
         }
 
     }

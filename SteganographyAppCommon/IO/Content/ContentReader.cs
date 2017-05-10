@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SteganographyAppCommon.Data;
+using System;
 using System.IO;
-using System.Text;
 
-namespace SteganographyAppCommon
+namespace SteganographyAppCommon.IO.Content
 {
 
     /// <summary>
