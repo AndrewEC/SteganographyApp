@@ -108,23 +108,11 @@ namespace SteganographyAppCalculator
         {
             try
             {
-                Console.WriteLine("\nCalculating compressed size.");
-                double compressedSpace = GetSize(args, true);
+                Console.WriteLine("\nCalculating encrypted size.");
+                double size = GetSize(args);
 
-                Console.WriteLine("\nCalculating uncompressed size.");
-                double uncompressedSpace = GetSize(args, false);
-
-                Console.WriteLine("\nCompressed file size is:");
-                PrintSize(compressedSpace);
-
-                Console.WriteLine("\nUncompressed file size is:");
-                PrintSize(uncompressedSpace);
-
-                Console.WriteLine("\nUsing compression you will save: ");
-                PrintSize(uncompressedSpace - compressedSpace);
-
-                Console.WriteLine("\nRequired images to store file at common resolutions:");
-                PrintComparison((compressedSpace < uncompressedSpace) ? compressedSpace : uncompressedSpace);
+                Console.WriteLine("\nEncrypted file size is:");
+                PrintSize(size);
             }
             catch (TransformationException e)
             {
@@ -143,11 +131,9 @@ namespace SteganographyAppCalculator
         /// <param name="compressed">States whether or not to compress the file or not. Overwrites the current
         /// value in the args parameter.</param>
         /// <returns>The size of the file in bits.</returns>
-        private static int GetSize(InputArguments args, bool compressed)
+        private static int GetSize(InputArguments args)
         {
             int length = 0;
-            bool old = args.UseCompression;
-            args.UseCompression = compressed;
             int reads = 0;
             using (var reader = new ContentReader(args))
             {
@@ -159,9 +145,8 @@ namespace SteganographyAppCalculator
                     length += content.Length;
                 }
             }
-            Console.WriteLine("Completed calculating file size");
-            args.UseCompression = old;
             length += new ImageStore(args).RequiredContentChunkTableBitSize;
+            Console.WriteLine("Completed calculating file size");
             return length;
         }
 
@@ -192,20 +177,6 @@ namespace SteganographyAppCalculator
             Console.WriteLine("\t{0} bytes", size / 8);
             Console.WriteLine("\t{0} KB", size / 8 / 1024);
             Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
-        }
-
-        /// <summary>
-        /// Prints how many images at common resolutions it would take to store this content.
-        /// </summary>
-        /// <param name="size">The size of the encoded file in bits.</param>
-        private static void PrintComparison(double size)
-        {
-            Console.WriteLine("\tAt 360p: \t{0}", size / CommonResolutionStorageSpace.P360);
-            Console.WriteLine("\tAt 480p: \t{0}", size / CommonResolutionStorageSpace.P480);
-            Console.WriteLine("\tAt 720p: \t{0}", size / CommonResolutionStorageSpace.P720);
-            Console.WriteLine("\tAt 1080p: \t{0}", size / CommonResolutionStorageSpace.P1080);
-            Console.WriteLine("\tAt 1440p: \t{0}", size / CommonResolutionStorageSpace.P1440);
-            Console.WriteLine("\tAt 4K (2160p): \t{0}", size / CommonResolutionStorageSpace.P2160);
         }
     }
 }
