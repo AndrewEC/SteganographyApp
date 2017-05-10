@@ -312,6 +312,11 @@ namespace SteganographyApp.Common.IO
             }
         }
 
+        /// <summary>
+        /// Moves the current index back to the index before the specified image
+        /// then calls the Next method to advance to the specified image.
+        /// </summary>
+        /// <param name="imageName">The image name to start reading and writing from.</param>
         public void ResetTo(string imageName)
         {
             currentImageIndex = Array.IndexOf(args.CoverImages, imageName) - 1;
