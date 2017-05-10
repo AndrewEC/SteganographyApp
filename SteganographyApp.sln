@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteganographyApp", "SteganographyApp\SteganographyApp.csproj", "{C43066A1-3FA6-4F95-A85E-6426F13A7623}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteganographyApp", "SteganographyApp\SteganographyApp.csproj", "{C43066A1-3FA6-4F95-A85E-6426F13A7623}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteganographyAppCommon", "SteganographyAppCommon\SteganographyAppCommon.csproj", "{D80D3CBF-241F-4FFC-BA33-180D6D4FC5DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteganographyApp.Calculator", "SteganographyApp.Calculator\SteganographyApp.Calculator.csproj", "{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteganographyAppCalculator", "SteganographyAppCalculator\SteganographyAppCalculator.csproj", "{80CE4844-0E11-42E7-B682-CDF4AE46E581}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteganographyApp.Common", "SteganographyApp.Common\SteganographyApp.Common.csproj", "{13602190-A2CA-4387-BD3F-F77418A88B4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteganographyAppCommon.Tests", "SteganographyAppCommon.Tests\SteganographyAppCommon.Tests.csproj", "{6F4B563D-E31E-4968-AD87-0B686D7FF76A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteganographyApp.Common.Tests", "SteganographyApp.Common.Tests\SteganographyApp.Common.Tests.csproj", "{A8ED516F-EB4C-4EF5-8EC0-CCD28A280CEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +21,18 @@ Global
 		{C43066A1-3FA6-4F95-A85E-6426F13A7623}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C43066A1-3FA6-4F95-A85E-6426F13A7623}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C43066A1-3FA6-4F95-A85E-6426F13A7623}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D80D3CBF-241F-4FFC-BA33-180D6D4FC5DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D80D3CBF-241F-4FFC-BA33-180D6D4FC5DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D80D3CBF-241F-4FFC-BA33-180D6D4FC5DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D80D3CBF-241F-4FFC-BA33-180D6D4FC5DD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80CE4844-0E11-42E7-B682-CDF4AE46E581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80CE4844-0E11-42E7-B682-CDF4AE46E581}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80CE4844-0E11-42E7-B682-CDF4AE46E581}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80CE4844-0E11-42E7-B682-CDF4AE46E581}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6F4B563D-E31E-4968-AD87-0B686D7FF76A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F4B563D-E31E-4968-AD87-0B686D7FF76A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F4B563D-E31E-4968-AD87-0B686D7FF76A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F4B563D-E31E-4968-AD87-0B686D7FF76A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13602190-A2CA-4387-BD3F-F77418A88B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13602190-A2CA-4387-BD3F-F77418A88B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13602190-A2CA-4387-BD3F-F77418A88B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13602190-A2CA-4387-BD3F-F77418A88B4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8ED516F-EB4C-4EF5-8EC0-CCD28A280CEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8ED516F-EB4C-4EF5-8EC0-CCD28A280CEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8ED516F-EB4C-4EF5-8EC0-CCD28A280CEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8ED516F-EB4C-4EF5-8EC0-CCD28A280CEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

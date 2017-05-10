@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SteganographyAppCommon\SteganographyAppCommon.csproj" />
+    <ProjectReference Include="..\SteganographyApp.Common\SteganographyApp.Common.csproj" />
   </ItemGroup>
 
 </Project>

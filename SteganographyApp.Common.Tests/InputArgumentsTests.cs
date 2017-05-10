@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace SteganographyAppCommon.Tests
+namespace SteganographyApp.Common.Tests
 {
 
     [TestClass]

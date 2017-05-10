@@ -1,12 +1,12 @@
 ﻿using ImageSharp;
-using SteganographyAppCommon.IO.Content;
+using SteganographyApp.Common.IO.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace SteganographyAppCommon.IO
+namespace SteganographyApp.Common.IO
 {
 
     /// <summary>

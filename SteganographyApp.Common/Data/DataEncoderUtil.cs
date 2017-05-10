@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-namespace SteganographyAppCommon.Data
+namespace SteganographyApp.Common.Data
 {
     /// <summary>
     /// A case class inheriting from Exception that specifies an error occured

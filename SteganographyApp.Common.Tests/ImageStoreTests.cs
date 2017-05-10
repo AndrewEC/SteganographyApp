@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SteganographyAppCommon.IO;
+using SteganographyApp.Common.IO;
 using System.Collections.Generic;
 
-namespace SteganographyAppCommon.Tests
+namespace SteganographyApp.Common.Tests
 {
     [TestClass]
     public class ImageStoreTests
