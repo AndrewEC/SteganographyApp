@@ -9,7 +9,7 @@ Important
 ---
 When you are hiding data inside in image it is important that the image uses a lossless format.
 Images such as BMP, and PNG, are both lossless and supported by the ImageSharp processing library.
-Using other formats, such as JPG, can loose data whenever the image is re-saved after being modification. Causing data loss and corruption.
+Using other formats, such as JPG, can cause data loss when saving any modifications to the image.
 
 Current Features
 ---
