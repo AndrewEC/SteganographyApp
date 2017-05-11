@@ -19,7 +19,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Parse(null);
+                ArgumentParser.Instance.Parse(null);
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -34,7 +34,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Parse(new string[] { "test=1" });
+                ArgumentParser.Instance.Parse(new string[] { "test=1" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -49,7 +49,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Parse(new string[] { "--name=" });
+                ArgumentParser.Instance.Parse(new string[] { "--name=" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -64,7 +64,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Parse(new string[] { "--name" });
+                ArgumentParser.Instance.Parse(new string[] { "--name" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -79,7 +79,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Parse(new string[] { "--action=whatever" });
+                ArgumentParser.Instance.Parse(new string[] { "--action=whatever" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -95,7 +95,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Parse(new string[] { "--action=encode" });
+                ArgumentParser.Instance.Parse(new string[] { "--action=encode" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -110,13 +110,14 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Parse(new string[] { "--input=test!@#.png" });
+                ArgumentParser.Instance.Parse(new string[] { "--input=test!@#.png" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
             {
                 Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.AreEqual("File to decode could not be found at test!@#.png", e.Message, MisMatchInnerExceptionMessage);
+                Assert.IsNotNull(e.InnerException);
+                Assert.AreEqual("File to decode could not be found at test!@#.png", e.InnerException.Message, MisMatchInnerExceptionMessage);
             }
         }
 
@@ -125,7 +126,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Parse(new string[] { "--images=test!@#.png" });
+                ArgumentParser.Instance.Parse(new string[] { "--images=test!@#.png" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)

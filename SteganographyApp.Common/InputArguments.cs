@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SteganographyApp.Common
 {
@@ -37,7 +38,7 @@ namespace SteganographyApp.Common
     }
 
     ///<summary>
-    /// Static utility class to parse the provided array of arguments and return and instance of
+    /// Singleton utility class to parse the provided array of arguments and return and instance of
     /// InputArguments with the required values
     ///</summary>
     public class ArgumentParser
@@ -50,6 +51,50 @@ namespace SteganographyApp.Common
         private static readonly string NoMissingValues = "NoMissingValues";
 
         /// <summary>
+        /// Takes in a value retrieved from an associated key, parses it, and sets the
+        /// relevant property value in the InputArguments instance
+        /// </summary>
+        /// <param name="args">The InputArguments param to modify.</param>
+        /// <param name="value">The value of the key/value pair from the array of arguments.</param>
+        public delegate void ValueParser(InputArguments args, string value);
+
+        /// <summary>
+        /// A dictionary containing all of the keys and associated delegate methods
+        /// to parse user provided values and sets values in the InputArguments instance.
+        /// </summary>
+        private Dictionary<string, ValueParser> valueProcessors;
+
+        /// <summary>
+        /// The singleton instance of the ArgumentParse class
+        /// </summary>
+        private static ArgumentParser instance;
+        public static ArgumentParser Instance
+        {
+            get
+            {
+                if(instance == null)
+                {
+                    instance = new ArgumentParser();
+                }
+                return instance;
+            }
+        }
+
+        private ArgumentParser()
+        {
+            valueProcessors = new Dictionary<string, ValueParser>
+            {
+                { "--action", ParseEncodeOrDecodeAction },
+                { "--input", ParseFileToEncode },
+                { "--compress", ParseUseCompression },
+                { "--printStack", ParsePrintStack },
+                { "--images", ParseImages },
+                { "--password", (arguments, value) => { arguments.Password = value; } },
+                { "--output", (arguments, value) => { arguments.DecodedOutputFile = value; } }
+            };
+        }
+
+        /// <summary>
         /// Parses the array of command line arguments and returns a new instance of InputArguments.
         /// <para>Requires that all arguments be in the format matching --action=decode with a proper key before the = sign
         /// and a non-empty value that meets the validation criteria.</para>
@@ -58,7 +103,7 @@ namespace SteganographyApp.Common
         /// <returns>A new InputArgumentsInstance with property values parsed from the user provided arguments.</returns>
         /// <exception cref="ArgumentParseException">Thrown if an argument has an invalid key,
         /// if a required argument was missing or is an exception was thrown while trying to parse the value of the argument.</exception>
-        public static InputArguments Parse(string[] args)
+        public InputArguments Parse(string[] args)
         {
             if (args == null || args.Length == 0)
             {
@@ -87,71 +132,22 @@ namespace SteganographyApp.Common
                     throw new ArgumentParseException(String.Format("Value for argument {0} was empty. A value must be provided for all specified arguments.", key));
                 }
 
-                switch (key)
+                if(valueProcessors.TryGetValue(key, out ValueParser processor))
                 {
-                    case "--action":
-                    case "-a":
-                        try
-                        {
-                            arguments.EncodeOrDecode = ParseEncodeOrDecodeAction(value);
-                        }
-                        catch (ArgumentValueException e)
-                        {
-                            throw new ArgumentParseException(String.Format("An error occured while parsing argument {0}", key), e);
-                        }
-                        break;
-                    case "--input":
-                    case "-i":
-                        arguments.FileToEncode = value;
-                        if (!System.IO.File.Exists(value))
-                        {
-                            throw new ArgumentParseException(String.Format("File to decode could not be found at {0}", value));
-                        }
-                        break;
-                    case "--output":
-                    case "-o":
-                        arguments.DecodedOutputFile = value;
-                        break;
-                    case "--images":
-                    case "-im":
-                        try
-                        {
-                            arguments.CoverImages = ParseImages(value);
-                        }
-                        catch (ArgumentValueException e)
-                        {
-                            throw new ArgumentParseException(String.Format("An error occured while parsing argument {0}", key), e);
-                        }
-                        break;
-                    case "--password":
-                    case "-p":
-                        arguments.Password = value;
-                        break;
-                    case "--printStack":
-                    case "-ps":
-                        try
-                        {
-                            arguments.PrintStack = Boolean.Parse(value);
-                        }
-                        catch (Exception e)
-                        {
-                            throw new ArgumentParseException(String.Format("Could not parse value for argument {0}", key), e);
-                        }
-                        break;
-                    case "--compress":
-                    case "-c":
-                        try
-                        {
-                            arguments.UseCompression = Boolean.Parse(value);
-                        }
-                        catch (Exception e)
-                        {
-                            throw new ArgumentParseException(String.Format("Could not parse value for argument {0}", key), e);
-                        }
-                        break;
-                    default:
-                        throw new ArgumentParseException(String.Format("An invalid key value was provided: {0}", key));
+                    try
+                    {
+                        processor(arguments, value);
+                    }
+                    catch (ArgumentValueException e)
+                    {
+                        throw new ArgumentParseException(String.Format("An error occured while parsing argument {0}", key), e);
+                    }
                 }
+                else
+                {
+                    throw new ArgumentParseException(String.Format("An invalid key value was provided: {0}", key));
+                }
+                
             }
 
             string validation = ValidateParseResult(arguments);
@@ -164,83 +160,86 @@ namespace SteganographyApp.Common
         }
 
         /// <summary>
-        /// Takes in a value for the --length parameter and attempts to parse the
-        /// string to an int where int >= 8 and int % 8 == 0
+        /// Parses a boolean from the value and sets the PrintStack property
         /// </summary>
-        /// <param name="value">A string containing a integer representation of the
-        /// number of bits to decode.</param>
-        /// <returns>An int value that is > 8 and a multiple of 8</returns>
-        /// <exception cref="ArgumentValueException">Thrown if the string value cannot be
-        /// parsed into an int, if the parsed value is less then 8, or if the value is not a multiple of 8.</exception>
-        private static int ParseDecodeLength(string value)
+        /// <param name="arguments">The InputArguments value to modify</param>
+        /// <param name="value">A string representation of a boolean value.</param>
+        /// <exception cref="ArgumentValueException">Thrown if a boolean value could not
+        /// be parsed from the value parameter.</exception>
+        private void ParsePrintStack(InputArguments arguments, string value)
         {
             try
             {
-                int length = Convert.ToInt32(value);
-                if (length < 8 || length % 8 != 0)
-                {
-                    throw new ArgumentValueException("Decode value must be a whole number that is 8 or greater and evenly divisiable by 8.");
-                }
-                return length;
+                arguments.PrintStack = Boolean.Parse(value);
             }
             catch (Exception e)
             {
-                if (e.GetType() == typeof(ArgumentValueException))
-                {
-                    throw e;
-                }
-                throw new ArgumentValueException("Not a valid 32bit Int value.");
+                throw new ArgumentValueException(String.Format("Could not parse value for argument: {0}", e.Message));
             }
         }
 
         /// <summary>
-        /// Takes in a string representation of the EncodeDecodeAction and returns an instance of
-        /// EncodeDecodeAction.
+        /// Checks if the specified file, value, exists and then sets the
+        /// FileToEncode property.
         /// </summary>
+        /// <param name="arguments">The InputArguments instance to modify.</param>
+        /// <param name="value">The relative or absolute path to the file to encode.</param>
+        /// <exception cref="ArgumentValueException">Thrown if the specified input file
+        /// could not be found.</exception>
+        private void ParseFileToEncode(InputArguments arguments, string value)
+        {
+            if(!System.IO.File.Exists(value))
+            {
+                throw new ArgumentValueException(String.Format("File to decode could not be found at {0}", value));
+            }
+            arguments.FileToEncode = value;
+        }
+
+        /// <summary>
+        /// Parses a boolean from the value string and sets the UseCompression property.
+        /// </summary>
+        /// <param name="arguments">The InputArguments instance to modify</param>
+        /// <param name="value">A string representation of a boolean value.</param>
+        /// <exception cref="ArgumentValueException">Thrown if a boolean value could not be parsed
+        /// from the value parameter</exception>
+        private void ParseUseCompression(InputArguments arguments, string value)
+        {
+            try
+            {
+                arguments.UseCompression = Boolean.Parse(value);
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentValueException(String.Format("Could not parse value for argument: {0}", e.Message));
+            }
+        }
+
+        /// <summary>
+        /// Sets the EncodeDecode action based on the value returned from the Enum.TryParse method.
+        /// </summary>
+        /// <param name="args">The InputArguments instance to make modifications to.</param>
         /// <param name="value">A string representation of an EncodeDecodeAction enum value.</param>
-        /// <returns>A enum value of type EncodeDecodeAction as determined by the input string.</returns>
         /// <exception cref="ArgumentValueException">Thrown if
         /// the string value does not map to an enum value.</exception>
-        private static EncodeDecodeAction ParseEncodeOrDecodeAction(string value)
+        private void ParseEncodeOrDecodeAction(InputArguments args, string value)
         {
-            EncodeDecodeAction action;
-            if (value.ToLower() == "encode")
-            {
-                action = EncodeDecodeAction.Encode;
-            }
-            else if (value.ToLower() == "decode")
-            {
-                action = EncodeDecodeAction.Decode;
-            }
-            else if (value.ToLower() == "calculate-storage-space")
-            {
-                action = EncodeDecodeAction.CalculateStorageSpace;
-            }
-            else if (value.ToLower() == "calculate-encrypted-size")
-            {
-                action = EncodeDecodeAction.CalculateEncryptedSize;
-            }
-            else if (value.ToLower() == "clean")
-            {
-                action = EncodeDecodeAction.Clean;
-            }
-            else
+            value = value.Replace("-", "");
+            if(!Enum.TryParse(value, true, out EncodeDecodeAction action))
             {
                 throw new ArgumentValueException(String.Format("Invalid value for action argument. Expected 'encode', 'decode', 'clean', 'calculate-storage-space', or 'calculate-encrypted-size' got {0}", value));
             }
-            return action;
+            args.EncodeOrDecode = action;
         }
 
         /// <summary>
         /// Takes in a string of comma delimited image names and returns an array of strings.
         /// </summary>
+        /// /// <param name="arguments">The input arguments instance to make modifications to.</param>
         /// <param name="value">A string representation of a number, or a single, image where encoded
         /// data will be writted to or where decoded data will be read from.</param>
-        /// <returns>A string array containing the names of all the images. If no comma was specified
-        /// in the string then an array with a length of 1 will be returned.</returns>
         /// <exception cref="ArgumentValueException">Thrown if the image
         /// could not be found at the specified path.</exception>
-        private static string[] ParseImages(string value)
+        private void ParseImages(InputArguments arguments, string value)
         {
             string[] images;
             if (value.Contains(","))
@@ -261,7 +260,7 @@ namespace SteganographyApp.Common
                     throw new ArgumentValueException(String.Format("Image could not be found at {0}", images[i]));
                 }
             }
-            return images;
+            arguments.CoverImages = images;
         }
 
         /// <summary>
@@ -272,7 +271,7 @@ namespace SteganographyApp.Common
         /// from user provdied arguments.</param>
         /// <returns>Returns a string with information stating what required argument values are missing.
         /// If no values are missing then NoMissingValues will be returned.</returns>
-        private static string ValidateParseResult(InputArguments input)
+        private string ValidateParseResult(InputArguments input)
         {
             if (input.EncodeOrDecode == EncodeDecodeAction.Encode)
             {
