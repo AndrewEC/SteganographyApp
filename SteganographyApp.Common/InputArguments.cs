@@ -165,6 +165,8 @@ namespace SteganographyApp.Common
         /// </summary>
         /// <param name="arguments">The InputArguments instance to modify.</param>
         /// <param name="value">The string representation of an int value.</param>
+        /// <exception cref="ArgumentValueException">Thrown if the string value could not be converted
+        /// to an int or if the value of the int is less than or equal to 0.</exception>
         private void ParseChunkSize(InputArguments arguments, string value)
         {
             try
