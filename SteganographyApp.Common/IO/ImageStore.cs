@@ -295,11 +295,19 @@ namespace SteganographyApp.Common.IO
         /// of data stored in the current set of images.</returns>
         public List<int> ReadContentChunkTable()
         {
+            //The size of each table entry plus the one padding bit to fill out a full pixel
+            int chunkSizeAndPadding = ChunkDefinitionBitSize + 1;
+
+            //Read the number of entries in the table
             int tableLength = Convert.ToInt32(Read(ChunkDefinitionBitSize), 2);
-            var table = new List<int>(tableLength);
-            for (int i = 0; i < tableLength; i++)
+
+            //Read all the available entries in the table
+            string rawTable = Read(tableLength * (chunkSizeAndPadding));
+            var table = new List<int>();
+            for (int i = 0; i < rawTable.Length; i += chunkSizeAndPadding)
             {
-                table.Add(Convert.ToInt32(Read(ChunkDefinitionBitSize), 2));
+                int entry = Convert.ToInt32(rawTable.Substring(i, ChunkDefinitionBitSize), 2);
+                table.Add(entry);
             }
             return table;
         }
@@ -312,15 +320,16 @@ namespace SteganographyApp.Common.IO
         /// originally written to the target images during the encoding process.</param>
         public void WriteContentChunkTable(List<int> table)
         {
-            string chunkCountBits = Convert.ToString(table.Count, 2).PadLeft(ChunkDefinitionBitSize, '0');
-            Write(chunkCountBits);
+            var binary = new StringBuilder("");
+            binary.Append(Convert.ToString(table.Count, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
+            
             int count = 0;
             foreach (int chunkLength in table)
             {
                 count++;
-                string chunkLengthBits = Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0');
-                Write(chunkLengthBits);
+                binary.Append(Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
             }
+            Write(binary.ToString());
         }
 
         /// <summary>
