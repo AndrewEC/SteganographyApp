@@ -121,7 +121,7 @@ namespace SteganographyApp.Common.IO
 
             if (args.FileToEncode.Length > 0)
             {
-                int start = (int)(Math.Ceiling((double)(new FileInfo(args.FileToEncode).Length) / ContentReader.ChunkByteSize));
+                int start = (int)(Math.Ceiling((double)(new FileInfo(args.FileToEncode).Length) / args.ChunkByteSize));
                 RequiredContentChunkTableBitSize = start * ChunkDefinitionBitSize + ChunkDefinitionBitSize + start;
             }
         }

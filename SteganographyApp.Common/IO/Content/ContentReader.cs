@@ -13,13 +13,6 @@ namespace SteganographyApp.Common.IO.Content
     {
 
         /// <summary>
-        /// Specifies the chunk size. I.e. the number of bytes to read, encode,
-        /// and write at any given time.
-        /// <para>Value of 131,072</para>
-        /// </summary>
-        public static readonly int ChunkByteSize = 131_072;
-
-        /// <summary>
         /// Specifies the number of iterations it will take to read the file based on the size
         /// of the file and the size of the file.
         /// <para>Value is readonly.</para>
@@ -33,7 +26,7 @@ namespace SteganographyApp.Common.IO.Content
         /// <param name="args">The values parsed from the command line values.</param>
         public ContentReader(InputArguments args) : base(args)
         {
-            RequiredNumberOfReads = (int)Math.Ceiling(new FileInfo(args.FileToEncode).Length / (double)ChunkByteSize);
+            RequiredNumberOfReads = (int)Math.Ceiling(new FileInfo(args.FileToEncode).Length / (double)args.ChunkByteSize);
         }
 
         /// <summary>
@@ -49,13 +42,13 @@ namespace SteganographyApp.Common.IO.Content
             {
                 stream = File.OpenRead(args.FileToEncode);
             }
-            byte[] buffer = new byte[ChunkByteSize];
+            byte[] buffer = new byte[args.ChunkByteSize];
             int read = stream.Read(buffer, 0, buffer.Length);
             if (read == 0)
             {
                 return null;
             }
-            else if (read < ChunkByteSize)
+            else if (read < args.ChunkByteSize)
             {
                 byte[] actual = new byte[read];
                 Array.Copy(buffer, actual, read);

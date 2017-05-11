@@ -90,7 +90,8 @@ namespace SteganographyApp.Common
                 { "--printStack", ParsePrintStack },
                 { "--images", ParseImages },
                 { "--password", (arguments, value) => { arguments.Password = value; } },
-                { "--output", (arguments, value) => { arguments.DecodedOutputFile = value; } }
+                { "--output", (arguments, value) => { arguments.DecodedOutputFile = value; } },
+                { "--chunkSize", ParseChunkSize }
             };
         }
 
@@ -160,9 +161,30 @@ namespace SteganographyApp.Common
         }
 
         /// <summary>
+        /// Parses an int32 from the value string and sets the ChunkByteSize property
+        /// </summary>
+        /// <param name="arguments">The InputArguments instance to modify.</param>
+        /// <param name="value">The string representation of an int value.</param>
+        private void ParseChunkSize(InputArguments arguments, string value)
+        {
+            try
+            {
+                arguments.ChunkByteSize = Convert.ToInt32(value);
+                if(arguments.ChunkByteSize <= 0)
+                {
+                    throw new ArgumentValueException("The chunk size value must be a positive whole number with a value more than 0.");
+                }
+            }
+            catch(Exception e)
+            {
+                throw new ArgumentValueException(String.Format("Could not parse chunk value from value {0}", value), e);
+            }
+        }
+
+        /// <summary>
         /// Parses a boolean from the value and sets the PrintStack property
         /// </summary>
-        /// <param name="arguments">The InputArguments value to modify</param>
+        /// <param name="arguments">The InputArguments instance to modify</param>
         /// <param name="value">A string representation of a boolean value.</param>
         /// <exception cref="ArgumentValueException">Thrown if a boolean value could not
         /// be parsed from the value parameter.</exception>
@@ -325,5 +347,12 @@ namespace SteganographyApp.Common
         public EncodeDecodeAction EncodeOrDecode { get; set; }
         public bool PrintStack { get; set; } = false;
         public bool UseCompression { get; set; } = false;
+
+        /// <summary>
+        /// Specifies the chunk size. I.e. the number of bytes to read, encode,
+        /// and write at any given time.
+        /// <para>Value of 131,072</para>
+        /// </summary>
+        public int ChunkByteSize { get; set; } = 131_072;
     }
 }

@@ -61,19 +61,21 @@ namespace SteganographyApp
             Console.WriteLine("\t\tdotnet .\\SteganographApp =-action=encode --images=001.png,002.png --input=FileToEncode.zip --password=Pass1234 --randomSeed=monkey --compress=true");
             Console.WriteLine("\tExample arguments for decoding data from a set of images to an output file.");
             Console.WriteLine("\t\tdotnet .\\SteganpgraphyApp --action=decode --images=001.png,002.png --output=DecodedOutputFile.zip --password=Pass1234 --randomSeed=monkey --compress=true\n");
-            Console.WriteLine("\t--action or -a :: Specifies whether to 'encode' a file to a set of images or 'decode' a set of images to a file.");
+            Console.WriteLine("\t--action :: Specifies whether to 'encode' a file to a set of images or 'decode' a set of images to a file.");
             Console.WriteLine("\t\tValue must be either 'encode', 'decode', or 'clean'.");
             Console.WriteLine("\t\tClean specifies that all LSBs in the set of images will be overwritten with garbage values.");
-            Console.WriteLine("\t--input or -i :: The path to the file to encode if 'encode' was specified in the action argument.");
-            Console.WriteLine("\t--output or -o :: The path to the output file when 'decode' was specified in the action argument.");
-            Console.WriteLine("\t--images or -im :: A comma delimited list of paths to images to be either encoded or decoded");
+            Console.WriteLine("\t--input :: The path to the file to encode if 'encode' was specified in the action argument.");
+            Console.WriteLine("\t--output :: The path to the output file when 'decode' was specified in the action argument.");
+            Console.WriteLine("\t--images :: A comma delimited list of paths to images to be either encoded or decoded");
             Console.WriteLine("\t\tThe order of the images affects the encoding and decoding results.");
-            Console.WriteLine("\t--passsword or -p :: The password to encrypt the input file when 'encode' was specified in the action argument.");
-            Console.WriteLine("\t--printStack or -ps :: Specifies whether or not to print the full stack trace if an error occurs.");
+            Console.WriteLine("\t--passsword :: The password to encrypt the input file when 'encode' was specified in the action argument.");
+            Console.WriteLine("\t--printStack :: Specifies whether or not to print the full stack trace if an error occurs.");
             Console.WriteLine("\t\tValue must either be 'true' or 'false'");
-            Console.WriteLine("\t--compress or -c :: Specifies whether or not to compress/decompress the encoded/decoded content.");
+            Console.WriteLine("\t--compress :: Specifies whether or not to compress/decompress the encoded/decoded content.");
             Console.WriteLine("\t\tValue must be either 'true' or 'false'.");
-            Console.WriteLine("");
+            Console.WriteLine("\t--chunkSize :: Specifies the number of bytes to read in each read, encode, and store operation");
+            Console.WriteLine("\t\tValue needs to be a positive whole number.");
+            Console.WriteLine();
         }
     }
 }
