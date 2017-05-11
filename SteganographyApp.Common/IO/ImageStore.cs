@@ -40,9 +40,6 @@ namespace SteganographyApp.Common.IO
     public class ImageStore
     {
 
-        private int[] rowPositions;
-        private int[] colPositions;
-
         /// <summary>
         /// Callback method for the Clean method to return the
         /// current progress back to the entry point so progress can be
@@ -61,9 +58,18 @@ namespace SteganographyApp.Common.IO
         private int y = 0;
 
         /// <summary>
-        /// The values parsed from the command line arguments.
+        /// The width of the image located at the current image index.
+        /// This value is set whenever the Next method is called and the
+        /// image index is incremented.
         /// </summary>
-        private readonly InputArguments args;
+        private int currentImageWidth;
+
+        /// <summary>
+        /// The height of the image located at the current image index.
+        /// This value is set whenever the Next method is called and the
+        /// image index is incremented.
+        /// </summary>
+        private int currentImageHeight;
 
         /// <summary>
         /// The index used to determine which image will be read/written to in the
@@ -72,6 +78,11 @@ namespace SteganographyApp.Common.IO
         /// using this field as the index.</para>
         /// </summary>
         private int currentImageIndex = -1;
+
+        /// <summary>
+        /// The values parsed from the command line arguments.
+        /// </summary>
+        private readonly InputArguments args;
 
         /// <summary>
         /// Specifies the number of bits that will be reserved for each entry in the content
@@ -174,7 +185,7 @@ namespace SteganographyApp.Common.IO
                 {
                     for (int i = 0; i < binary.Length; i += 3)
                     {
-                        Rgba32 pixel = pixels[colPositions[x], rowPositions[y]];
+                        Rgba32 pixel = pixels[x, y];
 
                         pixel.R = (binary[i] == '0') ? (byte)(pixel.R & ~1) : (byte)(pixel.R | 1);
                         written++;
@@ -191,7 +202,7 @@ namespace SteganographyApp.Common.IO
                             }
                         }
 
-                        pixels[colPositions[x], rowPositions[y]] = new Rgba32(
+                        pixels[x, y] = new Rgba32(
                                 pixel.R,
                                 pixel.G,
                                 pixel.B,
@@ -238,7 +249,7 @@ namespace SteganographyApp.Common.IO
                 {
                     while (read < length)
                     {
-                        Rgba32 pixel = pixels[colPositions[x], rowPositions[y]];
+                        Rgba32 pixel = pixels[x, y];
 
                         string redBit = Convert.ToString(pixel.R, 2);
                         binary.Append(redBit.Substring(redBit.Length - 1));
@@ -342,8 +353,8 @@ namespace SteganographyApp.Common.IO
 
             using (var image = Image.Load(args.CoverImages[currentImageIndex]))
             {
-                colPositions = Enumerable.Range(0, image.Width).ToArray();
-                rowPositions = Enumerable.Range(0, image.Height).ToArray();
+                currentImageWidth = image.Width;
+                currentImageHeight = image.Height;
             }
         }
 
@@ -354,7 +365,23 @@ namespace SteganographyApp.Common.IO
         /// <param name="length">The length of the all zero string to write to the current image.</param>
         public void Seek(int length)
         {
-            Write(Convert.ToString('0').PadLeft(length, '0'));
+            x = 0;
+            y = 0;
+            int count = 0;
+            while(count < length)
+            {
+                count += 3;
+                x++;
+                if(x == currentImageWidth)
+                {
+                    x = 0;
+                    y++;
+                    if(y == currentImageHeight)
+                    {
+                        throw new ImageProcessingException(String.Format("There are not enough available bits in this image to seek to the specified length of {0}", length));
+                    }
+                }
+            }
         }
 
     }
