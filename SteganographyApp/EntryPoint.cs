@@ -3,6 +3,7 @@ using SteganographyApp.Common.IO;
 using SteganographyApp.Common.IO.Content;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SteganographyApp
 {
@@ -127,29 +128,26 @@ namespace SteganographyApp
             var chunkTable = store.ReadContentChunkTable();
             var imagesUsed = new List<string>();
             imagesUsed.Add(store.CurrentImage);
-            var less = 0;
             int chunksWritten = 0; //used to display how much data has been read as a percent
             using (var writer = new ContentWriter(args))
             {
                 foreach (int length in chunkTable)
                 {
                     bool stillReading = true;
-                    string binary = "";
+                    var binary = new StringBuilder();
                     while (stillReading)
                     {
-                        binary += store.Read(length - less);
+                        binary.Append(store.Read(length - binary.Length));
                         if (binary.Length < length)
                         {
-                            less += binary.Length;
                             store.Next();
                         }
                         else
                         {
-                            less = 0;
-                            writer.WriteChunk(binary);
+                            writer.WriteChunk(binary.ToString());
                             chunksWritten++; //used to display how much data has been read as a percent
                             DisplayPercent(chunksWritten, chunkTable.Count, "Decoding file contents"); //used to display how much data has been read as a percent
-                            binary = "";
+                            binary = new StringBuilder();
                             stillReading = false;
                             if(!imagesUsed.Contains(store.CurrentImage))
                             {

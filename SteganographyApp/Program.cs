@@ -75,7 +75,7 @@ namespace SteganographyApp
             Console.WriteLine("\t\tValue must be either 'true' or 'false'.");
             Console.WriteLine("\t--chunkSize :: Specifies the number of bytes to read in each read, encode, and store operation.");
             Console.WriteLine("\t\tValue needs to be a positive whole number.");
-            Console.WriteLine("\t\tLarger numbers can be useful when trying to encode larger files as long as you also use images with larger dimensions.");
+            Console.WriteLine("\t\tLarger numbers can quicken the process of encoding larger files.");
             Console.WriteLine();
         }
     }

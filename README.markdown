@@ -55,7 +55,7 @@ Example arguments for decoding data from a set of images to an output file.
 
 --chunkSize :: Specifies the number of bytes to read in each read, encode, and store operation.
     Value needs to be a positive whole number.
-    Larger numbers can be useful when trying to encode larger files as long as you also use images with larger dimensions.
+    Larger numbers can quicken the process of encoding larger files.
 ```
 
 3rd Party Libraries
