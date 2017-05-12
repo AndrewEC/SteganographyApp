@@ -58,10 +58,12 @@ namespace SteganographyApp.Common.Data
                 }
             }
 
+            byte[] converted = Convert.FromBase64String(base64);
+
             var builder = new StringBuilder();
-            foreach (char c in base64)
+            foreach (byte bit in converted)
             {
-                builder.Append(Convert.ToString((int)c, 2).PadLeft(8, '0'));
+                builder.Append(Convert.ToString(bit, 2).PadLeft(8, '0'));
             }
             return builder.ToString();
         }
@@ -81,13 +83,14 @@ namespace SteganographyApp.Common.Data
         /// occured while decrypting the base64 string.</exception>
         public static byte[] Decode(string input, string password, bool useCompression)
         {
-            var builder = new StringBuilder();
-            for (int i = 0; i < input.Length; i += 8)
+            byte[] bits = new byte[input.Length / 8];
+            for (int i = 0; i < bits.Length; i++)
             {
-                var rawValue = input.Substring(i, 8);
-                builder.Append((char)Convert.ToInt32(rawValue, 2));
+                var rawValue = input.Substring(i * 8, 8);
+                bits[i] = Convert.ToByte(rawValue, 2);
             }
-            var decoded64String = builder.ToString();
+
+            var decoded64String = Convert.ToBase64String(bits);
             if (password != "")
             {
                 try
