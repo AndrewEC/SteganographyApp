@@ -141,6 +141,7 @@ namespace SteganographyApp
                         if (binary.Length < length)
                         {
                             store.Next();
+                            imagesUsed.Add(store.CurrentImage);
                         }
                         else
                         {
@@ -149,10 +150,6 @@ namespace SteganographyApp
                             DisplayPercent(chunksWritten, chunkTable.Count, "Decoding file contents"); //used to display how much data has been read as a percent
                             binary = new StringBuilder();
                             stillReading = false;
-                            if(!imagesUsed.Contains(store.CurrentImage))
-                            {
-                                imagesUsed.Add(store.CurrentImage);
-                            }
                         }
                     }
                 }

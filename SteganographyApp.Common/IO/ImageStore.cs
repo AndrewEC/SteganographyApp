@@ -148,15 +148,9 @@ namespace SteganographyApp.Common.IO
 
                             pixels[x, y] = new Rgba32(newRed, newGreen, newBlue, pixels[x, y].A);
 
-                            x++;
-                            if (x == image.Width)
+                            if(!TryMove())
                             {
-                                x = 0;
-                                y++;
-                                if (y == image.Height)
-                                {
-                                    break;
-                                }
+                                break;
                             }
                         }
                     }
@@ -209,15 +203,9 @@ namespace SteganographyApp.Common.IO
                                 pixel.A
                             );
 
-                        x++;
-                        if (x == image.Width)
+                        if(!TryMove())
                         {
-                            x = 0;
-                            y++;
-                            if (y == image.Height)
-                            {
-                                break;
-                            }
+                            break;
                         }
                     }
                 }
@@ -269,15 +257,9 @@ namespace SteganographyApp.Common.IO
                             }
                         }
 
-                        x++;
-                        if (x == image.Width)
+                        if(!TryMove())
                         {
-                            x = 0;
-                            y++;
-                            if (y == image.Height)
-                            {
-                                break;
-                            }
+                            break;
                         }
                     }
                 }
@@ -323,10 +305,8 @@ namespace SteganographyApp.Common.IO
             var binary = new StringBuilder("");
             binary.Append(Convert.ToString(table.Count, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
             
-            int count = 0;
             foreach (int chunkLength in table)
             {
-                count++;
                 binary.Append(Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
             }
             Write(binary.ToString());
@@ -391,6 +371,23 @@ namespace SteganographyApp.Common.IO
                     }
                 }
             }
+        }
+
+        public bool TryMove()
+        {
+            x++;
+            if(x == currentImageWidth)
+            {
+                x = 0;
+                y++;
+                if(y == currentImageHeight)
+                {
+                    x = 0;
+                    y = 0;
+                    return false;
+                }
+            }
+            return true;
         }
 
     }
