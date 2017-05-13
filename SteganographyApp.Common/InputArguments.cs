@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace SteganographyApp.Common
 {
@@ -212,9 +214,13 @@ namespace SteganographyApp.Common
         /// could not be found.</exception>
         private void ParseFileToEncode(InputArguments arguments, string value)
         {
-            if(!System.IO.File.Exists(value))
+            if (!File.Exists(value))
             {
                 throw new ArgumentValueException(String.Format("File to decode could not be found at {0}", value));
+            }
+            else if (File.GetAttributes(value).HasFlag(FileAttributes.Directory))
+            {
+                throw new ArgumentValueException(String.Format("Input file at {0} was a directory but a file is required.", value));
             }
             arguments.FileToEncode = value;
         }
@@ -257,6 +263,8 @@ namespace SteganographyApp.Common
 
         /// <summary>
         /// Takes in a string of comma delimited image names and returns an array of strings.
+        /// Will also parse for a regex expression if an expression has been specified with the [r]
+        /// prefix.
         /// </summary>
         /// /// <param name="arguments">The input arguments instance to make modifications to.</param>
         /// <param name="value">A string representation of a number, or a single, image where encoded
@@ -265,23 +273,67 @@ namespace SteganographyApp.Common
         /// could not be found at the specified path.</exception>
         private void ParseImages(InputArguments arguments, string value)
         {
-            string[] images;
-            if (value.Contains(","))
+            string regex = "";
+            string[] images = null;
+
+            if (value.Contains("[r]"))
+            {
+                value = value.Replace("[r]", "");
+
+                if (value[value.Length - 1] != '>' || value[0] != '<')
+                {
+                    throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
+                }
+
+                string[] parts = value.Split('>');
+                if (parts.Length != 3 || parts[0] == "<" || parts[1] == "<")
+                {
+                    throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
+                }
+
+                regex = parts[0].Replace("<", "");
+                string path = parts[1].Replace("<", "");
+                string[] files = Directory.GetFiles(path);
+                images = new string[files.Length];
+                int valid = 0;
+                foreach (string name in files)
+                {
+                    if (Regex.Match(name, regex).Success)
+                    {
+                        images[valid] = name;
+                        valid++;
+                    }
+                }
+                if (valid == 0)
+                {
+                    throw new ArgumentValueException(String.Format("The provided regex expression returned 0 usable files in the directory {0}", path));
+                }
+                else if(valid < images.Length)
+                {
+                    string[] temp = new string[valid];
+                    Array.Copy(images, temp, valid);
+                    images = temp;
+                }
+            }
+            else if (value.Contains(","))
             {
                 images = value.Split(',');
             }
             else
             {
-                images = new string[1];
-                images[0] = value;
+                images = new string[] { value };
             }
 
             for (int i = 0; i < images.Length; i++)
             {
                 images[i] = images[i].Trim();
-                if (!System.IO.File.Exists(images[i]))
+                if (!File.Exists(images[i]))
                 {
                     throw new ArgumentValueException(String.Format("Image could not be found at {0}", images[i]));
+                }
+                else if (File.GetAttributes(images[i]).HasFlag(FileAttributes.Directory))
+                {
+                    throw new ArgumentValueException(String.Format("File found at {0} was a directory instead of an image.", images[i]));
                 }
             }
             arguments.CoverImages = images;
