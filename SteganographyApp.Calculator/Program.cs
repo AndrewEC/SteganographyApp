@@ -81,6 +81,7 @@ namespace SteganographyAppCalculator
                     using (var image = Image.Load(imagePath))
                     {
                         binarySpace += (image.Width * image.Height);
+                        count++;
                         DisplayPercent(count, args.CoverImages.Length, "Calculating image storage space");
                     }
                 }

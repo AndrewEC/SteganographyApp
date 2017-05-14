@@ -136,5 +136,48 @@ namespace SteganographyApp.Common.Tests
                 Assert.AreEqual("Image could not be found at test!@#.png", e.InnerException.Message, MisMatchInnerExceptionMessage);
             }
         }
+
+        [TestMethod]
+        public void TestWithRegexGivesValidImages()
+        {
+            var args = ArgumentParser.Instance.Parse(new string[] {
+                "--images=[r]<^.*\\.(png|PNG)><./TestAssets/>",
+                "--action=encode",
+                "--input=./TestAssets/test.zip"
+            });
+            Assert.AreEqual(2, args.CoverImages.Length, "Parsing regular expression should have returned 2 images.");
+        }
+
+        [TestMethod]
+        public void TestWithRegexThrowsException()
+        {
+            try
+            {
+                ArgumentParser.Instance.Parse(new string[] { "--images=[r]<><>" });
+                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
+                Assert.IsNotNull(e.InnerException, InnerExceptionShouldNotBeNull);
+                Assert.AreEqual("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>", e.InnerException.Message, MisMatchInnerExceptionMessage);
+            }
+        }
+
+        [TestMethod]
+        public void TestWithRegexReturnsNoImages()
+        {
+            try
+            {
+                ArgumentParser.Instance.Parse(new string[] { "--images=[r]<^.*\\.(png|PNG)><.>" });
+                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
+            }
+            catch(Exception e)
+            {
+                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
+                Assert.IsNotNull(e.InnerException, InnerExceptionShouldNotBeNull);
+                Assert.AreEqual("The provided regex expression returned 0 usable files in the directory .", e.InnerException.Message, MisMatchInnerExceptionMessage);
+            }
+        }
     }
 }
