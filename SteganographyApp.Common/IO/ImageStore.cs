@@ -136,6 +136,9 @@ namespace SteganographyApp.Common.IO
             {
                 using (var image = Image.Load(imagePath))
                 {
+                    currentImageWidth = image.Width;
+                    currentImageHeight = image.Height;
+
                     using (var pixels = image.Lock())
                     {
                         int x = 0, y = 0;
