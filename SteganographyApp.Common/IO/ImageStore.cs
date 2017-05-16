@@ -286,8 +286,16 @@ namespace SteganographyApp.Common.IO
             //Read the number of entries in the table
             int tableLength = Convert.ToInt32(Read(ChunkDefinitionBitSize), 2);
 
+            int tableBitCount = tableLength * chunkSizeAndPadding;
+
             //Read all the available entries in the table
-            string rawTable = Read(tableLength * (chunkSizeAndPadding));
+            string rawTable = Read(tableBitCount);
+
+            if (rawTable.Length < tableBitCount)
+            {
+                throw new ImageProcessingException("There are not enough available bits in the image to read the entire content chunk table.");
+            }
+
             var table = new List<int>();
             for (int i = 0; i < rawTable.Length; i += chunkSizeAndPadding)
             {
@@ -312,7 +320,11 @@ namespace SteganographyApp.Common.IO
             {
                 binary.Append(Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
             }
-            Write(binary.ToString());
+            int written = Write(binary.ToString());
+            if(binary.Length < written)
+            {
+                throw new ImageProcessingException("There is not enough space in the current image to write the entire content chunk table.");
+            }
         }
 
         /// <summary>
@@ -376,6 +388,12 @@ namespace SteganographyApp.Common.IO
             }
         }
 
+        /// <summary>
+        /// Tries to move the read/write x/y position to the next available pixel.
+        /// Will return false if there are no more available pixels in the current image.
+        /// </summary>
+        /// <returns>False if there are no more pixels left to read/write to otherwise
+        /// returns true.</returns>
         public bool TryMove()
         {
             x++;
