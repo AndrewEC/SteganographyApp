@@ -74,6 +74,14 @@ namespace SteganographyApp
             var store = new ImageStore(args);
             int start = store.RequiredContentChunkTableBitSize;
             store.Next();
+
+            if(!store.HasEnoughSpaceForContentChunkTable())
+            {
+                Console.WriteLine("There is not enough space in the leading image to store the content chunk table.");
+                Console.WriteLine("The content chunk table requires {0} bits to store for the specified input file.", start);
+                return;
+            }
+
             store.Seek(start);
             var table = new List<int>();
             var imagesUsed = new List<string>();

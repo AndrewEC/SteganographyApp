@@ -328,6 +328,23 @@ namespace SteganographyApp.Common.IO
         }
 
         /// <summary>
+        /// Checks to see if the current image has enough available storage space to store the entirety
+        /// of the content chunk table.
+        /// </summary>
+        /// <returns>Returns true if the number of bits the image can store is more than the estimated number of
+        /// bits required for the content chunk table.</returns>
+        public bool HasEnoughSpaceForContentChunkTable()
+        {
+            using (var image = Image.Load(args.CoverImages[currentImageIndex]))
+            {
+                using (var pixels = image.Lock())
+                {
+                    return (pixels.Width * pixels.Height * 3) > RequiredContentChunkTableBitSize;
+                }
+            }
+        }
+
+        /// <summary>
         /// Moves the current index back to the index before the specified image
         /// then calls the Next method to advance to the specified image.
         /// </summary>
