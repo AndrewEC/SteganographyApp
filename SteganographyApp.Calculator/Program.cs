@@ -58,6 +58,9 @@ namespace SteganographyAppCalculator
             Console.WriteLine("\t--input or -i :: The path to the file to encode if 'encode' was specified in the action argument.");
             Console.WriteLine("\t--images or -im :: A comma delimited list of paths to images to be either encoded or decoded");
             Console.WriteLine("\t\tThe order of the images affects the encoding and decoding results.");
+            Console.WriteLine("\t\tThis parameter will also accept a regular expression to fine images.");
+            Console.WriteLine("\t\t\tA regex value will appear in the format [r]<regex><directory>");
+            Console.WriteLine("\t\t\tExample: --images=[r]<^.*\\.(png)><.> looks for all png files in the current directory.");
             Console.WriteLine("\t--passsword or -p :: The password to encrypt the input file when 'encode' was specified in the action argument.");
             Console.WriteLine("\t--chunkSize :: Specifies the number of bytes to read in each read, encode, and store operation.");
             Console.WriteLine("\t\tValue needs to be a positive whole number.");

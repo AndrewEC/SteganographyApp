@@ -47,6 +47,9 @@ Example arguments for decoding data from a set of images to an output file.
 
 --images :: A comma delimited list of paths to images to be either encoded or decoded
     The order of the images affects the encoding and decoding results.
+    This parameter will also accept a regular expression to fine images.
+    A regex value will appear in the format [r]<regex><directory>
+    Example: --images=[r]<^.*\\.(png)><.> looks for all png files in the current directory.
 
 --passsword :: The password to encrypt the input file when 'encode' was specified in the action argument.
 

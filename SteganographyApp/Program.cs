@@ -68,6 +68,9 @@ namespace SteganographyApp
             Console.WriteLine("\t--output :: The path to the output file when 'decode' was specified in the action argument.");
             Console.WriteLine("\t--images :: A comma delimited list of paths to images to be either encoded or decoded");
             Console.WriteLine("\t\tThe order of the images affects the encoding and decoding results.");
+            Console.WriteLine("\t\tThis parameter will also accept a regular expression to fine images.");
+            Console.WriteLine("\t\t\tA regex value will appear in the format [r]<regex><directory>");
+            Console.WriteLine("\t\t\tExample: --images=[r]<^.*\\.(png)><.> looks for all png files in the current directory.");
             Console.WriteLine("\t--passsword :: The password to encrypt the input file when 'encode' was specified in the action argument.");
             Console.WriteLine("\t--printStack :: Specifies whether or not to print the full stack trace if an error occurs.");
             Console.WriteLine("\t\tValue must either be 'true' or 'false'");
