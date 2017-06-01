@@ -141,8 +141,6 @@ namespace SteganographyApp.Common.IO
 
                     using (var pixels = image.Lock())
                     {
-                        int x = 0, y = 0;
-
                         while (true)
                         {
                             byte newRed = (byte)(pixels[x, y].R & ~1);

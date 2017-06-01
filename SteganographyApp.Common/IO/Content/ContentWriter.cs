@@ -1,4 +1,5 @@
 ﻿using SteganographyApp.Common.Data;
+using System;
 using System.IO;
 
 namespace SteganographyApp.Common.IO.Content
@@ -14,7 +15,7 @@ namespace SteganographyApp.Common.IO.Content
         /// <summary>
         /// Instantiates a new ContentWrite instance and sets the
         /// args field value.
-        /// </summary>
+        /// </summary>  
         /// <param name="args"></param>
         public ContentWriter(InputArguments args) : base(args) { }
 
@@ -35,6 +36,10 @@ namespace SteganographyApp.Common.IO.Content
             }
 
             byte[] decoded = DataEncoderUtil.Decode(binary, args.Password, args.UseCompression);
+            if (args.RandomSeed != "")
+            {
+                decoded = ReorderBytes(decoded);
+            }
             stream.Write(decoded, 0, decoded.Length);
             stream.Flush();
         }

@@ -59,6 +59,8 @@ Example arguments for decoding data from a set of images to an output file.
 --chunkSize :: Specifies the number of bytes to read in each read, encode, and store operation.
     Value needs to be a positive whole number.
     Larger numbers can quicken the process of encoding larger files.
+
+--randomSeed :: Randomizes the order in which bytes will be written from input file to image.
 ```
 
 3rd Party Libraries

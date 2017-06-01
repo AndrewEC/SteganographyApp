@@ -93,7 +93,8 @@ namespace SteganographyApp.Common
                 { "--images", ParseImages },
                 { "--password", (arguments, value) => { arguments.Password = value; } },
                 { "--output", (arguments, value) => { arguments.DecodedOutputFile = value; } },
-                { "--chunkSize", ParseChunkSize }
+                { "--chunkSize", ParseChunkSize },
+                { "--randomSeed", ParseRandomSeed }
             };
         }
 
@@ -340,10 +341,24 @@ namespace SteganographyApp.Common
         }
 
         /// <summary>
+        /// Takes in the random seed value and validates that it is of the appropriate length.
+        /// </summary>
+        /// <param name="arguments">The InputArguments instanced to fill with the parse random seed value.</param>
+        /// <param name="value">The string representation of the random seed.</param>
+        private void ParseRandomSeed(InputArguments arguments, string value)
+        {
+            if(value.Length > 235 || value.Length < 3)
+            {
+                throw new ArgumentValueException("The length of the random seed must be between 3 and 235 characters in length.");
+            }
+            arguments.RandomSeed = value;
+        }
+
+        /// <summary>
         /// Takes in the final result of the InputArgument parsing process and validates that all required
         /// arguments has been provided.
         /// </summary>
-        /// <param name="input">The InputArguments instance created a filled with parsed values retrieved
+        /// <param name="input">The InputArguments instance filled with parsed values retrieved
         /// from user provdied arguments.</param>
         /// <returns>Returns a string with information stating what required argument values are missing.
         /// If no values are missing then NoMissingValues will be returned.</returns>
@@ -401,6 +416,7 @@ namespace SteganographyApp.Common
         public EncodeDecodeAction EncodeOrDecode { get; set; }
         public bool PrintStack { get; set; } = false;
         public bool UseCompression { get; set; } = false;
+        public string RandomSeed { get; set; } = "";
 
         /// <summary>
         /// Specifies the chunk size. I.e. the number of bytes to read, encode,

@@ -54,8 +54,13 @@ namespace SteganographyApp.Common.IO.Content
                 Array.Copy(buffer, actual, read);
                 buffer = actual;
             }
-            string data = DataEncoderUtil.Encode(buffer, args.Password, args.UseCompression);
-            return data;
+
+            if (args.RandomSeed != "")
+            {
+                buffer = RandomizeBytes(buffer);
+            }
+
+            return DataEncoderUtil.Encode(buffer, args.Password, args.UseCompression);
         }
 
     }

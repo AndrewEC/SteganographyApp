@@ -79,6 +79,7 @@ namespace SteganographyApp
             Console.WriteLine("\t--chunkSize :: Specifies the number of bytes to read in each read, encode, and store operation.");
             Console.WriteLine("\t\tValue needs to be a positive whole number.");
             Console.WriteLine("\t\tLarger numbers can quicken the process of encoding larger files.");
+            Console.WriteLine("\t--randomSeed :: Randomizes the order in which bytes will be written from input file to image.");
             Console.WriteLine();
         }
     }
