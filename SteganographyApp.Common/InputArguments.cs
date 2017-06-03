@@ -304,6 +304,15 @@ namespace SteganographyApp.Common
             arguments.CoverImages = images;
         }
 
+        /// <summary>
+        /// If a regular expression is detected in the --images parameter this method
+        /// will load the images in the specified directory based on matches against
+        /// the regular expression.
+        /// </summary>
+        /// <param name="value">The value of the --images parameter</param>
+        /// <returns>An array of images from the specified directory.</returns>
+        /// <exception cref="ArgumentValueException">Thrown if an invalid regular expression is provided or if the
+        /// regular expression doesn't match any files in the provided directory.</exception>
         private string[] ImagesFromRegex(string value)
         {
             (string regex, string path) = ParseRegex(value);
@@ -339,6 +348,13 @@ namespace SteganographyApp.Common
             return images;
         }
 
+        /// <summary>
+        /// Parses the regular expression and path from the value of the --images parameter.
+        /// </summary>
+        /// <param name="value">The value of the --images parameter</param>
+        /// <returns>A tuple containing the regex nd directory in that order.</returns>
+        /// <exception cref="ArgumentValueException">Thrown if the value for the --images parameter
+        /// does not match the expected format.</exception>
         private (string, string) ParseRegex(string value)
         {
             value = value.Replace("[r]", "");
