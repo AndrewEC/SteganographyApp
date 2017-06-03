@@ -274,47 +274,11 @@ namespace SteganographyApp.Common
         /// could not be found at the specified path.</exception>
         private void ParseImages(InputArguments arguments, string value)
         {
-            string regex = "";
             string[] images = null;
 
             if (value.Contains("[r]"))
             {
-                value = value.Replace("[r]", "");
-
-                if (value[value.Length - 1] != '>' || value[0] != '<')
-                {
-                    throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
-                }
-
-                string[] parts = value.Split('>');
-                if (parts.Length != 3 || parts[0] == "<" || parts[1] == "<")
-                {
-                    throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
-                }
-
-                regex = parts[0].Replace("<", "");
-                string path = parts[1].Replace("<", "");
-                string[] files = Directory.GetFiles(path);
-                images = new string[files.Length];
-                int valid = 0;
-                foreach (string name in files)
-                {
-                    if (Regex.Match(name, regex).Success)
-                    {
-                        images[valid] = name;
-                        valid++;
-                    }
-                }
-                if (valid == 0)
-                {
-                    throw new ArgumentValueException(String.Format("The provided regex expression returned 0 usable files in the directory {0}", path));
-                }
-                else if(valid < images.Length)
-                {
-                    string[] temp = new string[valid];
-                    Array.Copy(images, temp, valid);
-                    images = temp;
-                }
+                images = ImagesFromRegex(value);
             }
             else if (value.Contains(","))
             {
@@ -338,6 +302,61 @@ namespace SteganographyApp.Common
                 }
             }
             arguments.CoverImages = images;
+        }
+
+        private string[] ImagesFromRegex(string value)
+        {
+            (string regex, string path) = ParseRegex(value);
+
+            string[] files = Directory.GetFiles(path);
+            string[] images = new string[files.Length];
+            int valid = 0;
+            foreach (string name in files)
+            {
+                try
+                {
+                    if (Regex.Match(name, regex).Success)
+                    {
+                        images[valid] = name;
+                        valid++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new ArgumentValueException("An invalid regular expression was provided for the image input value.", e);
+                }
+            }
+            if (valid == 0)
+            {
+                throw new ArgumentValueException(String.Format("The provided regex expression returned 0 usable files in the directory {0}", path));
+            }
+            else if (valid < images.Length)
+            {
+                string[] temp = new string[valid];
+                Array.Copy(images, temp, valid);
+                images = temp;
+            }
+            return images;
+        }
+
+        private (string, string) ParseRegex(string value)
+        {
+            value = value.Replace("[r]", "");
+
+            if (value[value.Length - 1] != '>' || value[0] != '<')
+            {
+                throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
+            }
+
+            string[] parts = value.Split('>');
+            if (parts.Length != 3 || parts[0] == "<" || parts[1] == "<")
+            {
+                throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
+            }
+
+            string regex = parts[0].Replace("<", "");
+            string path = parts[1].Replace("<", "");
+            return (regex, path);
         }
 
         /// <summary>
