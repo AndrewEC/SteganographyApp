@@ -297,6 +297,8 @@ namespace SteganographyApp.Common.IO
             var table = new List<int>();
             for (int i = 0; i < rawTable.Length; i += chunkSizeAndPadding)
             {
+                // Although we have 33 bits read for the table entry the last bit of the table entry is purely
+                // padding so we need to substring 33 bits minus the one padding bit.
                 int entry = Convert.ToInt32(rawTable.Substring(i, ChunkDefinitionBitSize), 2);
                 table.Add(entry);
             }
@@ -312,6 +314,10 @@ namespace SteganographyApp.Common.IO
         public void WriteContentChunkTable(List<int> table)
         {
             var binary = new StringBuilder("");
+
+            // Each table entry is 32 bits in size meaning that since each pixel can store 3 bits it will take
+            // 11 pixels. Since 11 pixels can actually store 33 bits we pad the 32 bit table entry with an additional
+            // zero at the end which will be ignored when reading the table.
             binary.Append(Convert.ToString(table.Count, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
             
             foreach (int chunkLength in table)
