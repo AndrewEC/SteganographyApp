@@ -339,13 +339,7 @@ namespace SteganographyApp.Common.IO
         /// bits required for the content chunk table.</returns>
         public bool HasEnoughSpaceForContentChunkTable()
         {
-            using (var image = Image.Load(args.CoverImages[currentImageIndex]))
-            {
-                using (var pixels = image.Lock())
-                {
-                    return (pixels.Width * pixels.Height * 3) > RequiredContentChunkTableBitSize;
-                }
-            }
+            return (currentImageWidth * currentImageHeight * 3) > RequiredContentChunkTableBitSize;
         }
 
         /// <summary>
