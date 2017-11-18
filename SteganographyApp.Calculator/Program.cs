@@ -1,4 +1,4 @@
-﻿using ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SteganographyApp.Common;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.IO;

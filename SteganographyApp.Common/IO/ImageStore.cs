@@ -1,4 +1,5 @@
-﻿using ImageSharp;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Helpers;
 using SteganographyApp.Common.IO.Content;
 using System;
 using System.Collections.Generic;
@@ -139,20 +140,17 @@ namespace SteganographyApp.Common.IO
                     currentImageWidth = image.Width;
                     currentImageHeight = image.Height;
 
-                    using (var pixels = image.Lock())
+                    while (true)
                     {
-                        while (true)
+                        byte newRed = (byte)(image[x, y].R & ~1);
+                        byte newGreen = (byte)(image[x, y].G & ~1);
+                        byte newBlue = (byte)(image[x, y].B & ~1);
+
+                        image[x, y] = new Rgba32(newRed, newGreen, newBlue, image[x, y].A);
+
+                        if (!TryMove())
                         {
-                            byte newRed = (byte)(pixels[x, y].R & ~1);
-                            byte newGreen = (byte)(pixels[x, y].G & ~1);
-                            byte newBlue = (byte)(pixels[x, y].B & ~1);
-
-                            pixels[x, y] = new Rgba32(newRed, newGreen, newBlue, pixels[x, y].A);
-
-                            if(!TryMove())
-                            {
-                                break;
-                            }
+                            break;
                         }
                     }
                     image.Save(imagePath);
@@ -176,38 +174,35 @@ namespace SteganographyApp.Common.IO
             int written = 0;
             using (var image = Image.Load(args.CoverImages[currentImageIndex]))
             {
-                using (var pixels = image.Lock())
+                for (int i = 0; i < binary.Length; i += 3)
                 {
-                    for (int i = 0; i < binary.Length; i += 3)
-                    {
-                        Rgba32 pixel = pixels[x, y];
+                    Rgba32 pixel = image[x, y];
 
-                        pixel.R = (binary[i] == '0') ? (byte)(pixel.R & ~1) : (byte)(pixel.R | 1);
+                    pixel.R = (binary[i] == '0') ? (byte)(pixel.R & ~1) : (byte)(pixel.R | 1);
+                    written++;
+
+                    if (written < binary.Length)
+                    {
+                        pixel.G = (binary[i + 1] == '0') ? (byte)(pixel.G & ~1) : (byte)(pixel.G | 1);
                         written++;
 
                         if (written < binary.Length)
                         {
-                            pixel.G = (binary[i + 1] == '0') ? (byte)(pixel.G & ~1) : (byte)(pixel.G | 1);
+                            pixel.B = (binary[i + 2] == '0') ? (byte)(pixel.B & ~1) : (byte)(pixel.B | 1);
                             written++;
-
-                            if (written < binary.Length)
-                            {
-                                pixel.B = (binary[i + 2] == '0') ? (byte)(pixel.B & ~1) : (byte)(pixel.B | 1);
-                                written++;
-                            }
                         }
+                    }
 
-                        pixels[x, y] = new Rgba32(
-                                pixel.R,
-                                pixel.G,
-                                pixel.B,
-                                pixel.A
-                            );
+                    image[x, y] = new Rgba32(
+                            pixel.R,
+                            pixel.G,
+                            pixel.B,
+                            pixel.A
+                        );
 
-                        if(!TryMove())
-                        {
-                            break;
-                        }
+                    if (!TryMove())
+                    {
+                        break;
                     }
                 }
                 image.Save(args.CoverImages[currentImageIndex]);
@@ -234,34 +229,31 @@ namespace SteganographyApp.Common.IO
             using (var image = Image.Load(args.CoverImages[currentImageIndex]))
             {
                 int read = 0;
-                using (var pixels = image.Lock())
+                while (read < length)
                 {
-                    while (read < length)
-                    {
-                        Rgba32 pixel = pixels[x, y];
+                    Rgba32 pixel = image[x, y];
 
-                        string redBit = Convert.ToString(pixel.R, 2);
-                        binary.Append(redBit.Substring(redBit.Length - 1));
+                    string redBit = Convert.ToString(pixel.R, 2);
+                    binary.Append(redBit.Substring(redBit.Length - 1));
+                    read++;
+
+                    if (read < length)
+                    {
+                        string greenBit = Convert.ToString(pixel.G, 2);
+                        binary.Append(greenBit.Substring(greenBit.Length - 1));
                         read++;
 
                         if (read < length)
                         {
-                            string greenBit = Convert.ToString(pixel.G, 2);
-                            binary.Append(greenBit.Substring(greenBit.Length - 1));
+                            string blueBit = Convert.ToString(pixel.B, 2);
+                            binary.Append(blueBit.Substring(blueBit.Length - 1));
                             read++;
-
-                            if (read < length)
-                            {
-                                string blueBit = Convert.ToString(pixel.B, 2);
-                                binary.Append(blueBit.Substring(blueBit.Length - 1));
-                                read++;
-                            }
                         }
+                    }
 
-                        if(!TryMove())
-                        {
-                            break;
-                        }
+                    if (!TryMove())
+                    {
+                        break;
                     }
                 }
             }
@@ -319,13 +311,13 @@ namespace SteganographyApp.Common.IO
             // 11 pixels. Since 11 pixels can actually store 33 bits we pad the 32 bit table entry with an additional
             // zero at the end which will be ignored when reading the table.
             binary.Append(Convert.ToString(table.Count, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
-            
+
             foreach (int chunkLength in table)
             {
                 binary.Append(Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
             }
             int written = Write(binary.ToString());
-            if(binary.Length < written)
+            if (binary.Length < written)
             {
                 throw new ImageProcessingException("There is not enough space in the current image to write the entire content chunk table.");
             }
@@ -365,7 +357,7 @@ namespace SteganographyApp.Common.IO
             x = 0;
             y = 0;
             currentImageIndex++;
-            if(currentImageIndex == args.CoverImages.Length)
+            if (currentImageIndex == args.CoverImages.Length)
             {
                 throw new ImageProcessingException("There are not enough available store space in the provided images to process this request.");
             }
@@ -387,15 +379,15 @@ namespace SteganographyApp.Common.IO
             x = 0;
             y = 0;
             int count = 0;
-            while(count < length)
+            while (count < length)
             {
                 count += 3;
                 x++;
-                if(x == currentImageWidth)
+                if (x == currentImageWidth)
                 {
                     x = 0;
                     y++;
-                    if(y == currentImageHeight)
+                    if (y == currentImageHeight)
                     {
                         throw new ImageProcessingException(String.Format("There are not enough available bits in this image to seek to the specified length of {0}", length));
                     }
@@ -412,11 +404,11 @@ namespace SteganographyApp.Common.IO
         public bool TryMove()
         {
             x++;
-            if(x == currentImageWidth)
+            if (x == currentImageWidth)
             {
                 x = 0;
                 y++;
-                if(y == currentImageHeight)
+                if (y == currentImageHeight)
                 {
                     x = 0;
                     y = 0;
