@@ -122,8 +122,17 @@ namespace SteganographyApp.Common.IO
 
             if (args.FileToEncode.Length > 0)
             {
-                int start = (int)(Math.Ceiling((double)(new FileInfo(args.FileToEncode).Length) / args.ChunkByteSize));
-                RequiredContentChunkTableBitSize = start * ChunkDefinitionBitSize + ChunkDefinitionBitSize + start;
+                // Specifies the number of times the file has to be read from, encoded, and written to the storage
+                // image. The number of writes is essentially based on the total size of the image divided by the
+                // number of bytes to read from each iteration from the input file.
+                int requiredWrites = (int)(Math.Ceiling((double)(new FileInfo(args.FileToEncode).Length) / args.ChunkByteSize));
+                // The table size is essentially the number of read/encode/write iterations times 32.
+                // Each time a chunk is read and encoded, the size of the encoded/compressed chunk is written
+                // to the table so it can be read and decoded later.
+                // We add an additional 32 bits onto the end so that a table header can be written that
+                // specifies the number of read write iterations that occurred when encoding the file
+                // so that it can be properly decoded.
+                RequiredContentChunkTableBitSize = requiredWrites * ChunkDefinitionBitSize + ChunkDefinitionBitSize + requiredWrites;
             }
         }
 
