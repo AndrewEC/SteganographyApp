@@ -92,18 +92,19 @@ namespace SteganographyApp.Common.Data
         /// Generates a new random seed from a string.
         /// </summary>
         /// <param name="seed">The seed or hash as a string.</param>
-        /// <returns>A valid 32 bit int that can be used as a seed to initialize an IndexGenerator instance.</returns>
-        public static Int32 SeedFromString(string seed)
+        /// <returns>An IndexGenerator instance with a calculated numeric seed pre-iterated to a
+        ///  number of times based on the provided seed string byte size.</returns>
+        public static IndexGenerator FromString(string seed)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(seed);
             seed = Convert.ToBase64String(bytes);
             Int32 total = 0;
             foreach (char c in seed)
             {
-                total += (int)c * c;
+                total += c * c;
             }
-            total /= (seed.Length >> 2);
-            return new IndexGenerator(total, bytes.Length).Next(total);
+            IndexGenerator temp = new IndexGenerator(total / (total >> 2), seed.Length);
+            return new IndexGenerator(total, bytes.Length * temp.Next(bytes.Length * 5));
         }
 
         /// <summary>

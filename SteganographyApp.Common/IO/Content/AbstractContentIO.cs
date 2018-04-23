@@ -28,8 +28,7 @@ namespace SteganographyApp.Common.IO.Content
             this.args = args;
             if(args.RandomSeed != "")
             {
-                int seed = IndexGenerator.SeedFromString(args.RandomSeed);
-                generator = new IndexGenerator(seed, args.RandomSeed.Length);
+                generator = IndexGenerator.FromString(args.RandomSeed);
             }
         }
 
