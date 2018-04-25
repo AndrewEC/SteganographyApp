@@ -53,18 +53,21 @@ namespace SteganographyAppCalculator
             Console.WriteLine("\t\tdotnet .\\SteganographyAppCalculator --action=calculate-encrypted-size --input=FileToEncode.zip --password=Pass1234");
             Console.WriteLine("\tExample of calculating the amount of storage space offered by a set of images:");
             Console.WriteLine("\t\tdotnet .\\SteganographyAppCalculator --action=calculate-storage-space --images=001.png,002.png\n");
-            Console.WriteLine("\t--action or -a :: Specifies whether to calculate the encrypted size of a file or the amount of storage space offered by a set of images.");
+            Console.WriteLine("\t--action :: Specifies whether to calculate the encrypted size of a file or the amount of storage space offered by a set of images.");
             Console.WriteLine("\t\tValue must be either 'calculate-storage-space' or 'calculate-encrypted-size'.");
-            Console.WriteLine("\t--input or -i :: The path to the file to encode if 'encode' was specified in the action argument.");
-            Console.WriteLine("\t--images or -im :: A comma delimited list of paths to images to be either encoded or decoded");
+            Console.WriteLine("\t--input :: The path to the file to encode if 'encode' was specified in the action argument.");
+            Console.WriteLine("\t--images :: A comma delimited list of paths to images to be either encoded or decoded");
             Console.WriteLine("\t\tThe order of the images affects the encoding and decoding results.");
             Console.WriteLine("\t\tThis parameter will also accept a regular expression to fine images.");
             Console.WriteLine("\t\t\tA regex value will appear in the format [r]<regex><directory>");
             Console.WriteLine("\t\t\tExample: --images=[r]<^.*\\.(png)><.> looks for all png files in the current directory.");
-            Console.WriteLine("\t--passsword or -p :: The password to encrypt the input file when 'encode' was specified in the action argument.");
+            Console.WriteLine("\t--passsword :: The password to encrypt the input file when 'encode' was specified in the action argument.");
+            Console.WriteLine("\t--compress :: Specifies whether or not to compress/decompress the encoded/decoded content.");
+            Console.WriteLine("\t\tValue must be either 'true' or 'false'.");
             Console.WriteLine("\t--chunkSize :: Specifies the number of bytes to read in each read, encode, and store operation.");
             Console.WriteLine("\t\tValue needs to be a positive whole number.");
             Console.WriteLine("\t\tLarger numbers can quicken the process of encoding larger files.");
+            Console.WriteLine("\t--randomSeed :: Randomizes the order in which bytes will be written from input file to image.");
             Console.WriteLine();
         }
 
