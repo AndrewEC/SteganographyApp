@@ -88,6 +88,7 @@ namespace SteganographyApp.Common.Tests
             string binary = "00101001110010100100011001101010";
             int written = store.Write(binary);
             Assert.AreEqual(binary.Length, written);
+            store.Finish(true);
             store.ResetTo(args.CoverImages[0]);
             Assert.AreEqual(binary, store.Read(binary.Length));
         }

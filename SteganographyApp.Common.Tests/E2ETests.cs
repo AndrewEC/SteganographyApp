@@ -31,6 +31,7 @@ namespace SteganographyApp.Common.Tests
         [TestCleanup]
         public void TearDown()
         {
+            store.ResetTo("TestAssets/001.png");
             store.CleanAll(null);
             if(File.Exists(args.DecodedOutputFile))
             {
@@ -43,29 +44,30 @@ namespace SteganographyApp.Common.Tests
         {
             store.Next();
             store.Seek(store.RequiredContentChunkTableBitSize);
-            var writeTable = new List<int>(1);
-            var writeContent = "";
-            using (var reader = new ContentReader(args))
+            string content = "";
+            var table = new List<int>();
+            using(var reader = new ContentReader(args))
             {
-                writeContent = reader.ReadNextChunk();
-                int written = store.Write(writeContent);
-                Assert.AreEqual(writeContent.Length, written);
-                writeTable.Add(written);
-                store.ResetTo(args.CoverImages[0]);
-                store.WriteContentChunkTable(writeTable);
+                content = reader.ReadNextChunk();
+                int written = store.Write(content);
+                table.Add(written);
+                Assert.AreEqual(content.Length, written);
             }
+            store.Finish(true);
+            store.ResetTo(args.CoverImages[0]);
+            store.WriteContentChunkTable(table);
 
             store.ResetTo(args.CoverImages[0]);
             var readTable = store.ReadContentChunkTable();
-            Assert.AreEqual(writeTable.Count, readTable.Count);
-
-            string readContent = store.Read(readTable[0]);
-            Assert.AreEqual(writeContent, readContent);
-
-            using (var writer = new ContentWriter(args))
+            using(var writer = new ContentWriter(args))
             {
-                writer.WriteChunk(readContent);
+                string binary = store.Read(readTable[0]);
+                Assert.AreEqual(content, binary);
+                writer.WriteChunk(binary);
             }
+            long target = new FileInfo(args.FileToEncode).Length;
+            long actual = new FileInfo(args.DecodedOutputFile).Length;
+            Assert.AreEqual(target, actual);
         }
 
         [TestMethod]
@@ -74,30 +76,29 @@ namespace SteganographyApp.Common.Tests
         {
             store.Next();
             store.Seek(store.RequiredContentChunkTableBitSize);
-            var writeTable = new List<int>(1);
-            var writeContent = "";
+            string content = "";
+            var table = new List<int>();
             using (var reader = new ContentReader(args))
             {
-                writeContent = reader.ReadNextChunk();
-                int written = store.Write(writeContent);
-                Assert.AreEqual(writeContent.Length, written);
-                writeTable.Add(written);
-                store.ResetTo(args.CoverImages[0]);
-                store.WriteContentChunkTable(writeTable);
+                content = reader.ReadNextChunk();
+                int written = store.Write(content);
+                table.Add(written);
+                Assert.AreEqual(content.Length, written);
             }
-
-            args.Password = "testing1";
-            store = new ImageStore(args);
-            store.Next();
+            store.Finish(true);
+            store.ResetTo(args.CoverImages[0]);
+            store.WriteContentChunkTable(table);
+            args.Password = "Wrong Password";
+            store.ResetTo(args.CoverImages[0]);
             var readTable = store.ReadContentChunkTable();
-            Assert.AreEqual(writeTable.Count, readTable.Count);
-            string readContent = store.Read(readTable[0]);
-            Assert.AreEqual(writeContent, readContent);
-
             using (var writer = new ContentWriter(args))
             {
-                writer.WriteChunk(readContent);
+                string binary = store.Read(readTable[0]);
+                writer.WriteChunk(binary);
             }
+            long target = new FileInfo(args.FileToEncode).Length;
+            long actual = new FileInfo(args.DecodedOutputFile).Length;
+            Assert.AreEqual(target, actual);
         }
 
         [TestMethod]
@@ -105,34 +106,30 @@ namespace SteganographyApp.Common.Tests
         {
             store.Next();
             store.Seek(store.RequiredContentChunkTableBitSize);
-            var writeTable = new List<int>(1);
-            var writeContent = "";
+            string content = "";
+            var table = new List<int>();
             using (var reader = new ContentReader(args))
             {
-                writeContent = reader.ReadNextChunk();
-                int written = store.Write(writeContent);
-                Assert.AreEqual(writeContent.Length, written);
-                writeTable.Add(written);
-                store.ResetTo(args.CoverImages[0]);
-                store.WriteContentChunkTable(writeTable);
+                content = reader.ReadNextChunk();
+                int written = store.Write(content);
+                table.Add(written);
+                Assert.AreEqual(content.Length, written);
             }
-
+            store.Finish(true);
+            store.ResetTo(args.CoverImages[0]);
+            store.WriteContentChunkTable(table);
+            args.UseCompression = false;
             store.ResetTo(args.CoverImages[0]);
             var readTable = store.ReadContentChunkTable();
-            Assert.AreEqual(writeTable.Count, readTable.Count);
-
-            string readContent = store.Read(readTable[0]);
-            Assert.AreEqual(writeContent, readContent);
-
-            args.UseCompression = false;
             using (var writer = new ContentWriter(args))
             {
-                writer.WriteChunk(readContent);
+                string binary = store.Read(readTable[0]);
+                Assert.AreEqual(content, binary);
+                writer.WriteChunk(binary);
             }
-
-            long targetSize = new FileInfo(args.FileToEncode).Length;
+            long target = new FileInfo(args.FileToEncode).Length;
             long actual = new FileInfo(args.DecodedOutputFile).Length;
-            Assert.AreNotEqual(targetSize, actual, "The target file size and actual file size should not match.");
+            Assert.AreNotEqual(target, actual);
         }
 
     }

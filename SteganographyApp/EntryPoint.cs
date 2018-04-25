@@ -73,8 +73,17 @@ namespace SteganographyApp
 
             var store = new ImageStore(args);
             int start = store.RequiredContentChunkTableBitSize;
+
+            var table = new List<int>();
+            var imagesUsed = new List<string>();
+            store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs args) =>
+            {
+                imagesUsed.Add(args.ImageName);
+            };
+
             store.Next();
 
+            // check that the leading image has enough storage space to store the content table
             if(!store.HasEnoughSpaceForContentChunkTable())
             {
                 Console.WriteLine("There is not enough space in the leading image to store the content chunk table.");
@@ -82,38 +91,27 @@ namespace SteganographyApp
                 return;
             }
 
+            // skip past the first few pixels as the leading pixels of the first image will
+            // be used to store the content chunk table.
             store.Seek(start);
-            var table = new List<int>();
-            var imagesUsed = new List<string>();
-            imagesUsed.Add(store.CurrentImage);
             int chunksRead = 0; //used to display how much data has been read as a percent
             using(var reader = new ContentReader(args))
             {
                 string content = "";
                 while((content = reader.ReadNextChunk()) != null)
                 {
+                    // record the length of the encoded content so it can be stored in the
+                    // content chunk table once the total encoding process has been completed.
+                    table.Add(content.Length);
+                    store.Write(content);
                     chunksRead++; //used to display how much data has been read as a percent
                     DisplayPercent(chunksRead, reader.RequiredNumberOfReads, "Encoding file contents"); //used to display how much data has been read as a percent
-                    table.Add(content.Length);
-                    bool stillWriting = true;
-                    while (stillWriting)
-                    {
-                        int wrote = store.Write(content);
-                        if (wrote < content.Length)
-                        {
-                            content = content.Substring(wrote);
-                            store.Next();
-                            imagesUsed.Add(store.CurrentImage);
-                        }
-                        else
-                        {
-                            stillWriting = false;
-                        }
-                    }
                 }
 
                 Console.WriteLine("All input file contents have been encoded.");
             }
+            store.Finish(true);
+
             PrintUnused(imagesUsed);
             store.ResetTo(args.CoverImages[0]);
             Console.WriteLine("Writing content chunk table.");
@@ -131,38 +129,33 @@ namespace SteganographyApp
             Console.WriteLine("Decoding data to file {0}", args.DecodedOutputFile);
 
             var store = new ImageStore(args);
+            var imagesUsed = new List<string>();
+            store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs args) =>
+            {
+                imagesUsed.Add(args.ImageName);
+            };
             store.Next();
+
+            // read in the content chunk table so we know how many bits to read 
             Console.WriteLine("Reading content chunk table.");
             var chunkTable = store.ReadContentChunkTable();
-            var imagesUsed = new List<string>();
-            imagesUsed.Add(store.CurrentImage);
+            
             int chunksWritten = 0; //used to display how much data has been read as a percent
             using (var writer = new ContentWriter(args))
             {
                 foreach (int length in chunkTable)
                 {
-                    bool stillReading = true;
-                    var binary = new StringBuilder();
-                    while (stillReading)
-                    {
-                        binary.Append(store.Read(length - binary.Length));
-                        if (binary.Length < length)
-                        {
-                            store.Next();
-                            imagesUsed.Add(store.CurrentImage);
-                        }
-                        else
-                        {
-                            writer.WriteChunk(binary.ToString());
-                            chunksWritten++; //used to display how much data has been read as a percent
-                            DisplayPercent(chunksWritten, chunkTable.Count, "Decoding file contents"); //used to display how much data has been read as a percent
-                            binary = new StringBuilder();
-                            stillReading = false;
-                        }
-                    }
+                    // as we read in each chunk from the images start writing the decoded
+                    // values to the target output file.
+                    string binary = store.Read(length);
+                    writer.WriteChunk(binary);
+                    chunksWritten++; //used to display how much data has been read as a percent
+                    DisplayPercent(chunksWritten, chunkTable.Count, "Decoding file contents"); //used to display how much data has been read as a percent
                 }
                 Console.WriteLine("All encoded file contents has been decoded.");
             }
+            store.Finish();
+
             PrintUnused(imagesUsed);
             Console.WriteLine("Decoding process complete.");
         }
