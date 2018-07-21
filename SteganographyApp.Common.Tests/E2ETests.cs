@@ -32,7 +32,7 @@ namespace SteganographyApp.Common.Tests
         public void TearDown()
         {
             store.ResetTo("TestAssets/001.png");
-            store.CleanAll(null);
+            store.CleanAll();
             if(File.Exists(args.DecodedOutputFile))
             {
                 File.Delete(args.DecodedOutputFile);

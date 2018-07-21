@@ -27,7 +27,7 @@ namespace SteganographyApp.Common.Tests
         {
             if (store != null && args.CoverImages != null)
             {
-                store.CleanAll(null);
+                store.CleanAll();
             }
         }
 

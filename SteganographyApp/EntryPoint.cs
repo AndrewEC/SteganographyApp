@@ -53,11 +53,13 @@ namespace SteganographyApp
         {
             int cleaned = 0;
             DisplayPercent(cleaned, args.CoverImages.Length, "Cleaning image LSB data");
-            new ImageStore(args).CleanAll(() =>
+            var store = new ImageStore(args);
+            store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs eventArg) =>
             {
                 cleaned++;
                 DisplayPercent(cleaned, args.CoverImages.Length, "Cleaning image LSB data");
-            });
+            };
+            store.CleanAll();
             Console.WriteLine("Finished cleaning all {0} images.", args.CoverImages.Length);
         }
 

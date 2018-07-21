@@ -48,13 +48,6 @@ namespace SteganographyApp.Common.IO
     {
 
         /// <summary>
-        /// Callback method for the Clean method to return the
-        /// current progress back to the entry point so progress can be
-        /// formatted and displayed to the user.
-        /// </summary>
-        public delegate void ProgressReport();
-
-        /// <summary>
         /// Event handle the will be invoked whenever the Next method is internally
         /// invoked so that the calling entry point can record which images
         /// have been used in the encoding or decoding process.
@@ -145,7 +138,7 @@ namespace SteganographyApp.Common.IO
         /// Will look over all images specified in the InputArguments
         /// and set the LSB in all pixels in all images to 0.
         /// </summary>
-        public void CleanAll(ProgressReport report)
+        public void CleanAll()
         {
             currentImageIndex = -1;
             Next();
@@ -172,7 +165,6 @@ namespace SteganographyApp.Common.IO
                 {
                     Next(true);
                 }
-                report?.Invoke();
             }
         }
 
