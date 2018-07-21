@@ -1,5 +1,5 @@
 ﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Helpers;
+using SixLabors.ImageSharp.PixelFormats;
 using SteganographyApp.Common.IO.Content;
 using System;
 using System.Collections.Generic;
