@@ -220,7 +220,7 @@ namespace SteganographyApp.Common.IO
         /// Attempts to read the specified number of bits from the current image starting
         /// at the last read/write position.
         /// <para>If there is not enough available space in the current image then it will
-        /// invoke the Next method and continue to read from the next available method..</para>
+        /// invoke the Next method and continue to read from the next available image.</para>
         /// </summary>
         /// <param name="length">Specifies the number of bits to be read from the current image.</param>
         /// <returns>A binary string whose length is equal to the length specified in the length

@@ -456,6 +456,9 @@ namespace SteganographyApp.Common
         /// <summary>
         /// Specifies the chunk size. I.e. the number of bytes to read, encode,
         /// and write at any given time.
+        /// <para>Higher values will improve the time to encode a larger file and reduce
+        /// ther overall encoded file size though values too high run the risk of
+        /// having memory related errors.</para>
         /// <para>Value of 131,072</para>
         /// </summary>
         public int ChunkByteSize { get; set; } = 131_072;
