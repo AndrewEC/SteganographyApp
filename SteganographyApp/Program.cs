@@ -17,7 +17,7 @@ namespace SteganographyApp
 
             try
             {
-                InputArguments inputArgs = ArgumentParser.Instance.Parse(args);
+                InputArguments inputArgs = new ArgumentParser().Parse(args);
 
                 try
                 {

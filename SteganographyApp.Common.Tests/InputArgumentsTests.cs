@@ -19,7 +19,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(null);
+                new ArgumentParser().Parse(null);
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -34,7 +34,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(new string[] { "test=1" });
+                new ArgumentParser().Parse(new string[] { "test=1" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -49,7 +49,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(new string[] { "--name=" });
+                new ArgumentParser().Parse(new string[] { "--name=" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -64,7 +64,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(new string[] { "--name" });
+                new ArgumentParser().Parse(new string[] { "--name" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -79,7 +79,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(new string[] { "--action=whatever" });
+                new ArgumentParser().Parse(new string[] { "--action=whatever" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -95,7 +95,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(new string[] { "--action=encode" });
+                new ArgumentParser().Parse(new string[] { "--action=encode" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -110,7 +110,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(new string[] { "--input=test!@#.png" });
+                new ArgumentParser().Parse(new string[] { "--input=test!@#.png" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -126,7 +126,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(new string[] { "--images=test!@#.png" });
+                new ArgumentParser().Parse(new string[] { "--images=test!@#.png" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -140,7 +140,7 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestWithRegexGivesValidImages()
         {
-            var args = ArgumentParser.Instance.Parse(new string[] {
+            var args = new ArgumentParser().Parse(new string[] {
                 "--images=[r]<^.*\\.(png|PNG)><./TestAssets/>",
                 "--action=encode",
                 "--input=./TestAssets/test.zip"
@@ -153,7 +153,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(new string[] { "--images=[r]<><>" });
+                new ArgumentParser().Parse(new string[] { "--images=[r]<><>" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -169,7 +169,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                ArgumentParser.Instance.Parse(new string[] { "--images=[r]<^.*\\.(png|PNG)><.>" });
+                new ArgumentParser().Parse(new string[] { "--images=[r]<^.*\\.(png|PNG)><.>" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch(Exception e)

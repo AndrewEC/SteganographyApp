@@ -31,7 +31,7 @@ namespace SteganographyApp.Common.Tests
         [TestCleanup]
         public void TearDown()
         {
-            store.ResetTo("TestAssets/001.png");
+            store.ResetTo(0);
             store.CleanAll();
             if(File.Exists(args.DecodedOutputFile))
             {
@@ -54,10 +54,10 @@ namespace SteganographyApp.Common.Tests
                 Assert.AreEqual(content.Length, written);
             }
             store.Finish(true);
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             store.WriteContentChunkTable(table);
 
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             var readTable = store.ReadContentChunkTable();
             using(var writer = new ContentWriter(args))
             {
@@ -86,10 +86,10 @@ namespace SteganographyApp.Common.Tests
                 Assert.AreEqual(content.Length, written);
             }
             store.Finish(true);
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             store.WriteContentChunkTable(table);
             args.Password = "Wrong Password";
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             var readTable = store.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
@@ -116,10 +116,10 @@ namespace SteganographyApp.Common.Tests
                 Assert.AreEqual(content.Length, written);
             }
             store.Finish(true);
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             store.WriteContentChunkTable(table);
             args.UseCompression = false;
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             var readTable = store.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {

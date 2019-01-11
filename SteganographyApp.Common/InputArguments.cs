@@ -66,23 +66,7 @@ namespace SteganographyApp.Common
         /// </summary>
         private Dictionary<string, ValueParser> valueProcessors;
 
-        /// <summary>
-        /// The singleton instance of the ArgumentParse class
-        /// </summary>
-        private static ArgumentParser instance;
-        public static ArgumentParser Instance
-        {
-            get
-            {
-                if(instance == null)
-                {
-                    instance = new ArgumentParser();
-                }
-                return instance;
-            }
-        }
-
-        private ArgumentParser()
+        public ArgumentParser()
         {
             valueProcessors = new Dictionary<string, ValueParser>
             {

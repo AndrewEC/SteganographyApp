@@ -348,9 +348,13 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <param name="imageName">The image name to start reading and writing from.</param>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        public void ResetTo(string imageName)
+        public void ResetTo(int index)
         {
-            currentImageIndex = Array.IndexOf(args.CoverImages, imageName) - 1;
+            if(index < 0 || index >= args.CoverImages.Length)
+            {
+                throw new ImageProcessingException(string.Format("An invalid image index was provided in ResetTo. Expected value between {0} and {1}, instead got {2}", 0, args.CoverImages.Length - 1, index));
+            }
+            currentImageIndex = index - 1;
             Next();
         }
 

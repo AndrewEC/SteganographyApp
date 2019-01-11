@@ -39,7 +39,7 @@ namespace SteganographyApp.Common.Tests
             store.Next();
             Assert.AreEqual(args.CoverImages[1], store.CurrentImage);
 
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             Assert.AreEqual(args.CoverImages[0], store.CurrentImage);
         }
 
@@ -71,7 +71,7 @@ namespace SteganographyApp.Common.Tests
             entries.Add(4000);
             store.Next();
             store.WriteContentChunkTable(entries);
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             var read = store.ReadContentChunkTable();
 
             Assert.AreEqual(entries.Count, read.Count);
@@ -89,7 +89,7 @@ namespace SteganographyApp.Common.Tests
             int written = store.Write(binary);
             Assert.AreEqual(binary.Length, written);
             store.Finish(true);
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             Assert.AreEqual(binary, store.Read(binary.Length));
         }
     }

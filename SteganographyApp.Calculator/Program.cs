@@ -20,7 +20,7 @@ namespace SteganographyAppCalculator
             }
             try
             {
-                var inputArguments = ArgumentParser.Instance.Parse(args);
+                var inputArguments = new ArgumentParser().Parse(args);
                 if (inputArguments.EncodeOrDecode == EncodeDecodeAction.CalculateStorageSpace)
                 {
                     Console.WriteLine("Calculating storage space in {0} images.", inputArguments.CoverImages.Length);

@@ -74,9 +74,9 @@ namespace SteganographyApp
             Console.WriteLine("Started encoding file {0}", args.FileToEncode);
 
             var store = new ImageStore(args);
+            var table = new List<int>();
             int start = store.RequiredContentChunkTableBitSize;
 
-            var table = new List<int>();
             var imagesUsed = new List<string>();
             store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs args) =>
             {
@@ -84,7 +84,6 @@ namespace SteganographyApp
             };
 
             store.Next();
-
             // check that the leading image has enough storage space to store the content table
             if(!store.HasEnoughSpaceForContentChunkTable())
             {
@@ -115,7 +114,7 @@ namespace SteganographyApp
             store.Finish(true);
 
             PrintUnused(imagesUsed);
-            store.ResetTo(args.CoverImages[0]);
+            store.ResetTo(0);
             Console.WriteLine("Writing content chunk table.");
             store.WriteContentChunkTable(table);
             Console.WriteLine("Encoding process complete.");
