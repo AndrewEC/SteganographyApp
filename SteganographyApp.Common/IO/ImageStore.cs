@@ -34,6 +34,10 @@ namespace SteganographyApp.Common.IO
         public static readonly int P2160 = 25_012_800;
     }
 
+    /// <summary>
+    /// Event arguments passed into the OnNextImageLoaded event handler whenever the next image
+    /// has been loaded in the read, write, or clean process.
+    /// </summary>
     public class NextImageLoadedEventArgs
     {
         public string ImageName { get; set; }

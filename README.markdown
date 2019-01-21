@@ -52,6 +52,7 @@ Example arguments for decoding data from a set of images to an output file.
     Example: --images=[r]<^.*\\.(png)><.> looks for all png files in the current directory.
 
 --passsword :: The password to encrypt the input file when 'encode' was specified in the action argument.
+    Enter ? as the password to input the real password in interactive mode.
 
 --compress :: Specifies whether or not to compress/decompress the encoded/decoded content.
     Value must be either 'true' or 'false'.
@@ -61,6 +62,7 @@ Example arguments for decoding data from a set of images to an output file.
     Larger numbers can quicken the process of encoding larger files.
 
 --randomSeed :: Randomizes the order in which bytes will be written from input file to image.
+    Enter ? as the randomSeed to input the real randomSeed in interactive mode.
 ```
 
 3rd Party Libraries

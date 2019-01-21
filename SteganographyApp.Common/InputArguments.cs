@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SteganographyApp.Common
@@ -64,7 +65,7 @@ namespace SteganographyApp.Common
         /// A dictionary containing all of the keys and associated delegate methods
         /// to parse user provided values and sets values in the InputArguments instance.
         /// </summary>
-        private Dictionary<string, ValueParser> valueProcessors;
+        private readonly Dictionary<string, ValueParser> valueProcessors;
 
         public ArgumentParser()
         {
@@ -75,7 +76,7 @@ namespace SteganographyApp.Common
                 { "--compress", ParseUseCompression },
                 { "--printStack", ParsePrintStack },
                 { "--images", ParseImages },
-                { "--password", (arguments, value) => { arguments.Password = value; } },
+                { "--password", ParsePassword },
                 { "--output", (arguments, value) => { arguments.DecodedOutputFile = value; } },
                 { "--chunkSize", ParseChunkSize },
                 { "--randomSeed", ParseRandomSeed }
@@ -145,6 +146,54 @@ namespace SteganographyApp.Common
             }
 
             return arguments;
+        }
+
+        /// <summary>
+        /// Attempts to retrieve the user's input without displaying the input on screen.
+        /// </summary>
+        /// <param name="value">The original value for the current argument the user provided.
+        /// If this value is a question mark then this will invoke the ReadKey method and record
+        /// input until the enter key has been pressed and return the result without presenting
+        /// the resulting value on screen.</param>
+        /// <param name="message">The argument to prompt the user to enter.</param>
+        /// <returns>Either the original value string value or the value of the user's input
+        /// if the original value string value was a question mark.</returns>
+        private string ReadString(string value, string message)
+        {
+            if(value == "?")
+            {
+                Console.Write("Enter {0}: ", message);
+                var builder = new StringBuilder();
+                while (true)
+                {
+                    var key = Console.ReadKey(true);
+                    if (key.Key == ConsoleKey.Enter)
+                    {
+                        Console.WriteLine();
+                        return builder.ToString();
+                    }
+                    else if (key.Key == ConsoleKey.Backspace && builder.Length > 0)
+                    {
+                        builder.Remove(builder.Length - 1, 1);
+                    }
+                    else
+                    {
+                        builder.Append(key.KeyChar);
+                    }
+                }
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// Retrieves the encryption password by invoking the <see cref="ReadString"/> method to retrieve
+        /// either the user input or the original string value.
+        /// </summary>
+        /// <param name="arguments">The InputArguments instance to modify.</param>
+        /// <param name="value">The string representation of the password</param>
+        private void ParsePassword(InputArguments arguments, string value)
+        {
+            arguments.Password = ReadString(value, "Password");
         }
 
         /// <summary>
@@ -292,6 +341,7 @@ namespace SteganographyApp.Common
         /// If a regular expression is detected in the --images parameter this method
         /// will load the images in the specified directory based on matches against
         /// the regular expression.
+        /// <para>The regex expression will be retrieved by invoking the <see cref="ParseRegex"/> method.</para>
         /// </summary>
         /// <param name="value">The value of the --images parameter</param>
         /// <returns>An array of images from the specified directory.</returns>
@@ -360,17 +410,19 @@ namespace SteganographyApp.Common
         }
 
         /// <summary>
-        /// Takes in the random seed value and validates that it is of the appropriate length.
+        /// Takes in the random seed value by invoking the <see cref="ReadString"/> method and validating the
+        /// input is of a valid length.
         /// </summary>
         /// <param name="arguments">The InputArguments instanced to fill with the parse random seed value.</param>
         /// <param name="value">The string representation of the random seed.</param>
         private void ParseRandomSeed(InputArguments arguments, string value)
         {
-            if(value.Length > 235 || value.Length < 3)
+            var seed = ReadString(value, "Random Seed");
+            if(seed.Length > 235 || seed.Length < 3)
             {
                 throw new ArgumentValueException("The length of the random seed must be between 3 and 235 characters in length.");
             }
-            arguments.RandomSeed = value;
+            arguments.RandomSeed = seed;
         }
 
         /// <summary>
