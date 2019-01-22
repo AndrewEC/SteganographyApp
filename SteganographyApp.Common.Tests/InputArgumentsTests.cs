@@ -34,43 +34,13 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                new ArgumentParser().Parse(new string[] { "test=1" });
+                new ArgumentParser().Parse(new string[] { "test", "1" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
             {
                 Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.AreEqual("An invalid key value was provided: test", e.Message, MisMatchExceptionmessage);
-            }
-        }
-
-        [TestMethod]
-        public void TestParseWithMissingValueThrowsException()
-        {
-            try
-            {
-                new ArgumentParser().Parse(new string[] { "--name=" });
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.AreEqual("Value for argument --name was empty. A value must be provided for all specified arguments.", e.Message, MisMatchExceptionmessage);
-            }
-        }
-
-        [TestMethod]
-        public void TestParseWithMissingEqualsInArgumentThrowsException()
-        {
-            try
-            {
-                new ArgumentParser().Parse(new string[] { "--name" });
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.AreEqual("Invalid argument --name. Did not contain required = sign.", e.Message, MisMatchExceptionmessage);
+                Assert.AreEqual("An unrecognized argument was provided: test", e.Message, MisMatchExceptionmessage);
             }
         }
 
@@ -79,7 +49,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                new ArgumentParser().Parse(new string[] { "--action=whatever" });
+                new ArgumentParser().Parse(new string[] { "--action", "whatever" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -95,7 +65,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                new ArgumentParser().Parse(new string[] { "--action=encode" });
+                new ArgumentParser().Parse(new string[] { "--action", "encode" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -110,7 +80,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                new ArgumentParser().Parse(new string[] { "--input=test!@#.png" });
+                new ArgumentParser().Parse(new string[] { "--input", "test!@#.png" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -126,7 +96,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                new ArgumentParser().Parse(new string[] { "--images=test!@#.png" });
+                new ArgumentParser().Parse(new string[] { "--images", "test!@#.png" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -141,9 +111,9 @@ namespace SteganographyApp.Common.Tests
         public void TestWithRegexGivesValidImages()
         {
             var args = new ArgumentParser().Parse(new string[] {
-                "--images=[r]<^.*\\.(png|PNG)><./TestAssets/>",
-                "--action=encode",
-                "--input=./TestAssets/test.zip"
+                "--images", "[r]<^.*\\.(png|PNG)><./TestAssets/>",
+                "--action", "encode",
+                "--input", "./TestAssets/test.zip"
             });
             Assert.AreEqual(2, args.CoverImages.Length, "Parsing regular expression should have returned 2 images.");
         }
@@ -153,7 +123,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                new ArgumentParser().Parse(new string[] { "--images=[r]<><>" });
+                new ArgumentParser().Parse(new string[] { "--images", "[r]<><>" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch (Exception e)
@@ -169,7 +139,7 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                new ArgumentParser().Parse(new string[] { "--images=[r]<^.*\\.(png|PNG)><.>" });
+                new ArgumentParser().Parse(new string[] { "--images", "[r]<^.*\\.(png|PNG)><.>" });
                 Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
             }
             catch(Exception e)

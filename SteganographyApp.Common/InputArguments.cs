@@ -62,25 +62,68 @@ namespace SteganographyApp.Common
         public delegate void ValueParser(InputArguments args, string value);
 
         /// <summary>
-        /// A dictionary containing all of the keys and associated delegate methods
-        /// to parse user provided values and sets values in the InputArguments instance.
+        /// Encapsulates information about an argument that the user can specify when invoking the
+        /// tool.
         /// </summary>
-        private readonly Dictionary<string, ValueParser> valueProcessors;
+        public class Argument
+        {
+            public string Name { get; private set; }
+            public string ShortName { get; private set; }
+            public ValueParser Parser { get; private set; }
+            public bool IsFlag { get; private set; }
+
+            public Argument(string name, string shortName, ValueParser parser, bool flag=false)
+            {
+                Name = name;
+                ShortName = shortName;
+                Parser = parser;
+                IsFlag = flag;
+            }
+        }
+
+        /// <summary>
+        /// The list of user providable arguments.
+        /// </summary>
+        private readonly List<Argument> arguments;
 
         public ArgumentParser()
         {
-            valueProcessors = new Dictionary<string, ValueParser>
+            arguments = new List<Argument>()
             {
-                { "--action", ParseEncodeOrDecodeAction },
-                { "--input", ParseFileToEncode },
-                { "--compress", ParseUseCompression },
-                { "--printStack", ParsePrintStack },
-                { "--images", ParseImages },
-                { "--password", ParsePassword },
-                { "--output", (arguments, value) => { arguments.DecodedOutputFile = value; } },
-                { "--chunkSize", ParseChunkSize },
-                { "--randomSeed", ParseRandomSeed }
+                new Argument("--action", "-a", ParseEncodeOrDecodeAction),
+                new Argument("--input", "-in", ParseFileToEncode),
+                new Argument("--compress", "-c", ParseUseCompression, true),
+                new Argument("--printStack", "-stack", ParsePrintStack, true),
+                new Argument("--images", "-im", ParseImages),
+                new Argument("--password", "-p", ParsePassword),
+                new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
+                new Argument("--chunkSize", "-cs", ParseChunkSize),
+                new Argument("--randomSeed", "-rs", ParseRandomSeed)
             };
+        }
+
+        /// <summary>
+        /// Attempts to lookup an Argument instance from the list of arguments.
+        /// <para>The key value to lookup from can either be the regular argument name or
+        /// the arguments short name.</para>
+        /// </summary>
+        /// <param name="key">The name of the argument to find. This can either be the arguments name or the
+        /// arguments short name</param>
+        /// <param name="argument">The Argument instance to be provided if found. If not found this value
+        /// will be null.</param>
+        /// <returns>True if the argument could be found else false.</returns>
+        private bool TryGetArgument(string key, out Argument argument)
+        {
+            foreach(Argument arg in arguments)
+            {
+                if(arg.Name == key || arg.ShortName == key)
+                {
+                    argument = arg;
+                    return true;
+                }
+            }
+            argument = null;
+            return false;
         }
 
         /// <summary>
@@ -99,53 +142,50 @@ namespace SteganographyApp.Common
                 throw new ArgumentParseException("No arguments provided to parse.");
             }
 
-            var arguments = new InputArguments();
-
-            foreach (string arg in args)
+            var inputs = new InputArguments();
+            for(int i = 0; i < args.Length; i++)
             {
-                if (!arg.Contains("="))
+                if (!TryGetArgument(args[i], out Argument argument))
                 {
-                    throw new ArgumentParseException(String.Format("Invalid argument {0}. Did not contain required = sign.", arg));
+                    throw new ArgumentParseException(string.Format("An unrecognized argument was provided: {0}", args[i]));
                 }
 
-                var key = arg.Split('=')[0].Trim();
-                var value = arg.Split('=')[1].Trim();
-
-                if (key == "")
-                {
-                    throw new ArgumentParseException("Argument name was empty when it is required.");
-                }
-
-                if (value == "")
-                {
-                    throw new ArgumentParseException(String.Format("Value for argument {0} was empty. A value must be provided for all specified arguments.", key));
-                }
-
-                if(valueProcessors.TryGetValue(key, out ValueParser processor))
+                if (argument.IsFlag)
                 {
                     try
                     {
-                        processor(arguments, value);
+                        argument.Parser(inputs, "true");
                     }
-                    catch (ArgumentValueException e)
+                    catch (Exception e)
                     {
-                        throw new ArgumentParseException(String.Format("An error occured while parsing argument {0}", key), e);
+                        throw new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", args[i]), e);
                     }
                 }
                 else
                 {
-                    throw new ArgumentParseException(String.Format("An invalid key value was provided: {0}", key));
+                    if(i + 1 >= args.Length)
+                    {
+                        throw new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", args[i]));
+                    }
+                    try
+                    {
+                        argument.Parser(inputs, args[i + 1]);
+                        i++;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", args[i]), e);
+                    }
                 }
-                
             }
 
-            string validation = ValidateParseResult(arguments);
+            string validation = ValidateParseResult(inputs);
             if (validation != NoMissingValues)
             {
-                throw new ArgumentParseException(String.Format("Missing required values. {0}", validation));
+                throw new ArgumentParseException(string.Format("Missing required values. {0}", validation));
             }
 
-            return arguments;
+            return inputs;
         }
 
         /// <summary>
