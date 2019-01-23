@@ -71,13 +71,17 @@ namespace SteganographyApp.Common
             public string ShortName { get; private set; }
             public ValueParser Parser { get; private set; }
             public bool IsFlag { get; private set; }
+            public bool IsPassword { get; private set; }
+            public bool IsRandomSeed { get; private set; }
 
-            public Argument(string name, string shortName, ValueParser parser, bool flag=false)
+            public Argument(string name, string shortName, ValueParser parser, bool flag=false, bool password=false, bool randomSeed=false)
             {
                 Name = name;
                 ShortName = shortName;
                 Parser = parser;
                 IsFlag = flag;
+                IsPassword = password;
+                IsRandomSeed = randomSeed;
             }
         }
 
@@ -95,10 +99,10 @@ namespace SteganographyApp.Common
                 new Argument("--compress", "-c", ParseUseCompression, true),
                 new Argument("--printStack", "-stack", ParsePrintStack, true),
                 new Argument("--images", "-im", ParseImages),
-                new Argument("--password", "-p", ParsePassword),
+                new Argument("--password", "-p", ParsePassword, password: true),
                 new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
                 new Argument("--chunkSize", "-cs", ParseChunkSize),
-                new Argument("--randomSeed", "-rs", ParseRandomSeed)
+                new Argument("--randomSeed", "-rs", ParseRandomSeed, randomSeed: true)
             };
         }
 
@@ -114,9 +118,10 @@ namespace SteganographyApp.Common
         /// <returns>True if the argument could be found else false.</returns>
         private bool TryGetArgument(string key, out Argument argument)
         {
+            string lowerKey = key.ToLower();
             foreach(Argument arg in arguments)
             {
-                if(arg.Name == key || arg.ShortName == key)
+                if(arg.Name == lowerKey || arg.ShortName == lowerKey)
                 {
                     argument = arg;
                     return true;
@@ -143,11 +148,35 @@ namespace SteganographyApp.Common
             }
 
             var inputs = new InputArguments();
+            ValueTuple<string, Argument> password = ("", null);
+            ValueTuple<string, Argument> randomSeed = ("", null);
+
             for(int i = 0; i < args.Length; i++)
             {
                 if (!TryGetArgument(args[i], out Argument argument))
                 {
                     throw new ArgumentParseException(string.Format("An unrecognized argument was provided: {0}", args[i]));
+                }
+
+                //Retrieve the password and randomSeed values to process them last as they may
+                //require interactive input in which we should throw any validations error available before
+                //requesting further user input.
+                if(argument.Name == "--password" || argument.Name == "--randomSeed")
+                {
+                    if (i + 1 >= args.Length)
+                    {
+                        throw new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", args[i]));
+                    }
+                    if (argument.Name == "--password")
+                    {
+                        password = (args[i + 1], argument);
+                    }
+                    else if (argument.Name == "--randomSeed")
+                    {
+                        randomSeed = (args[i + 1], argument);
+                    }
+                    i++;
+                    continue;
                 }
 
                 if (argument.IsFlag)
@@ -183,6 +212,15 @@ namespace SteganographyApp.Common
             if (validation != NoMissingValues)
             {
                 throw new ArgumentParseException(string.Format("Missing required values. {0}", validation));
+            }
+
+            if (password.Item2 != null)
+            {
+                password.Item2.Parser(inputs, password.Item1);
+            }
+            if (randomSeed.Item2 != null)
+            {
+                randomSeed.Item2.Parser(inputs, randomSeed.Item1);
             }
 
             return inputs;
