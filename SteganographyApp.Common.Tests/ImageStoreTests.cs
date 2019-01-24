@@ -10,6 +10,7 @@ namespace SteganographyApp.Common.Tests
 
         private ImageStore store;
         private InputArguments args;
+        private ImageStore.ImageStoreWrapper wrapper;
 
         [TestInitialize]
         public void SetUp()
@@ -20,6 +21,7 @@ namespace SteganographyApp.Common.Tests
                 CoverImages = new string[] { "TestAssets/001.png", "TestAssets/002.png" }
             };
             store = new ImageStore(args);
+            wrapper = store.CreateIOWrapper();
         }
 
         [TestCleanup]
@@ -29,17 +31,17 @@ namespace SteganographyApp.Common.Tests
             {
                 store.CleanAll();
             }
+            wrapper.Dispose();
         }
 
         [TestMethod]
         public void TestReturnsProperCurrentImage()
         {
-            store.Next();
             Assert.AreEqual(args.CoverImages[0], store.CurrentImage);
-            store.Next();
+            wrapper.Next();
             Assert.AreEqual(args.CoverImages[1], store.CurrentImage);
 
-            store.ResetTo(0);
+            wrapper.ResetTo(0);
             Assert.AreEqual(args.CoverImages[0], store.CurrentImage);
         }
 
@@ -47,9 +49,9 @@ namespace SteganographyApp.Common.Tests
         [ExpectedException(typeof(ImageProcessingException), AllowDerivedTypes = false)]
         public void TestNotEnoughImagesProducesException()
         {
-            store.Next();
-            store.Next();
-            store.Next();
+            wrapper.Next();
+            wrapper.Next();
+            wrapper.Next();
         }
 
         [TestMethod]
@@ -69,10 +71,9 @@ namespace SteganographyApp.Common.Tests
             var entries = new List<int>();
             entries.Add(3000);
             entries.Add(4000);
-            store.Next();
             store.WriteContentChunkTable(entries);
-            store.ResetTo(0);
-            var read = store.ReadContentChunkTable();
+            wrapper.ResetTo(0);
+            var read = wrapper.ReadContentChunkTable();
 
             Assert.AreEqual(entries.Count, read.Count);
             for (int i = 0; i < entries.Count; i++)
@@ -84,13 +85,12 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestWriteAndReadContentMatches()
         {
-            store.Next();
             string binary = "00101001110010100100011001101010";
-            int written = store.Write(binary);
+            int written = wrapper.Write(binary);
             Assert.AreEqual(binary.Length, written);
-            store.Finish(true);
-            store.ResetTo(0);
-            Assert.AreEqual(binary, store.Read(binary.Length));
+            wrapper.Finish(true);
+            wrapper.ResetTo(0);
+            Assert.AreEqual(binary, wrapper.Read(binary.Length));
         }
     }
 }

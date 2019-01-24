@@ -13,6 +13,7 @@ namespace SteganographyApp.Common.Tests
 
         private InputArguments args;
         private ImageStore store;
+        private ImageStore.ImageStoreWrapper wrapper;
 
         [TestInitialize]
         public void SetUp()
@@ -26,12 +27,13 @@ namespace SteganographyApp.Common.Tests
                 UseCompression = true
             };
             store = new ImageStore(args);
+            wrapper = store.CreateIOWrapper();
         }
 
         [TestCleanup]
         public void TearDown()
         {
-            store.ResetTo(0);
+            wrapper.ResetTo(0);
             store.CleanAll();
             if(File.Exists(args.DecodedOutputFile))
             {
@@ -42,26 +44,25 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestFullWriteReadHappyPath()
         {
-            store.Next();
-            store.Seek(store.RequiredContentChunkTableBitSize);
+            wrapper.Seek(store.RequiredContentChunkTableBitSize);
             string content = "";
             var table = new List<int>();
             using(var reader = new ContentReader(args))
             {
                 content = reader.ReadNextChunk();
-                int written = store.Write(content);
+                int written = wrapper.Write(content);
                 table.Add(written);
                 Assert.AreEqual(content.Length, written);
             }
-            store.Finish(true);
-            store.ResetTo(0);
+            wrapper.Finish(true);
+            wrapper.ResetTo(0);
             store.WriteContentChunkTable(table);
 
-            store.ResetTo(0);
-            var readTable = store.ReadContentChunkTable();
+            wrapper.ResetTo(0);
+            var readTable = wrapper.ReadContentChunkTable();
             using(var writer = new ContentWriter(args))
             {
-                string binary = store.Read(readTable[0]);
+                string binary = wrapper.Read(readTable[0]);
                 Assert.AreEqual(content, binary);
                 writer.WriteChunk(binary);
             }
@@ -74,26 +75,25 @@ namespace SteganographyApp.Common.Tests
         [ExpectedException(typeof(TransformationException), AllowDerivedTypes = false)]
         public void TestPasswordMismatchError()
         {
-            store.Next();
-            store.Seek(store.RequiredContentChunkTableBitSize);
+            wrapper.Seek(store.RequiredContentChunkTableBitSize);
             string content = "";
             var table = new List<int>();
             using (var reader = new ContentReader(args))
             {
                 content = reader.ReadNextChunk();
-                int written = store.Write(content);
+                int written = wrapper.Write(content);
                 table.Add(written);
                 Assert.AreEqual(content.Length, written);
             }
-            store.Finish(true);
-            store.ResetTo(0);
+            wrapper.Finish(true);
+            wrapper.ResetTo(0);
             store.WriteContentChunkTable(table);
             args.Password = "Wrong Password";
-            store.ResetTo(0);
-            var readTable = store.ReadContentChunkTable();
+            wrapper.ResetTo(0);
+            var readTable = wrapper.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = store.Read(readTable[0]);
+                string binary = wrapper.Read(readTable[0]);
                 writer.WriteChunk(binary);
             }
             long target = new FileInfo(args.FileToEncode).Length;
@@ -104,26 +104,25 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestCompressMismatchProducesBadFile()
         {
-            store.Next();
-            store.Seek(store.RequiredContentChunkTableBitSize);
+            wrapper.Seek(store.RequiredContentChunkTableBitSize);
             string content = "";
             var table = new List<int>();
             using (var reader = new ContentReader(args))
             {
                 content = reader.ReadNextChunk();
-                int written = store.Write(content);
+                int written = wrapper.Write(content);
                 table.Add(written);
                 Assert.AreEqual(content.Length, written);
             }
-            store.Finish(true);
-            store.ResetTo(0);
+            wrapper.Finish(true);
+            wrapper.ResetTo(0);
             store.WriteContentChunkTable(table);
             args.UseCompression = false;
-            store.ResetTo(0);
-            var readTable = store.ReadContentChunkTable();
+            wrapper.ResetTo(0);
+            var readTable = wrapper.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = store.Read(readTable[0]);
+                string binary = wrapper.Read(readTable[0]);
                 Assert.AreEqual(content, binary);
                 writer.WriteChunk(binary);
             }

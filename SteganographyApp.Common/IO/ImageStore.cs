@@ -45,66 +45,81 @@ namespace SteganographyApp.Common.IO
     }
 
     /// <summary>
-    /// A wrapper class that exposes the IO related methods of an ImageStore instance while implementing
-    /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
-    /// more error prone IO operations.
-    /// </summary>
-    public class ImageStoreWrapper : IDisposable
-    {
-
-        private readonly ImageStore store;
-
-        private bool save = false;
-
-        public ImageStoreWrapper(ImageStore store)
-        {
-            this.store = store;
-            store.Next();
-        }
-
-        public void Complete()
-        {
-            save = true;
-        }
-
-        public void Write(string binary)
-        {
-            store.Write(binary);
-        }
-
-        public string Read(int length)
-        {
-            return store.Read(length);
-        }
-
-        public List<int> ReadContentChunkTable()
-        {
-            return store.ReadContentChunkTable();
-        }
-
-        public void Seek(int position)
-        {
-            store.Seek(position);
-        }
-
-        public bool HasEnoughSpaceForContentChunkTable()
-        {
-            return store.HasEnoughSpaceForContentChunkTable();
-        }
-
-        public void Dispose()
-        {
-            store.Finish(save);
-            store.ResetTo(0);
-        }
-    }
-
-    /// <summary>
     /// Class that handles positioning a make shift write stream in the proper position so
     /// data can be reliably read and written to the storage images.
     /// </summary>
     public class ImageStore
     {
+
+        /// <summary>
+        /// A wrapper class that exposes the IO related methods of an ImageStore instance while implementing
+        /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
+        /// more error prone IO operations.
+        /// </summary>
+        public class ImageStoreWrapper : IDisposable
+        {
+
+            private readonly ImageStore store;
+
+            private bool save = false;
+
+            public ImageStoreWrapper(ImageStore store)
+            {
+                this.store = store;
+                store.Next();
+            }
+
+            public void Complete()
+            {
+                save = true;
+            }
+
+            public int Write(string binary)
+            {
+                return store.Write(binary);
+            }
+
+            public string Read(int length)
+            {
+                return store.Read(length);
+            }
+
+            public List<int> ReadContentChunkTable()
+            {
+                return store.ReadContentChunkTable();
+            }
+
+            public void Seek(int position)
+            {
+                store.Seek(position);
+            }
+
+            public bool HasEnoughSpaceForContentChunkTable()
+            {
+                return store.HasEnoughSpaceForContentChunkTable();
+            }
+
+            public void Next()
+            {
+                store.Next();
+            }
+
+            public void ResetTo(int index)
+            {
+                store.ResetTo(index);
+            }
+
+            public void Finish(bool save = false)
+            {
+                store.Finish(save);
+            }
+
+            public void Dispose()
+            {
+                store.Finish(save);
+                store.ResetTo(0);
+            }
+        }
 
         /// <summary>
         /// Event handle the will be invoked whenever the Next method is internally
@@ -214,31 +229,39 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         public void CleanAll()
         {
-            currentImageIndex = -1;
-            Next();
-            for(int i = 0; i < args.CoverImages.Length; i++)
+            try
             {
-                while (true)
+                currentImageIndex = -1;
+                Next();
+                for (int i = 0; i < args.CoverImages.Length; i++)
                 {
-                    byte newRed = (byte)(currentImage[x, y].R & ~1);
-                    byte newGreen = (byte)(currentImage[x, y].G & ~1);
-                    byte newBlue = (byte)(currentImage[x, y].B & ~1);
-
-                    currentImage[x, y] = new Rgba32(newRed, newGreen, newBlue, currentImage[x, y].A);
-
-                    if (!TryMove())
+                    while (true)
                     {
-                        break;
+                        byte newRed = (byte)(currentImage[x, y].R & ~1);
+                        byte newGreen = (byte)(currentImage[x, y].G & ~1);
+                        byte newBlue = (byte)(currentImage[x, y].B & ~1);
+
+                        currentImage[x, y] = new Rgba32(newRed, newGreen, newBlue, currentImage[x, y].A);
+
+                        if (!TryMove())
+                        {
+                            break;
+                        }
+                    }
+                    if (i == args.CoverImages.Length - 1)
+                    {
+                        Finish(true);
+                    }
+                    else
+                    {
+                        Next(true);
                     }
                 }
-                if (i == args.CoverImages.Length - 1)
-                {
-                    Finish(true);
-                }
-                else
-                {
-                    Next(true);
-                }
+            }
+            catch (Exception e)
+            {
+                Finish();
+                throw e;
             }
         }
 
@@ -253,7 +276,7 @@ namespace SteganographyApp.Common.IO
         /// <returns>The number of bits written to the image. This is mostly important when
         /// writing the content chunk table to the start of the leading image.</returns>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        public int Write(string binary)
+        private int Write(string binary)
         {
             int written = 0;
             for (int i = 0; i < binary.Length; i += 3)
@@ -300,7 +323,7 @@ namespace SteganographyApp.Common.IO
         /// <returns>A binary string whose length is equal to the length specified in the length
         /// parameter.</returns>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        public string Read(int length)
+        private string Read(int length)
         {
             var binary = new StringBuilder();
             int read = 0;
@@ -344,7 +367,7 @@ namespace SteganographyApp.Common.IO
         /// of data stored in the current set of images.</returns>
         /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
         /// storage space to read the entire content chunk table.</exception>
-        public List<int> ReadContentChunkTable()
+        private List<int> ReadContentChunkTable()
         {
             //The size of each table entry plus the one padding bit to fill out a full pixel
             int chunkSizeAndPadding = ChunkDefinitionBitSize + 1;
@@ -403,6 +426,7 @@ namespace SteganographyApp.Common.IO
             catch (Exception e)
             {
                 Finish();
+                throw e;
             }
         }
 
@@ -412,7 +436,7 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <returns>Returns true if the number of bits the image can store is more than the estimated number of
         /// bits required for the content chunk table.</returns>
-        public bool HasEnoughSpaceForContentChunkTable()
+        private bool HasEnoughSpaceForContentChunkTable()
         {
             return (currentImage.Width * currentImage.Height * 3) > RequiredContentChunkTableBitSize;
         }
@@ -423,9 +447,9 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <param name="imageName">The image name to start reading and writing from.</param>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        public void ResetTo(int index)
+        private void ResetTo(int index)
         {
-            if(index < 0 || index >= args.CoverImages.Length)
+            if (index < 0 || index >= args.CoverImages.Length)
             {
                 throw new ImageProcessingException(string.Format("An invalid image index was provided in ResetTo. Expected value between {0} and {1}, instead got {2}", 0, args.CoverImages.Length - 1, index));
             }
@@ -442,9 +466,9 @@ namespace SteganographyApp.Common.IO
         /// image before attempting to increment to the next available image.</param>
         /// <exception cref="ImageProcessingException">If the increment of the current
         /// image index exeeds the available number of images an exception will be thrown.</exception>
-        public void Next(bool save = false, bool callback = true)
+        private void Next(bool save = false, bool callback = true)
         {
-            if(currentImage != null)
+            if (currentImage != null)
             {
                 if (save)
                 {
@@ -481,7 +505,7 @@ namespace SteganographyApp.Common.IO
         /// <param name="position">The number of pixels to skip through in the current image.</param>
         /// <exception cref="ImageProcessingException">Thrown if the value of position is greater than
         /// the number of available pixels the current image has.</exception>
-        public void Seek(int position)
+        private void Seek(int position)
         {
             x = 0;
             y = 0;
@@ -496,7 +520,7 @@ namespace SteganographyApp.Common.IO
                     y++;
                     if (y == currentImage.Height)
                     {
-                        throw new ImageProcessingException(String.Format("There are not enough available bits in this image to seek to the specified length of {0}", position));
+                        throw new ImageProcessingException(string.Format("There are not enough available bits in this image to seek to the specified length of {0}", position));
                     }
                 }
             }
@@ -508,7 +532,7 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <returns>False if there are no more pixels left to read/write to otherwise
         /// returns true.</returns>
-        public bool TryMove()
+        private bool TryMove()
         {
             x++;
             if (x == currentImage.Width)
@@ -530,9 +554,9 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <param name="save">If true this method will attempt to save any changes
         /// made to the current image.</param>
-        public void Finish(bool save = false)
+        private void Finish(bool save = false)
         {
-            if(currentImage != null)
+            if (currentImage != null)
             {
                 if (save)
                 {
