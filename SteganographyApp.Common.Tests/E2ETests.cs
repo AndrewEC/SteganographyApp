@@ -59,7 +59,7 @@ namespace SteganographyApp.Common.Tests
             store.WriteContentChunkTable(table);
 
             wrapper.ResetTo(0);
-            var readTable = wrapper.ReadContentChunkTable();
+            var readTable = store.ReadContentChunkTable();
             using(var writer = new ContentWriter(args))
             {
                 string binary = wrapper.Read(readTable[0]);
@@ -90,7 +90,7 @@ namespace SteganographyApp.Common.Tests
             store.WriteContentChunkTable(table);
             args.Password = "Wrong Password";
             wrapper.ResetTo(0);
-            var readTable = wrapper.ReadContentChunkTable();
+            var readTable = store.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.Read(readTable[0]);
@@ -119,7 +119,7 @@ namespace SteganographyApp.Common.Tests
             store.WriteContentChunkTable(table);
             args.UseCompression = false;
             wrapper.ResetTo(0);
-            var readTable = wrapper.ReadContentChunkTable();
+            var readTable = store.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.Read(readTable[0]);

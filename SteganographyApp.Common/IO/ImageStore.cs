@@ -84,19 +84,9 @@ namespace SteganographyApp.Common.IO
                 return store.Read(length);
             }
 
-            public List<int> ReadContentChunkTable()
-            {
-                return store.ReadContentChunkTable();
-            }
-
             public void Seek(int position)
             {
                 store.Seek(position);
-            }
-
-            public bool HasEnoughSpaceForContentChunkTable()
-            {
-                return store.HasEnoughSpaceForContentChunkTable();
             }
 
             public void Next()
@@ -367,33 +357,41 @@ namespace SteganographyApp.Common.IO
         /// of data stored in the current set of images.</returns>
         /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
         /// storage space to read the entire content chunk table.</exception>
-        private List<int> ReadContentChunkTable()
+        public List<int> ReadContentChunkTable()
         {
-            //The size of each table entry plus the one padding bit to fill out a full pixel
-            int chunkSizeAndPadding = ChunkDefinitionBitSize + 1;
-
-            //Read the number of entries in the table
-            int tableLength = Convert.ToInt32(Read(ChunkDefinitionBitSize), 2);
-
-            int tableBitCount = tableLength * chunkSizeAndPadding;
-
-            //Read all the available entries in the table
-            string rawTable = Read(tableBitCount);
-
-            if (rawTable.Length < tableBitCount)
+            try
             {
-                throw new ImageProcessingException("There are not enough available bits in the image to read the entire content chunk table.");
-            }
+                //The size of each table entry plus the one padding bit to fill out a full pixel
+                int chunkSizeAndPadding = ChunkDefinitionBitSize + 1;
 
-            var table = new List<int>();
-            for (int i = 0; i < rawTable.Length; i += chunkSizeAndPadding)
-            {
-                // Although we have 33 bits read for the table entry the last bit of the table entry is purely
-                // padding so we need to substring 33 bits minus the one padding bit.
-                int entry = Convert.ToInt32(rawTable.Substring(i, ChunkDefinitionBitSize), 2);
-                table.Add(entry);
+                //Read the number of entries in the table
+                int tableLength = Convert.ToInt32(Read(ChunkDefinitionBitSize), 2);
+
+                int tableBitCount = tableLength * chunkSizeAndPadding;
+
+                //Read all the available entries in the table
+                string rawTable = Read(tableBitCount);
+
+                if (rawTable.Length < tableBitCount)
+                {
+                    throw new ImageProcessingException("There are not enough available bits in the image to read the entire content chunk table.");
+                }
+
+                var table = new List<int>();
+                for (int i = 0; i < rawTable.Length; i += chunkSizeAndPadding)
+                {
+                    // Although we have 33 bits read for the table entry the last bit of the table entry is purely
+                    // padding so we need to substring 33 bits minus the one padding bit.
+                    int entry = Convert.ToInt32(rawTable.Substring(i, ChunkDefinitionBitSize), 2);
+                    table.Add(entry);
+                }
+                return table;
             }
-            return table;
+            catch (Exception e)
+            {
+                Finish();
+                throw e;
+            }
         }
 
         /// <summary>
@@ -436,7 +434,7 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <returns>Returns true if the number of bits the image can store is more than the estimated number of
         /// bits required for the content chunk table.</returns>
-        private bool HasEnoughSpaceForContentChunkTable()
+        public bool HasEnoughSpaceForContentChunkTable()
         {
             return (currentImage.Width * currentImage.Height * 3) > RequiredContentChunkTableBitSize;
         }
@@ -454,7 +452,7 @@ namespace SteganographyApp.Common.IO
                 throw new ImageProcessingException(string.Format("An invalid image index was provided in ResetTo. Expected value between {0} and {1}, instead got {2}", 0, args.CoverImages.Length - 1, index));
             }
             currentImageIndex = index - 1;
-            Next(callback: false);
+            Next();
         }
 
         /// <summary>
@@ -466,7 +464,7 @@ namespace SteganographyApp.Common.IO
         /// image before attempting to increment to the next available image.</param>
         /// <exception cref="ImageProcessingException">If the increment of the current
         /// image index exeeds the available number of images an exception will be thrown.</exception>
-        private void Next(bool save = false, bool callback = true)
+        private void Next(bool save = false)
         {
             if (currentImage != null)
             {
@@ -488,14 +486,11 @@ namespace SteganographyApp.Common.IO
 
             currentImage = Image.Load(args.CoverImages[currentImageIndex]);
 
-            if (callback)
+            OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
             {
-                OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
-                {
-                    ImageIndex = currentImageIndex,
-                    ImageName = args.CoverImages[currentImageIndex]
-                });
-            }
+                ImageIndex = currentImageIndex,
+                ImageName = args.CoverImages[currentImageIndex]
+            });
         }
 
         /// <summary>

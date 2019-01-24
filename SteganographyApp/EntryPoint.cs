@@ -75,29 +75,34 @@ namespace SteganographyApp
 
             var store = new ImageStore(args);
             var table = new List<int>();
-            int start = store.RequiredContentChunkTableBitSize;
 
             var imagesUsed = new List<string>();
             store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs args) =>
             {
+                if (imagesUsed.Contains(args.ImageName))
+                {
+                    return;
+                }
                 imagesUsed.Add(args.ImageName);
             };
 
             using (var wrapper = store.CreateIOWrapper())
             {
-                // skip past the first few pixels as the leading pixels of the first image will
-                // be used to store the content chunk table.
-                wrapper.Seek(start);
-
-                int chunksRead = 0; //used to display how much data has been read as a percent
+                int start = store.RequiredContentChunkTableBitSize;
 
                 // check that the leading image has enough storage space to store the content table
-                if (!wrapper.HasEnoughSpaceForContentChunkTable())
+                if (!store.HasEnoughSpaceForContentChunkTable())
                 {
                     Console.WriteLine("There is not enough space in the leading image to store the content chunk table.");
                     Console.WriteLine("The content chunk table requires {0} bits to store for the specified input file.", start);
                     return;
                 }
+
+                // skip past the first few pixels as the leading pixels of the first image will
+                // be used to store the content chunk table.
+                wrapper.Seek(start);
+
+                int chunksRead = 0; //used to display how much data has been read as a percent
 
                 using (var reader = new ContentReader(args))
                 {
@@ -137,6 +142,10 @@ namespace SteganographyApp
             var imagesUsed = new List<string>();
             store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs args) =>
             {
+                if (imagesUsed.Contains(args.ImageName))
+                {
+                    return;
+                }
                 imagesUsed.Add(args.ImageName);
             };
             
@@ -144,7 +153,7 @@ namespace SteganographyApp
             {
                 // read in the content chunk table so we know how many bits to read 
                 Console.WriteLine("Reading content chunk table.");
-                var chunkTable = wrapper.ReadContentChunkTable();
+                var chunkTable = store.ReadContentChunkTable();
 
                 using (var writer = new ContentWriter(args))
                 {
