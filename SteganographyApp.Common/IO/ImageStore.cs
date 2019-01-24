@@ -45,6 +45,61 @@ namespace SteganographyApp.Common.IO
     }
 
     /// <summary>
+    /// A wrapper class that exposes the IO related methods of an ImageStore instance while implementing
+    /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
+    /// more error prone IO operations.
+    /// </summary>
+    public class ImageStoreWrapper : IDisposable
+    {
+
+        private readonly ImageStore store;
+
+        private bool save = false;
+
+        public ImageStoreWrapper(ImageStore store)
+        {
+            this.store = store;
+            store.Next();
+        }
+
+        public void Complete()
+        {
+            save = true;
+        }
+
+        public void Write(string binary)
+        {
+            store.Write(binary);
+        }
+
+        public string Read(int length)
+        {
+            return store.Read(length);
+        }
+
+        public List<int> ReadContentChunkTable()
+        {
+            return store.ReadContentChunkTable();
+        }
+
+        public void Seek(int position)
+        {
+            store.Seek(position);
+        }
+
+        public bool HasEnoughSpaceForContentChunkTable()
+        {
+            return store.HasEnoughSpaceForContentChunkTable();
+        }
+
+        public void Dispose()
+        {
+            store.Finish(save);
+            store.ResetTo(0);
+        }
+    }
+
+    /// <summary>
     /// Class that handles positioning a make shift write stream in the proper position so
     /// data can be reliably read and written to the storage images.
     /// </summary>
@@ -136,6 +191,21 @@ namespace SteganographyApp.Common.IO
                 // so that it can be properly decoded.
                 RequiredContentChunkTableBitSize = requiredWrites * ChunkDefinitionBitSize + ChunkDefinitionBitSize + requiredWrites;
             }
+        }
+
+        /// <summary>
+        /// Utility method to create an <see cref="ImageStoreWrapper"/> instance to be used in conjunction with the
+        /// read and write methods.
+        /// <para>The ImageStoreWrapper instance provides proxies to the ImageStore IO methods as well as
+        /// implementing the IDisposable interface to ensure that any currently open and loaded image
+        /// will be properly disposed.</para>
+        /// </summary>
+        /// <param name="save">Determines if the wrapper will call Finish(true) on the originating ImageStore
+        /// instance when the Dispose method is being called.</param>
+        /// <returns>A new ImageStoreWrapper instance.</returns>
+        public ImageStoreWrapper CreateIOWrapper()
+        {
+            return new ImageStoreWrapper(this);
         }
 
         /// <summary>
@@ -313,26 +383,27 @@ namespace SteganographyApp.Common.IO
         /// storage space to store the entire content chunk table.</exception>
         public void WriteContentChunkTable(List<int> table)
         {
-            var binary = new StringBuilder("");
-
-            // Each table entry is 32 bits in size meaning that since each pixel can store 3 bits it will take
-            // 11 pixels. Since 11 pixels can actually store 33 bits we pad the 32 bit table entry with an additional
-            // zero at the end which will be ignored when reading the table.
-            binary.Append(Convert.ToString(table.Count, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
-
-            foreach (int chunkLength in table)
+            try
             {
-                binary.Append(Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
+                var binary = new StringBuilder("");
+
+                // Each table entry is 32 bits in size meaning that since each pixel can store 3 bits it will take
+                // 11 pixels. Since 11 pixels can actually store 33 bits we pad the 32 bit table entry with an additional
+                // zero at the end which will be ignored when reading the table.
+                binary.Append(Convert.ToString(table.Count, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
+
+                foreach (int chunkLength in table)
+                {
+                    binary.Append(Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
+                }
+
+                Write(binary.ToString());
+                Finish(true);
             }
-
-            int written = Write(binary.ToString());
-
-            if (binary.Length < written)
+            catch (Exception e)
             {
-                throw new ImageProcessingException("There is not enough space in the current image to write the entire content chunk table.");
+                Finish();
             }
-
-            Finish(true);
         }
 
         /// <summary>
@@ -359,7 +430,7 @@ namespace SteganographyApp.Common.IO
                 throw new ImageProcessingException(string.Format("An invalid image index was provided in ResetTo. Expected value between {0} and {1}, instead got {2}", 0, args.CoverImages.Length - 1, index));
             }
             currentImageIndex = index - 1;
-            Next();
+            Next(callback: false);
         }
 
         /// <summary>
@@ -371,7 +442,7 @@ namespace SteganographyApp.Common.IO
         /// image before attempting to increment to the next available image.</param>
         /// <exception cref="ImageProcessingException">If the increment of the current
         /// image index exeeds the available number of images an exception will be thrown.</exception>
-        public void Next(bool save = false)
+        public void Next(bool save = false, bool callback = true)
         {
             if(currentImage != null)
             {
@@ -393,11 +464,14 @@ namespace SteganographyApp.Common.IO
 
             currentImage = Image.Load(args.CoverImages[currentImageIndex]);
 
-            OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
+            if (callback)
             {
-                ImageIndex = currentImageIndex,
-                ImageName = args.CoverImages[currentImageIndex]
-            });
+                OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
+                {
+                    ImageIndex = currentImageIndex,
+                    ImageName = args.CoverImages[currentImageIndex]
+                });
+            }
         }
 
         /// <summary>

@@ -83,38 +83,42 @@ namespace SteganographyApp
                 imagesUsed.Add(args.ImageName);
             };
 
-            store.Next();
-            // check that the leading image has enough storage space to store the content table
-            if(!store.HasEnoughSpaceForContentChunkTable())
+            using (var wrapper = store.CreateIOWrapper())
             {
-                Console.WriteLine("There is not enough space in the leading image to store the content chunk table.");
-                Console.WriteLine("The content chunk table requires {0} bits to store for the specified input file.", start);
-                return;
-            }
+                // skip past the first few pixels as the leading pixels of the first image will
+                // be used to store the content chunk table.
+                wrapper.Seek(start);
 
-            // skip past the first few pixels as the leading pixels of the first image will
-            // be used to store the content chunk table.
-            store.Seek(start);
-            int chunksRead = 0; //used to display how much data has been read as a percent
-            using(var reader = new ContentReader(args))
-            {
-                string content = "";
-                while((content = reader.ReadNextChunk()) != null)
+                int chunksRead = 0; //used to display how much data has been read as a percent
+
+                // check that the leading image has enough storage space to store the content table
+                if (!wrapper.HasEnoughSpaceForContentChunkTable())
                 {
-                    // record the length of the encoded content so it can be stored in the
-                    // content chunk table once the total encoding process has been completed.
-                    table.Add(content.Length);
-                    store.Write(content);
-                    chunksRead++; //used to display how much data has been read as a percent
-                    DisplayPercent(chunksRead, reader.RequiredNumberOfReads, "Encoding file contents"); //used to display how much data has been read as a percent
+                    Console.WriteLine("There is not enough space in the leading image to store the content chunk table.");
+                    Console.WriteLine("The content chunk table requires {0} bits to store for the specified input file.", start);
+                    return;
                 }
 
-                Console.WriteLine("All input file contents have been encoded.");
+                using (var reader = new ContentReader(args))
+                {
+                    string content = "";
+                    while ((content = reader.ReadNextChunk()) != null)
+                    {
+                        // record the length of the encoded content so it can be stored in the
+                        // content chunk table once the total encoding process has been completed.
+                        table.Add(content.Length);
+                        wrapper.Write(content);
+                        chunksRead++; //used to display how much data has been read as a percent
+                        DisplayPercent(chunksRead, reader.RequiredNumberOfReads, "Encoding file contents"); //used to display how much data has been read as a percent
+                    }
+
+                    Console.WriteLine("All input file contents have been encoded.");
+                }
+
+                wrapper.Complete();
             }
-            store.Finish(true);
 
             PrintUnused(imagesUsed);
-            store.ResetTo(0);
             Console.WriteLine("Writing content chunk table.");
             store.WriteContentChunkTable(table);
             Console.WriteLine("Encoding process complete.");
@@ -135,27 +139,28 @@ namespace SteganographyApp
             {
                 imagesUsed.Add(args.ImageName);
             };
-            store.Next();
-
-            // read in the content chunk table so we know how many bits to read 
-            Console.WriteLine("Reading content chunk table.");
-            var chunkTable = store.ReadContentChunkTable();
             
-            int chunksWritten = 0; //used to display how much data has been read as a percent
-            using (var writer = new ContentWriter(args))
+            using (var wrapper = store.CreateIOWrapper())
             {
-                foreach (int length in chunkTable)
+                // read in the content chunk table so we know how many bits to read 
+                Console.WriteLine("Reading content chunk table.");
+                var chunkTable = wrapper.ReadContentChunkTable();
+
+                using (var writer = new ContentWriter(args))
                 {
-                    // as we read in each chunk from the images start writing the decoded
-                    // values to the target output file.
-                    string binary = store.Read(length);
-                    writer.WriteChunk(binary);
-                    chunksWritten++; //used to display how much data has been read as a percent
-                    DisplayPercent(chunksWritten, chunkTable.Count, "Decoding file contents"); //used to display how much data has been read as a percent
+                    int chunksWritten = 0; //used to display how much data has been read as a percent
+                    foreach (int length in chunkTable)
+                    {
+                        // as we read in each chunk from the images start writing the decoded
+                        // values to the target output file.
+                        string binary = wrapper.Read(length);
+                        writer.WriteChunk(binary);
+                        chunksWritten++; //used to display how much data has been read as a percent
+                        DisplayPercent(chunksWritten, chunkTable.Count, "Decoding file contents"); //used to display how much data has been read as a percent
+                    }
+                    Console.WriteLine("All encoded file contents has been decoded.");
                 }
-                Console.WriteLine("All encoded file contents has been decoded.");
             }
-            store.Finish();
 
             PrintUnused(imagesUsed);
             Console.WriteLine("Decoding process complete.");
