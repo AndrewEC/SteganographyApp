@@ -71,17 +71,13 @@ namespace SteganographyApp.Common
             public string ShortName { get; private set; }
             public ValueParser Parser { get; private set; }
             public bool IsFlag { get; private set; }
-            public bool IsPassword { get; private set; }
-            public bool IsRandomSeed { get; private set; }
 
-            public Argument(string name, string shortName, ValueParser parser, bool flag=false, bool password=false, bool randomSeed=false)
+            public Argument(string name, string shortName, ValueParser parser, bool flag=false)
             {
                 Name = name;
                 ShortName = shortName;
                 Parser = parser;
                 IsFlag = flag;
-                IsPassword = password;
-                IsRandomSeed = randomSeed;
             }
         }
 
@@ -99,10 +95,10 @@ namespace SteganographyApp.Common
                 new Argument("--compress", "-c", ParseUseCompression, true),
                 new Argument("--printStack", "-stack", ParsePrintStack, true),
                 new Argument("--images", "-im", ParseImages),
-                new Argument("--password", "-p", ParsePassword, password: true),
+                new Argument("--password", "-p", ParsePassword),
                 new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
                 new Argument("--chunkSize", "-cs", ParseChunkSize),
-                new Argument("--randomSeed", "-rs", ParseRandomSeed, randomSeed: true)
+                new Argument("--randomSeed", "-rs", ParseRandomSeed)
             };
         }
 

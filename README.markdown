@@ -30,10 +30,10 @@ Important Arguments
 Arguments must be specified as <argument_name>space<argument_value>.
 
 Example arguments for encoding a file to a set of images: 
-    dotnet .\\SteganographApp --action encode --images 001.png,002.png --input FileToEncode.zip --password Pass1234 --compress true
+    dotnet .\\SteganographApp --action encode --images 001.png,002.png --input FileToEncode.zip --password Pass1234 --compress
 
 Example arguments for decoding data from a set of images to an output file.
-    dotnet .\\SteganpgraphyApp --action decode --images 001.png,002.png --output DecodedOutputFile.zip --password Pass1234 --compress true
+    dotnet .\\SteganpgraphyApp --action decode --images 001.png,002.png --output DecodedOutputFile.zip --password Pass1234 --compress
 
 --action | a :: Specifies whether to 'encode' a file to a set of images or 'decode' a set of images to a file.
     Value must be either 'encode', 'decode', or 'clean'.
