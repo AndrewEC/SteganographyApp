@@ -205,8 +205,6 @@ namespace SteganographyApp.Common.IO
         /// implementing the IDisposable interface to ensure that any currently open and loaded image
         /// will be properly disposed.</para>
         /// </summary>
-        /// <param name="save">Determines if the wrapper will call Finish(true) on the originating ImageStore
-        /// instance when the Dispose method is being called.</param>
         /// <returns>A new ImageStoreWrapper instance.</returns>
         public ImageStoreWrapper CreateIOWrapper()
         {

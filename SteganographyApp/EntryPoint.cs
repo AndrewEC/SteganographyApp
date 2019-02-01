@@ -76,13 +76,9 @@ namespace SteganographyApp
             var store = new ImageStore(args);
             var table = new List<int>();
 
-            var imagesUsed = new List<string>();
+            var imagesUsed = new HashSet<string>();
             store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs args) =>
             {
-                if (imagesUsed.Contains(args.ImageName))
-                {
-                    return;
-                }
                 imagesUsed.Add(args.ImageName);
             };
 
@@ -139,13 +135,9 @@ namespace SteganographyApp
             Console.WriteLine("Decoding data to file {0}", args.DecodedOutputFile);
 
             var store = new ImageStore(args);
-            var imagesUsed = new List<string>();
+            var imagesUsed = new HashSet<string>();
             store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs args) =>
             {
-                if (imagesUsed.Contains(args.ImageName))
-                {
-                    return;
-                }
                 imagesUsed.Add(args.ImageName);
             };
             
@@ -198,7 +190,7 @@ namespace SteganographyApp
         /// </summary>
         /// <param name="imagesUsed">A list containing the names of the images used in the
         /// encoding/decoding process.</param>
-        private void PrintUnused(List<string> imagesUsed)
+        private void PrintUnused(HashSet<string> imagesUsed)
         {
             if (imagesUsed.Count == args.CoverImages.Length)
             {
