@@ -23,6 +23,74 @@ namespace SteganographyApp.Common.Data
     public class DataEncoderUtil
     {
 
+        private static readonly int DUMMY_LENGTH = 3;
+
+        public static string InsertDummies(int numDummies, string binary)
+        {
+            if(numDummies == 0)
+            {
+                return binary;
+            }
+
+            // cubed root
+            int length = (int)Math.Ceiling(Math.Pow(binary.Length, (double)1 / 3)) + 1;
+            var generator = new IndexGenerator(length, length);
+
+            // capture the positions of the dummy values first to make it easier to
+            // remove the dummies during the decoding process
+            int[] positions = new int[numDummies];
+            for(int i = 0; i < positions.Length; i++)
+            {
+                positions[i] = generator.Next(binary.Length - 1);
+            }
+
+            for (int i = 0; i < positions.Length; i++)
+            {
+                binary = binary.Insert(positions[i], GenerateDummy(generator));
+            }
+
+            return binary;
+        }
+
+        private static string GenerateDummy(IndexGenerator generator)
+        {
+            string dummy = "";
+            for(int i = 0; i < DUMMY_LENGTH; i++)
+            {
+                dummy += (generator.Next(2) == 0) ? "0" : "1";
+            }
+            return dummy;
+        }
+
+        public static string RemoveDummies(int numDummies, string binary)
+        {
+            if(numDummies == 0)
+            {
+                return binary;
+            }
+
+            int dummyLength = numDummies * DUMMY_LENGTH;
+            int actualLength = binary.Length - dummyLength;
+
+            // cubed root
+            int length = (int)Math.Ceiling(Math.Pow(actualLength, (double)1 / 3)) + 1;
+            var generator = new IndexGenerator(length, length);
+
+            int[] positions = new int[numDummies];
+            for(int i = 0; i < positions.Length; i++)
+            {
+                positions[i] = generator.Next(actualLength - 1);
+            }
+
+            Array.Reverse(positions);
+
+            for(int i = 0; i < positions.Length; i++)
+            {
+                binary = binary.Remove(positions[i], DUMMY_LENGTH);
+            }
+            return binary;
+        }
+
         /// <summary>
         /// Takes in a raw byte array, compresses, encodes base64, encrypts, and then
         /// returns as a binary string.

@@ -24,7 +24,8 @@ namespace SteganographyApp.Common.Tests
                 DecodedOutputFile = "TestAssets/testing.zip",
                 CoverImages = new string[] { "TestAssets/001.png" },
                 Password = "testing",
-                UseCompression = true
+                UseCompression = true,
+                DummyCount = 3
             };
             store = new ImageStore(args);
             wrapper = store.CreateIOWrapper();

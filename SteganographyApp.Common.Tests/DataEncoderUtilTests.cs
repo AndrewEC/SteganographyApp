@@ -105,5 +105,36 @@ namespace SteganographyApp.Common.Tests
             byte[] uncompressed = DataEncoderUtil.Decode(InputFile, Password, false);
         }
 
+        [TestMethod]
+        public void TestInsertAndRemoveDummiesWithMatchingCountIsSuccessful()
+        {
+            string binary = "10010101101111100001101010101010111";
+            int dummyCount = 3;
+            string inserted = DataEncoderUtil.InsertDummies(dummyCount, binary);
+            Assert.AreNotEqual(binary, inserted, "After inserting dummies the new binary value should be different than the original.");
+            string removed = DataEncoderUtil.RemoveDummies(dummyCount, inserted);
+            Assert.AreEqual(binary, removed, "After removing the dummies the new binary value should be the same as the original value.");
+        }
+
+        [TestMethod]
+        public void TestInsertAndRemoveDummiesMissmatchCountReturnsBadResult()
+        {
+            string binary = "10010101101111100001101010101010111";
+            string inserted = DataEncoderUtil.InsertDummies(3, binary);
+            Assert.AreNotEqual(binary, inserted, "After inserting dummies the new binary value should be different than the original.");
+            string removed = DataEncoderUtil.RemoveDummies(2, inserted);
+            Assert.AreNotEqual(binary, removed, "After removing the dummies the new binary value should not be the same as the original value.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException), AllowDerivedTypes = false)]
+        public void TestInsertAndRemoveWithMissmatchedCountThrowsException()
+        {
+            string binary = "10010101101111100001101010101010111";
+            string inserted = DataEncoderUtil.InsertDummies(3, binary);
+            Assert.AreNotEqual(binary, inserted, "After inserting dummies the new binary value should be different than the original.");
+            string removed = DataEncoderUtil.RemoveDummies(30, inserted);
+        }
+
     }
 }

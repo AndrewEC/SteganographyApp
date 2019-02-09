@@ -60,7 +60,8 @@ namespace SteganographyApp.Common.IO.Content
                 buffer = RandomizeBytes(buffer);
             }
 
-            return DataEncoderUtil.Encode(buffer, args.Password, args.UseCompression);
+            string binary = DataEncoderUtil.Encode(buffer, args.Password, args.UseCompression);
+            return DataEncoderUtil.InsertDummies(args.DummyCount, binary);
         }
 
     }

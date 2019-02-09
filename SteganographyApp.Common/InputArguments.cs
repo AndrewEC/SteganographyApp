@@ -98,7 +98,8 @@ namespace SteganographyApp.Common
                 new Argument("--password", "-p", ParsePassword),
                 new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
                 new Argument("--chunkSize", "-cs", ParseChunkSize),
-                new Argument("--randomSeed", "-rs", ParseRandomSeed)
+                new Argument("--randomSeed", "-rs", ParseRandomSeed),
+                new Argument("--dummies", "-d", ParseDummyCount)
             };
         }
 
@@ -257,6 +258,22 @@ namespace SteganographyApp.Common
                 }
             }
             return value;
+        }
+
+        private void ParseDummyCount(InputArguments arguments, string value)
+        {
+            try
+            {
+                arguments.DummyCount = Convert.ToInt32(value);
+                if(arguments.DummyCount < 0)
+                {
+                    throw new ArgumentValueException("The dummy count must be a positive whole number with a value more than 0.");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentValueException(string.Format("Could not parse dummy count from value: {0}", value), e);
+            }
         }
 
         /// <summary>
@@ -562,6 +579,7 @@ namespace SteganographyApp.Common
         public bool PrintStack { get; set; } = false;
         public bool UseCompression { get; set; } = false;
         public string RandomSeed { get; set; } = "";
+        public int DummyCount { get; set; } = 0;
 
         /// <summary>
         /// Specifies the chunk size. I.e. the number of bytes to read, encode,
