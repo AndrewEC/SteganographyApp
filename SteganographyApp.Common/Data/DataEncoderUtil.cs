@@ -23,8 +23,21 @@ namespace SteganographyApp.Common.Data
     public class DataEncoderUtil
     {
 
+        /// <summary>
+        /// Specifies the number of bits that will be written with each dummy entry.
+        /// </summary>
         private static readonly int DUMMY_LENGTH = 3;
 
+        /// <summary>
+        /// Inserts the specified number of dummy entries into the current
+        /// binary string.
+        /// </summary>
+        /// <param name="numDummies">The number of dummy entries to insert into the
+        /// binary string.</param>
+        /// <param name="binary">The original binary string to be modified with the
+        /// dummy entries.</param>
+        /// <returns>If numDummies == 0 then it will return the original binary string
+        /// otherwise will return the binary string with the new dummy entries.</returns>
         public static string InsertDummies(int numDummies, string binary)
         {
             if(numDummies == 0)
@@ -52,6 +65,14 @@ namespace SteganographyApp.Common.Data
             return binary;
         }
 
+        /// <summary>
+        /// Generates a random binary string of the length specified by
+        /// <see cref="DUMMY_LENGTH"/> using an existing IndexGenerator instance.
+        /// </summary>
+        /// <param name="generator">The index generator instance to determine whether
+        /// each character in the dummy string should be a 1 or a 0.</param>
+        /// <returns>Returns a random binary string of a length equal to
+        /// <see cref="DUMMY_LENGTH"/></returns>
         private static string GenerateDummy(IndexGenerator generator)
         {
             string dummy = "";
@@ -62,6 +83,15 @@ namespace SteganographyApp.Common.Data
             return dummy;
         }
 
+        /// <summary>
+        /// Attempts to remove dummy entries from the string equal to the number
+        /// of entries specified in the numDummies parameter.
+        /// </summary>
+        /// <param name="numDummies">The number of dummy entries to remove from
+        /// the binary string.</param>
+        /// <param name="binary">The binary string to remove the dummy entries from.</param>
+        /// <returns>If numDummies == 0 then it will return the original binary string
+        /// otherwise will return the binary string with the dummy entries removed.</returns>
         public static string RemoveDummies(int numDummies, string binary)
         {
             if(numDummies == 0)
