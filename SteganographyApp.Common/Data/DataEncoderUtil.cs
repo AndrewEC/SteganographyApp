@@ -92,6 +92,8 @@ namespace SteganographyApp.Common.Data
         /// <param name="binary">The binary string to remove the dummy entries from.</param>
         /// <returns>If numDummies == 0 then it will return the original binary string
         /// otherwise will return the binary string with the dummy entries removed.</returns>
+        /// <exception cref="TransformationException">Thrown if an our of range exception is caught
+        /// while trying to remove the dummy entries from the chunk.</exception>
         public static string RemoveDummies(int numDummies, string binary)
         {
             if(numDummies == 0)
@@ -114,9 +116,16 @@ namespace SteganographyApp.Common.Data
 
             Array.Reverse(positions);
 
-            for(int i = 0; i < positions.Length; i++)
+            try
             {
-                binary = binary.Remove(positions[i], DUMMY_LENGTH);
+                for (int i = 0; i < positions.Length; i++)
+                {
+                    binary = binary.Remove(positions[i], DUMMY_LENGTH);
+                }
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw new TransformationException("Unable to remove all dummy entries from chunk.", e);
             }
             return binary;
         }

@@ -127,7 +127,7 @@ namespace SteganographyApp.Common.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException), AllowDerivedTypes = false)]
+        [ExpectedException(typeof(TransformationException), AllowDerivedTypes = false)]
         public void TestInsertAndRemoveWithMissmatchedCountThrowsException()
         {
             string binary = "10010101101111100001101010101010111";

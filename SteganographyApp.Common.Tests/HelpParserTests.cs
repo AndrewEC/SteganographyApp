@@ -33,5 +33,17 @@ namespace SteganographyApp.Common.Tests
             Assert.IsNotNull(parser.LastError);
         }
 
+        [TestMethod]
+        public void TestMissingArgumentKeyReturnsErrorMessage()
+        {
+            var parser = new HelpParser();
+            Assert.IsTrue(parser.TryParse(out HelpInfo info, TEST_PATH));
+            Assert.IsNull(parser.LastError);
+            foreach(string line in info.GetMessagesFor("Missing"))
+            {
+                Assert.AreEqual("No help information configured for Missing.\n", line);
+            }
+        }
+
     }
 }

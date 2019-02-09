@@ -46,9 +46,6 @@ namespace SteganographyApp
                     case TransformationException t:
                         Console.WriteLine("This error often occurs as a result of an incorrect password or incorrect dummy count when decrypting a file.");
                         break;
-                    case ArgumentOutOfRangeException t:
-                        Console.WriteLine("This error often occurs when decoding using a dummy count much larger than the count specified when encoding.");
-                        break;
                 }
             }
 

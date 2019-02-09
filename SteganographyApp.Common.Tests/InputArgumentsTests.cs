@@ -8,7 +8,6 @@ namespace SteganographyApp.Common.Tests
     public class InputArgumentsTests
     {
 
-        private readonly string ExceptionShouldHaveBeenThrownByParse = "An exception should have been thrown by the parse method call.";
         private readonly string ExceptionWasNotArgumentParse = "Exception thrown should be of type ArgumentParseException.";
         private readonly string MisMatchExceptionmessage = "Exception message was not what was expected.";
         private readonly string InnerExceptionShouldNotBeNull = "Inner exception should not have been a null value.";
