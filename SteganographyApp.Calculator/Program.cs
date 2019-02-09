@@ -14,33 +14,33 @@ namespace SteganographyAppCalculator
         static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography Calculator\n");
-            if (Array.IndexOf(args, "--help") != -1)
+            if (Array.IndexOf(args, "--help") != -1 || Array.IndexOf(args, "-h") != -1)
             {
                 PrintHelp();
                 return;
             }
-            try
+
+            var parser = new ArgumentParser();
+            if(!parser.TryParse(args, out InputArguments arguments))
             {
-                var inputArguments = new ArgumentParser().Parse(args);
-                if (inputArguments.EncodeOrDecode == EncodeDecodeAction.CalculateStorageSpace)
+                Console.WriteLine("An exception occured while parsing provided arguments: {0}", parser.LastError.Message);
+                if (parser.LastError.InnerException != null)
                 {
-                    Console.WriteLine("Calculating storage space in {0} images.", inputArguments.CoverImages.Length);
-                    CalculateStorageSpace(inputArguments);
-                }
-                else if (inputArguments.EncodeOrDecode == EncodeDecodeAction.CalculateEncryptedSize)
-                {
-                    Console.WriteLine("Calculating encypted size of file {0}.", inputArguments.FileToEncode);
-                    CalculateEncryptedSize(inputArguments);
-                }
-            }
-            catch (ArgumentParseException e)
-            {
-                Console.WriteLine("An exception occured while parsing provided arguments: {0}", e.Message);
-                if (e.InnerException != null)
-                {
-                    Console.WriteLine("The exception was caused by: {0}", e.InnerException.Message);
+                    Console.WriteLine("The exception was caused by: {0}", parser.LastError.InnerException.Message);
                 }
                 Console.WriteLine("\nRun the program with --help to get more information.");
+                return;
+            }
+
+            if (arguments.EncodeOrDecode == EncodeDecodeAction.CalculateStorageSpace)
+            {
+                Console.WriteLine("Calculating storage space in {0} images.", arguments.CoverImages.Length);
+                CalculateStorageSpace(arguments);
+            }
+            else if (arguments.EncodeOrDecode == EncodeDecodeAction.CalculateEncryptedSize)
+            {
+                Console.WriteLine("Calculating encypted size of file {0}.", arguments.FileToEncode);
+                CalculateEncryptedSize(arguments);
             }
 
             Console.WriteLine("");
@@ -49,7 +49,7 @@ namespace SteganographyAppCalculator
         private static void PrintHelp()
         {
             var parser = new HelpParser();
-            if (!parser.TryParse())
+            if (!parser.TryParse(out HelpInfo info))
             {
                 Console.WriteLine("An error occurred while parsing the help file: {0}", parser.LastError);
                 Console.WriteLine("Check that the help.prop file is in the same directory as the application and try again.");
@@ -59,7 +59,7 @@ namespace SteganographyAppCalculator
 
             Console.WriteLine("SteganographyApp Help\n");
 
-            foreach(string message in parser.GetMessagesFor("AppDescription", "AppAction", "Input", "Images", "Password", "Compress", "ChunkSize", "RandomSeed", "Dummies"))
+            foreach(string message in info.GetMessagesFor("AppDescription", "AppAction", "Input", "Images", "Password", "Compress", "ChunkSize", "RandomSeed", "Dummies"))
             {
                 Console.WriteLine("{0}\n", message);
             }

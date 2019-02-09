@@ -86,6 +86,8 @@ namespace SteganographyApp.Common
         /// </summary>
         private readonly List<Argument> arguments;
 
+        public Exception LastError { get; private set; }
+
         public ArgumentParser()
         {
             arguments = new List<Argument>()
@@ -129,40 +131,45 @@ namespace SteganographyApp.Common
         }
 
         /// <summary>
-        /// Parses the array of command line arguments and returns a new instance of InputArguments.
-        /// <para>Requires that all arguments be in the format matching --action=decode with a proper key before the = sign
-        /// and a non-empty value that meets the validation criteria.</para>
+        /// Attempts to parser the command line arguments into a usable
+        /// <see cref="InputArguments"/> instance.
+        /// <para>If the parsing or validation of the arguments fails then
+        /// this method will return false and the LastError attribute will be set.</para>
         /// </summary>
-        /// <param name="args">The command line arguments provided by the user when launching the application.</param>
-        /// <returns>A new InputArgumentsInstance with property values parsed from the user provided arguments.</returns>
-        /// <exception cref="ArgumentParseException">Thrown if an argument has an invalid key,
-        /// if a required argument was missing or is an exception was thrown while trying to parse the value of the argument.</exception>
-        public InputArguments Parse(string[] args)
+        /// <param name="args">The array of command line arguments to parse.</param>
+        /// <param name="inputs">The <see cref="InputArguments"/> instance containing the parsed
+        /// argument values.</param>
+        /// <returns>True if all the arguments provided were parsed and the validation was successful
+        /// else returns false.</returns>
+        public bool TryParse(string[] args, out InputArguments inputs)
         {
-            if (args == null || args.Length == 0)
+            inputs = new InputArguments();
+            if(args == null || args.Length == 0)
             {
-                throw new ArgumentParseException("No arguments provided to parse.");
+                LastError = new ArgumentParseException("No arguments provided to parse.");
+                return false;
             }
 
-            var inputs = new InputArguments();
             ValueTuple<string, Argument> password = ("", null);
             ValueTuple<string, Argument> randomSeed = ("", null);
 
-            for(int i = 0; i < args.Length; i++)
+            for (int i = 0; i < args.Length; i++)
             {
                 if (!TryGetArgument(args[i], out Argument argument))
                 {
-                    throw new ArgumentParseException(string.Format("An unrecognized argument was provided: {0}", args[i]));
+                    LastError = new ArgumentParseException(string.Format("An unrecognized argument was provided: {0}", args[i]));
+                    return false;
                 }
 
                 //Retrieve the password and randomSeed values to process them last as they may
                 //require interactive input in which we should throw any validations error available before
                 //requesting further user input.
-                if(argument.Name == "--password" || argument.Name == "--randomSeed")
+                if (argument.Name == "--password" || argument.Name == "--randomSeed")
                 {
                     if (i + 1 >= args.Length)
                     {
-                        throw new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", args[i]));
+                        LastError = new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", args[i]));
+                        return false;
                     }
                     if (argument.Name == "--password")
                     {
@@ -184,14 +191,16 @@ namespace SteganographyApp.Common
                     }
                     catch (Exception e)
                     {
-                        throw new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", args[i]), e);
+                        LastError = new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", args[i]), e);
+                        return false;
                     }
                 }
                 else
                 {
-                    if(i + 1 >= args.Length)
+                    if (i + 1 >= args.Length)
                     {
-                        throw new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", args[i]));
+                        LastError = new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", args[i]));
+                        return false;
                     }
                     try
                     {
@@ -200,7 +209,8 @@ namespace SteganographyApp.Common
                     }
                     catch (Exception e)
                     {
-                        throw new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", args[i]), e);
+                        LastError = new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", args[i]), e);
+                        return false;
                     }
                 }
             }
@@ -208,7 +218,8 @@ namespace SteganographyApp.Common
             string validation = ValidateParseResult(inputs);
             if (validation != NoMissingValues)
             {
-                throw new ArgumentParseException(string.Format("Missing required values. {0}", validation));
+                LastError = new ArgumentParseException(string.Format("Missing required values. {0}", validation));
+                return false;
             }
 
             if (password.Item2 != null)
@@ -220,7 +231,7 @@ namespace SteganographyApp.Common
                 randomSeed.Item2.Parser(inputs, randomSeed.Item1);
             }
 
-            return inputs;
+            return true;
         }
 
         /// <summary>

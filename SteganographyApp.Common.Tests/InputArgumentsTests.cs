@@ -15,139 +15,94 @@ namespace SteganographyApp.Common.Tests
         private readonly string MisMatchInnerExceptionMessage = "Inner exception message was not what was expected.";
 
         [TestMethod]
-        public void TestParseNullArgsThrowsException()
+        public void TestParseNullArgsReturnsFalse()
         {
-            try
-            {
-                new ArgumentParser().Parse(null);
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.AreEqual("No arguments provided to parse.", e.Message, MisMatchExceptionmessage);
-            }
+            var parser = new ArgumentParser();
+            Assert.IsFalse(parser.TryParse(null, out InputArguments arguments));
+            Assert.IsNotNull(parser.LastError);
+            Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType(), ExceptionWasNotArgumentParse);
         }
 
         [TestMethod]
-        public void TestParseWithInvalidKeyThrowsException()
+        public void TestParseWithInvalidKeyReturnsFalse()
         {
-            try
-            {
-                new ArgumentParser().Parse(new string[] { "test", "1" });
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.AreEqual("An unrecognized argument was provided: test", e.Message, MisMatchExceptionmessage);
-            }
+            var parser = new ArgumentParser();
+            Assert.IsFalse(parser.TryParse(new string[] { "test", "1" }, out InputArguments arguments));
+            Assert.IsNotNull(parser.LastError);
+            Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType(), ExceptionWasNotArgumentParse);
+            Assert.AreEqual("An unrecognized argument was provided: test", parser.LastError.Message, MisMatchExceptionmessage);
         }
 
         [TestMethod]
-        public void TestParseWithBadActionArgumentThrowsException()
+        public void TestParseWithBadActionArgumentReturnsFalse()
         {
-            try
-            {
-                new ArgumentParser().Parse(new string[] { "--action", "whatever" });
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.IsNotNull(e.InnerException, InnerExceptionShouldNotBeNull);
-                Assert.AreEqual("Invalid value for action argument. Expected 'encode', 'decode', 'clean', 'calculate-storage-space', or 'calculate-encrypted-size' got whatever", e.InnerException.Message, MisMatchInnerExceptionMessage);
-            }
+            var parser = new ArgumentParser();
+            Assert.IsFalse(parser.TryParse(new string[] { "--action", "whatever" }, out InputArguments arguments));
+            Assert.IsNotNull(parser.LastError);
+            Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType(), ExceptionWasNotArgumentParse);
+            Assert.IsNotNull(parser.LastError.InnerException, InnerExceptionShouldNotBeNull);
+            Assert.AreEqual("Invalid value for action argument. Expected 'encode', 'decode', 'clean', 'calculate-storage-space', or 'calculate-encrypted-size' got whatever", parser.LastError.InnerException.Message, MisMatchInnerExceptionMessage);
         }
 
         [TestMethod]
-        public void TestParseWithMissingArgumentsThrowsException()
+        public void TestParseWithMissingArgumentsReturnsFalse()
         {
-            try
-            {
-                new ArgumentParser().Parse(new string[] { "--action", "encode" });
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.AreEqual("Missing required values. Specified encode action but no file to encode was provided in arguments.", e.Message, MisMatchInnerExceptionMessage);
-            }
+
+            var parser = new ArgumentParser();
+            Assert.IsFalse(parser.TryParse(new string[] { "--action", "encode" }, out InputArguments arguments));
+            Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType(), ExceptionWasNotArgumentParse);
+            Assert.AreEqual("Missing required values. Specified encode action but no file to encode was provided in arguments.", parser.LastError.Message, MisMatchInnerExceptionMessage);
         }
 
         [TestMethod]
-        public void TestParseWithBadInputFileThrowsException()
+        public void TestParseWithBadInputFileReturnsFalse()
         {
-            try
-            {
-                new ArgumentParser().Parse(new string[] { "--input", "test!@#.png" });
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.IsNotNull(e.InnerException);
-                Assert.AreEqual("File to decode could not be found at test!@#.png", e.InnerException.Message, MisMatchInnerExceptionMessage);
-            }
+            var parser = new ArgumentParser();
+            Assert.IsFalse(parser.TryParse(new string[] { "--input", "test!@#.png" }, out InputArguments arguments));
+            Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType(), ExceptionWasNotArgumentParse);
+            Assert.IsNotNull(parser.LastError.InnerException);
+            Assert.AreEqual("File to decode could not be found at test!@#.png", parser.LastError.InnerException.Message, MisMatchInnerExceptionMessage);
         }
 
         [TestMethod]
-        public void TestWithInvalidCoverImagePathThrowsException()
+        public void TestWithInvalidCoverImagePathReturnsFalse()
         {
-            try
-            {
-                new ArgumentParser().Parse(new string[] { "--images", "test!@#.png" });
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.IsNotNull(e.InnerException, InnerExceptionShouldNotBeNull);
-                Assert.AreEqual("Image could not be found at test!@#.png", e.InnerException.Message, MisMatchInnerExceptionMessage);
-            }
+            var parser = new ArgumentParser();
+            Assert.IsFalse(parser.TryParse(new string[] { "--images", "test!@#.png" }, out InputArguments arguments));
+            Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType(), ExceptionWasNotArgumentParse);
+            Assert.IsNotNull(parser.LastError.InnerException, InnerExceptionShouldNotBeNull);
+            Assert.AreEqual("Image could not be found at test!@#.png", parser.LastError.InnerException.Message, MisMatchInnerExceptionMessage);
         }
 
         [TestMethod]
         public void TestWithRegexGivesValidImages()
         {
-            var args = new ArgumentParser().Parse(new string[] {
+            new ArgumentParser().TryParse(new string[] {
                 "--images", "[r]<^.*\\.(png|PNG)><./TestAssets/>",
                 "--action", "encode",
                 "--input", "./TestAssets/test.zip"
-            });
-            Assert.AreEqual(2, args.CoverImages.Length, "Parsing regular expression should have returned 2 images.");
+            }, out InputArguments arguments);
+            Assert.AreEqual(2, arguments.CoverImages.Length, "Parsing regular expression should have returned 2 images.");
         }
 
         [TestMethod]
-        public void TestWithRegexThrowsException()
+        public void TestWithRegexReturnsFalse()
         {
-            try
-            {
-                new ArgumentParser().Parse(new string[] { "--images", "[r]<><>" });
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.IsNotNull(e.InnerException, InnerExceptionShouldNotBeNull);
-                Assert.AreEqual("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>", e.InnerException.Message, MisMatchInnerExceptionMessage);
-            }
+            var parser = new ArgumentParser();
+            Assert.IsFalse(parser.TryParse(new string[] { "--images", "[r]<><>" }, out InputArguments arguments));
+            Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType(), ExceptionWasNotArgumentParse);
+            Assert.IsNotNull(parser.LastError.InnerException, InnerExceptionShouldNotBeNull);
+            Assert.AreEqual("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>", parser.LastError.InnerException.Message, MisMatchInnerExceptionMessage);
         }
 
         [TestMethod]
         public void TestWithRegexReturnsNoImages()
         {
-            try
-            {
-                new ArgumentParser().Parse(new string[] { "--images", "[r]<^.*\\.(png|PNG)><.>" });
-                Assert.Fail(ExceptionShouldHaveBeenThrownByParse);
-            }
-            catch(Exception e)
-            {
-                Assert.AreEqual(typeof(ArgumentParseException), e.GetType(), ExceptionWasNotArgumentParse);
-                Assert.IsNotNull(e.InnerException, InnerExceptionShouldNotBeNull);
-                Assert.AreEqual("The provided regex expression returned 0 usable files in the directory .", e.InnerException.Message, MisMatchInnerExceptionMessage);
-            }
+            var parser = new ArgumentParser();
+            Assert.IsFalse(parser.TryParse(new string[] { "--images", "[r]<^.*\\.(png|PNG)><.>" }, out InputArguments arguments));
+            Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType(), ExceptionWasNotArgumentParse);
+            Assert.IsNotNull(parser.LastError.InnerException, InnerExceptionShouldNotBeNull);
+            Assert.AreEqual("The provided regex expression returned 0 usable files in the directory .", parser.LastError.InnerException.Message, MisMatchInnerExceptionMessage);
         }
     }
 }

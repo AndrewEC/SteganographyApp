@@ -10,48 +10,46 @@ namespace SteganographyApp
         static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography App\n");
-            if (Array.IndexOf(args, "--help") != -1)
+            if (Array.IndexOf(args, "--help") != -1 || Array.IndexOf(args, "-h") != -1)
             {
                 PrintHelp();
                 return;
             }
 
-            try
+            var parser = new ArgumentParser();
+            if(!parser.TryParse(args, out InputArguments arguments))
             {
-                InputArguments inputArgs = new ArgumentParser().Parse(args);
-
-                try
+                Console.WriteLine("\nAn exception occured while parsing arguments:\n\t{0}", parser.LastError.Message);
+                if (parser.LastError.InnerException != null)
                 {
-                    new EntryPoint(inputArgs).Start();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("An error occured during execution: ");
-                    Console.WriteLine("\tException Message: {0}", e.Message);
-                    if (inputArgs.PrintStack)
-                    {
-                        Console.WriteLine(e.StackTrace);
-                    }
-
-                    switch (e)
-                    {
-                        case TransformationException t:
-                            Console.WriteLine("This error often occurs as a result of an incorrect password or incorrect dummy count when decrypting a file.");
-                            break;
-                        case ArgumentOutOfRangeException t:
-                            Console.WriteLine("This error often occurs when decoding using a dummy count much larger than the count specified when encoding.");
-                            break;
-                    }
-                }
-            }
-            catch (ArgumentParseException e)
-            {
-                Console.WriteLine("\nAn exception occured while parsing arguments:\n\t{0}", e.Message);
-                if (e.InnerException != null)
-                {
-                    Console.WriteLine("And was caused by:\n\t{0}", e.InnerException.Message);
+                    Console.WriteLine("And was caused by:\n\t{0}", parser.LastError.InnerException.Message);
                 }
                 Console.WriteLine("\nRun the program with --help to get more information.");
+                return;
+            }
+
+            try
+            {
+                new EntryPoint(arguments).Start();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("An error occured during execution: ");
+                Console.WriteLine("\tException Message: {0}", e.Message);
+                if (arguments.PrintStack)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
+
+                switch (e)
+                {
+                    case TransformationException t:
+                        Console.WriteLine("This error often occurs as a result of an incorrect password or incorrect dummy count when decrypting a file.");
+                        break;
+                    case ArgumentOutOfRangeException t:
+                        Console.WriteLine("This error often occurs when decoding using a dummy count much larger than the count specified when encoding.");
+                        break;
+                }
             }
 
             Console.WriteLine("");
@@ -61,7 +59,7 @@ namespace SteganographyApp
         {
 
             var parser = new HelpParser();
-            if (!parser.TryParse())
+            if (!parser.TryParse(out HelpInfo info))
             {
                 Console.WriteLine("An error occurred while parsing the help file: {0}", parser.LastError);
                 Console.WriteLine("Check that the help.prop file is in the same directory as the application and try again.");
@@ -71,7 +69,7 @@ namespace SteganographyApp
 
             Console.WriteLine("SteganographyApp Help\n");
 
-            foreach (string message in parser.GetMessagesFor("AppDescription", "AppAction", "Input", "Output", "Images", "Password",
+            foreach (string message in info.GetMessagesFor("AppDescription", "AppAction", "Input", "Output", "Images", "Password",
                 "PrintStack", "Compress", "ChunkSize", "RandomSeed", "Dummies"))
             {
                 Console.WriteLine("{0}\n", message);

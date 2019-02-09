@@ -16,12 +16,21 @@ namespace SteganographyApp.Common.Tests
         public void TestHelpParserHappyPath()
         {
             var parser = new HelpParser();
-            Assert.IsTrue(parser.TryParse(TEST_PATH));
-            foreach(string line in parser.GetMessagesFor("Description", "Action"))
+            Assert.IsTrue(parser.TryParse(out HelpInfo info, TEST_PATH));
+            Assert.IsNull(parser.LastError);
+            foreach(string line in info.GetMessagesFor("Description", "Action"))
             {
                 Assert.IsNotNull(line);
                 Assert.AreNotEqual("", line);
             }
+        }
+
+        [TestMethod]
+        public void TestMissingFileReturnsFalse()
+        {
+            var parser = new HelpParser();
+            Assert.IsFalse(parser.TryParse(out HelpInfo info, "missing"));
+            Assert.IsNotNull(parser.LastError);
         }
 
     }

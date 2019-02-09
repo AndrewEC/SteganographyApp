@@ -8,6 +8,47 @@ namespace SteganographyApp.Common.Help
 {
 
     /// <summary>
+    /// Class containing the results of parsing the help file and a utiilty
+    /// method to retrieve help messages for a given set of arguments.
+    /// </summary>
+    public class HelpInfo
+    {
+        /// <summary>
+        /// A dictionary containing the results of the help file parsing.
+        /// This will include a key value representing the name of the help
+        /// message or the parameter that it corresponds to and a value 
+        /// being the actual help message.
+        /// </summary>
+        public Dictionary<string, string> Results { get; set; }
+
+        /// <summary>
+        /// Attempts to retrieve an of array of help messages that are associated with
+        /// the provided array of names and return them in the order in which they
+        /// were requested.
+        /// <para>If a particular parameter name was not loaded from the help file then a
+        /// standard message will be returned in place of the actual help message.</para>
+        /// </summary>
+        /// <param name="names">The ordered list of parameter names to retrieve the help
+        /// messages for.</param>
+        /// <returns>An array of help messages whose order is based on the order of the names
+        /// provided to lookup.</returns>
+        public string[] GetMessagesFor(params string[] names)
+        {
+            string[] messages = new string[names.Length];
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (!Results.ContainsKey(names[i]))
+                {
+                    messages[i] = string.Format("No help information configured for {0}.\n", names[i]);
+                    continue;
+                }
+                messages[i] = Results[names[i]];
+            }
+            return messages;
+        }
+    }
+
+    /// <summary>
     /// Utility class to parse help information from the help.prop file
     /// so it can be shared between the regular app and the calculator.
     /// </summary>
@@ -20,14 +61,6 @@ namespace SteganographyApp.Common.Help
         public string LastError { get; private set; }
 
         /// <summary>
-        /// A dictionary containing the results of the help file parsing.
-        /// This will include a key value representing the name of the help
-        /// message or the parameter that it corresponds to and a value 
-        /// being the actual help message.
-        /// </summary>
-        public Dictionary<string, string> Results { get; private set; }
-
-        /// <summary>
         /// Attempts to parse the help file located at the fileName parameter value.
         /// <para> If successful it will have populated the <see cref="Results"/> dictionary with all the
         /// help messages and the parameters that they are associated with.</para>
@@ -36,8 +69,10 @@ namespace SteganographyApp.Common.Help
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public bool TryParse(string fileName = "help.prop")
+        public bool TryParse(out HelpInfo info, string fileName = "help.prop")
         {
+            info = new HelpInfo();
+
             string assemblyPath = Assembly.GetExecutingAssembly().Location;
             int index = assemblyPath.LastIndexOf("\\");
             if(index == -1)
@@ -52,7 +87,7 @@ namespace SteganographyApp.Common.Help
                 return false;
             }
 
-            Results = new Dictionary<string, string>();
+            Dictionary<string, string> results = new Dictionary<string, string>();
             string[] lines = File.ReadAllLines(location);
 
             for(int i = 0; i < lines.Length; i++)
@@ -61,7 +96,7 @@ namespace SteganographyApp.Common.Help
                 {
                     try
                     {
-                        Results[lines[i].Substring(1)] = ReadItem(lines, i + 1);
+                        results[lines[i].Substring(1)] = ReadItem(lines, i + 1);
                     }
                     catch (Exception e)
                     {
@@ -71,6 +106,7 @@ namespace SteganographyApp.Common.Help
                 }
             }
 
+            info.Results = results;
             return true;
         }
 
@@ -104,32 +140,6 @@ namespace SteganographyApp.Common.Help
                 message += lines[i].Replace("\\t", "\t");
             }
             return message;
-        }
-
-        /// <summary>
-        /// Attempts to retrieve an of array of help messages that are associated with
-        /// the provided array of names and return them in the order in which they
-        /// were requested.
-        /// <para>If a particular parameter name was not loaded from the help file then a
-        /// standard message will be returned in place of the actual help message.</para>
-        /// </summary>
-        /// <param name="names">The ordered list of parameter names to retrieve the help
-        /// messages for.</param>
-        /// <returns>An array of help messages whose order is based on the order of the names
-        /// provided to lookup.</returns>
-        public string[] GetMessagesFor(params string[] names)
-        {
-            string[] messages = new string[names.Length];
-            for(int i = 0; i < names.Length; i++)
-            {
-                if (!Results.ContainsKey(names[i]))
-                {
-                    messages[i] = string.Format("No help information configured for {0}.\n", names[i]);
-                    continue;
-                }
-                messages[i] = Results[names[i]];
-            }
-            return messages;
         }
     }
 }
