@@ -24,11 +24,6 @@ namespace SteganographyApp.Common.Data
     {
 
         /// <summary>
-        /// Specifies the number of bits that will be written with each dummy entry.
-        /// </summary>
-        private static readonly int DUMMY_LENGTH = 3;
-
-        /// <summary>
         /// Inserts the specified number of dummy entries into the current
         /// binary string.
         /// </summary>
@@ -38,12 +33,9 @@ namespace SteganographyApp.Common.Data
         /// dummy entries.</param>
         /// <returns>If numDummies == 0 then it will return the original binary string
         /// otherwise will return the binary string with the new dummy entries.</returns>
-        public static string InsertDummies(int numDummies, string binary)
+        private static string InsertDummies(int numDummies, string binary)
         {
-            if(numDummies == 0)
-            {
-                return binary;
-            }
+            int[] lengths = GenerateLengths(numDummies);
 
             // cubed root
             int length = (int)Math.Ceiling(Math.Pow(binary.Length, (double)1 / 3)) + 1;
@@ -65,6 +57,17 @@ namespace SteganographyApp.Common.Data
             return binary;
         }
 
+        private int[] GenerateLengths(int numDummies)
+        {
+            var lengthGenerator = new IndexGenerator(numDummies, numDummies);
+            int[] lengths = new int[numDummies];
+            for(int i = 0; i < lengths.length; i++)
+            {
+                lengths[i] = lengthGenerator.Next(10) + 1;
+            }
+            return lengths;
+        }
+
         /// <summary>
         /// Generates a random binary string of the length specified by
         /// <see cref="DUMMY_LENGTH"/> using an existing IndexGenerator instance.
@@ -73,10 +76,10 @@ namespace SteganographyApp.Common.Data
         /// each character in the dummy string should be a 1 or a 0.</param>
         /// <returns>Returns a random binary string of a length equal to
         /// <see cref="DUMMY_LENGTH"/></returns>
-        private static string GenerateDummy(IndexGenerator generator)
+        private static string GenerateDummy(IndexGenerator generator, int length)
         {
             string dummy = "";
-            for(int i = 0; i < DUMMY_LENGTH; i++)
+            for(int i = 0; i < length; i++)
             {
                 dummy += (generator.Next(2) == 0) ? "0" : "1";
             }
@@ -94,15 +97,12 @@ namespace SteganographyApp.Common.Data
         /// otherwise will return the binary string with the dummy entries removed.</returns>
         /// <exception cref="TransformationException">Thrown if an our of range exception is caught
         /// while trying to remove the dummy entries from the chunk.</exception>
-        public static string RemoveDummies(int numDummies, string binary)
+        private static string RemoveDummies(int numDummies, string binary)
         {
-            if(numDummies == 0)
-            {
-                return binary;
-            }
-
             int dummyLength = numDummies * DUMMY_LENGTH;
             int actualLength = binary.Length - dummyLength;
+
+            int[] lengths = Array.Reverse(GenerateLengths(numDummies));
 
             // cubed root
             int length = (int)Math.Ceiling(Math.Pow(actualLength, (double)1 / 3)) + 1;
@@ -113,14 +113,13 @@ namespace SteganographyApp.Common.Data
             {
                 positions[i] = generator.Next(actualLength - 1);
             }
-
             Array.Reverse(positions);
 
             try
             {
                 for (int i = 0; i < positions.Length; i++)
                 {
-                    binary = binary.Remove(positions[i], DUMMY_LENGTH);
+                    binary = binary.Remove(positions[i], lengths[i]);
                 }
             }
             catch (ArgumentOutOfRangeException e)
@@ -144,7 +143,7 @@ namespace SteganographyApp.Common.Data
         /// <exception cref="TransformationException">Thrown
         /// if there was an issue trying to pass the base64 encoded string through the AES
         /// cipher.</exception>
-        public static string Encode(byte[] bytes, string password, bool useCompression)
+        public static string Encode(byte[] bytes, string password, bool useCompression, int dummyCount)
         {
             if (useCompression)
             {
@@ -172,7 +171,15 @@ namespace SteganographyApp.Common.Data
             {
                 builder.Append(Convert.ToString(bit, 2).PadLeft(8, '0'));
             }
-            return builder.ToString();
+
+            if(dummyCount == 0)
+            {
+                return builder.ToString();
+            }
+            else
+            {
+                return InsertDummies(dummyCount, builder.ToString());
+            }
         }
 
         /// <summary>
@@ -188,8 +195,13 @@ namespace SteganographyApp.Common.Data
         /// encoding.</returns>
         /// <exception cref="TransformationException">Thrown if an error
         /// occured while decrypting the base64 string.</exception>
-        public static byte[] Decode(string input, string password, bool useCompression)
+        public static byte[] Decode(string input, string password, bool useCompression, int dummyCount)
         {
+            if(dummyCount > 0)
+            {
+                input = RemoveDummies(dummyCount, input);
+            }
+
             byte[] bits = new byte[input.Length / 8];
             for (int i = 0; i < bits.Length; i++)
             {

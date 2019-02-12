@@ -35,9 +35,7 @@ namespace SteganographyApp.Common.IO.Content
                 stream = File.Open(args.DecodedOutputFile, FileMode.OpenOrCreate);
             }
 
-            binary = DataEncoderUtil.RemoveDummies(args.DummyCount, binary);
-
-            byte[] decoded = DataEncoderUtil.Decode(binary, args.Password, args.UseCompression);
+            byte[] decoded = DataEncoderUtil.Decode(binary, args.Password, args.UseCompression, args.DummyCount);
             if (args.RandomSeed != "")
             {
                 decoded = ReorderBytes(decoded);
