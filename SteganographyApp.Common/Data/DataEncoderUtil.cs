@@ -51,17 +51,24 @@ namespace SteganographyApp.Common.Data
 
             for (int i = 0; i < positions.Length; i++)
             {
-                binary = binary.Insert(positions[i], GenerateDummy(generator));
+                binary = binary.Insert(positions[i], GenerateDummy(generator, lengths[i]));
             }
 
             return binary;
         }
 
-        private int[] GenerateLengths(int numDummies)
+        /// <summary>
+        /// Generates an array of the specified lengths containing ints consisting
+        /// of random values between 1 and 10.
+        /// </summary>
+        /// <param name="numDummies">The number of random numbers to generate. Will also
+        /// determine the length of the array being returned.</param>
+        /// <returns>A new array of random numbers of the specified length.</returns>
+        private static int[] GenerateLengths(int numDummies)
         {
             var lengthGenerator = new IndexGenerator(numDummies, numDummies);
             int[] lengths = new int[numDummies];
-            for(int i = 0; i < lengths.length; i++)
+            for(int i = 0; i < lengths.Length; i++)
             {
                 lengths[i] = lengthGenerator.Next(10) + 1;
             }
@@ -99,10 +106,12 @@ namespace SteganographyApp.Common.Data
         /// while trying to remove the dummy entries from the chunk.</exception>
         private static string RemoveDummies(int numDummies, string binary)
         {
-            int dummyLength = numDummies * DUMMY_LENGTH;
-            int actualLength = binary.Length - dummyLength;
 
-            int[] lengths = Array.Reverse(GenerateLengths(numDummies));
+            int[] lengths = GenerateLengths(numDummies);
+            Array.Reverse(lengths);
+            int totalLength = 0;
+            Array.ForEach(lengths, delegate (int i) { totalLength += i;  });
+            int actualLength = binary.Length - totalLength;
 
             // cubed root
             int length = (int)Math.Ceiling(Math.Pow(actualLength, (double)1 / 3)) + 1;

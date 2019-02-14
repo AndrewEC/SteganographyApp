@@ -26,7 +26,7 @@ namespace SteganographyApp.Common.Tests
         public void TestEncodeFileWithoutPassHappyPath()
         {
             byte[] fileBytes = File.ReadAllBytes(InputFile);
-            string binary = DataEncoderUtil.Encode(fileBytes, "", false);
+            string binary = DataEncoderUtil.Encode(fileBytes, "", false, 0);
             Assert.IsTrue(binary.Length > 0 && binary.Length % 8 == 0, "Binary string length needs to be greater than zero and evenly divisble by 8.");
             foreach (char c in binary)
             {
@@ -38,7 +38,7 @@ namespace SteganographyApp.Common.Tests
         public void TestEncodeFileWithPasswordHappyPath()
         {
             byte[] fileBytes = File.ReadAllBytes(InputFile);
-            string binary = DataEncoderUtil.Encode(fileBytes, Password, false);
+            string binary = DataEncoderUtil.Encode(fileBytes, Password, false, 0);
             Assert.IsTrue(binary.Length > 0 && binary.Length % 8 == 0, "Binary string length needs to be greater than zero and evenly divisble by 8.");
             foreach (char c in binary)
             {
@@ -50,8 +50,8 @@ namespace SteganographyApp.Common.Tests
         public void TestEncodeAndDecodeMatch()
         {
             byte[] fileBytes = File.ReadAllBytes(InputFile);
-            string binary = DataEncoderUtil.Encode(fileBytes, Password, false);
-            byte[] bytes = DataEncoderUtil.Decode(binary, Password, false);
+            string binary = DataEncoderUtil.Encode(fileBytes, Password, false, 0);
+            byte[] bytes = DataEncoderUtil.Decode(binary, Password, false, 0);
 
             Assert.AreEqual(fileBytes.Length, bytes.Length, "Expected length of byte arrays to match.");
             for (int i = 0; i < fileBytes.Length; i++)
@@ -65,16 +65,16 @@ namespace SteganographyApp.Common.Tests
         public void TestMismatchPasswordEncodeDecodeException()
         {
             byte[] fileBytes = File.ReadAllBytes(InputFile);
-            string binary = DataEncoderUtil.Encode(fileBytes, Password, false);
-            byte[] bytes = DataEncoderUtil.Decode(binary, "testPasswords", false);
+            string binary = DataEncoderUtil.Encode(fileBytes, Password, false, 0);
+            byte[] bytes = DataEncoderUtil.Decode(binary, "testPasswords", false, 0);
         }
 
         [TestMethod]
         public void TestEncodeAndDecodeCompressionMatch()
         {
             byte[] fileBytes = File.ReadAllBytes(InputFile);
-            string binary = DataEncoderUtil.Encode(fileBytes, Password, true);
-            byte[] bytes = DataEncoderUtil.Decode(binary, Password, true);
+            string binary = DataEncoderUtil.Encode(fileBytes, Password, true, 0);
+            byte[] bytes = DataEncoderUtil.Decode(binary, Password, true, 0);
 
             Assert.AreEqual(fileBytes.Length, bytes.Length, "Encoded/Decoded byte length should match original file byte length.");
             for (int i = 0; i < fileBytes.Length; i++)
@@ -87,12 +87,12 @@ namespace SteganographyApp.Common.Tests
         public void TestCompressedIsLessThanUncompressed()
         {
             byte[] fileBytes = File.ReadAllBytes(InputFile);
-            string compressed = DataEncoderUtil.Encode(fileBytes, Password, true);
-            string uncompressed = DataEncoderUtil.Encode(fileBytes, Password, false);
+            string compressed = DataEncoderUtil.Encode(fileBytes, Password, true, 0);
+            string uncompressed = DataEncoderUtil.Encode(fileBytes, Password, false, 0);
             Assert.IsTrue(compressed.Length < uncompressed.Length, "Compressed file data should be less than uncompressed data.");
 
-            compressed = DataEncoderUtil.Encode(fileBytes, "", true);
-            uncompressed = DataEncoderUtil.Encode(fileBytes, "", false);
+            compressed = DataEncoderUtil.Encode(fileBytes, "", true, 0);
+            uncompressed = DataEncoderUtil.Encode(fileBytes, "", false, 0);
             Assert.IsTrue(compressed.Length < uncompressed.Length, "Compressed file data should be less than uncompressed data.");
         }
 
@@ -101,39 +101,30 @@ namespace SteganographyApp.Common.Tests
         public void TestCompressUncompressMismatchThrowsException()
         {
             byte[] fileBytes = File.ReadAllBytes(InputFile);
-            string compressed = DataEncoderUtil.Encode(fileBytes, Password, true);
-            byte[] uncompressed = DataEncoderUtil.Decode(InputFile, Password, false);
+            string compressed = DataEncoderUtil.Encode(fileBytes, Password, true, 0);
+            byte[] uncompressed = DataEncoderUtil.Decode(InputFile, Password, false, 0);
         }
 
         [TestMethod]
-        public void TestInsertAndRemoveDummiesWithMatchingCountIsSuccessful()
+        public void TestInsertDummiesReturnsDifferentThanNonInsert()
         {
-            string binary = "10010101101111100001101010101010111";
-            int dummyCount = 3;
-            string inserted = DataEncoderUtil.InsertDummies(dummyCount, binary);
-            Assert.AreNotEqual(binary, inserted, "After inserting dummies the new binary value should be different than the original.");
-            string removed = DataEncoderUtil.RemoveDummies(dummyCount, inserted);
-            Assert.AreEqual(binary, removed, "After removing the dummies the new binary value should be the same as the original value.");
+            byte[] fileBytes = File.ReadAllBytes(InputFile);
+            string dummyEncoded = DataEncoderUtil.Encode(fileBytes, Password, true, 0);
+            string plainEncoded = DataEncoderUtil.Encode(fileBytes, Password, true, 3);
+            Assert.AreNotEqual(dummyEncoded, plainEncoded);
         }
 
         [TestMethod]
-        public void TestInsertAndRemoveDummiesMissmatchCountReturnsBadResult()
+        public void TestEncodeAndDecodeWithDummiesSuccessful()
         {
-            string binary = "10010101101111100001101010101010111";
-            string inserted = DataEncoderUtil.InsertDummies(3, binary);
-            Assert.AreNotEqual(binary, inserted, "After inserting dummies the new binary value should be different than the original.");
-            string removed = DataEncoderUtil.RemoveDummies(2, inserted);
-            Assert.AreNotEqual(binary, removed, "After removing the dummies the new binary value should not be the same as the original value.");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(TransformationException), AllowDerivedTypes = false)]
-        public void TestInsertAndRemoveWithMissmatchedCountThrowsException()
-        {
-            string binary = "10010101101111100001101010101010111";
-            string inserted = DataEncoderUtil.InsertDummies(3, binary);
-            Assert.AreNotEqual(binary, inserted, "After inserting dummies the new binary value should be different than the original.");
-            string removed = DataEncoderUtil.RemoveDummies(30, inserted);
+            byte[] fileBytes = File.ReadAllBytes(InputFile);
+            string dummyEncoded = DataEncoderUtil.Encode(fileBytes, Password, true, 3);
+            byte[] decoded = DataEncoderUtil.Decode(dummyEncoded, Password, true, 3);
+            Assert.AreEqual(fileBytes.Length, decoded.Length);
+            for(int i = 0; i < fileBytes.Length; i++)
+            {
+                Assert.AreEqual(fileBytes[i], decoded[i]);
+            }
         }
 
     }
