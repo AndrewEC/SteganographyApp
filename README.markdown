@@ -63,6 +63,11 @@ Example arguments for decoding data from a set of images to an output file.
 
 --randomSeed | -rs:: Randomizes the order in which bytes will be written from input file to image.
     Enter ? as the randomSeed to input the real randomSeed in interactive mode.
+
+--dummies | -d :: Specifies the number of 3 bit dummy entries to insert or remove when encoding and decoding.
+    This will make it more difficult to completely decode the content of the encoded file even with the correct password.
+    This will also increase the overall size of the encoded content as it will be adding in extra values to the content after encoding.
+    Values must be a positive, whole number with a value greater than 1.
 ```
 
 3rd Party Libraries

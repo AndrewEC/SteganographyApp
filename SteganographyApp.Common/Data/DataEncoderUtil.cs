@@ -31,8 +31,7 @@ namespace SteganographyApp.Common.Data
         /// binary string.</param>
         /// <param name="binary">The original binary string to be modified with the
         /// dummy entries.</param>
-        /// <returns>If numDummies == 0 then it will return the original binary string
-        /// otherwise will return the binary string with the new dummy entries.</returns>
+        /// <returns>Returns the binary string with the new dummy entries.</returns>
         private static string InsertDummies(int numDummies, string binary)
         {
             int[] lengths = GenerateLengths(numDummies);
@@ -76,13 +75,12 @@ namespace SteganographyApp.Common.Data
         }
 
         /// <summary>
-        /// Generates a random binary string of the length specified by
-        /// <see cref="DUMMY_LENGTH"/> using an existing IndexGenerator instance.
+        /// Generates a random binary string of the length specified by the length parameter
+        /// using the provided IndexGenerator instance.
         /// </summary>
         /// <param name="generator">The index generator instance to determine whether
         /// each character in the dummy string should be a 1 or a 0.</param>
         /// <returns>Returns a random binary string of a length equal to
-        /// <see cref="DUMMY_LENGTH"/></returns>
         private static string GenerateDummy(IndexGenerator generator, int length)
         {
             string dummy = "";
@@ -107,6 +105,7 @@ namespace SteganographyApp.Common.Data
         private static string RemoveDummies(int numDummies, string binary)
         {
 
+            // calculate the length of the dummies originally added to the string
             int[] lengths = GenerateLengths(numDummies);
             Array.Reverse(lengths);
             int totalLength = 0;
