@@ -57,7 +57,7 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t\tValue must be either 'calculate-storage-space' or 'calculate-encrypted-size'.
 
 ~Dummies
-\t--dummies | -d :: Specifies the number of 3 bit dummy entries to insert or remove when encoding and decoding.
+\t--dummies | -d :: Specifies the number of random length dummy entries to insert or remove when encoding and decoding.
 \t\tThis will make it more difficult to completely decode the content of the encoded file even with the correct password.
 \t\tThis will also increase the overall size of the encoded content as it will be adding in extra values to the content after encoding.
 \t\tValues must be a positive, whole number with a value greater than 1.
