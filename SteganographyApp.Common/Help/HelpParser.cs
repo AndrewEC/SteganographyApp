@@ -73,13 +73,8 @@ namespace SteganographyApp.Common.Help
         {
             info = new HelpInfo();
 
-            string assemblyPath = Assembly.GetExecutingAssembly().Location;
-            int index = assemblyPath.LastIndexOf("\\");
-            if(index == -1)
-            {
-                assemblyPath.LastIndexOf("/");
-            }
-            string location = string.Format("{0}\\{1}", assemblyPath.Substring(0, index), fileName);
+            string assemblyPath = GetAssemblyPath();
+            string location = string.Format("{0}\\{1}", assemblyPath, fileName);
             
             if (!File.Exists(location))
             {
@@ -108,6 +103,17 @@ namespace SteganographyApp.Common.Help
 
             info.Results = results;
             return true;
+        }
+
+        private string GetAssemblyPath()
+        {
+            string assemblyPath = Assembly.GetExecutingAssembly().Location;
+            int index = assemblyPath.LastIndexOf("\\");
+            if(index == -1)
+            {
+                index = assemblyPath.LastIndexOf("/");
+            }
+            return assemblyPath.Substring(0, index);
         }
 
         /// <summary>
