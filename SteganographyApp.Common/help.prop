@@ -31,8 +31,8 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t--printStack | -stack :: Specifies whether or not to print the full stack trace if an error occurs.
 \t\tNo value is required for this argument. When provided it will always be true otherwise it will be false.
 
-~Compress
-\t--compress | -c :: Specifies whether or not to compress/decompress the encoded/decoded content.
+~EnableCompression
+\t--enableCompression | -c :: Specifies whether or not to compress/decompress the encoded/decoded content.
 \t\tNo value is required for this argument. When provided it will always be true otherwise it will be false.
 
 ~ChunkSize
@@ -56,8 +56,7 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t--action | -a :: Specifies whether to calculate the encrypted size of a file or the amount of storage space offered by a set of images.
 \t\tValue must be either 'calculate-storage-space' or 'calculate-encrypted-size'.
 
-~Dummies
-\t--dummies | -d :: Specifies the number of random length dummy entries to insert or remove when encoding and decoding.
-\t\tThis will make it more difficult to completely decode the content of the encoded file even with the correct password.
+~EnableDummies
+\t--enableDummies | -d :: Flag indicating whether or not to insert dummy values into the image.
+\t\tThe number of dummies to insert per read/write will be based on the properties of the first and last image to write to.
 \t\tThis will also increase the overall size of the encoded content as it will be adding in extra values to the content after encoding.
-\t\tValues must be a positive, whole number with a value greater than 1.

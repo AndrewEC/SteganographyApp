@@ -67,7 +67,7 @@ namespace SteganographyApp
             Console.WriteLine("SteganographyApp Help\n");
 
             foreach (string message in info.GetMessagesFor("AppDescription", "AppAction", "Input", "Output", "Images", "Password",
-                "PrintStack", "Compress", "ChunkSize", "RandomSeed", "Dummies"))
+                "PrintStack", "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"))
             {
                 Console.WriteLine("{0}\n", message);
             }

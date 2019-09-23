@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SteganographyApp.Common.Data;
 
 namespace SteganographyApp.Common
 {
@@ -94,14 +97,14 @@ namespace SteganographyApp.Common
             {
                 new Argument("--action", "-a", ParseEncodeOrDecodeAction),
                 new Argument("--input", "-in", ParseFileToEncode),
-                new Argument("--compress", "-c", ParseUseCompression, true),
+                new Argument("--enableCompression", "-c", ParseUseCompression, true),
                 new Argument("--printStack", "-stack", ParsePrintStack, true),
                 new Argument("--images", "-im", ParseImages),
                 new Argument("--password", "-p", ParsePassword),
                 new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
                 new Argument("--chunkSize", "-cs", ParseChunkSize),
                 new Argument("--randomSeed", "-rs", ParseRandomSeed),
-                new Argument("--dummies", "-d", ParseDummyCount)
+                new Argument("--enableDummies", "-d", ParseInsertDummies, true)
             };
         }
 
@@ -117,10 +120,9 @@ namespace SteganographyApp.Common
         /// <returns>True if the argument could be found else false.</returns>
         private bool TryGetArgument(string key, out Argument argument)
         {
-            string lowerKey = key.ToLower();
             foreach(Argument arg in arguments)
             {
-                if(arg.Name == lowerKey || arg.ShortName == lowerKey)
+                if(arg.Name == key || arg.ShortName == key)
                 {
                     argument = arg;
                     return true;
@@ -271,20 +273,49 @@ namespace SteganographyApp.Common
             return value;
         }
 
-        private void ParseDummyCount(InputArguments arguments, string value)
+        /// <summary>
+        /// Parses a boolean from the value parameter and sets the InsertDummies property.
+        /// Will also attempt to call <see cref="ParseDummyCount"/>
+        /// </summary>
+        /// <param name="arguments">The InputArguments instance to modify.</param>
+        /// <param name="value">The string representation of the InsertDummies boolean flag.</param>
+        private void ParseInsertDummies(InputArguments arguments, string value)
         {
             try
             {
-                arguments.DummyCount = Convert.ToInt32(value);
-                if(arguments.DummyCount < 0)
-                {
-                    throw new ArgumentValueException("The dummy count must be a positive whole number with a value more than 0.");
-                }
+                arguments.InsertDummies = Boolean.Parse(value);
+                ParseDummyCount(arguments);
             }
             catch (Exception e)
             {
-                throw new ArgumentValueException(string.Format("Could not parse dummy count from value: {0}", value), e);
+                throw new ArgumentValueException(string.Format("Could not parse insert dummies from value: {0}", value), e);
             }
+        }
+
+        /// <summary>
+        /// Parses the number of dummy entries to insert into the image based on the
+        /// properties retrieved from the first and last images.
+        /// <para>Note: the first and last image can be the same image if only one cover image
+        /// was provided.</para>
+        /// </summary>
+        private void ParseDummyCount(InputArguments arguments)
+        {
+            if (!arguments.InsertDummies || arguments.CoverImages == null)
+            {
+                return;
+            }
+            
+            long dummyCount = 1;
+            int[] points = new int[] { 0, arguments.CoverImages.Length - 1 };
+            foreach (int point in points)
+            {
+                using(Image<Rgba32> image = Image.Load(arguments.CoverImages[point]))
+                {
+                    dummyCount += dummyCount * (image.Width * image.Height);
+                }
+            }
+            String seed = dummyCount.ToString();
+            arguments.DummyCount = IndexGenerator.FromString(seed).Next(10);
         }
 
         /// <summary>
@@ -437,6 +468,7 @@ namespace SteganographyApp.Common
                 }
             }
             arguments.CoverImages = images;
+            ParseDummyCount(arguments);
         }
 
         /// <summary>
@@ -591,6 +623,7 @@ namespace SteganographyApp.Common
         public bool UseCompression { get; set; } = false;
         public string RandomSeed { get; set; } = "";
         public int DummyCount { get; set; } = 0;
+        public bool InsertDummies { get; set; } = false;
 
         /// <summary>
         /// Specifies the chunk size. I.e. the number of bytes to read, encode,
