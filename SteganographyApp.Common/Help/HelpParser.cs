@@ -7,6 +7,12 @@ using System.Reflection;
 namespace SteganographyApp.Common.Help
 {
 
+    public enum HelpItemSet
+    {
+        Main,
+        Calculator
+    }
+
     /// <summary>
     /// Class containing the results of parsing the help file and a utiilty
     /// method to retrieve help messages for a given set of arguments.
@@ -20,6 +26,32 @@ namespace SteganographyApp.Common.Help
         /// being the actual help message.
         /// </summary>
         public Dictionary<string, string> Results { get; set; }
+
+        /// <summary>
+        /// Conversion point that takes in an <see cref="HelpItemSet"/> and invokes the
+        /// <see cref="GetMessagesFor(string[])"/> method with the appropriate list of
+        /// headings to lookup for the given item set enum value.
+        /// </summary>
+        /// <param name="item">The HelpItemSet enum value indicating which help items should
+        /// be loaded and displayed to the user.</param>
+        /// <returns>The value retrieved from the <see cref="GetMessagesFor(string[])"/>
+        /// invocation</returns>
+        public string[] GetMessagesFor(HelpItemSet item)
+        {
+            string[] labels = new string[0];
+            switch(item)
+            {
+                case HelpItemSet.Main:
+                    labels = new string[]{"AppDescription", "AppAction", "Input", "Output", "Images", "Password",
+                        "PrintStack", "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"};
+                    break;
+                case HelpItemSet.Calculator:
+                    labels = new string[] {"CalculatorDescription", "AppAction", "Input", "Images", "Password",
+                        "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"};
+                    break;
+            }
+            return GetMessagesFor(labels);
+        }
 
         /// <summary>
         /// Attempts to retrieve an of array of help messages that are associated with

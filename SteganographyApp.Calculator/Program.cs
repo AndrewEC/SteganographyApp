@@ -59,8 +59,7 @@ namespace SteganographyAppCalculator
 
             Console.WriteLine("SteganographyApp Help\n");
 
-            foreach(string message in info.GetMessagesFor("AppDescription", "AppAction", "Input", "Images", "Password",
-                "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"))
+            foreach(string message in info.GetMessagesFor(HelpItemSet.Calculator))
             {
                 Console.WriteLine("{0}\n", message);
             }
