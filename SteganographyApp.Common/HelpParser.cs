@@ -4,13 +4,14 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 
-namespace SteganographyApp.Common.Help
+namespace SteganographyApp.Common
 {
 
     public enum HelpItemSet
     {
         Main,
-        Calculator
+        Calculator,
+        Converter
     }
 
     /// <summary>
@@ -48,6 +49,10 @@ namespace SteganographyApp.Common.Help
                 case HelpItemSet.Calculator:
                     labels = new string[] {"CalculatorDescription", "AppAction", "Input", "Images", "Password",
                         "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"};
+                    break;
+                case HelpItemSet.Converter:
+                    labels = new string[] {"ConverterDescription", "ConvertAction", "Images", "DeleteOriginals",
+                        "CompressionLevel"};
                     break;
             }
             return GetMessagesFor(labels);
@@ -178,6 +183,17 @@ namespace SteganographyApp.Common.Help
                 message += lines[i].Replace("\\t", "\t");
             }
             return message;
+        }
+
+        /// <summary>
+        /// Utility to print out a common error message in the instance where there is an error parsing
+        /// the help properties file.
+        /// </summary>
+        public void PrintCommonErrorMessage()
+        {
+            Console.WriteLine("An error occurred while parsing the help file: {0}", LastError);
+            Console.WriteLine("Check that the help.prop file is in the same directory as the application and try again.");
+            Console.WriteLine();
         }
     }
 }

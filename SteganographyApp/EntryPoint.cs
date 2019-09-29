@@ -51,16 +51,14 @@ namespace SteganographyApp
         /// </summary>
         private void StartClean()
         {
-            int cleaned = 0;
-            DisplayPercent(cleaned, args.CoverImages.Length, "Cleaning image LSB data");
+            var tracker = new ProgressTracker(args.CoverImages.Length, "Cleaning image LSB data", "Finished cleaning all images.");
+            tracker.Display();
             var store = new ImageStore(args);
             store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs eventArg) =>
             {
-                cleaned++;
-                DisplayPercent(cleaned, args.CoverImages.Length, "Cleaning image LSB data");
+                tracker.TickAndDisplay();
             };
             store.CleanAll();
-            Console.WriteLine("Finished cleaning all {0} images.", args.CoverImages.Length);
         }
 
         /// <summary>
@@ -98,10 +96,11 @@ namespace SteganographyApp
                 // be used to store the content chunk table.
                 wrapper.Seek(start);
 
-                int chunksRead = 0; //used to display how much data has been read as a percent
-
                 using (var reader = new ContentReader(args))
                 {
+                    var tracker = new ProgressTracker(reader.RequiredNumberOfReads, "Encoding file contents", "All input file contents have been encoded.");
+                    tracker.Display();
+
                     string content = "";
                     while ((content = reader.ReadNextChunk()) != null)
                     {
@@ -109,11 +108,8 @@ namespace SteganographyApp
                         // content chunk table once the total encoding process has been completed.
                         table.Add(content.Length);
                         wrapper.Write(content);
-                        chunksRead++; //used to display how much data has been read as a percent
-                        DisplayPercent(chunksRead, reader.RequiredNumberOfReads, "Encoding file contents"); //used to display how much data has been read as a percent
+                        tracker.TickAndDisplay();
                     }
-
-                    Console.WriteLine("All input file contents have been encoded.");
                 }
 
                 wrapper.Complete();
@@ -146,41 +142,24 @@ namespace SteganographyApp
                 // read in the content chunk table so we know how many bits to read 
                 Console.WriteLine("Reading content chunk table.");
                 var chunkTable = store.ReadContentChunkTable();
+                var tracker = new ProgressTracker(chunkTable.Count, "Decoding file contents", "All encoded file contents have been decoded.");
+                tracker.Display();
 
                 using (var writer = new ContentWriter(args))
                 {
-                    int chunksWritten = 0; //used to display how much data has been read as a percent
                     foreach (int length in chunkTable)
                     {
                         // as we read in each chunk from the images start writing the decoded
                         // values to the target output file.
                         string binary = wrapper.Read(length);
                         writer.WriteChunk(binary);
-                        chunksWritten++; //used to display how much data has been read as a percent
-                        DisplayPercent(chunksWritten, chunkTable.Count, "Decoding file contents"); //used to display how much data has been read as a percent
+                        tracker.TickAndDisplay();
                     }
-                    Console.WriteLine("All encoded file contents has been decoded.");
                 }
             }
 
             PrintUnused(imagesUsed);
             Console.WriteLine("Decoding process complete.");
-        }
-
-        /// <summary>
-        /// Displays a message with a completion percent.
-        /// </summary>
-        /// <param name="cur">The current step in the process.</param>
-        /// <param name="max">The value dictating the point of completion.</param>
-        /// <param name="prefix">The message to prefix to the calculated percentage.</param>
-        private void DisplayPercent(double cur, double max, string prefix)
-        {
-            double percent = cur / max * 100.0;
-            if(percent > 100.0)
-            {
-                percent = 100.0;
-            }
-            Console.Write("{0} :: {1}%\r", prefix, (int)percent);
         }
 
         /// <summary>

@@ -1,13 +1,27 @@
 ﻿using SixLabors.ImageSharp;
 using SteganographyApp.Common;
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Help;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.IO.Content;
 using System;
 
 namespace SteganographyAppCalculator
 {
+
+    /// <summary>
+    /// Static reference class containing the number of available storage bits
+    /// provided by images in common resolutions.
+    /// </summary>
+    public static class CommonResolutionStorageSpace
+    {
+        public static readonly int P360 = 518_400;
+        public static readonly int P480 = 921_600;
+        public static readonly int P720 = 2_764_800;
+        public static readonly int P1080 = 6_220_800;
+        public static readonly int P1440 = 11_059_200;
+        public static readonly int P2160 = 25_012_800;
+    }
+
     class Program
     {
 
@@ -21,14 +35,9 @@ namespace SteganographyAppCalculator
             }
 
             var parser = new ArgumentParser();
-            if(!parser.TryParse(args, out InputArguments arguments))
+            if(!parser.TryParse(args, out InputArguments arguments, PostValidate))
             {
-                Console.WriteLine("An exception occured while parsing provided arguments: {0}", parser.LastError.Message);
-                if (parser.LastError.InnerException != null)
-                {
-                    Console.WriteLine("The exception was caused by: {0}", parser.LastError.InnerException.Message);
-                }
-                Console.WriteLine("\nRun the program with --help to get more information.");
+                parser.PrintCommonErrorMessage();
                 return;
             }
 
@@ -46,14 +55,37 @@ namespace SteganographyAppCalculator
             Console.WriteLine("");
         }
 
+        /// <summary>
+        /// Performs some validation once all the user inputted values have been parsed and individually
+        /// validated.
+        /// </summary>
+        private static string PostValidate(InputArguments input)
+        {
+            if (input.EncodeOrDecode != EncodeDecodeAction.CalculateStorageSpace
+                && input.EncodeOrDecode != EncodeDecodeAction.CalculateEncryptedSize)
+            {
+                return "The action must either be calculate-storage-space or calculate-encrypted-size.";    
+            }
+            if (input.EncodeOrDecode == EncodeDecodeAction.CalculateEncryptedSize && Checks.IsNullOrEmpty(input.FileToEncode))
+            {
+                return "A file must be specified in order to calculate the encrypted file size.";
+            }
+            else if (input.EncodeOrDecode == EncodeDecodeAction.CalculateStorageSpace && Checks.IsNullOrEmpty(input.CoverImages))
+            {
+                return "At least one image must be specified in order to calculate the available storage space of those images.";
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Attempts to print the help information retrieved from the help.prop file.
+        /// </summary>
         private static void PrintHelp()
         {
             var parser = new HelpParser();
             if (!parser.TryParse(out HelpInfo info))
             {
-                Console.WriteLine("An error occurred while parsing the help file: {0}", parser.LastError);
-                Console.WriteLine("Check that the help.prop file is in the same directory as the application and try again.");
-                Console.WriteLine();
+                parser.PrintCommonErrorMessage();
                 return;
             }
 
@@ -75,18 +107,17 @@ namespace SteganographyAppCalculator
             double binarySpace = 0;
             try
             {
-                int count = 0;
                 foreach (string imagePath in args.CoverImages)
                 {
+                    var tracker = new ProgressTracker(args.CoverImages.Length, "Calculating image storage space", "Completed calculating image storage space.");
+                    tracker.Display();
                     using (var image = Image.Load(imagePath))
                     {
                         binarySpace += (image.Width * image.Height);
-                        count++;
-                        DisplayPercent(count, args.CoverImages.Length, "Calculating image storage space");
+                        tracker.TickAndDisplay();
                     }
                 }
                 binarySpace *= 3;
-                Console.WriteLine("Completing calculating image storage space.");
 
                 Console.WriteLine("\nImages are able to store:");
                 PrintSize(binarySpace);
@@ -141,36 +172,19 @@ namespace SteganographyAppCalculator
         private static int GetSize(InputArguments args)
         {
             int length = 0;
-            int reads = 0;
             using (var reader = new ContentReader(args))
             {
+                var tracker = new ProgressTracker(reader.RequiredNumberOfReads, "Calculating file size", "Completed calculating file size");
+                tracker.Display();
                 string content = "";
                 while ((content = reader.ReadNextChunk()) != null)
                 {
-                    reads++;
-                    DisplayPercent(reads, reader.RequiredNumberOfReads, "Calculating file size");
+                    tracker.TickAndDisplay();
                     length += content.Length;
                 }
             }
             length += new ImageStore(args).RequiredContentChunkTableBitSize;
-            Console.WriteLine("Completed calculating file size");
             return length;
-        }
-
-        /// <summary>
-        /// Displays a message with a completion percent.
-        /// </summary>
-        /// <param name="cur">The current step in the process.</param>
-        /// <param name="max">The value dictating the point of completion.</param>
-        /// <param name="prefix">The message to prefix to the calculated percentage.</param>
-        private static void DisplayPercent(double cur, double max, string prefix)
-        {
-            double percent = cur / max * 100.0;
-            if (percent > 100.0)
-            {
-                percent = 100.0;
-            }
-            Console.Write("{0} :: {1}%\r", prefix, (int)percent);
         }
 
         /// <summary>

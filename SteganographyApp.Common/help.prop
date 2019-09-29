@@ -45,6 +45,11 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t--randomSeed | -rs :: Randomizes the order in which bytes will be written from input file to image.
 \t\tEnter ? for the randomSeed to input the real randomSeed in interactive mode.
 
+~EnableDummies
+\t--enableDummies | -d :: Flag indicating whether or not to insert dummy values into the image.
+\t\tThe number of dummies to insert per read/write will be based on the properties of the first and last image to write to.
+\t\tThis will also increase the overall size of the encoded content as it will be adding in extra values to the content after encoding.
+
 ~CalculatorDescription
 Arguments must be specified as <argument_name>space<argument_value>.
 \tExample of calculating required space to store an encrypted file:
@@ -56,7 +61,20 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t--action | -a :: Specifies whether to calculate the encrypted size of a file or the amount of storage space offered by a set of images.
 \t\tValue must be either 'calculate-storage-space' or 'calculate-encrypted-size'.
 
-~EnableDummies
-\t--enableDummies | -d :: Flag indicating whether or not to insert dummy values into the image.
-\t\tThe number of dummies to insert per read/write will be based on the properties of the first and last image to write to.
-\t\tThis will also increase the overall size of the encoded content as it will be adding in extra values to the content after encoding.
+~ConverterDescription
+Arguments must be specified as <argument_name>space<argument_value>.
+\tExample of converting a set of jpg images to png format
+\t\t dotnet .\\SteganographyAppCalculator --action convert --images image001.jpg,image002.jpg
+
+~ConvertAction
+\t--action | -a :: Specifies the convertion process to execute
+\t\tCurrently only one value is supported 'convert'
+
+~DeleteOriginals
+\t--deleteOriginals | -do :: Flag indicating to delete the original images after convertion.
+
+~CompressionLevel
+\t--compressionLevel | -cl :: Specifies the level of compression to use when converting the images to PNG.
+\t\tValue must be between 0 and 9.
+\t\tThe higher the value, the more the image will be compressed.
+\t\tThe value defaults to 6

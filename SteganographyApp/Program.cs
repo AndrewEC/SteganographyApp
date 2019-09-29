@@ -1,6 +1,5 @@
 ﻿using SteganographyApp.Common;
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Help;
 using System;
 
 namespace SteganographyApp
@@ -17,14 +16,9 @@ namespace SteganographyApp
             }
 
             var parser = new ArgumentParser();
-            if(!parser.TryParse(args, out InputArguments arguments))
+            if(!parser.TryParse(args, out InputArguments arguments, PostValidate))
             {
-                Console.WriteLine("\nAn exception occured while parsing arguments:\n\t{0}", parser.LastError.Message);
-                if (parser.LastError.InnerException != null)
-                {
-                    Console.WriteLine("And was caused by:\n\t{0}", parser.LastError.InnerException.Message);
-                }
-                Console.WriteLine("\nRun the program with --help to get more information.");
+                parser.PrintCommonErrorMessage();
                 return;
             }
 
@@ -52,15 +46,41 @@ namespace SteganographyApp
             Console.WriteLine("");
         }
 
+        /// <summary>
+        /// Performs some validation once all the user inputted values have been parsed and individually
+        /// validated.
+        /// </summary>
+        private static string PostValidate(InputArguments input)
+        {
+            if (!Checks.IsOneOf(input.EncodeOrDecode, EncodeDecodeAction.Clean, EncodeDecodeAction.Encode,
+                EncodeDecodeAction.Decode))
+            {
+                return "The action specified must be one of: 'clean', 'encode', or 'decode'.";
+            }
+            if (input.EncodeOrDecode == EncodeDecodeAction.Encode && Checks.IsNullOrEmpty(input.FileToEncode))
+            {
+                return "Specified encode action but no file to encode was provided in arguments.";
+            }
+            else if (input.EncodeOrDecode == EncodeDecodeAction.Decode && Checks.IsNullOrEmpty(input.DecodedOutputFile))
+            {
+                return "Specified decode action but no file to decode was provided in arguments.";
+            }
+            else if ((input.EncodeOrDecode == EncodeDecodeAction.Encode || input.EncodeOrDecode == EncodeDecodeAction.Decode) && Checks.IsNullOrEmpty(input.CoverImages))
+            {
+                return "In order to encode or decode at least one image must be provided in the list of arguments.";
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Attempts to print out the help information retrieved from the help.prop file.
+        /// </summary>
         static void PrintHelp()
         {
-
             var parser = new HelpParser();
             if (!parser.TryParse(out HelpInfo info))
             {
-                Console.WriteLine("An error occurred while parsing the help file: {0}", parser.LastError);
-                Console.WriteLine("Check that the help.prop file is in the same directory as the application and try again.");
-                Console.WriteLine();
+                parser.PrintCommonErrorMessage();
                 return;
             }
 

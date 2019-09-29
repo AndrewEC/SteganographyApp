@@ -20,7 +20,8 @@ namespace SteganographyApp.Common
         Decode,
         Clean,
         CalculateStorageSpace,
-        CalculateEncryptedSize
+        CalculateEncryptedSize,
+        Convert
     }
 
     /// <summary>
@@ -51,18 +52,21 @@ namespace SteganographyApp.Common
     {
 
         /// <summary>
-        /// String returned by the ValidateParseResult method if no validation errors
-        /// occured.
-        /// </summary>
-        private static readonly string NoMissingValues = "NoMissingValues";
-
-        /// <summary>
         /// Takes in a value retrieved from an associated key, parses it, and sets the
         /// relevant property value in the InputArguments instance
         /// </summary>
         /// <param name="args">The InputArguments param to modify.</param>
         /// <param name="value">The value of the key/value pair from the array of arguments.</param>
         public delegate void ValueParser(InputArguments args, string value);
+
+        /// <summary>
+        /// Takes in the collected set of argument/value pairs and performs a final validation
+        /// on them.
+        /// <para>If the string returned is neither null or empty than then the validation is treated
+        /// as a failure.</para>
+        /// </summary>
+        /// <param name="args">The InputArguments and all their associated values.</param>
+        public delegate string PostValidation(InputArguments args);
 
         /// <summary>
         /// Encapsulates information about an argument that the user can specify when invoking the
@@ -104,7 +108,9 @@ namespace SteganographyApp.Common
                 new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
                 new Argument("--chunkSize", "-cs", ParseChunkSize),
                 new Argument("--randomSeed", "-rs", ParseRandomSeed),
-                new Argument("--enableDummies", "-d", ParseInsertDummies, true)
+                new Argument("--enableDummies", "-d", ParseInsertDummies, true),
+                new Argument("--deleteOriginals", "-do", ParseDeleteOriginals, true),
+                new Argument("--compressionLevel", "-co", ParseCompressionLevel)
             };
         }
 
@@ -141,9 +147,11 @@ namespace SteganographyApp.Common
         /// <param name="args">The array of command line arguments to parse.</param>
         /// <param name="inputs">The <see cref="InputArguments"/> instance containing the parsed
         /// argument values.</param>
+        /// <param name="validation">The post validation delegate that will validate if all the
+        /// resulting argument/value pairings at the end of parsing all provided arguments are correct.</param>
         /// <returns>True if all the arguments provided were parsed and the validation was successful
         /// else returns false.</returns>
-        public bool TryParse(string[] args, out InputArguments inputs)
+        public bool TryParse(string[] args, out InputArguments inputs, PostValidation validation)
         {
             inputs = new InputArguments();
             if(args == null || args.Length == 0)
@@ -217,10 +225,10 @@ namespace SteganographyApp.Common
                 }
             }
 
-            string validation = ValidateParseResult(inputs);
-            if (validation != NoMissingValues)
+            string validationResult = validation(inputs);
+            if (validationResult != null && validationResult.Length != 0)
             {
-                LastError = new ArgumentParseException(string.Format("Missing required values. {0}", validation));
+                LastError = new ArgumentParseException(string.Format("Invalid arguments provided. {0}", validationResult));
                 return false;
             }
 
@@ -293,6 +301,23 @@ namespace SteganographyApp.Common
         }
 
         /// <summary>
+        /// Parses a boolean from the value parameter and sets the DeleteAfterConversion property.
+        /// </summary>
+        /// <param name="arguments">The InputArguments instance to modify.</param>
+        /// <param name="value">The string representation of the InsertDummies boolean flag.</param>
+        private void ParseDeleteOriginals(InputArguments arguments, string value)
+        {
+            try
+            {
+                arguments.DeleteAfterConversion = Boolean.Parse(value);
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentValueException(string.Format("Could not parse delete originals from value: {0}", value), e);
+            }
+        }
+
+        /// <summary>
         /// Parses the number of dummy entries to insert into the image based on the
         /// properties retrieved from the first and last images.
         /// <para>Note: the first and last image can be the same image if only one cover image
@@ -327,6 +352,29 @@ namespace SteganographyApp.Common
         private void ParsePassword(InputArguments arguments, string value)
         {
             arguments.Password = ReadString(value, "Password");
+        }
+
+        /// <summary>
+        /// Parses the compression level and sets the CompressionLevel property value.
+        /// </summary>
+        /// <param name="arguments">The InputArguments instance to modify.</param>
+        /// <param name="value">The string representation of an int value.</param>
+        /// <exception cref="ArgumentValueException">Thrown if the string value could not be converted
+        /// to an int or if the value is less than 0 or greater than 9.</exception>
+        private void ParseCompressionLevel(InputArguments arguments, string value)
+        {
+            try
+            {
+                arguments.CompressionLevel = Convert.ToInt32(value);
+                if (arguments.CompressionLevel < 0 || arguments.CompressionLevel > 9)
+                {
+                    throw new ArgumentValueException(string.Format("The compression level must be a whole number between 0 and 9 inclusive."));
+                }
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentValueException(string.Format("Could not parse compression level from value: {0}", value), e);
+            }
         }
 
         /// <summary>
@@ -560,52 +608,16 @@ namespace SteganographyApp.Common
         }
 
         /// <summary>
-        /// Takes in the final result of the InputArgument parsing process and validates that all required
-        /// arguments has been provided.
+        /// A utility method to help print a common error message when parsing the user's arguments fails.
         /// </summary>
-        /// <param name="input">The InputArguments instance filled with parsed values retrieved
-        /// from user provdied arguments.</param>
-        /// <returns>Returns a string with information stating what required argument values are missing.
-        /// If no values are missing then NoMissingValues will be returned.</returns>
-        private string ValidateParseResult(InputArguments input)
+        public void PrintCommonErrorMessage()
         {
-            if (input.EncodeOrDecode == EncodeDecodeAction.Encode)
+            Console.WriteLine("An exception occured while parsing provided arguments: {0}", LastError.Message);
+            if (LastError.InnerException != null)
             {
-                if (input.FileToEncode == null || input.FileToEncode.Length == 0)
-                {
-                    return "Specified encode action but no file to encode was provided in arguments.";
-                }
+                Console.WriteLine("The exception was caused by: {0}", LastError.InnerException.Message);
             }
-            else if (input.EncodeOrDecode == EncodeDecodeAction.Decode)
-            {
-                if (input.DecodedOutputFile == null || input.DecodedOutputFile.Length == 0)
-                {
-                    return "Specified decode action but no file to decode was provided in arguments.";
-                }
-            }
-            else if (input.EncodeOrDecode == EncodeDecodeAction.CalculateEncryptedSize)
-            {
-                if (input.FileToEncode == null || input.FileToEncode.Length == 0)
-                {
-                    return "A file must be specified in order to calculate the encrypted file size.";
-                }
-            }
-
-            if (input.EncodeOrDecode != EncodeDecodeAction.CalculateEncryptedSize)
-            {
-                if (input.CoverImages == null || input.CoverImages.Length == 0)
-                {
-                    if (input.EncodeOrDecode == EncodeDecodeAction.CalculateStorageSpace)
-                    {
-                        return "One or more images must be specified in order to calculate storage space.";
-                    }
-                    else
-                    {
-                        return "No cover images were provided in arguments.";
-                    }
-                }
-            }
-            return NoMissingValues;
+            Console.WriteLine("\nRun the program with --help to get more information.");
         }
     }
 
@@ -624,6 +636,8 @@ namespace SteganographyApp.Common
         public string RandomSeed { get; set; } = "";
         public int DummyCount { get; set; } = 0;
         public bool InsertDummies { get; set; } = false;
+        public bool DeleteAfterConversion { get; set; } = false;
+        public int CompressionLevel { get; set; } = 6;
 
         /// <summary>
         /// Specifies the chunk size. I.e. the number of bytes to read, encode,

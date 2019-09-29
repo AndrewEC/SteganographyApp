@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using SteganographyApp.Common.Help;
 
 namespace SteganographyApp.Common.Tests
 {
