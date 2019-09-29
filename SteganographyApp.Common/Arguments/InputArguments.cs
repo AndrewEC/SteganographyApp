@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SteganographyApp.Common.Data;
 
-namespace SteganographyApp.Common
+namespace SteganographyApp.Common.Arguments
 {
 
     /// <summary>
@@ -104,7 +103,7 @@ namespace SteganographyApp.Common
                 new Argument("--enableCompression", "-c", ParseUseCompression, true),
                 new Argument("--printStack", "-stack", ParsePrintStack, true),
                 new Argument("--images", "-im", ParseImages),
-                new Argument("--password", "-p", ParsePassword),
+                new Argument("--password", "-p", (arguments, value) => { arguments.Password = ReadString(value, "Password"); }),
                 new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
                 new Argument("--chunkSize", "-cs", ParseChunkSize),
                 new Argument("--randomSeed", "-rs", ParseRandomSeed),
@@ -344,17 +343,6 @@ namespace SteganographyApp.Common
         }
 
         /// <summary>
-        /// Retrieves the encryption password by invoking the <see cref="ReadString"/> method to retrieve
-        /// either the user input or the original string value.
-        /// </summary>
-        /// <param name="arguments">The InputArguments instance to modify.</param>
-        /// <param name="value">The string representation of the password</param>
-        private void ParsePassword(InputArguments arguments, string value)
-        {
-            arguments.Password = ReadString(value, "Password");
-        }
-
-        /// <summary>
         /// Parses the compression level and sets the CompressionLevel property value.
         /// </summary>
         /// <param name="arguments">The InputArguments instance to modify.</param>
@@ -492,7 +480,7 @@ namespace SteganographyApp.Common
 
             if (value.Contains("[r]"))
             {
-                images = ImagesFromRegex(value);
+                images = ImageRegexParser.ImagesFromRegex(value);
             }
             else if (value.Contains(","))
             {
@@ -517,78 +505,6 @@ namespace SteganographyApp.Common
             }
             arguments.CoverImages = images;
             ParseDummyCount(arguments);
-        }
-
-        /// <summary>
-        /// If a regular expression is detected in the --images parameter this method
-        /// will load the images in the specified directory based on matches against
-        /// the regular expression.
-        /// <para>The regex expression will be retrieved by invoking the <see cref="ParseRegex"/> method.</para>
-        /// </summary>
-        /// <param name="value">The value of the --images parameter</param>
-        /// <returns>An array of images from the specified directory.</returns>
-        /// <exception cref="ArgumentValueException">Thrown if an invalid regular expression is provided or if the
-        /// regular expression doesn't match any files in the provided directory.</exception>
-        private string[] ImagesFromRegex(string value)
-        {
-            (string regex, string path) = ParseRegex(value);
-
-            string[] files = Directory.GetFiles(path);
-            string[] images = new string[files.Length];
-            int valid = 0;
-            foreach (string name in files)
-            {
-                try
-                {
-                    if (Regex.Match(name, regex).Success)
-                    {
-                        images[valid] = name;
-                        valid++;
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new ArgumentValueException("An invalid regular expression was provided for the image input value.", e);
-                }
-            }
-            if (valid == 0)
-            {
-                throw new ArgumentValueException(String.Format("The provided regex expression returned 0 usable files in the directory {0}", path));
-            }
-            else if (valid < images.Length)
-            {
-                string[] temp = new string[valid];
-                Array.Copy(images, temp, valid);
-                images = temp;
-            }
-            return images;
-        }
-
-        /// <summary>
-        /// Parses the regular expression and path from the value of the --images parameter.
-        /// </summary>
-        /// <param name="value">The value of the --images parameter</param>
-        /// <returns>A tuple containing the regex nd directory in that order.</returns>
-        /// <exception cref="ArgumentValueException">Thrown if the value for the --images parameter
-        /// does not match the expected format.</exception>
-        private (string, string) ParseRegex(string value)
-        {
-            value = value.Replace("[r]", "");
-
-            if (value[value.Length - 1] != '>' || value[0] != '<')
-            {
-                throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
-            }
-
-            string[] parts = value.Split('>');
-            if (parts.Length != 3 || parts[0] == "<" || parts[1] == "<")
-            {
-                throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
-            }
-
-            string regex = parts[0].Replace("<", "");
-            string path = parts[1].Replace("<", "");
-            return (regex, path);
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SteganographyApp.Common;
+using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Converter
 {

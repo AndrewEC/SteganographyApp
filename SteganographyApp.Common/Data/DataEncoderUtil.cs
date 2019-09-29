@@ -20,7 +20,7 @@ namespace SteganographyApp.Common.Data
     /// Utility class to encode a file to encrypted binary data or decode the encrypted binary string to the
     /// original file bytes.
     /// </summary>
-    public class DataEncoderUtil
+    public static class DataEncoderUtil
     {
 
         /// <summary>

@@ -1,6 +1,7 @@
-﻿using SteganographyApp.Common.Data;
-using System;
-using System.IO;
+﻿using System.IO;
+
+using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common.Data;
 
 namespace SteganographyApp.Common.IO.Content
 {

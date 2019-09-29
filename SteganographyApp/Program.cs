@@ -1,5 +1,6 @@
 ﻿using SteganographyApp.Common;
 using SteganographyApp.Common.Data;
+using SteganographyApp.Common.Arguments;
 using System;
 
 namespace SteganographyApp

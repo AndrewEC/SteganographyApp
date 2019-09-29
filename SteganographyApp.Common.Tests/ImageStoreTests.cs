@@ -1,5 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
+
 using System.Collections.Generic;
 
 namespace SteganographyApp.Common.Tests

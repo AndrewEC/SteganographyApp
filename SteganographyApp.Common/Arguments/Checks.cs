@@ -1,9 +1,9 @@
 using System;
 
-namespace SteganographyApp.Common
+namespace SteganographyApp.Common.Arguments
 {
 
-    public class Checks
+    public static class Checks
     {
 
         /// <summary>

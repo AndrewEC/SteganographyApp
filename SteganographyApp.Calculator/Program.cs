@@ -3,6 +3,7 @@ using SteganographyApp.Common;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.IO.Content;
+using SteganographyApp.Common.Arguments;
 using System;
 
 namespace SteganographyAppCalculator

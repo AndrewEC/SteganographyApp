@@ -1,11 +1,12 @@
-﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SteganographyApp.Common.IO.Content;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
+
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+
+using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.IO
 {
