@@ -107,15 +107,15 @@ namespace SteganographyAppCalculator
             double binarySpace = 0;
             try
             {
+                var tracker = new ProgressTracker(args.CoverImages.Length, "Calculating image storage space", "Completed calculating image storage space.");
+                tracker.Display();
                 foreach (string imagePath in args.CoverImages)
                 {
-                    var tracker = new ProgressTracker(args.CoverImages.Length, "Calculating image storage space", "Completed calculating image storage space.");
-                    tracker.Display();
                     using (var image = Image.Load(imagePath))
                     {
                         binarySpace += (image.Width * image.Height);
-                        tracker.TickAndDisplay();
                     }
+                    tracker.TickAndDisplay();
                 }
                 binarySpace *= 3;
 
