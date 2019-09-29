@@ -26,6 +26,12 @@ namespace SteganographyApp.Common
             return value == null || value.Length == 0;
         }
 
+        /// <summary>
+        /// Checks if the provided action value existst within the array specified by
+        /// the parameters values.
+        /// </summary>
+        /// <param name="action">The action type to validate exists in the values array.</param>
+        /// <param name="values">The array of action types to check against.</param>
         public static bool IsOneOf(EncodeDecodeAction action, params EncodeDecodeAction[] values)
         {
             return Array.IndexOf(values, action) != -1;
