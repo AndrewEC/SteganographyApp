@@ -11,6 +11,22 @@ When you are hiding data inside in image it is important that the image uses a l
 Images such as BMP, and PNG, are both lossless and supported by the ImageSharp processing library.
 Using other formats, such as JPG, can cause data loss when saving any modifications to the image.
 
+Running Tests
+---
+```
+// Install Global Tools
+dotnet tool install --global coverlet.console
+dotnet tool install -g dotnet-reportgenerator-globaltool
+
+//Execute and record tests
+rm -r -f reports
+coverlet ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp2.2/SteganographyApp.Common.Tests.dll --target "dotnet" --targetargs "test SteganographyApp.sln --no-build" --format opencover
+mkdir reports
+reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
+
+Report can be view via reports/index.html
+```
+
 Current Features
 ---
 * .Net Core for cross platform support

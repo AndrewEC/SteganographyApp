@@ -231,15 +231,30 @@ namespace SteganographyApp.Common.Arguments
                 return false;
             }
 
-            if (password.Item2 != null)
+            return TryParseSecureItems(inputs, password, randomSeed);
+        }
+
+        private bool TryParseSecureItems(InputArguments inputs, ValueTuple<string, Argument> password, ValueTuple<string, Argument> randomSeed)
+        {
+            return TryParseSecureItem(inputs, password, "--password") && TryParseSecureItem(inputs, randomSeed, "--randomSeed");
+        }
+
+        private bool TryParseSecureItem(InputArguments inputArguments, ValueTuple<string, Argument> argument, string argumentName)
+        {
+            if (argument.Item1 == null || argument.Item2 == null)
             {
-                password.Item2.Parser(inputs, password.Item1);
-            }
-            if (randomSeed.Item2 != null)
-            {
-                randomSeed.Item2.Parser(inputs, randomSeed.Item1);
+                return true;
             }
 
+            try
+            {
+                argument.Item2.Parser(inputArguments, argument.Item1);
+            }
+            catch (Exception e)
+            {
+                LastError = new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", argumentName), e);
+                return false;
+            }
             return true;
         }
 
@@ -529,9 +544,11 @@ namespace SteganographyApp.Common.Arguments
         public void PrintCommonErrorMessage()
         {
             Console.WriteLine("An exception occured while parsing provided arguments: {0}", LastError.Message);
-            if (LastError.InnerException != null)
+            var exception = LastError;
+            while (exception.InnerException != null)
             {
-                Console.WriteLine("The exception was caused by: {0}", LastError.InnerException.Message);
+                Console.WriteLine("Caused by: {0}", LastError.InnerException.Message);
+                exception = exception.InnerException;
             }
             Console.WriteLine("\nRun the program with --help to get more information.");
         }

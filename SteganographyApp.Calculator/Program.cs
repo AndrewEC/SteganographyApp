@@ -67,11 +67,21 @@ namespace SteganographyAppCalculator
             {
                 return "The action must either be calculate-storage-space or calculate-encrypted-size.";    
             }
+
             if (input.EncodeOrDecode == EncodeDecodeAction.CalculateEncryptedSize && Checks.IsNullOrEmpty(input.FileToEncode))
             {
-                return "A file must be specified in order to calculate the encrypted file size.";
+                if (Checks.IsNullOrEmpty(input.FileToEncode))
+                {
+                    return "A file must be specified in order to calculate the encrypted file size.";
+                }
+                else if (input.InsertDummies && Checks.IsNullOrEmpty(input.CoverImages))
+                {
+                    return "When insertDummies has been specified you must also provide at least one image "
+                        + "to properly calculate the number of dummy entries to insert.";
+                }
             }
-            else if (input.EncodeOrDecode == EncodeDecodeAction.CalculateStorageSpace && Checks.IsNullOrEmpty(input.CoverImages))
+
+            if (input.EncodeOrDecode == EncodeDecodeAction.CalculateStorageSpace && Checks.IsNullOrEmpty(input.CoverImages))
             {
                 return "At least one image must be specified in order to calculate the available storage space of those images.";
             }
