@@ -13,19 +13,24 @@ Using other formats, such as JPG, can cause data loss when saving any modificati
 
 Running Tests
 ---
-```
 // Install Global Tools
-dotnet tool install --global coverlet.console
-dotnet tool install -g dotnet-reportgenerator-globaltool
+1. dotnet tool install --global coverlet.console
+2. dotnet tool install -g dotnet-reportgenerator-globaltool
+3. dotnet tool install -g dotnet-stryker
 
 //Execute and record tests
-rm -r -f reports
-coverlet ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp2.2/SteganographyApp.Common.Tests.dll --target "dotnet" --targetargs "test SteganographyApp.sln --no-build" --format opencover
-mkdir reports
-reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
+1. rm -r -f reports
+2. coverlet ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp2.2/SteganographyApp.Common.Tests.dll --target "dotnet" --targetargs "test SteganographyApp.sln --no-build" --format opencover
+3. mkdir reports
+4. reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
 
-Report can be view via reports/index.html
-```
+Test coverage report can be view via reports/index.html
+
+//Execute mutation tests
+1. cd into the SteganographyApp.Common.Tests directory and execute
+2. dotnet stryker --reporters "['html']"
+
+Mutation test report can be found at: StrykerOutput
 
 Current Features
 ---
