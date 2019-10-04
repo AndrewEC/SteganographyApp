@@ -3,6 +3,28 @@ using System;
 namespace SteganographyApp.Common
 {
 
+
+    public interface IWriter
+    {
+        void Write(string line);
+        void WriteLine(string line);
+    }
+
+    public class ConsoleWriter : IWriter
+    {
+
+        public void Write(string line)
+        {
+            Console.Write(line);
+        }
+
+        public void WriteLine(string line)
+        {
+            Console.WriteLine(line);
+        }
+
+    }
+
     /// <summary>
     /// Utility class to help write messages to the console along with a
     /// percent representing the progress currently made for the current
@@ -14,7 +36,16 @@ namespace SteganographyApp.Common
         private readonly double maxProgress;
         private readonly string progressMessage;
         private readonly string completeMessage;
+        private readonly IWriter writer;
         private double currentProgress;
+
+        public ProgressTracker(double maxProgress, string progressMessage, string completeMessage, IWriter writer)
+        {
+            this.maxProgress = maxProgress;
+            this.progressMessage = progressMessage;
+            this.completeMessage = completeMessage;
+            this.writer = writer;
+        }
 
         /// <summary>
         /// Initializes the progress tracker.
@@ -25,18 +56,14 @@ namespace SteganographyApp.Common
         /// <param name="completeMessage">The message to display once the operation has completed. I.e. when
         /// the current progress has reached the maxProgress value.</param>
         public ProgressTracker(double maxProgress, string progressMessage, string completeMessage)
-        {
-            this.maxProgress = maxProgress;
-            this.progressMessage = progressMessage;
-            this.completeMessage = completeMessage;
-        }
+            : this(maxProgress, progressMessage, completeMessage, new ConsoleWriter()) {}
 
         /// <summary>
         /// Displays the progress message with a progress of 0.
         /// </summary>
         public void Display()
         {
-            Console.Write("{0} :: 0%\r", progressMessage);
+            writer.Write(string.Format("{0} :: 0%\r", progressMessage));
         }
 
         /// <summary>
@@ -52,11 +79,11 @@ namespace SteganographyApp.Common
             if(percent >= 100.0)
             {
                 percent = 100.0;
-                Console.WriteLine(completeMessage);
+                writer.WriteLine(completeMessage);
             }
             else
             {
-                Console.Write("{0} :: {1}%\r", progressMessage, (int)percent);
+                writer.Write(string.Format("{0} :: {1}%\r", progressMessage, (int)percent));
             }
         }
 
