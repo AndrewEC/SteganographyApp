@@ -48,48 +48,7 @@ SteganographyApp.Calculator
 Important Arguments
 ---
 ```
-Arguments must be specified as <argument_name>space<argument_value>.
-
-Example arguments for encoding a file to a set of images: 
-    dotnet .\\SteganographApp --action encode --images 001.png,002.png --input FileToEncode.zip --password Pass1234 --compress
-
-Example arguments for decoding data from a set of images to an output file.
-    dotnet .\\SteganpgraphyApp --action decode --images 001.png,002.png --output DecodedOutputFile.zip --password Pass1234 --compress
-
---action | a :: Specifies whether to 'encode' a file to a set of images or 'decode' a set of images to a file.
-    Value must be either 'encode', 'decode', or 'clean'.
-    Clean specifies that all LSBs in the set of images will be overwritten with garbage values.
-
-    When used with the Calculator this value can be 'calculate-encrypted-size' or 'calculate-storage-space'.
-
---input | -in :: The path to the file to encode if 'encode' was specified in the action argument.
-
---output | -o :: The path to the output file when 'decode' was specified in the action argument.
-
---images | -im :: A comma delimited list of paths to images to be either encoded or decoded
-    The order of the images affects the encoding and decoding results.
-    This parameter will also accept a regular expression to fine images.
-    A regex value will appear in the format [r]<regex><directory>
-    Example: --images [r]<^.*\\.(png)><.> looks for all png files in the current directory.
-
---passsword | -p :: The password to encrypt the input file when 'encode' was specified in the action argument.
-    Enter ? as the password to input the real password in interactive mode.
-
---compress | -c :: Specifies whether or not to compress/decompress the encoded/decoded content.
-    No value is required for this argument. When provided it will always be true otherwise it will be false.
-
---chunkSize | -cs :: Specifies the number of bytes to read in each read, encode, and store operation.
-    Value needs to be a positive whole number.
-    Larger numbers can quicken the process of encoding larger files and make the overall encoded side smaller.
-    Values that are too large can produce out of memory errors.
-
---randomSeed | -rs:: Randomizes the order in which bytes will be written from input file to image.
-    Enter ? as the randomSeed to input the real randomSeed in interactive mode.
-
---dummies | -d :: Specifies the number of random length bit dummy entries to insert or remove when encoding and decoding.
-    This will make it more difficult to completely decode the content of the encoded file even with the correct password.
-    This will also increase the overall size of the encoded content as it will be adding in extra values to the content after encoding.
-    Values must be a positive, whole number with a value greater than 1.
+Use the -h or --help flag with the Converter, Encoder, and Calculator utilities to view the full list of arguments relavant to that particular tool.
 ```
 
 3rd Party Libraries
@@ -100,6 +59,9 @@ This app takes advantage of the following third party nuget packages:
 * [Rijindael256](https://github.com/2Toad/Rijndael256)
 * [ImageSharp](https://github.com/JimBobSquarePants/ImageSharp)
 * [System.ValueTuple](https://www.nuget.org/packages/System.ValueTuple/)
+* [Coverlet](https://github.com/tonerdo/coverlet)
+* [StrykerNet](https://github.com/stryker-mutator/stryker-net)
+* [ReportGenerator](https://github.com/danielpalme/ReportGenerator)
 
 Software Used
 ---
