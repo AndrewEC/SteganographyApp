@@ -26,7 +26,7 @@ namespace SteganographyApp.Common.IO.Content
         /// RequiredNumberOfReads property value.
         /// </summary>
         /// <param name="args">The values parsed from the command line values.</param>
-        public ContentReader(InputArguments args) : base(args)
+        public ContentReader(IInputArguments args) : base(args)
         {
             RequiredNumberOfReads = (int)Math.Ceiling(new FileInfo(args.FileToEncode).Length / (double)args.ChunkByteSize);
         }

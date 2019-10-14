@@ -10,12 +10,12 @@ namespace SteganographyApp.Common.Tests
     public class InputArgumentsTests
     {
 
-        private String TestParseWithMissingArgumentsReturnsFalsePostValidator(InputArguments inputs)
+        private String TestParseWithMissingArgumentsReturnsFalsePostValidator(IInputArguments inputs)
         {
             return "Missing Stuff";
         }
 
-        private string NullReturningPostValidator(InputArguments input)
+        private string NullReturningPostValidator(IInputArguments input)
         {
             return null;
         }
@@ -25,7 +25,7 @@ namespace SteganographyApp.Common.Tests
         public void TestParseNullArgumentsReturnsFalseAndProducesParseException()
         {
             var parser = new ArgumentParser();
-            Assert.IsFalse(parser.TryParse(null, out InputArguments arguments, null));
+            Assert.IsFalse(parser.TryParse(null, out IInputArguments arguments, null));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
         }
@@ -35,7 +35,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputsArgs = new string[] { "test", "1" };
             var parser = new ArgumentParser();
-            Assert.IsFalse(parser.TryParse(inputsArgs, out InputArguments arguments, null));
+            Assert.IsFalse(parser.TryParse(inputsArgs, out IInputArguments arguments, null));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
         }
@@ -43,17 +43,17 @@ namespace SteganographyApp.Common.Tests
 
         #region Parsing action
         [DataTestMethod]
-        [DataRow("encode", EncodeDecodeAction.Encode)]
-        [DataRow("decode", EncodeDecodeAction.Decode)]
-        [DataRow("clean", EncodeDecodeAction.Clean)]
-        [DataRow("convert", EncodeDecodeAction.Convert)]
-        [DataRow("calculate-storage-space", EncodeDecodeAction.CalculateStorageSpace)]
-        [DataRow("calculate-encrypted-size", EncodeDecodeAction.CalculateEncryptedSize)]
-        public void TestParseActionWithValidValuesProducesValidResult(string actionString, EncodeDecodeAction action)
+        [DataRow("encode", ActionEnum.Encode)]
+        [DataRow("decode", ActionEnum.Decode)]
+        [DataRow("clean", ActionEnum.Clean)]
+        [DataRow("convert", ActionEnum.Convert)]
+        [DataRow("calculate-storage-space", ActionEnum.CalculateStorageSpace)]
+        [DataRow("calculate-encrypted-size", ActionEnum.CalculateEncryptedSize)]
+        public void TestParseActionWithValidValuesProducesValidResult(string actionString, ActionEnum action)
         {
             string[] inputArgs = new string[] { "--action", actionString };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.AreEqual(action, arguments.EncodeOrDecode);
         }
@@ -63,7 +63,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--action", "invalid-action" };
             var parser = new ArgumentParser();
-            Assert.IsFalse(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
         }
@@ -76,7 +76,7 @@ namespace SteganographyApp.Common.Tests
             string path = "TestAssets/test.zip";
             string[] inputArgs = new string[] { "--input", path };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.AreEqual(path, arguments.FileToEncode);
         }
@@ -87,7 +87,7 @@ namespace SteganographyApp.Common.Tests
             string path = "TestAssets/FileDoesntExist";
             string[] inputArgs = new string[] { "--input", path };
             var parser = new ArgumentParser();
-            Assert.IsFalse(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
             Assert.IsNotNull(parser.LastError.InnerException);
@@ -101,7 +101,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--enableCompression" };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.IsTrue(arguments.UseCompression);
         }
@@ -113,7 +113,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--printStack" };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.IsTrue(arguments.PrintStack);
         }
@@ -126,7 +126,7 @@ namespace SteganographyApp.Common.Tests
             string image = "TestAssets/001.png";
             string[] inputArgs = new string[] { "--images", image };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             string[] images = arguments.CoverImages;
             Assert.AreEqual(1, images.Length);
@@ -139,7 +139,7 @@ namespace SteganographyApp.Common.Tests
             string expression = "[r]<^[\\w\\W]+\\.(png)$><./TestAssets>";
             string[] inputArgs = new string[] { "--images", expression };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
 
             string[] images = arguments.CoverImages;
@@ -153,7 +153,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--images", "missing-image" };    
             var parser = new ArgumentParser();
-            Assert.IsFalse(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
         }
@@ -165,7 +165,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--password", "testing" };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.AreEqual("testing", arguments.Password);
         }
@@ -177,7 +177,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--output", "testing.txt" };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.AreEqual("testing.txt", arguments.DecodedOutputFile);
         }
@@ -192,7 +192,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--chunkSize", value.ToString() };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.AreEqual(value, arguments.ChunkByteSize);
         }
@@ -205,7 +205,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--chunkSize", value.ToString() };
             var parser = new ArgumentParser();
-            Assert.IsFalse(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
             Assert.IsNotNull(parser.LastError.InnerException);
@@ -222,7 +222,7 @@ namespace SteganographyApp.Common.Tests
             string seedValue = CreateString(stringLength);
             string[] inputArgs = new string[] { "--randomSeed", seedValue };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.AreEqual(seedValue, arguments.RandomSeed);
         }
@@ -234,7 +234,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--randomSeed", CreateString(stringLength) };
             var parser = new ArgumentParser();
-            Assert.IsFalse(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
             Assert.IsNotNull(parser.LastError.InnerException);
@@ -258,7 +258,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--enableDummies" };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.IsTrue(arguments.InsertDummies);
         }
@@ -270,7 +270,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--deleteOriginals" };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.IsTrue(arguments.DeleteAfterConversion);
         }
@@ -285,7 +285,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--compressionLevel", value.ToString() };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.AreEqual(value, arguments.CompressionLevel);
         }
@@ -297,7 +297,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--compressionLevel", value.ToString() };
             var parser = new ArgumentParser();
-            Assert.IsFalse(parser.TryParse(inputArgs, out InputArguments arguments, NullReturningPostValidator));
+            Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
         }

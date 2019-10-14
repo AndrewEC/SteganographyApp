@@ -132,7 +132,7 @@ namespace SteganographyApp.Common.IO
         /// <summary>
         /// The values parsed from the command line arguments.
         /// </summary>
-        private readonly InputArguments args;
+        private readonly IInputArguments args;
 
         /// <summary>
         /// Specifies the number of bits that will be reserved for each entry in the content
@@ -165,7 +165,7 @@ namespace SteganographyApp.Common.IO
         /// value.
         /// </summary>
         /// <param name="args">The values parsed from the command line arguments.</param>
-        public ImageStore(InputArguments args)
+        public ImageStore(IInputArguments args)
         {
             this.args = args;
 

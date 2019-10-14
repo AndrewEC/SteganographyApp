@@ -17,7 +17,7 @@ namespace SteganographyApp
             }
 
             var parser = new ArgumentParser();
-            if(!parser.TryParse(args, out InputArguments arguments, PostValidate))
+            if(!parser.TryParse(args, out IInputArguments arguments, PostValidate))
             {
                 parser.PrintCommonErrorMessage();
                 return;
@@ -51,22 +51,22 @@ namespace SteganographyApp
         /// Performs some validation once all the user inputted values have been parsed and individually
         /// validated.
         /// </summary>
-        private static string PostValidate(InputArguments input)
+        private static string PostValidate(IInputArguments input)
         {
-            if (!Checks.IsOneOf(input.EncodeOrDecode, EncodeDecodeAction.Clean, EncodeDecodeAction.Encode,
-                EncodeDecodeAction.Decode))
+            if (!Checks.IsOneOf(input.EncodeOrDecode, ActionEnum.Clean, ActionEnum.Encode,
+                ActionEnum.Decode))
             {
                 return "The action specified must be one of: 'clean', 'encode', or 'decode'.";
             }
-            if (input.EncodeOrDecode == EncodeDecodeAction.Encode && Checks.IsNullOrEmpty(input.FileToEncode))
+            if (input.EncodeOrDecode == ActionEnum.Encode && Checks.IsNullOrEmpty(input.FileToEncode))
             {
                 return "Specified encode action but no file to encode was provided in arguments.";
             }
-            else if (input.EncodeOrDecode == EncodeDecodeAction.Decode && Checks.IsNullOrEmpty(input.DecodedOutputFile))
+            else if (input.EncodeOrDecode == ActionEnum.Decode && Checks.IsNullOrEmpty(input.DecodedOutputFile))
             {
                 return "Specified decode action but no file to decode was provided in arguments.";
             }
-            else if ((input.EncodeOrDecode == EncodeDecodeAction.Encode || input.EncodeOrDecode == EncodeDecodeAction.Decode) && Checks.IsNullOrEmpty(input.CoverImages))
+            else if ((input.EncodeOrDecode == ActionEnum.Encode || input.EncodeOrDecode == ActionEnum.Decode) && Checks.IsNullOrEmpty(input.CoverImages))
             {
                 return "In order to encode or decode at least one image must be provided in the list of arguments.";
             }

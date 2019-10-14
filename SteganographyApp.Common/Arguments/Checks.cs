@@ -32,7 +32,7 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         /// <param name="action">The action type to validate exists in the values array.</param>
         /// <param name="values">The array of action types to check against.</param>
-        public static bool IsOneOf(EncodeDecodeAction action, params EncodeDecodeAction[] values)
+        public static bool IsOneOf(ActionEnum action, params ActionEnum[] values)
         {
             return Array.IndexOf(values, action) != -1;
         }

@@ -18,7 +18,7 @@ namespace SteganographyApp.Common.IO.Content
         /// args field value.
         /// </summary>  
         /// <param name="args"></param>
-        public ContentWriter(InputArguments args) : base(args) { }
+        public ContentWriter(IInputArguments args) : base(args) { }
 
         /// <summary>
         /// Takes in an encrypted binary string, decyrypts it using the DataEncoderUtil

@@ -36,13 +36,13 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestCheckIsOneOfReturnsTrueWhenArrayContainsAction()
         {
-            Assert.IsTrue(Checks.IsOneOf(EncodeDecodeAction.Encode, EncodeDecodeAction.Clean, EncodeDecodeAction.Decode, EncodeDecodeAction.Encode));
+            Assert.IsTrue(Checks.IsOneOf(ActionEnum.Encode, ActionEnum.Clean, ActionEnum.Decode, ActionEnum.Encode));
         }
 
         [TestMethod]
         public void TestCheckIsOneOfReturnsFalseWhenArrayContainsAction()
         {
-            Assert.IsFalse(Checks.IsOneOf(EncodeDecodeAction.Encode, EncodeDecodeAction.Clean, EncodeDecodeAction.Decode));
+            Assert.IsFalse(Checks.IsOneOf(ActionEnum.Encode, ActionEnum.Clean, ActionEnum.Decode));
         }
 
     }

@@ -13,14 +13,14 @@ namespace SteganographyApp
         /// <summary>
         /// The model with values parsed from the user's input.
         /// </summary>
-        private readonly InputArguments args;
+        private readonly IInputArguments args;
 
         /// <summary>
         /// Instantiates a new InputArguments instance with user provided
         /// command line values.
         /// </summary>
         /// <param name="args">The model with values parsed from the user's input.</param>
-        public EntryPoint(InputArguments args)
+        public EntryPoint(IInputArguments args)
         {
             this.args = args;
         }
@@ -32,13 +32,13 @@ namespace SteganographyApp
         {
             switch (args.EncodeOrDecode)
             {
-                case EncodeDecodeAction.Clean:
+                case ActionEnum.Clean:
                     StartClean();
                     break;
-                case EncodeDecodeAction.Encode:
+                case ActionEnum.Encode:
                     StartEncode();
                     break;
-                case EncodeDecodeAction.Decode:
+                case ActionEnum.Decode:
                     StartDecode();
                     break;
             }

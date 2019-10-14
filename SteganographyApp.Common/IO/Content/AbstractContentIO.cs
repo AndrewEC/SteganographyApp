@@ -18,14 +18,14 @@ namespace SteganographyApp.Common.IO.Content
         /// <summary>
         /// The values parsed from the command line arguments.
         /// </summary>
-        protected readonly InputArguments args;
+        protected readonly IInputArguments args;
 
         /// <summary>
         /// Index generator to randomize the order of the binary data being read and wrote
         /// </summary>
         protected readonly IndexGenerator generator;
 
-        public AbstractContentIO(InputArguments args)
+        public AbstractContentIO(IInputArguments args)
         {
             this.args = args;
             if(args.RandomSeed != "")

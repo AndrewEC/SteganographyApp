@@ -36,18 +36,18 @@ namespace SteganographyAppCalculator
             }
 
             var parser = new ArgumentParser();
-            if(!parser.TryParse(args, out InputArguments arguments, PostValidate))
+            if(!parser.TryParse(args, out IInputArguments arguments, PostValidate))
             {
                 parser.PrintCommonErrorMessage();
                 return;
             }
 
-            if (arguments.EncodeOrDecode == EncodeDecodeAction.CalculateStorageSpace)
+            if (arguments.EncodeOrDecode == ActionEnum.CalculateStorageSpace)
             {
                 Console.WriteLine("Calculating storage space in {0} images.", arguments.CoverImages.Length);
                 CalculateStorageSpace(arguments);
             }
-            else if (arguments.EncodeOrDecode == EncodeDecodeAction.CalculateEncryptedSize)
+            else if (arguments.EncodeOrDecode == ActionEnum.CalculateEncryptedSize)
             {
                 Console.WriteLine("Calculating encypted size of file {0}.", arguments.FileToEncode);
                 CalculateEncryptedSize(arguments);
@@ -60,15 +60,15 @@ namespace SteganographyAppCalculator
         /// Performs some validation once all the user inputted values have been parsed and individually
         /// validated.
         /// </summary>
-        private static string PostValidate(InputArguments input)
+        private static string PostValidate(IInputArguments input)
         {
-            if (input.EncodeOrDecode != EncodeDecodeAction.CalculateStorageSpace
-                && input.EncodeOrDecode != EncodeDecodeAction.CalculateEncryptedSize)
+            if (input.EncodeOrDecode != ActionEnum.CalculateStorageSpace
+                && input.EncodeOrDecode != ActionEnum.CalculateEncryptedSize)
             {
                 return "The action must either be calculate-storage-space or calculate-encrypted-size.";    
             }
 
-            if (input.EncodeOrDecode == EncodeDecodeAction.CalculateEncryptedSize && Checks.IsNullOrEmpty(input.FileToEncode))
+            if (input.EncodeOrDecode == ActionEnum.CalculateEncryptedSize && Checks.IsNullOrEmpty(input.FileToEncode))
             {
                 if (Checks.IsNullOrEmpty(input.FileToEncode))
                 {
@@ -81,7 +81,7 @@ namespace SteganographyAppCalculator
                 }
             }
 
-            if (input.EncodeOrDecode == EncodeDecodeAction.CalculateStorageSpace && Checks.IsNullOrEmpty(input.CoverImages))
+            if (input.EncodeOrDecode == ActionEnum.CalculateStorageSpace && Checks.IsNullOrEmpty(input.CoverImages))
             {
                 return "At least one image must be specified in order to calculate the available storage space of those images.";
             }
@@ -113,7 +113,7 @@ namespace SteganographyAppCalculator
         /// </summary>
         /// <param name="args">The InputArguments instance parsed from the user provided command
         /// line arguments.</param>
-        private static void CalculateStorageSpace(InputArguments args)
+        private static void CalculateStorageSpace(IInputArguments args)
         {
             double binarySpace = 0;
             try
@@ -150,7 +150,7 @@ namespace SteganographyAppCalculator
         /// </summary>
         /// <param name="args">The InputArguments instance parsed from the user provided command
         /// line arguments.</param>
-        private static void CalculateEncryptedSize(InputArguments args)
+        private static void CalculateEncryptedSize(IInputArguments args)
         {
             try
             {
@@ -180,7 +180,7 @@ namespace SteganographyAppCalculator
         /// <param name="compressed">States whether or not to compress the file or not. Overwrites the current
         /// value in the args parameter.</param>
         /// <returns>The size of the file in bits.</returns>
-        private static int GetSize(InputArguments args)
+        private static int GetSize(IInputArguments args)
         {
             int length = 0;
             using (var reader = new ContentReader(args))

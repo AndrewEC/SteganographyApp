@@ -27,7 +27,7 @@ namespace SteganographyApp.Converter
             }
 
             var parser = new ArgumentParser();
-            if(!parser.TryParse(args, out InputArguments arguments, PostValidation))
+            if(!parser.TryParse(args, out IInputArguments arguments, PostValidation))
             {
                 parser.PrintCommonErrorMessage();
                 return;
@@ -40,9 +40,9 @@ namespace SteganographyApp.Converter
         /// Performs some validation once all the user inputted values have been parsed and individually
         /// validated.
         /// </summary>
-        private static string PostValidation(InputArguments inputs)
+        private static string PostValidation(IInputArguments inputs)
         {
-            if (inputs.EncodeOrDecode != EncodeDecodeAction.Convert)
+            if (inputs.EncodeOrDecode != ActionEnum.Convert)
             {
                 return "The converter utility only supports the Convert action.";
             }
@@ -58,7 +58,7 @@ namespace SteganographyApp.Converter
         /// the original images after convertion if the delete option was specified
         /// by the user.
         /// </summary>
-        private static void ConvertImages(InputArguments args)
+        private static void ConvertImages(IInputArguments args)
         {
             string[] images = args.CoverImages.Where(FilterImage).ToArray();
             Console.WriteLine("Converting {0} images.", images.Length);
