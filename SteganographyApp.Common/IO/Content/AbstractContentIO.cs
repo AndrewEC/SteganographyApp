@@ -64,19 +64,16 @@ namespace SteganographyApp.Common.IO.Content
         public byte[] ReorderBytes(byte[] bytes)
         {
             int generations = bytes.Length * 2;
-            var pairs = new ValueTuple<int, int>[generations];
-            for(int i=0; i<generations; i++)
+            for(int i=generations - 1; i>=0; i--)
             {
                 int first = generator.Next(bytes.Length - 1);
                 int second = generator.Next(bytes.Length - 1);
-                pairs[i] = (first, second);
-            }
-            Array.Reverse(pairs);
-            foreach((int first, int second) in pairs)
-            {
-                byte temp = bytes[first];
-                bytes[first] = bytes[second];
-                bytes[second] = temp;
+                if (first != second)
+                {
+                    byte temp = bytes[first];
+                    bytes[first] = bytes[second];
+                    bytes[second] = temp;
+                }
             }
             return bytes;
         }
