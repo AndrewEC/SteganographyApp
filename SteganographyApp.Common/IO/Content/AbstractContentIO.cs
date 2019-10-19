@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
@@ -64,16 +65,18 @@ namespace SteganographyApp.Common.IO.Content
         public byte[] ReorderBytes(byte[] bytes)
         {
             int generations = bytes.Length * 2;
-            for(int i=generations - 1; i>=0; i--)
+            var pairs = new ValueTuple<int, int>[generations];
+            for(int i = generations - 1; i >= 0; i--)
             {
                 int first = generator.Next(bytes.Length - 1);
                 int second = generator.Next(bytes.Length - 1);
-                if (first != second)
-                {
-                    byte temp = bytes[first];
-                    bytes[first] = bytes[second];
-                    bytes[second] = temp;
-                }
+                pairs[i] = (first, second);
+            }
+            foreach((int first, int second) in pairs)
+            {
+                byte temp = bytes[first];
+                bytes[first] = bytes[second];
+                bytes[second] = temp;
             }
             return bytes;
         }
