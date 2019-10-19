@@ -1,29 +1,7 @@
-using System;
+using SteganographyApp.Common.Test;
 
 namespace SteganographyApp.Common
 {
-
-
-    public interface IWriter
-    {
-        void Write(string line);
-        void WriteLine(string line);
-    }
-
-    public class ConsoleWriter : IWriter
-    {
-
-        public void Write(string line)
-        {
-            Console.Write(line);
-        }
-
-        public void WriteLine(string line)
-        {
-            Console.WriteLine(line);
-        }
-
-    }
 
     /// <summary>
     /// Utility class to help write messages to the console along with a

@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SteganographyApp.Common;
+using SteganographyApp.Common.Test;
 using Moq;
 using System.Collections.Generic;
 

@@ -5,6 +5,7 @@ using System.Text;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SteganographyApp.Common.Data;
+using SteganographyApp.Common.Test;
 
 namespace SteganographyApp.Common.Arguments
 {
@@ -80,8 +81,14 @@ namespace SteganographyApp.Common.Arguments
 
         public Exception LastError { get; private set; }
 
-        public ArgumentParser()
+        private readonly IReader reader;
+
+        private readonly IWriter writer;
+
+        public ArgumentParser(IReader reader, IWriter writer)
         {
+            this.reader = reader;
+            this.writer = writer;
             arguments = new List<Argument>()
             {
                 new Argument("--action", "-a", ParseEncodeOrDecodeAction),
@@ -98,6 +105,8 @@ namespace SteganographyApp.Common.Arguments
                 new Argument("--compressionLevel", "-co", ParseCompressionLevel)
             };
         }
+
+        public ArgumentParser() : this(new ConsoleKeyReader(), new ConsoleWriter()) {}
 
         /// <summary>
         /// Attempts to lookup an Argument instance from the list of arguments.
@@ -268,14 +277,14 @@ namespace SteganographyApp.Common.Arguments
         {
             if(value == "?")
             {
-                Console.Write("Enter {0}: ", message);
+                writer.Write(string.Format("Enter {0}: ", message));
                 var builder = new StringBuilder();
                 while (true)
                 {
-                    var key = Console.ReadKey(true);
+                    var key = reader.ReadKey(true);
                     if (key.Key == ConsoleKey.Enter)
                     {
-                        Console.WriteLine();
+                        writer.WriteLine("");
                         return builder.ToString();
                     }
                     else if (key.Key == ConsoleKey.Backspace && builder.Length > 0)
@@ -302,12 +311,12 @@ namespace SteganographyApp.Common.Arguments
             try
             {
                 arguments.InsertDummies = Boolean.Parse(value);
-                ParseDummyCount(arguments);
             }
             catch (Exception e)
             {
                 throw new ArgumentValueException(string.Format("Could not parse insert dummies from value: {0}", value), e);
             }
+            ParseDummyCount(arguments);
         }
 
         /// <summary>
@@ -539,14 +548,14 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         public void PrintCommonErrorMessage()
         {
-            Console.WriteLine("An exception occured while parsing provided arguments: {0}", LastError.Message);
+            writer.WriteLine(string.Format("An exception occured while parsing provided arguments: {0}", LastError.Message));
             var exception = LastError;
             while (exception.InnerException != null)
             {
-                Console.WriteLine("Caused by: {0}", LastError.InnerException.Message);
+                writer.WriteLine(string.Format("Caused by: {0}", LastError.InnerException.Message));
                 exception = exception.InnerException;
             }
-            Console.WriteLine("\nRun the program with --help to get more information.");
+            writer.WriteLine("\nRun the program with --help to get more information.");
         }
     }
 }
