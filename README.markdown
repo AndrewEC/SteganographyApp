@@ -36,9 +36,7 @@ SteganographyApp.Calculator
 
 Important Arguments
 ---
-```
 Use the -h or --help flag with the Converter, Encoder, and Calculator utilities to view the full list of arguments relavant to that particular tool.
-```
 
 3rd Party Libraries
 ---
