@@ -67,11 +67,6 @@ namespace SteganographyApp.Converter
 
             foreach (string coverImage in images)
             {
-                if (Image.DetectFormat(coverImage).DefaultMimeType == PngMimeType)
-                {
-                    continue;
-                }
-
                 var encoder = new PngEncoder();
                 encoder.CompressionLevel = args.CompressionLevel;
                 using(var image = Image.Load(coverImage))

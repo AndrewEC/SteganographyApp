@@ -18,19 +18,8 @@ Running Tests
 2. dotnet tool install -g dotnet-reportgenerator-globaltool
 3. dotnet tool install -g dotnet-stryker
 
-//Execute and record tests
-1. rm -r -f reports
-2. coverlet ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp2.2/SteganographyApp.Common.Tests.dll --target "dotnet" --targetargs "test SteganographyApp.sln --no-build" --format opencover
-3. mkdir reports
-4. reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
-
-Test coverage report can be view via reports/index.html
-
-//Execute mutation tests
-1. cd into the SteganographyApp.Common.Tests directory and execute
-2. dotnet stryker --reporters "['html']"
-
-Mutation test report can be found at: StrykerOutput
+After installing the global tools you can run the unit tests and generate the coverage reports by executing the script `run_tests.ps1`.
+To run and view the mutation test results execute the script `run_mutations.ps1`.
 
 Current Features
 ---
