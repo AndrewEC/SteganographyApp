@@ -154,7 +154,6 @@ namespace SteganographyAppCalculator
         {
             try
             {
-                Console.WriteLine("\nCalculating encrypted size.");
                 double size = GetSize(args);
 
                 Console.WriteLine("\nEncrypted file size is:");
@@ -180,9 +179,9 @@ namespace SteganographyAppCalculator
         /// <param name="compressed">States whether or not to compress the file or not. Overwrites the current
         /// value in the args parameter.</param>
         /// <returns>The size of the file in bits.</returns>
-        private static int GetSize(IInputArguments args)
+        private static double GetSize(IInputArguments args)
         {
-            int length = 0;
+            double length = 0;
             using (var reader = new ContentReader(args))
             {
                 var tracker = new ProgressTracker(reader.RequiredNumberOfReads, "Calculating file size", "Completed calculating file size");
