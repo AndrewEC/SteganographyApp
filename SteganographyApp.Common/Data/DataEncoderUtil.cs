@@ -40,8 +40,7 @@ namespace SteganographyApp.Common.Data
             int length = (int)Math.Ceiling(Math.Pow(binary.Length, (double)1 / 3)) + 1;
             var generator = new IndexGenerator(length, length);
 
-            // capture the positions of the dummy values first to make it easier to
-            // remove the dummies during the decoding process
+            // storing the positions instead of calculating on the fly will make decoding easier
             int[] positions = new int[numDummies];
             for(int i = 0; i < positions.Length; i++)
             {
@@ -109,7 +108,9 @@ namespace SteganographyApp.Common.Data
             int[] lengths = GenerateLengths(numDummies);
             Array.Reverse(lengths);
             int totalLength = 0;
-            Array.ForEach(lengths, delegate (int i) { totalLength += i;  });
+            Array.ForEach(lengths, (int i) => { totalLength += i;  });
+
+            // determine the length of the binary string before the dummies were added
             int actualLength = binary.Length - totalLength;
 
             // cubed root

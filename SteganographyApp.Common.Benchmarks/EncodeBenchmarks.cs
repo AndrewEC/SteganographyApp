@@ -8,6 +8,7 @@ namespace SteganographyApp.Common.Benchmarks
 {
 
     [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 10, targetCount: 10)]
+    [MeanColumn, MinColumn, MaxColumn]
     public class EncodeBench
     {
 
@@ -59,52 +60,55 @@ namespace SteganographyApp.Common.Benchmarks
     }
 
     [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 10, targetCount: 10)]
+    [MeanColumn, MinColumn, MaxColumn]
     public class DecodeBench
     {
 
-        private byte[] data;
+        private readonly string Password = "Password123!@#";
+        private readonly int DummyCount = 10;
 
-        [GlobalSetup]
-        public void Setup()
+        private string data;
+
+        [GlobalSetup(Target=nameof(DecodeWithPassword))]
+        public void EncryptedSetup()
         {
-            data = new byte[4_000_000];
-            new Random(100).NextBytes(data);
+            byte[] rawData = new byte[4_000_000];
+            new Random(100).NextBytes(rawData);
+            data = DataEncoderUtil.Encode(rawData, Password, false, 0);
         }
 
         [Benchmark]
-        public string Decode()
+        public byte[] DecodeWithPassword()
         {
-            return DataEncoderUtil.Decode(data, "", false, 0);
+            return DataEncoderUtil.Decode(data, Password, false, 0);
+        }
+
+        [GlobalSetup(Target=nameof(DecodeWithPasswordAndCompression))]
+        public void EncryptedAndCompressedSetup()
+        {
+            byte[] rawData = new byte[4_000_000];
+            new Random(100).NextBytes(rawData);
+            data = DataEncoderUtil.Encode(rawData, Password, true, 0);
         }
 
         [Benchmark]
-        public string DecodeWithPassword()
+        public byte[] DecodeWithPasswordAndCompression()
         {
-            return DataEncoderUtil.Decode(data, "Password123!@#", false, 0);
+            return DataEncoderUtil.Decode(data, Password, true, 0);
+        }
+
+        [GlobalSetup(Target=nameof(DecodeWithPasswordAndCompressionAndDummies))]
+        public void EncryptedAndCompressedAndDummiesSetup()
+        {
+            byte[] rawData = new byte[4_000_000];
+            new Random(100).NextBytes(rawData);
+            data = DataEncoderUtil.Encode(rawData, Password, true, DummyCount);
         }
 
         [Benchmark]
-        public string DecodeWithCompression()
+        public byte[] DecodeWithPasswordAndCompressionAndDummies()
         {
-            return DataEncoderUtil.Decode(data, "", true, 0);
-        }
-
-        [Benchmark]
-        public string DecodeWithDummies()
-        {
-            return DataEncoderUtil.Decode(data, "", false, 10);
-        }
-
-        [Benchmark]
-        public string DecodeWithPasswordAndCompression()
-        {
-            return DataEncoderUtil.Decode(data, "Password123!@#", true, 0);
-        }
-
-        [Benchmark]
-        public string DecodeWithPasswordAndCompressionAndDummies()
-        {
-            return DataEncoderUtil.Decode(data, "Password123!@#", true, 10);
+            return DataEncoderUtil.Decode(data, Password, true, DummyCount);
         }
 
     }
