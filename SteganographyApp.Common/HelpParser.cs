@@ -17,7 +17,7 @@ namespace SteganographyApp.Common
     /// Class containing the results of parsing the help file and a utiilty
     /// method to retrieve help messages for a given set of arguments.
     /// </summary>
-    public class HelpInfo
+    public sealed class HelpInfo
     {
         /// <summary>
         /// A dictionary containing the results of the help file parsing.

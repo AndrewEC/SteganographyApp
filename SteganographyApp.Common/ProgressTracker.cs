@@ -8,7 +8,7 @@ namespace SteganographyApp.Common
     /// percent representing the progress currently made for the current
     /// operation.
     /// </summary>
-    public class ProgressTracker
+    public sealed class ProgressTracker
     {
 
         private readonly double maxProgress;

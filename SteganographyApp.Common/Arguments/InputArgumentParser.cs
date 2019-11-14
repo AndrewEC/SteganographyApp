@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Text;
 using SixLabors.ImageSharp;
@@ -34,7 +34,7 @@ namespace SteganographyApp.Common.Arguments
     /// Singleton utility class to parse the provided array of arguments and return and instance of
     /// InputArguments with the required values
     ///</summary>
-    public class ArgumentParser
+    public sealed class ArgumentParser
     {
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace SteganographyApp.Common.Arguments
         /// Encapsulates information about an argument that the user can specify when invoking the
         /// tool.
         /// </summary>
-        class Argument
+        private sealed class Argument
         {
             public string Name { get; private set; }
             public string ShortName { get; private set; }
@@ -77,20 +77,30 @@ namespace SteganographyApp.Common.Arguments
         /// <summary>
         /// The list of user providable arguments.
         /// </summary>
-        private readonly List<Argument> arguments;
+        private readonly ImmutableList<Argument> arguments;
 
+        /// <summary>
+        /// The last exception to ocurr while parsing the argument values.
+        /// </summary>
         public Exception LastError { get; private set; }
 
+        /// <summary>
+        /// IReader instance providing the capability to read keys from an input source.
+        /// <para>Primarily made available for mocking keyboard input for testing purposes.</para>
+        /// </summary>
         private readonly IReader reader;
 
+        /// <summary>
+        /// IWriter instance providing the capability for logging message to an output source.
+        /// <para>Primarily made available for capturing output for testing purposes.</para>
+        /// </summary>
         private readonly IWriter writer;
 
         public ArgumentParser(IReader reader, IWriter writer)
         {
             this.reader = reader;
             this.writer = writer;
-            arguments = new List<Argument>()
-            {
+            arguments = ImmutableList.Create(
                 new Argument("--action", "-a", ParseEncodeOrDecodeAction),
                 new Argument("--input", "-in", ParseFileToEncode),
                 new Argument("--enableCompression", "-c", ParseUseCompression, true),
@@ -103,7 +113,7 @@ namespace SteganographyApp.Common.Arguments
                 new Argument("--enableDummies", "-d", ParseInsertDummies, true),
                 new Argument("--deleteOriginals", "-do", ParseDeleteOriginals, true),
                 new Argument("--compressionLevel", "-co", ParseCompressionLevel)
-            };
+            );
         }
 
         public ArgumentParser() : this(new ConsoleKeyReader(), new ConsoleWriter()) {}

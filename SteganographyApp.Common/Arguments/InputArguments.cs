@@ -18,7 +18,7 @@ namespace SteganographyApp.Common.Arguments
     /// <summary>
     /// Contains a number of properties that will contain values parsed from the user provided command line arguments.
     /// </summary>
-    public class InputArguments : IInputArguments, IImmutableFactory<IInputArguments>
+    public sealed class InputArguments : IInputArguments, IImmutableFactory<IInputArguments>
     {
         public string Password { get; set; } = "";
         public string FileToEncode { get; set; } = "";
@@ -54,7 +54,7 @@ namespace SteganographyApp.Common.Arguments
     /// Immutable class containg the parsed argument values.
     /// <para>Parsed arguments are made immutable to prevent any accidental mutations.</para>
     /// </summary>
-    public class ImmutableInputArguments : IInputArguments
+    public sealed class ImmutableInputArguments : IInputArguments
     {
 
         public ImmutableInputArguments(string password, string fileToEncode, string decodedOutputFile, string[] coverImages,

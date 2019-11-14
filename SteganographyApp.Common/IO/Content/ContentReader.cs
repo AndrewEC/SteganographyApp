@@ -11,7 +11,7 @@ namespace SteganographyApp.Common.IO.Content
     /// Stream encapsulation class that reads and encodes data
     /// from the input file.
     /// </summary>
-    public class ContentReader : AbstractContentIO
+    public sealed class ContentReader : AbstractContentIO
     {
 
         /// <summary>

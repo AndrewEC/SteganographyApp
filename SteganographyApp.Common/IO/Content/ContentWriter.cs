@@ -10,7 +10,7 @@ namespace SteganographyApp.Common.IO.Content
     /// Stream encapsulating class that decodes binary data and writes it
     /// to an output file.
     /// </summary>
-    public class ContentWriter : AbstractContentIO
+    public sealed class ContentWriter : AbstractContentIO
     {
 
         /// <summary>

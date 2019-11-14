@@ -9,7 +9,7 @@ namespace SteganographyApp.Common.Data
     /// A reliable number generator that will repeatably generate random sets
     /// of numbers as long as the input seed is the always the same.
     /// </summary>
-    public class IndexGenerator
+    public sealed class IndexGenerator
     {
 
         /// <summary>
