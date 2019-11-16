@@ -79,7 +79,7 @@ namespace SteganographyApp
         static void PrintHelp()
         {
             var parser = new HelpParser();
-            if (!parser.TryParse(out HelpInfo info))
+            if (!parser.TryParseHelpFile(out HelpInfo info))
             {
                 parser.PrintCommonErrorMessage();
                 return;
@@ -87,7 +87,7 @@ namespace SteganographyApp
 
             Console.WriteLine("SteganographyApp Help\n");
 
-            foreach (string message in info.GetMessagesFor(HelpItemSet.Main))
+            foreach (string message in info.GetHelpMessagesFor(HelpItemSet.Main))
             {
                 Console.WriteLine("{0}\n", message);
             }

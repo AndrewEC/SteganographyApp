@@ -94,7 +94,7 @@ namespace SteganographyAppCalculator
         private static void PrintHelp()
         {
             var parser = new HelpParser();
-            if (!parser.TryParse(out HelpInfo info))
+            if (!parser.TryParseHelpFile(out HelpInfo info))
             {
                 parser.PrintCommonErrorMessage();
                 return;
@@ -102,7 +102,7 @@ namespace SteganographyAppCalculator
 
             Console.WriteLine("SteganographyApp Help\n");
 
-            foreach(string message in info.GetMessagesFor(HelpItemSet.Calculator))
+            foreach(string message in info.GetHelpMessagesFor(HelpItemSet.Calculator))
             {
                 Console.WriteLine("{0}\n", message);
             }

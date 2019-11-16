@@ -1,11 +1,80 @@
-﻿~Description
+﻿~AppDescription
 Arguments must be specified as <argument_name>space<argument_value>.
 \tExample arguments for encoding a file to a set of images: 
-\t\tdotnet .\\SteganographApp =-action encode --images 001.png,002.png --input FileToEncode.zip --password Pass1234 --randomSeed monkey --compress
+\t\tdotnet .\\SteganographApp --action encode --images 001.png,002.png --input FileToEncode.zip --password Pass1234 --randomSeed monkey --compress
 \tExample arguments for decoding data from a set of images to an output file.
 \t\tdotnet .\\SteganpgraphyApp --action decode --images 001.png,002.png --output DecodedOutputFile.zip --password Pass1234 --randomSeed monkey --compress
 
-~Action
+~AppAction
 \t--action | -a :: Specifies whether to 'encode' a file to a set of images or 'decode' a set of images to a file.
 \t\tValue must be either 'encode', 'decode', or 'clean'.
 \t\tClean specifies that all LSBs in the set of images will be overwritten with garbage values.
+
+~Input
+\t--input | -in :: The path to the file to encode if 'encode' was specified in the action argument.
+
+~Output
+\t--output | -o :: The path to the output file when 'decode' was specified in the action argument.
+
+~Images
+\t--images | -im :: A comma delimited list of paths to images to be either encoded or decoded
+\t\tThe order of the images affects the encoding and decoding results.
+\t\tThis parameter will also accept a regular expression to find images.
+\t\t\tA regex value will appear in the format [r]<regex><directory>
+\t\t\tExample: --images [r]<^[\w\W]+\.(png|bmp|tiff)$><.> matches all files in the current directory with a png, bmp, or tiff extension.
+
+~Password
+\t--passsword | -p :: The password to encrypt the input file when 'encode' was specified in the action argument.
+\t\tEnter ? for the password to input the real password in interactive mode.
+
+~PrintStack
+\t--printStack | -stack :: Specifies whether or not to print the full stack trace if an error occurs.
+\t\tNo value is required for this argument. When provided it will always be true otherwise it will be false.
+
+~EnableCompression
+\t--enableCompression | -c :: Specifies whether or not to compress/decompress the encoded/decoded content.
+\t\tNo value is required for this argument. When provided it will always be true otherwise it will be false.
+
+~ChunkSize
+\t--chunkSize | -cs :: Specifies the number of bytes to read in each read, encode, and store operation.
+\t\tValue needs to be a positive whole number.
+\t\tLarger numbers can quicken the process of encoding larger files and make the encoded file size smaller.
+\t\tValues that are too large can produce out of memory errors.
+
+~RandomSeed
+\t--randomSeed | -rs :: Randomizes the order in which bytes will be written from input file to image.
+\t\tEnter ? for the randomSeed to input the real randomSeed in interactive mode.
+
+~EnableDummies
+\t--enableDummies | -d :: Flag indicating whether or not to insert dummy values into the image.
+\t\tThe number of dummies to insert per read/write will be based on the properties of the first and last image to write to.
+\t\tThis will also increase the overall size of the encoded content as it will be adding in extra values to the content after encoding.
+
+~CalculatorDescription
+Arguments must be specified as <argument_name>space<argument_value>.
+\tExample of calculating required space to store an encrypted file:
+\t\tdotnet .\\SteganographyAppCalculator --action calculate-encrypted-size --input FileToEncode.zip --password Pass1234
+\tExample of calculating the amount of storage space offered by a set of images:
+\t\tdotnet .\\SteganographyAppCalculator --action calculate-storage-space --images 001.png,002.png
+
+~CalculatorAction
+\t--action | -a :: Specifies whether to calculate the encrypted size of a file or the amount of storage space offered by a set of images.
+\t\tValue must be either 'calculate-storage-space' or 'calculate-encrypted-size'.
+
+~ConverterDescription
+Arguments must be specified as <argument_name>space<argument_value>.
+\tExample of converting a set of jpg images to png format
+\t\t dotnet .\\SteganographyAppCalculator --action convert --images image001.jpg,image002.jpg
+
+~ConvertAction
+\t--action | -a :: Specifies the convertion process to execute
+\t\tCurrently only one value is supported 'convert'
+
+~DeleteOriginals
+\t--deleteOriginals | -do :: Flag indicating to delete the original images after convertion.
+
+~CompressionLevel
+\t--compressionLevel | -cl :: Specifies the level of compression to use when converting the images to PNG.
+\t\tValue must be between 0 and 9.
+\t\tThe higher the value, the more the image will be compressed.
+\t\tThe value defaults to 6

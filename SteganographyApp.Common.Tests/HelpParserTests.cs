@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -12,9 +13,9 @@ namespace SteganographyApp.Common.Tests
         public void TestHelpParserHappyPath()
         {
             var parser = new HelpParser();
-            Assert.IsTrue(parser.TryParse(out HelpInfo info, TEST_PATH));
+            Assert.IsTrue(parser.TryParseHelpFile(out HelpInfo info, TEST_PATH));
             Assert.IsNull(parser.LastError);
-            foreach(string line in info.GetMessagesFor("Description", "Action"))
+            foreach(string line in info.GetHelpMessagesFor(HelpItemSet.Main))
             {
                 Assert.IsNotNull(line);
                 Assert.AreNotEqual("", line);
@@ -25,20 +26,8 @@ namespace SteganographyApp.Common.Tests
         public void TestMissingFileReturnsFalse()
         {
             var parser = new HelpParser();
-            Assert.IsFalse(parser.TryParse(out HelpInfo info, "missing"));
+            Assert.IsFalse(parser.TryParseHelpFile(out HelpInfo info, "missing"));
             Assert.IsNotNull(parser.LastError);
-        }
-
-        [TestMethod]
-        public void TestMissingArgumentKeyReturnsErrorMessage()
-        {
-            var parser = new HelpParser();
-            Assert.IsTrue(parser.TryParse(out HelpInfo info, TEST_PATH));
-            Assert.IsNull(parser.LastError);
-            foreach(string line in info.GetMessagesFor("Missing"))
-            {
-                Assert.AreEqual("No help information configured for Missing.\n", line);
-            }
         }
 
     }

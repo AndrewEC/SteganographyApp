@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Reflection;
 
@@ -25,7 +26,12 @@ namespace SteganographyApp.Common
         /// message or the parameter that it corresponds to and a value 
         /// being the actual help message.
         /// </summary>
-        public Dictionary<string, string> Results { get; set; }
+        public ImmutableDictionary<string, string> helpItems;
+
+        public HelpInfo(ImmutableDictionary<string, string> helpItems)
+        {
+            this.helpItems = helpItems;
+        }
 
         /// <summary>
         /// Conversion point that takes in an <see cref="HelpItemSet"/> and invokes the
@@ -36,7 +42,7 @@ namespace SteganographyApp.Common
         /// be loaded and displayed to the user.</param>
         /// <returns>The value retrieved from the <see cref="GetMessagesFor(string[])"/>
         /// invocation</returns>
-        public string[] GetMessagesFor(HelpItemSet item)
+        public string[] GetHelpMessagesFor(HelpItemSet item)
         {
             string[] labels = new string[0];
             switch(item)
@@ -64,21 +70,21 @@ namespace SteganographyApp.Common
         /// <para>If a particular parameter name was not loaded from the help file then a
         /// standard message will be returned in place of the actual help message.</para>
         /// </summary>
-        /// <param name="names">The ordered list of parameter names to retrieve the help
+        /// <param name="helpLabels">The ordered list of parameter names to retrieve the help
         /// messages for.</param>
         /// <returns>An array of help messages whose order is based on the order of the names
         /// provided to lookup.</returns>
-        public string[] GetMessagesFor(params string[] names)
+        private string[] GetMessagesFor(params string[] helpLabels)
         {
-            string[] messages = new string[names.Length];
-            for (int i = 0; i < names.Length; i++)
+            string[] messages = new string[helpLabels.Length];
+            for (int i = 0; i < helpLabels.Length; i++)
             {
-                if (!Results.ContainsKey(names[i]))
+                if (!helpItems.ContainsKey(helpLabels[i]))
                 {
-                    messages[i] = string.Format("No help information configured for {0}.\n", names[i]);
+                    messages[i] = string.Format("No help information configured for {0}.\n", helpLabels[i]);
                     continue;
                 }
-                messages[i] = Results[names[i]];
+                messages[i] = helpItems[helpLabels[i]];
             }
             return messages;
         }
@@ -105,40 +111,45 @@ namespace SteganographyApp.Common
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public bool TryParse(out HelpInfo info, string fileName = "help.prop")
+        public bool TryParseHelpFile(out HelpInfo info, string fileName = "help.prop")
         {
-            info = new HelpInfo();
 
             string assemblyPath = GetAssemblyPath();
-            string location = string.Format("{0}\\{1}", assemblyPath, fileName);
+            string helpFileLocation = string.Format("{0}\\{1}", assemblyPath, fileName);
             
-            if (!File.Exists(location))
+            if (!File.Exists(helpFileLocation))
             {
-                LastError = string.Format("The help file named {0} could not be found.", location);
+                LastError = string.Format("The help file named {0} could not be found.", helpFileLocation);
+                info = new HelpInfo(null);
                 return false;
             }
 
-            Dictionary<string, string> results = new Dictionary<string, string>();
-            string[] lines = File.ReadAllLines(location);
+            try
+            {
+                info = new HelpInfo(ParseHelpItems(helpFileLocation).ToImmutableDictionary());
+            }
+            catch (Exception e)
+            {
+                LastError = e.Message;
+                info = new HelpInfo(null);
+                return false;
+            }
 
+            return true;
+        }
+
+        public Dictionary<string, string> ParseHelpItems(string helpFileLocation)
+        {
+            Dictionary<string, string> helpItems = new Dictionary<string, string>();
+            string[] lines = File.ReadAllLines(helpFileLocation);
             for(int i = 0; i < lines.Length; i++)
             {
                 if (lines[i].StartsWith("~"))
                 {
-                    try
-                    {
-                        results[lines[i].Substring(1)] = ReadItem(lines, i + 1);
-                    }
-                    catch (Exception e)
-                    {
-                        LastError = e.Message;
-                        return false;
-                    }
+                    helpItems[lines[i].Substring(1)] = ReadHelpItem(lines, i + 1);
                 }
             }
-
-            info.Results = results;
-            return true;
+            return helpItems;
         }
 
         private string GetAssemblyPath()
@@ -160,12 +171,12 @@ namespace SteganographyApp.Common
         /// help message.</para>
         /// </summary>
         /// <param name="lines">The array of lines loaded from the help file.</param>
-        /// <param name="start">The index to start reading the help message lines from.</param>
+        /// <param name="startLine">The index to start reading the help message lines from.</param>
         /// <returns>A single string containing all the lines of the help message delimeted by line breaks.</returns>
-        private string ReadItem(string[] lines, int start)
+        private string ReadHelpItem(string[] lines, int startLine)
         {
             string message = "";
-            for(int i = start; i < lines.Length; i++)
+            for(int i = startLine; i < lines.Length; i++)
             {
                 if (lines[i].StartsWith("~"))
                 {
@@ -175,7 +186,7 @@ namespace SteganographyApp.Common
                 {
                     continue;
                 }
-                if(i != start)
+                if(i != startLine)
                 {
                     message += "\n";
                 }

@@ -53,7 +53,7 @@ namespace SteganographyApp.Common.IO
             public ImageStoreWrapper(ImageStore store)
             {
                 this.store = store;
-                store.Next();
+                store.LoadNextImage();
             }
 
             public void Complete()
@@ -78,7 +78,7 @@ namespace SteganographyApp.Common.IO
 
             public void Next()
             {
-                store.Next();
+                store.LoadNextImage();
             }
 
             public void ResetTo(int index)
@@ -88,12 +88,12 @@ namespace SteganographyApp.Common.IO
 
             public void Finish(bool save = false)
             {
-                store.Finish(save);
+                store.CloseOpenImage(save);
             }
 
             public void Dispose()
             {
-                store.Finish(save);
+                store.CloseOpenImage(save);
                 store.ResetTo(0);
             }
         }
@@ -206,7 +206,7 @@ namespace SteganographyApp.Common.IO
             try
             {
                 currentImageIndex = -1;
-                Next();
+                LoadNextImage();
                 for (int i = 0; i < args.CoverImages.Length; i++)
                 {
                     while (true)
@@ -217,24 +217,24 @@ namespace SteganographyApp.Common.IO
 
                         currentImage[x, y] = new Rgba32(newRed, newGreen, newBlue, currentImage[x, y].A);
 
-                        if (!TryMove())
+                        if (!TryMoveToNextPixel())
                         {
                             break;
                         }
                     }
                     if (i == args.CoverImages.Length - 1)
                     {
-                        Finish(true);
+                        CloseOpenImage(true);
                     }
                     else
                     {
-                        Next(true);
+                        LoadNextImage(true);
                     }
                 }
             }
             catch (Exception e)
             {
-                Finish();
+                CloseOpenImage();
                 throw e;
             }
         }
@@ -279,9 +279,9 @@ namespace SteganographyApp.Common.IO
                         pixel.A
                     );
 
-                if (!TryMove())
+                if (!TryMoveToNextPixel())
                 {
-                    Next(true);
+                    LoadNextImage(true);
                 }
             }
             return written;
@@ -293,39 +293,39 @@ namespace SteganographyApp.Common.IO
         /// <para>If there is not enough available space in the current image then it will
         /// invoke the Next method and continue to read from the next available image.</para>
         /// </summary>
-        /// <param name="length">Specifies the number of bits to be read from the current image.</param>
+        /// <param name="bitsToRead">Specifies the number of bits to be read from the current image.</param>
         /// <returns>A binary string whose length is equal to the length specified in the length
         /// parameter.</returns>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        private string Read(int length)
+        private string Read(int bitsToRead)
         {
             var binary = new StringBuilder();
-            int read = 0;
-            while (read < length)
+            int bitsRead = 0;
+            while (bitsRead < bitsToRead)
             {
                 Rgba32 pixel = currentImage[x, y];
 
                 string redBit = Convert.ToString(pixel.R, 2);
                 binary.Append(redBit.Substring(redBit.Length - 1));
-                read++;
+                bitsRead++;
 
-                if (read < length)
+                if (bitsRead < bitsToRead)
                 {
                     string greenBit = Convert.ToString(pixel.G, 2);
                     binary.Append(greenBit.Substring(greenBit.Length - 1));
-                    read++;
+                    bitsRead++;
 
-                    if (read < length)
+                    if (bitsRead < bitsToRead)
                     {
                         string blueBit = Convert.ToString(pixel.B, 2);
                         binary.Append(blueBit.Substring(blueBit.Length - 1));
-                        read++;
+                        bitsRead++;
                     }
                 }
 
-                if (!TryMove())
+                if (!TryMoveToNextPixel())
                 {
-                    Next();
+                    LoadNextImage();
                 }
             }
             return binary.ToString();
@@ -349,31 +349,31 @@ namespace SteganographyApp.Common.IO
                 int chunkSizeAndPadding = ChunkDefinitionBitSize + 1;
 
                 //Read the number of entries in the table
-                int tableLength = Convert.ToInt32(Read(ChunkDefinitionBitSize), 2);
+                int chunkCount = Convert.ToInt32(Read(ChunkDefinitionBitSize), 2);
 
-                int tableBitCount = tableLength * chunkSizeAndPadding;
+                int tableBitCount = chunkCount * chunkSizeAndPadding;
 
                 //Read all the available entries in the table
-                string rawTable = Read(tableBitCount);
+                string chunkTableBinary = Read(tableBitCount);
 
-                if (rawTable.Length < tableBitCount)
+                if (chunkTableBinary.Length < tableBitCount)
                 {
                     throw new ImageProcessingException("There are not enough available bits in the image to read the entire content chunk table.");
                 }
 
-                var table = new List<int>();
-                for (int i = 0; i < rawTable.Length; i += chunkSizeAndPadding)
+                var chunkTable = new List<int>();
+                for (int i = 0; i < chunkTableBinary.Length; i += chunkSizeAndPadding)
                 {
                     // Although we have 33 bits read for the table entry the last bit of the table entry is purely
                     // padding so we need to substring 33 bits minus the one padding bit.
-                    int entry = Convert.ToInt32(rawTable.Substring(i, ChunkDefinitionBitSize), 2);
-                    table.Add(entry);
+                    int entry = Convert.ToInt32(chunkTableBinary.Substring(i, ChunkDefinitionBitSize), 2);
+                    chunkTable.Add(entry);
                 }
-                return table;
+                return chunkTable;
             }
             catch (Exception e)
             {
-                Finish();
+                CloseOpenImage();
                 throw e;
             }
         }
@@ -382,11 +382,11 @@ namespace SteganographyApp.Common.IO
         /// Writes the content chunk table so that the proper number of bits can be read
         /// from the target images and properly decrypted.
         /// </summary>
-        /// <param name="table">A list containing the bit length of each chunk of data that was
+        /// <param name="chunkTable">A list containing the bit length of each chunk of data that was
         /// originally written to the target images during the encoding process.</param>
         /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
         /// storage space to store the entire content chunk table.</exception>
-        public void WriteContentChunkTable(List<int> table)
+        public void WriteContentChunkTable(List<int> chunkTable)
         {
             try
             {
@@ -395,19 +395,19 @@ namespace SteganographyApp.Common.IO
                 // Each table entry is 32 bits in size meaning that since each pixel can store 3 bits it will take
                 // 11 pixels. Since 11 pixels can actually store 33 bits we pad the 32 bit table entry with an additional
                 // zero at the end which will be ignored when reading the table.
-                binary.Append(Convert.ToString(table.Count, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
+                binary.Append(Convert.ToString(chunkTable.Count, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
 
-                foreach (int chunkLength in table)
+                foreach (int chunkLength in chunkTable)
                 {
                     binary.Append(Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
                 }
 
                 Write(binary.ToString());
-                Finish(true);
+                CloseOpenImage(true);
             }
             catch (Exception e)
             {
-                Finish();
+                CloseOpenImage();
                 throw e;
             }
         }
@@ -429,14 +429,14 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <param name="imageName">The image name to start reading and writing from.</param>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        private void ResetTo(int index)
+        private void ResetTo(int coverImageIndex)
         {
-            if (index < 0 || index >= args.CoverImages.Length)
+            if (coverImageIndex < 0 || coverImageIndex >= args.CoverImages.Length)
             {
-                throw new ImageProcessingException(string.Format("An invalid image index was provided in ResetTo. Expected value between {0} and {1}, instead got {2}", 0, args.CoverImages.Length - 1, index));
+                throw new ImageProcessingException(string.Format("An invalid image index was provided in ResetTo. Expected value between {0} and {1}, instead got {2}", 0, args.CoverImages.Length - 1, coverImageIndex));
             }
-            currentImageIndex = index - 1;
-            Next();
+            currentImageIndex = coverImageIndex - 1;
+            LoadNextImage();
         }
 
         /// <summary>
@@ -444,15 +444,15 @@ namespace SteganographyApp.Common.IO
         /// is not null, resets the read/write x and y positions to 0, increments the current image index,
         /// loads the new image, and invokes the OnNextImageLoaded event.
         /// </summary>
-        /// <param name="save">If true it will attempt to save any changes made to the currently open
+        /// <param name="saveImageChanges">If true it will attempt to save any changes made to the currently open
         /// image before attempting to increment to the next available image.</param>
         /// <exception cref="ImageProcessingException">If the increment of the current
         /// image index exeeds the available number of images an exception will be thrown.</exception>
-        private void Next(bool save = false)
+        private void LoadNextImage(bool saveImageChanges = false)
         {
             if (currentImage != null)
             {
-                if (save)
+                if (saveImageChanges)
                 {
                     currentImage.Save(args.CoverImages[currentImageIndex]);
                 }
@@ -481,15 +481,15 @@ namespace SteganographyApp.Common.IO
         /// Write a binary string of all zeroes of the specified length to help skip the read/write
         /// position to a new desired position.
         /// </summary>
-        /// <param name="position">The number of pixels to skip through in the current image.</param>
+        /// <param name="pixelIndex">The number of pixels to skip through in the current image.</param>
         /// <exception cref="ImageProcessingException">Thrown if the value of position is greater than
         /// the number of available pixels the current image has.</exception>
-        private void Seek(int position)
+        private void Seek(int pixelIndex)
         {
             x = 0;
             y = 0;
             int count = 0;
-            while (count < position)
+            while (count < pixelIndex)
             {
                 count += 3;
                 x++;
@@ -499,7 +499,7 @@ namespace SteganographyApp.Common.IO
                     y++;
                     if (y == currentImage.Height)
                     {
-                        throw new ImageProcessingException(string.Format("There are not enough available bits in this image to seek to the specified length of {0}", position));
+                        throw new ImageProcessingException(string.Format("There are not enough available bits in this image to seek to the specified length of {0}", pixelIndex));
                     }
                 }
             }
@@ -511,7 +511,7 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <returns>False if there are no more pixels left to read/write to otherwise
         /// returns true.</returns>
-        private bool TryMove()
+        private bool TryMoveToNextPixel()
         {
             x++;
             if (x == currentImage.Width)
@@ -531,13 +531,13 @@ namespace SteganographyApp.Common.IO
         /// <summary>
         /// Method to help close off any open images.
         /// </summary>
-        /// <param name="save">If true this method will attempt to save any changes
+        /// <param name="saveImageChanges">If true this method will attempt to save any changes
         /// made to the current image.</param>
-        private void Finish(bool save = false)
+        private void CloseOpenImage(bool saveImageChanges = false)
         {
             if (currentImage != null)
             {
-                if (save)
+                if (saveImageChanges)
                 {
                     currentImage.Save(args.CoverImages[currentImageIndex]);
                 }

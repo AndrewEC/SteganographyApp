@@ -14,15 +14,15 @@ namespace SteganographyApp.Common
         private readonly double maxProgress;
         private readonly string progressMessage;
         private readonly string completeMessage;
-        private readonly IWriter writer;
+        private readonly IWriter outputWriter;
         private double currentProgress;
 
-        public ProgressTracker(double maxProgress, string progressMessage, string completeMessage, IWriter writer)
+        public ProgressTracker(double maxProgress, string progressMessage, string completeMessage, IWriter outputWriter)
         {
             this.maxProgress = maxProgress;
             this.progressMessage = progressMessage;
             this.completeMessage = completeMessage;
-            this.writer = writer;
+            this.outputWriter = outputWriter;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace SteganographyApp.Common
         /// </summary>
         public void Display()
         {
-            writer.Write(string.Format("{0} :: 0%\r", progressMessage));
+            outputWriter.Write(string.Format("{0} :: 0%\r", progressMessage));
         }
 
         /// <summary>
@@ -57,11 +57,11 @@ namespace SteganographyApp.Common
             if(percent >= 100.0)
             {
                 percent = 100.0;
-                writer.WriteLine(completeMessage);
+                outputWriter.WriteLine(completeMessage);
             }
             else
             {
-                writer.Write(string.Format("{0} :: {1}%\r", progressMessage, (int)percent));
+                outputWriter.Write(string.Format("{0} :: {1}%\r", progressMessage, (int)percent));
             }
         }
 

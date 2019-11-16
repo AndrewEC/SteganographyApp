@@ -108,7 +108,7 @@ namespace SteganographyApp.Converter
         private static void PrintHelp()
         {
             var parser = new HelpParser();
-            if (!parser.TryParse(out HelpInfo info))
+            if (!parser.TryParseHelpFile(out HelpInfo info))
             {
                 parser.PrintCommonErrorMessage();
                 return;
@@ -116,7 +116,7 @@ namespace SteganographyApp.Converter
 
             Console.WriteLine("Steganography Converter Help\n");
 
-            foreach (string message in info.GetMessagesFor(HelpItemSet.Converter))
+            foreach (string message in info.GetHelpMessagesFor(HelpItemSet.Converter))
             {
                 Console.WriteLine("{0}\n", message);
             }

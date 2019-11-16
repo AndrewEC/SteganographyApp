@@ -360,15 +360,15 @@ namespace SteganographyApp.Common.Arguments
             }
             
             long dummyCount = 1;
-            int[] points = new int[] { 0, arguments.CoverImages.Length - 1 };
-            foreach (int point in points)
+            int[] imageIndexes = new int[] { 0, arguments.CoverImages.Length - 1 };
+            foreach (int imageIndex in imageIndexes)
             {
-                using(Image<Rgba32> image = Image.Load(arguments.CoverImages[point]))
+                using(Image<Rgba32> image = Image.Load(arguments.CoverImages[imageIndex]))
                 {
                     dummyCount += dummyCount * (image.Width * image.Height);
                 }
             }
-            String seed = dummyCount.ToString();
+            string seed = dummyCount.ToString();
             arguments.DummyCount = IndexGenerator.FromString(seed).Next(10);
         }
 
@@ -389,7 +389,7 @@ namespace SteganographyApp.Common.Arguments
                     throw new ArgumentValueException(string.Format("The compression level must be a whole number between 0 and 9 inclusive."));
                 }
             }
-            catch (Exception e)
+            catch (Exception e) when (e is FormatException || e is OverflowException)
             {
                 throw new ArgumentValueException(string.Format("Could not parse compression level from value: {0}", value), e);
             }
@@ -412,7 +412,7 @@ namespace SteganographyApp.Common.Arguments
                     throw new ArgumentValueException("The chunk size value must be a positive whole number with a value more than 0.");
                 }
             }
-            catch(Exception e)
+            catch(Exception e) when (e is FormatException || e is OverflowException)
             {
                 throw new ArgumentValueException(String.Format("Could not parse chunk value from value {0}", value), e);
             }
