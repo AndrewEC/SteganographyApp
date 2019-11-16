@@ -1,5 +1,55 @@
+using System;
+
 namespace SteganographyApp.Common.Arguments
 {
+
+    /// <summary>
+    /// Specifies that an exception occured while trying to read and parse the command line arguments
+    /// or that certain required arguments were not present.
+    /// </summary>
+    public class ArgumentParseException : Exception
+    {
+        public ArgumentParseException(string message) : base(message) { }
+        public ArgumentParseException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    /// <summary>
+    /// Specifies that a value provided for a particular argument was not valid or could not be properly
+    /// parsed into the required data type.
+    /// </summary>
+    public class ArgumentValueException : Exception
+    {
+        public ArgumentValueException(string message) : base(message) { }
+        public ArgumentValueException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    /// <summary>
+    /// Takes in a value retrieved from an associated key, parses it, and sets the
+    /// relevant property value in the InputArguments instance
+    /// </summary>
+    /// <param name="args">The InputArguments param to modify.</param>
+    /// <param name="value">The value of the key/value pair from the array of arguments.</param>
+    public delegate void ValueParser(InputArguments args, string value);
+
+    /// <summary>
+    /// Encapsulates information about an argument that the user can specify when invoking the
+    /// tool.
+    /// </summary>
+    public sealed class Argument
+    {
+        public string Name { get; private set; }
+        public string ShortName { get; private set; }
+        public ValueParser Parser { get; private set; }
+        public bool IsFlag { get; private set; }
+
+        public Argument(string name, string shortName, ValueParser parser, bool flag=false)
+        {
+            Name = name;
+            ShortName = shortName;
+            Parser = parser;
+            IsFlag = flag;
+        }
+    }
 
     /// <summary>
     /// Enum specifying whether the program is to attempt to proceed with encoding a file

@@ -10,40 +10,12 @@ using SteganographyApp.Common.Test;
 namespace SteganographyApp.Common.Arguments
 {
 
-    /// <summary>
-    /// Specifies that an exception occured while trying to read and parse the command line arguments
-    /// or that certain required arguments were not present.
-    /// </summary>
-    public class ArgumentParseException : Exception
-    {
-        public ArgumentParseException(string message) : base(message) { }
-        public ArgumentParseException(string message, Exception inner) : base(message, inner) { }
-    }
-
-    /// <summary>
-    /// Specifies that a value provided for a particular argument was not valid or could not be properly
-    /// parsed into the required data type.
-    /// </summary>
-    public class ArgumentValueException : Exception
-    {
-        public ArgumentValueException(string message) : base(message) { }
-        public ArgumentValueException(string message, Exception inner) : base(message, inner) { }
-    }
-
     ///<summary>
     /// Singleton utility class to parse the provided array of arguments and return and instance of
     /// InputArguments with the required values
     ///</summary>
     public sealed class ArgumentParser
     {
-
-        /// <summary>
-        /// Takes in a value retrieved from an associated key, parses it, and sets the
-        /// relevant property value in the InputArguments instance
-        /// </summary>
-        /// <param name="args">The InputArguments param to modify.</param>
-        /// <param name="value">The value of the key/value pair from the array of arguments.</param>
-        delegate void ValueParser(InputArguments args, string value);
 
         /// <summary>
         /// Takes in the collected set of argument/value pairs and performs a final validation
@@ -53,26 +25,6 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         /// <param name="args">The InputArguments and all their associated values.</param>
         public delegate string PostValidation(IInputArguments args);
-
-        /// <summary>
-        /// Encapsulates information about an argument that the user can specify when invoking the
-        /// tool.
-        /// </summary>
-        private sealed class Argument
-        {
-            public string Name { get; private set; }
-            public string ShortName { get; private set; }
-            public ValueParser Parser { get; private set; }
-            public bool IsFlag { get; private set; }
-
-            public Argument(string name, string shortName, ValueParser parser, bool flag=false)
-            {
-                Name = name;
-                ShortName = shortName;
-                Parser = parser;
-                IsFlag = flag;
-            }
-        }
 
         /// <summary>
         /// The list of user providable arguments.
@@ -150,127 +102,105 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         /// <param name="args">The array of command line arguments to parse.</param>
         /// <param name="inputs">The <see cref="IInputArguments"/> instance containing the parsed
-        /// argument values.</param>
+        /// argument values to be set during the execution of this method.</param>
         /// <param name="validation">The post validation delegate that will validate if all the
         /// resulting argument/value pairings at the end of parsing all provided arguments are correct.</param>
         /// <returns>True if all the arguments provided were parsed and the validation was successful
         /// else returns false.</returns>
         public bool TryParse(string[] args, out IInputArguments inputs, PostValidation validation)
         {
-            InputArguments parsed = new InputArguments();
-            inputs = null;
-            if(args == null || args.Length == 0)
+            try
             {
-                LastError = new ArgumentParseException("No arguments provided to parse.");
+                inputs = DoTryParse(args, validation);
+                return true;
+            }
+            catch (Exception e)
+            {
+                LastError = e;
+                inputs = null;
                 return false;
             }
+        }
 
-            ValueTuple<string, Argument> password = ("", null);
-            ValueTuple<string, Argument> randomSeed = ("", null);
-
-            for (int i = 0; i < args.Length; i++)
+        public IInputArguments DoTryParse(string[] userArguments, PostValidation postValidationMethod)
+        {
+            if(userArguments == null || userArguments.Length == 0)
             {
-                if (!TryGetArgument(args[i], out Argument argument))
+                throw new ArgumentParseException("No arguments provided to parse.");
+            }
+
+            SensitiveArgumentParser sensitiveParser = new SensitiveArgumentParser();
+            InputArguments parsedArguments = new InputArguments();
+
+            for (int i = 0; i < userArguments.Length; i++)
+            {
+                if (!TryGetArgument(userArguments[i], out Argument argument))
                 {
-                    LastError = new ArgumentParseException(string.Format("An unrecognized argument was provided: {0}", args[i]));
-                    return false;
+                    throw new ArgumentParseException(string.Format("An unrecognized argument was provided: {0}", userArguments[i]));
                 }
 
-                //Retrieve the password and randomSeed values to process them last as they may
-                //require interactive input in which we should throw any validations error available before
-                //requesting further user input.
-                if (argument.Name == "--password" || argument.Name == "--randomSeed")
+                if (sensitiveParser.IsSensitiveArgument(argument))
                 {
-                    if (i + 1 >= args.Length)
-                    {
-                        LastError = new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", args[i]));
-                        return false;
-                    }
-                    if (argument.Name == "--password")
-                    {
-                        password = (args[i + 1], argument);
-                    }
-                    else if (argument.Name == "--randomSeed")
-                    {
-                        randomSeed = (args[i + 1], argument);
-                    }
+                    sensitiveParser.CaptureArgument(argument, userArguments, i);
                     i++;
                     continue;
                 }
 
-                if (argument.IsFlag)
+                string inputValue = getRawArgumentValue(argument, userArguments, i);
+                ParseArgument(argument, parsedArguments, inputValue);
+
+                if (!argument.IsFlag)
                 {
-                    try
-                    {
-                        argument.Parser(parsed, "true");
-                    }
-                    catch (Exception e)
-                    {
-                        LastError = new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", args[i]), e);
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (i + 1 >= args.Length)
-                    {
-                        LastError = new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", args[i]));
-                        return false;
-                    }
-                    try
-                    {
-                        argument.Parser(parsed, args[i + 1]);
-                        i++;
-                    }
-                    catch (Exception e)
-                    {
-                        LastError = new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", args[i]), e);
-                        return false;
-                    }
+                    i++;
                 }
             }
 
-            string validationResult = validation(parsed);
-            if (validationResult != null && validationResult.Length != 0)
-            {
-                LastError = new ArgumentParseException(string.Format("Invalid arguments provided. {0}", validationResult));
-                return false;
-            }
+            invokePostValidation(postValidationMethod, parsedArguments);
 
-            if(!TryParseSecureItems(parsed, password, randomSeed))
-            {
-                return false;
-            }
+            sensitiveParser.ParseSecureArguments(parsedArguments);
 
-            inputs = parsed.ToImmutable();
-            return true;
-        }
-
-        private bool TryParseSecureItems(InputArguments inputs, ValueTuple<string, Argument> password, ValueTuple<string, Argument> randomSeed)
-        {
-            return TryParseSecureItem(inputs, password, "--password") && TryParseSecureItem(inputs, randomSeed, "--randomSeed");
+            return parsedArguments.ToImmutable();
         }
 
         /// <summary>
-        /// Utility method containing the common logic for parsing the random seed and the password parameters.
+        /// Retrieves the raw unparsed value that corresponds to a given argument from the set
+        /// of command line arguments passed to the program.
         /// </summary>
-        private bool TryParseSecureItem(InputArguments inputArguments, ValueTuple<string, Argument> argument, string argumentName)
+        private string getRawArgumentValue(Argument argument, string[] userArguments, int i)
         {
-            if (argument.Item1 == null || argument.Item2 == null)
+            if (argument.IsFlag)
             {
-                return true;
+                return "true";
             }
+            else
+            {
+                if (i + 1 >= userArguments.Length)
+                {
+                    throw new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", userArguments[i]));
+                }
+                return userArguments[i + 1];
+            }
+        }
 
+        private void invokePostValidation(PostValidation validation, InputArguments parsed)
+        {
+            string validationResult = validation(parsed);
+            if (validationResult != null && validationResult.Length != 0)
+            {
+                throw new ArgumentParseException(string.Format("Invalid arguments provided. {0}", validationResult));
+            }
+        }
+
+        private void ParseArgument(Argument argument, InputArguments parsedArguments, string rawInput)
+        {
             try
             {
-                argument.Item2.Parser(inputArguments, argument.Item1);
+                argument.Parser(parsedArguments, rawInput);
             }
             catch (Exception e)
             {
-                LastError = new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", argumentName), e);
-                return false;
+                throw new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", argument.Name), e);
             }
-            return true;
         }
 
         /// <summary>
