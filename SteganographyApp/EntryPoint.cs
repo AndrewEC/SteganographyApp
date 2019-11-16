@@ -102,7 +102,7 @@ namespace SteganographyApp
                     tracker.Display();
 
                     string content = "";
-                    while ((content = reader.ReadNextChunk()) != null)
+                    while ((content = reader.ReadContentChunk()) != null)
                     {
                         // record the length of the encoded content so it can be stored in the
                         // content chunk table once the total encoding process has been completed.
@@ -152,7 +152,7 @@ namespace SteganographyApp
                         // as we read in each chunk from the images start writing the decoded
                         // values to the target output file.
                         string binary = wrapper.Read(length);
-                        writer.WriteChunk(binary);
+                        writer.WriteContentChunk(binary);
                         tracker.TickAndDisplay();
                     }
                 }

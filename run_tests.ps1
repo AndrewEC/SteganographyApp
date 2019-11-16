@@ -1,11 +1,16 @@
-Write-Host("Creating report directory")
 if(Test-Path ./reports){
     Write-Host("Removing old report directory and contents")
     Remove-Item -Recurse -Force ./reports | Out-Null
 }
+if(Test-Path ./reports){
+    Write-Host("Unable to delete ./reports directory.")
+    Exit
+}
+
+Write-Host("Creating report directory")
 New-Item -ItemType directory -Path ./reports | Out-Null
-if($LastExitCode -ne 0){
-    Write-Host("'New-Item -ItemType directory -Path ./reports' failed with status: $LastExitCode")
+if(-Not (Test-Path ./reports)){
+    Write-Host("Could not create ./reports directory")
     Exit
 }
 

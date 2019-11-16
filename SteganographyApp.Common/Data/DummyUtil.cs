@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace SteganographyApp.Common.Data
 {
@@ -16,7 +17,7 @@ namespace SteganographyApp.Common.Data
         /// <returns>Returns the binary string with the new dummy entries.</returns>
         public static string InsertDummies(int numDummies, string binary)
         {
-            int[] lengths = GenerateLengths(numDummies);
+            int[] lengths = GenerateLengthsForDummies(numDummies);
 
             // cubed root
             int length = (int)Math.Ceiling(Math.Pow(binary.Length, (double)1 / 3)) + 1;
@@ -44,7 +45,7 @@ namespace SteganographyApp.Common.Data
         /// <param name="numDummies">The number of random numbers to generate. Will also
         /// determine the length of the array being returned.</param>
         /// <returns>A new array of random numbers of the specified length.</returns>
-        private static int[] GenerateLengths(int numDummies)
+        private static int[] GenerateLengthsForDummies(int numDummies)
         {
             var lengthGenerator = new IndexGenerator(numDummies, numDummies);
             int[] lengths = new int[numDummies];
@@ -87,10 +88,9 @@ namespace SteganographyApp.Common.Data
         {
 
             // calculate the length of the dummies originally added to the string
-            int[] lengths = GenerateLengths(numDummies);
+            int[] lengths = GenerateLengthsForDummies(numDummies);
             Array.Reverse(lengths);
-            int totalLength = 0;
-            Array.ForEach(lengths, (int i) => { totalLength += i;  });
+            int totalLength = lengths.Sum();
 
             // determine the length of the binary string before the dummies were added
             int actualLength = binary.Length - totalLength;

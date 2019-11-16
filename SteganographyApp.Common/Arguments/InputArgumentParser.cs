@@ -318,14 +318,7 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="value">The string representation of the InsertDummies boolean flag.</param>
         private void ParseInsertDummies(InputArguments arguments, string value)
         {
-            try
-            {
-                arguments.InsertDummies = Boolean.Parse(value);
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentValueException(string.Format("Could not parse insert dummies from value: {0}", value), e);
-            }
+            arguments.InsertDummies = Boolean.Parse(value);
             ParseDummyCount(arguments);
         }
 
@@ -336,14 +329,7 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="value">The string representation of the InsertDummies boolean flag.</param>
         private void ParseDeleteOriginals(InputArguments arguments, string value)
         {
-            try
-            {
-                arguments.DeleteAfterConversion = Boolean.Parse(value);
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentValueException(string.Format("Could not parse delete originals from value: {0}", value), e);
-            }
+            arguments.DeleteAfterConversion = Boolean.Parse(value);
         }
 
         /// <summary>
@@ -427,14 +413,7 @@ namespace SteganographyApp.Common.Arguments
         /// be parsed from the value parameter.</exception>
         private void ParsePrintStack(InputArguments arguments, string value)
         {
-            try
-            {
-                arguments.PrintStack = Boolean.Parse(value);
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentValueException(String.Format("Could not parse value for argument: {0}", e.Message));
-            }
+            arguments.PrintStack = Boolean.Parse(value);
         }
 
         /// <summary>
@@ -467,14 +446,7 @@ namespace SteganographyApp.Common.Arguments
         /// from the value parameter</exception>
         private void ParseUseCompression(InputArguments arguments, string value)
         {
-            try
-            {
-                arguments.UseCompression = Boolean.Parse(value);
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentValueException(String.Format("Could not parse value for argument: {0}", e.Message));
-            }
+            arguments.UseCompression = Boolean.Parse(value);
         }
 
         /// <summary>

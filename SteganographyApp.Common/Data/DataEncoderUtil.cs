@@ -1,8 +1,5 @@
 ﻿using Rijndael256;
 using System;
-using System.IO;
-using System.IO.Compression;
-using System.Text;
 
 namespace SteganographyApp.Common.Data
 {
@@ -41,7 +38,7 @@ namespace SteganographyApp.Common.Data
         {
             if (useCompression)
             {
-                bytes = Compress(bytes);
+                bytes = CompressionUtil.Compress(bytes);
             }
 
             string base64 = Convert.ToBase64String(bytes);
@@ -58,21 +55,15 @@ namespace SteganographyApp.Common.Data
                 }
             }
 
-            byte[] converted = Convert.FromBase64String(base64);
-
-            var builder = new StringBuilder();
-            foreach (byte bit in converted)
-            {
-                builder.Append(Convert.ToString(bit, 2).PadLeft(8, '0'));
-            }
+            string binary = BinaryUtil.ToBinaryString(base64);
 
             if(dummyCount == 0)
             {
-                return builder.ToString();
+                return binary;
             }
             else
             {
-                return DummyUtil.InsertDummies(dummyCount, builder.ToString());
+                return DummyUtil.InsertDummies(dummyCount, binary);
             }
         }
 
@@ -80,7 +71,7 @@ namespace SteganographyApp.Common.Data
         /// Takes an encrypted binary string and returns a byte array that is the original bytes
         /// that made up the original input file.
         /// </summary>
-        /// <param name="input">The encrypted binary string.</param>
+        /// <param name="binary">The encrypted binary string.</param>
         /// <param name="password">The password used to decrypt the base64 string. If no password is provided
         /// then no decryption will be done to the string.</param>
         /// <param name="useCompression">Tells the encoder whether or not to uncompress the encoded
@@ -89,21 +80,14 @@ namespace SteganographyApp.Common.Data
         /// encoding.</returns>
         /// <exception cref="TransformationException">Thrown if an error
         /// occured while decrypting the base64 string.</exception>
-        public static byte[] Decode(string input, string password, bool useCompression, int dummyCount)
+        public static byte[] Decode(string binary, string password, bool useCompression, int dummyCount)
         {
             if(dummyCount > 0)
             {
-                input = DummyUtil.RemoveDummies(dummyCount, input);
+                binary = DummyUtil.RemoveDummies(dummyCount, binary);
             }
 
-            byte[] bits = new byte[input.Length / 8];
-            for (int i = 0; i < bits.Length; i++)
-            {
-                var rawValue = input.Substring(i * 8, 8);
-                bits[i] = Convert.ToByte(rawValue, 2);
-            }
-
-            var decoded64String = Convert.ToBase64String(bits);
+            var decoded64String = BinaryUtil.ToBase64String(binary);
             if (password != "")
             {
                 try
@@ -119,7 +103,7 @@ namespace SteganographyApp.Common.Data
             byte[] decoded = Convert.FromBase64String(decoded64String);
             if (useCompression)
             {
-                return Decompress(decoded);
+                return CompressionUtil.Decompress(decoded);
             }
             else
             {
@@ -127,59 +111,5 @@ namespace SteganographyApp.Common.Data
             }
         }
 
-        /// <summary>
-        /// Copies all the data from the source stream into the destination stream
-        /// </summary>
-        /// <param name="src">The source stream where the data is coming from.</param>
-        /// <param name="dest">The destination stream the data is being written to.</param>
-        private static void CopyTo(Stream src, Stream dest)
-        {
-            byte[] bytes = new byte[2048];
-            int read = 0;
-            while ((read = src.Read(bytes, 0, bytes.Length)) != 0)
-            {
-                dest.Write(bytes, 0, read);
-            }
-        }
-
-        /// <summary>
-        /// Compresses the raw file bytes using standard gzip compression.
-        /// </summary>
-        /// <param name="fileBytes">The array of bytes read from the input file.</param>
-        /// <returns>The gzip compressed array of bytes.</returns>
-        private static byte[] Compress(byte[] fileBytes)
-        {
-            using (var msi = new MemoryStream(fileBytes))
-            using (var mso = new MemoryStream())
-            {
-                using (var gs = new GZipStream(mso, CompressionMode.Compress))
-                {
-                    CopyTo(msi, gs);
-                }
-
-                return mso.ToArray();
-            }
-        }
-
-        /// <summary>
-        /// Decompresses the bytes read and decoded from the cover image(s) using standard
-        /// gzip compression.
-        /// </summary>
-        /// <param name="readBytes">The array of bytes read and decoded from the
-        /// cover images.</param>
-        /// <returns>A byte array after being decompressed using standard gzip compression.</returns>
-        private static byte[] Decompress(byte[] readBytes)
-        {
-            using (var msi = new MemoryStream(readBytes))
-            using (var mso = new MemoryStream())
-            {
-                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
-                {
-                    CopyTo(gs, mso);
-                }
-
-                return mso.ToArray();
-            }
-        }
     }
 }

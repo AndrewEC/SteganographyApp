@@ -25,7 +25,7 @@ namespace SteganographyApp.Common.IO.Content
         /// and writes the resulting bytes to the output file.
         /// </summary>
         /// <param name="binary">The encrypted binary string read from the storage images.</param>
-        public void WriteChunk(string binary)
+        public void WriteContentChunk(string binary)
         {
             if(stream == null)
             {

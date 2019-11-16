@@ -38,7 +38,7 @@ namespace SteganographyApp.Common.IO.Content
         /// than the ChunkByteSize</para>
         /// </summary>
         /// <returns>A binary string representation of the next availabe ChunkByteSize from the input file.</returns>
-        public string ReadNextChunk()
+        public string ReadContentChunk()
         {
             if (stream == null)
             {

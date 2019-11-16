@@ -55,7 +55,7 @@ namespace SteganographyApp.Common.Tests
             var table = new List<int>();
             using(var reader = new ContentReader(args))
             {
-                content = reader.ReadNextChunk();
+                content = reader.ReadContentChunk();
                 int written = wrapper.Write(content);
                 table.Add(written);
                 Assert.AreEqual(content.Length, written);
@@ -70,7 +70,7 @@ namespace SteganographyApp.Common.Tests
             {
                 string binary = wrapper.Read(readTable[0]);
                 Assert.AreEqual(content, binary);
-                writer.WriteChunk(binary);
+                writer.WriteContentChunk(binary);
             }
             long target = new FileInfo(args.FileToEncode).Length;
             long actual = new FileInfo(args.DecodedOutputFile).Length;
@@ -87,7 +87,7 @@ namespace SteganographyApp.Common.Tests
             var table = new List<int>();
             using (var reader = new ContentReader(args))
             {
-                content = reader.ReadNextChunk();
+                content = reader.ReadContentChunk();
                 int written = wrapper.Write(content);
                 table.Add(written);
                 Assert.AreEqual(content.Length, written);
@@ -103,7 +103,7 @@ namespace SteganographyApp.Common.Tests
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.Read(readTable[0]);
-                writer.WriteChunk(binary);
+                writer.WriteContentChunk(binary);
             }
         }
 
@@ -117,7 +117,7 @@ namespace SteganographyApp.Common.Tests
             var table = new List<int>();
             using (var reader = new ContentReader(args))
             {
-                content = reader.ReadNextChunk();
+                content = reader.ReadContentChunk();
                 int written = wrapper.Write(content);
                 table.Add(written);
                 Assert.AreEqual(content.Length, written);
@@ -133,7 +133,7 @@ namespace SteganographyApp.Common.Tests
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.Read(readTable[0]);
-                writer.WriteChunk(binary);
+                writer.WriteContentChunk(binary);
             }
         }
 
@@ -146,7 +146,7 @@ namespace SteganographyApp.Common.Tests
             var table = new List<int>();
             using (var reader = new ContentReader(args))
             {
-                content = reader.ReadNextChunk();
+                content = reader.ReadContentChunk();
                 int written = wrapper.Write(content);
                 table.Add(written);
                 Assert.AreEqual(content.Length, written);
@@ -163,7 +163,7 @@ namespace SteganographyApp.Common.Tests
             {
                 string binary = wrapper.Read(readTable[0]);
                 Assert.AreEqual(content, binary);
-                writer.WriteChunk(binary);
+                writer.WriteContentChunk(binary);
             }
             long target = new FileInfo(args.FileToEncode).Length;
             long actual = new FileInfo(args.DecodedOutputFile).Length;
@@ -180,7 +180,7 @@ namespace SteganographyApp.Common.Tests
             var table = new List<int>();
             using (var reader = new ContentReader(args))
             {
-                content = reader.ReadNextChunk();
+                content = reader.ReadContentChunk();
                 int written = wrapper.Write(content);
                 table.Add(written);
                 Assert.AreEqual(content.Length, written);
@@ -197,7 +197,7 @@ namespace SteganographyApp.Common.Tests
             {
                 string binary = wrapper.Read(readTable[0]);
                 Assert.AreEqual(content, binary);
-                writer.WriteChunk(binary);
+                writer.WriteContentChunk(binary);
             }
             CollectionAssert.AreNotEqual(File.ReadAllBytes(args.FileToEncode), File.ReadAllBytes(args.DecodedOutputFile));
         }
