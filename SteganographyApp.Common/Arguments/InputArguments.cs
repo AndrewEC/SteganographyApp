@@ -32,6 +32,15 @@ namespace SteganographyApp.Common.Arguments
     public delegate void ValueParser(InputArguments args, string value);
 
     /// <summary>
+    /// Takes in the collected set of argument/value pairs and performs a final validation
+    /// on them.
+    /// <para>If the string returned is neither null or empty than then the validation is treated
+    /// as a failure.</para>
+    /// </summary>
+    /// <param name="args">The InputArguments and all their associated values.</param>
+    public delegate string PostValidation(IInputArguments args);
+
+    /// <summary>
     /// Encapsulates information about an argument that the user can specify when invoking the
     /// tool.
     /// </summary>
