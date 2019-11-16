@@ -174,10 +174,17 @@ namespace SteganographyApp.Common.Arguments
 
         private void invokePostValidation(PostValidation validation, InputArguments parsed)
         {
-            string validationResult = validation(parsed);
-            if (validationResult != null && validationResult.Length != 0)
+            try
             {
-                throw new ArgumentParseException(string.Format("Invalid arguments provided. {0}", validationResult));
+                string validationResult = validation(parsed);
+                if (!Checks.IsNullOrEmpty(validationResult))
+                {
+                    throw new ArgumentParseException(string.Format("Invalid arguments provided. {0}", validationResult));
+                }
+            }
+            catch (Exception e)
+            {
+                throw new ValidationException(string.Format("An error occurred while validation your input: {0}", e.Message), e);
             }
         }
 

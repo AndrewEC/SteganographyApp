@@ -41,6 +41,15 @@ namespace SteganographyApp.Common.Arguments
     }
 
     /// <summary>
+    /// An exception type that is thrown when an error occurs while invoking the
+    /// post validation delegate from the argument parser.
+    /// </summary>
+    public class ValidationException : Exception
+    {
+        public ValidationException(string message, Exception inner) : base(message, inner) {}
+    }
+
+    /// <summary>
     /// Encapsulates information about an argument that the user can specify when invoking the
     /// tool.
     /// </summary>

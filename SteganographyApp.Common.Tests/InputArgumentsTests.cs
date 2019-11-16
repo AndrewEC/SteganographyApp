@@ -178,16 +178,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--password", "?" };
 
-            var queue = new Queue<ConsoleKeyInfo>();
-            queue.Enqueue(new ConsoleKeyInfo('T', ConsoleKey.T, true, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('e', ConsoleKey.E, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('s', ConsoleKey.S, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('t', ConsoleKey.T, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('i', ConsoleKey.I, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('n', ConsoleKey.N, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('g', ConsoleKey.G, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('*', ConsoleKey.Backspace, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('*', ConsoleKey.Enter, false, false, false));
+            var queue = CreateUserInputQueue();
 
             var mockReader = new Mock<IReader>();
             mockReader.Setup(reader => reader.ReadKey(It.IsAny<bool>())).Returns<bool>((intercept) => queue.Dequeue());
@@ -198,6 +189,21 @@ namespace SteganographyApp.Common.Tests
             mockReader.Verify(reader => reader.ReadKey(It.IsAny<bool>()), Times.Exactly(9));
             Assert.AreEqual(0, queue.Count);
             Assert.AreEqual("Testin", inputArguments.Password);
+        }
+
+        private Queue<ConsoleKeyInfo> CreateUserInputQueue()
+        {
+            var queue = new Queue<ConsoleKeyInfo>();
+            queue.Enqueue(new ConsoleKeyInfo('T', ConsoleKey.T, true, false, false));
+            queue.Enqueue(new ConsoleKeyInfo('e', ConsoleKey.E, false, false, false));
+            queue.Enqueue(new ConsoleKeyInfo('s', ConsoleKey.S, false, false, false));
+            queue.Enqueue(new ConsoleKeyInfo('t', ConsoleKey.T, false, false, false));
+            queue.Enqueue(new ConsoleKeyInfo('i', ConsoleKey.I, false, false, false));
+            queue.Enqueue(new ConsoleKeyInfo('n', ConsoleKey.N, false, false, false));
+            queue.Enqueue(new ConsoleKeyInfo('g', ConsoleKey.G, false, false, false));
+            queue.Enqueue(new ConsoleKeyInfo('*', ConsoleKey.Backspace, false, false, false));
+            queue.Enqueue(new ConsoleKeyInfo('*', ConsoleKey.Enter, false, false, false));
+            return queue;
         }
 
         public class NullWriter : IWriter
