@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace SteganographyApp.Common.Arguments
 {
@@ -9,12 +10,24 @@ namespace SteganographyApp.Common.Arguments
     public sealed class SensitiveArgumentParser
     {
 
+        private readonly string PasswordPrompt = "Password";
+        private readonly string RandomSeedPrompt = "Random Seed";
+        private readonly string PasswordName = "--password";
+        private readonly string RandomSeedName = "--randomSeed";
+
+        private readonly ReadWriteUtils readWriteUtils;
+
         private ValueTuple<string, Argument> password;
         private ValueTuple<string, Argument> randomSeed;
 
+        public SensitiveArgumentParser(ReadWriteUtils readWriteUtils)
+        {
+            this.readWriteUtils = readWriteUtils;
+        }
+
         public bool IsSensitiveArgument(Argument argument)
         {
-            return argument.Name == "--password" || argument.Name == "--randomSeed";
+            return argument.Name == PasswordName || argument.Name == RandomSeedName;
         }
 
         /// <summary>
@@ -27,11 +40,11 @@ namespace SteganographyApp.Common.Arguments
             {
                 throw new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", userArguments[argumentIndex]));
             }
-            if(argument.Name == "--password")
+            if(argument.Name == PasswordName)
             {
                 password = (userArguments[argumentIndex + 1], argument);
             }
-            else if (argument.Name == "--randomSeed")
+            else if (argument.Name == RandomSeedName)
             {
                 randomSeed = (userArguments[argumentIndex + 1], argument);
             }
@@ -43,8 +56,8 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         public void ParseSecureArguments(InputArguments inputArguments)
         {
-            TryParseSecureItem(inputArguments, password, "--password");
-            TryParseSecureItem(inputArguments, randomSeed, "--randomSeed");
+            TryParseSecureItem(inputArguments, password, PasswordName);
+            TryParseSecureItem(inputArguments, randomSeed, RandomSeedName);
         }
 
         /// <summary>
@@ -65,6 +78,75 @@ namespace SteganographyApp.Common.Arguments
             {
                 throw new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", argumentName), e);
             }
+        }
+
+        /// <summary>
+        /// Takes in the random seed value by invoking the <see cref="ReadUserInput"/> method and validating the
+        /// input is of a valid length.
+        /// </summary>
+        /// <param name="arguments">The InputArguments instanced to fill with the parse random seed value.</param>
+        /// <param name="value">The string representation of the random seed.</param>
+        /// <param name="readWriteUtils">The utilities containing the read and write for processing and
+        /// receiving user input.</param>
+        public void ParseRandomSeed(InputArguments arguments, string value)
+        {
+            var seed = ReadUserInput(value, RandomSeedPrompt);
+            if(seed.Length > 235 || seed.Length < 3)
+            {
+                throw new ArgumentValueException("The length of the random seed must be between 3 and 235 characters in length.");
+            }
+            arguments.RandomSeed = seed;
+        }
+
+        /// <summary>
+        /// Parses the password value using the <see cref="ReadString(string, string, ReadWriteUtils)"/> method.
+        /// </summary>
+        /// <param name="arguments">The InputArguments instance to insert the password into.</param>
+        /// <param name="value">The string representation of the password</param>
+        /// <param name="readWriteUtils">The utilities containing the read and write for processing and
+        /// receiving user input.</param>
+        public void ParsePassword(InputArguments arguments, string value)
+        {
+            arguments.Password = ReadUserInput(value, PasswordPrompt);
+        }
+
+        /// <summary>
+        /// Attempts to retrieve the user's input without displaying the input on screen.
+        /// </summary>
+        /// <param name="value">The original value for the current argument the user provided.
+        /// If this value is a question mark then this will invoke the ReadKey method and record
+        /// input until the enter key has been pressed and return the result without presenting
+        /// the resulting value on screen.</param>
+        /// <param name="messagePrompt">The argument to prompt the user to enter.</param>
+        /// <param name="readWriteUtils">Contains the IReader instance required for receiving user
+        /// input for interactively entering the password or random seed fields.</param>
+        /// <returns>Either the original value string value or the value of the user's input
+        /// if the original value string value was a question mark.</returns>
+        private string ReadUserInput(string value, string messagePrompt)
+        {
+            if(value == "?")
+            {
+                readWriteUtils.Writer.Write(string.Format("Enter {0}: ", messagePrompt));
+                var builder = new StringBuilder();
+                while (true)
+                {
+                    var key = readWriteUtils.Reader.ReadKey(true);
+                    if (key.Key == ConsoleKey.Enter)
+                    {
+                        readWriteUtils.Writer.WriteLine("");
+                        return builder.ToString();
+                    }
+                    else if (key.Key == ConsoleKey.Backspace && builder.Length > 0)
+                    {
+                        builder.Remove(builder.Length - 1, 1);
+                    }
+                    else
+                    {
+                        builder.Append(key.KeyChar);
+                    }
+                }
+            }
+            return value;
         }
 
     }

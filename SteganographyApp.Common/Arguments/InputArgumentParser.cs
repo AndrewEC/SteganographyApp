@@ -5,7 +5,7 @@ using SteganographyApp.Common.Test;
 namespace SteganographyApp.Common.Arguments
 {
 
-    sealed class ReadWriteUtils
+    public struct ReadWriteUtils
     {
         public IReader Reader { get; set; }
         public IWriter Writer { get; set; }
@@ -35,19 +35,24 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         private readonly ReadWriteUtils readWriteUtils;
 
+        private readonly SensitiveArgumentParser sensitiveArgumentParser;
+
         public ArgumentParser(IReader reader, IWriter writer)
         {
             readWriteUtils = new ReadWriteUtils { Reader = reader, Writer = writer };
+
+            sensitiveArgumentParser = new SensitiveArgumentParser(readWriteUtils);
+
             arguments = ImmutableList.Create(
                 new Argument("--action", "-a", Parsers.ParseEncodeOrDecodeAction),
                 new Argument("--input", "-in", Parsers.ParseFileToEncode),
                 new Argument("--enableCompression", "-c", Parsers.ParseUseCompression, true),
                 new Argument("--printStack", "-stack", Parsers.ParsePrintStack, true),
                 new Argument("--images", "-im", Parsers.ParseImages),
-                new Argument("--password", "-p", (arguments, value) => { Parsers.ParsePassword(arguments, value, readWriteUtils); }),
+                new Argument("--password", "-p", sensitiveArgumentParser.ParsePassword),
                 new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
                 new Argument("--chunkSize", "-cs", Parsers.ParseChunkSize),
-                new Argument("--randomSeed", "-rs", (arguments, value) => { Parsers.ParseRandomSeed(arguments, value, readWriteUtils); }),
+                new Argument("--randomSeed", "-rs", sensitiveArgumentParser.ParseRandomSeed),
                 new Argument("--enableDummies", "-d", Parsers.ParseInsertDummies, true),
                 new Argument("--deleteOriginals", "-do", Parsers.ParseDeleteOriginals, true),
                 new Argument("--compressionLevel", "-co", Parsers.ParseCompressionLevel)
@@ -115,7 +120,6 @@ namespace SteganographyApp.Common.Arguments
                 throw new ArgumentParseException("No arguments provided to parse.");
             }
 
-            SensitiveArgumentParser sensitiveParser = new SensitiveArgumentParser();
             InputArguments parsedArguments = new InputArguments();
 
             for (int i = 0; i < userArguments.Length; i++)
@@ -125,9 +129,9 @@ namespace SteganographyApp.Common.Arguments
                     throw new ArgumentParseException(string.Format("An unrecognized argument was provided: {0}", userArguments[i]));
                 }
 
-                if (sensitiveParser.IsSensitiveArgument(argument))
+                if (sensitiveArgumentParser.IsSensitiveArgument(argument))
                 {
-                    sensitiveParser.CaptureArgument(argument, userArguments, i);
+                    sensitiveArgumentParser.CaptureArgument(argument, userArguments, i);
                     i++;
                     continue;
                 }
@@ -143,7 +147,7 @@ namespace SteganographyApp.Common.Arguments
 
             invokePostValidation(postValidationMethod, parsedArguments);
 
-            sensitiveParser.ParseSecureArguments(parsedArguments);
+            sensitiveArgumentParser.ParseSecureArguments(parsedArguments);
 
             return parsedArguments.ToImmutable();
         }

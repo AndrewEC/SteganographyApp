@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SteganographyApp.Common.Data;
@@ -10,57 +9,6 @@ namespace SteganographyApp.Common.Arguments
 
     static class Parsers
     {
-
-        /// <summary>
-        /// Attempts to retrieve the user's input without displaying the input on screen.
-        /// </summary>
-        /// <param name="value">The original value for the current argument the user provided.
-        /// If this value is a question mark then this will invoke the ReadKey method and record
-        /// input until the enter key has been pressed and return the result without presenting
-        /// the resulting value on screen.</param>
-        /// <param name="message">The argument to prompt the user to enter.</param>
-        /// <param name="readWriteUtils">Contains the IReader instance required for receiving user
-        /// input for interactively entering the password or random seed fields.</param>
-        /// <returns>Either the original value string value or the value of the user's input
-        /// if the original value string value was a question mark.</returns>
-        public static string ReadString(string value, string message, ReadWriteUtils readWriteUtils)
-        {
-            if(value == "?")
-            {
-                readWriteUtils.Writer.Write(string.Format("Enter {0}: ", message));
-                var builder = new StringBuilder();
-                while (true)
-                {
-                    var key = readWriteUtils.Reader.ReadKey(true);
-                    if (key.Key == ConsoleKey.Enter)
-                    {
-                        readWriteUtils.Writer.WriteLine("");
-                        return builder.ToString();
-                    }
-                    else if (key.Key == ConsoleKey.Backspace && builder.Length > 0)
-                    {
-                        builder.Remove(builder.Length - 1, 1);
-                    }
-                    else
-                    {
-                        builder.Append(key.KeyChar);
-                    }
-                }
-            }
-            return value;
-        }
-
-        /// <summary>
-        /// Parses the password value using the <see cref="ReadString(string, string, ReadWriteUtils)"/> method.
-        /// </summary>
-        /// <param name="arguments">The InputArguments instance to insert the password into.</param>
-        /// <param name="value">The string representation of the password</param>
-        /// <param name="readWriteUtils">The utilities containing the read and write for processing and
-        /// receiving user input.</param>
-        public static void ParsePassword(InputArguments arguments, string value, ReadWriteUtils readWriteUtils)
-        {
-            arguments.Password = ReadString(value, "Password", readWriteUtils);
-        }
 
         /// <summary>
         /// Parses a boolean from the value parameter and sets the InsertDummies property.
@@ -259,24 +207,6 @@ namespace SteganographyApp.Common.Arguments
             }
             arguments.CoverImages = images;
             ParseDummyCount(arguments);
-        }
-
-        /// <summary>
-        /// Takes in the random seed value by invoking the <see cref="ReadString"/> method and validating the
-        /// input is of a valid length.
-        /// </summary>
-        /// <param name="arguments">The InputArguments instanced to fill with the parse random seed value.</param>
-        /// <param name="value">The string representation of the random seed.</param>
-        /// <param name="readWriteUtils">The utilities containing the read and write for processing and
-        /// receiving user input.</param>
-        public static void ParseRandomSeed(InputArguments arguments, string value, ReadWriteUtils readWriteUtils)
-        {
-            var seed = ReadString(value, "Random Seed", readWriteUtils);
-            if(seed.Length > 235 || seed.Length < 3)
-            {
-                throw new ArgumentValueException("The length of the random seed must be between 3 and 235 characters in length.");
-            }
-            arguments.RandomSeed = seed;
         }
 
     }

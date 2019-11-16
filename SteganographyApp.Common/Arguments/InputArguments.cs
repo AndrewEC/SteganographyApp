@@ -4,6 +4,23 @@ namespace SteganographyApp.Common.Arguments
 {
 
     /// <summary>
+    /// Takes in a value retrieved from an associated key, parses it, and sets the
+    /// relevant property value in the InputArguments instance
+    /// </summary>
+    /// <param name="args">The InputArguments param to modify.</param>
+    /// <param name="value">The value of the key/value pair from the array of arguments.</param>
+    public delegate void ValueParser(InputArguments args, string value);
+
+    /// <summary>
+    /// Takes in the collected set of argument/value pairs and performs a final validation
+    /// on them.
+    /// <para>If the string returned is neither null or empty than then the validation is treated
+    /// as a failure.</para>
+    /// </summary>
+    /// <param name="args">The InputArguments and all their associated values.</param>
+    public delegate string PostValidation(IInputArguments args);
+
+    /// <summary>
     /// Specifies that an exception occured while trying to read and parse the command line arguments
     /// or that certain required arguments were not present.
     /// </summary>
@@ -22,23 +39,6 @@ namespace SteganographyApp.Common.Arguments
         public ArgumentValueException(string message) : base(message) { }
         public ArgumentValueException(string message, Exception inner) : base(message, inner) { }
     }
-
-    /// <summary>
-    /// Takes in a value retrieved from an associated key, parses it, and sets the
-    /// relevant property value in the InputArguments instance
-    /// </summary>
-    /// <param name="args">The InputArguments param to modify.</param>
-    /// <param name="value">The value of the key/value pair from the array of arguments.</param>
-    public delegate void ValueParser(InputArguments args, string value);
-
-    /// <summary>
-    /// Takes in the collected set of argument/value pairs and performs a final validation
-    /// on them.
-    /// <para>If the string returned is neither null or empty than then the validation is treated
-    /// as a failure.</para>
-    /// </summary>
-    /// <param name="args">The InputArguments and all their associated values.</param>
-    public delegate string PostValidation(IInputArguments args);
 
     /// <summary>
     /// Encapsulates information about an argument that the user can specify when invoking the
