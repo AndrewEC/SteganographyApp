@@ -13,7 +13,7 @@ namespace SteganographyAppCalculator
     /// Static reference class containing the number of available storage bits
     /// provided by images in common resolutions.
     /// </summary>
-    public static class CommonResolutionStorageSpace
+    public struct CommonResolutionStorageSpace
     {
         public static readonly int P360 = 518_400;
         public static readonly int P480 = 921_600;
@@ -44,12 +44,10 @@ namespace SteganographyAppCalculator
 
             if (arguments.EncodeOrDecode == ActionEnum.CalculateStorageSpace)
             {
-                Console.WriteLine("Calculating storage space in {0} images.", arguments.CoverImages.Length);
                 CalculateStorageSpace(arguments);
             }
             else if (arguments.EncodeOrDecode == ActionEnum.CalculateEncryptedSize)
             {
-                Console.WriteLine("Calculating encypted size of file {0}.", arguments.FileToEncode);
                 CalculateEncryptedSize(arguments);
             }
 
@@ -115,18 +113,19 @@ namespace SteganographyAppCalculator
         /// line arguments.</param>
         private static void CalculateStorageSpace(IInputArguments args)
         {
+            Console.WriteLine("Calculating storage space in {0} images.", args.CoverImages.Length);
             double binarySpace = 0;
             try
             {
-                var tracker = new ProgressTracker(args.CoverImages.Length, "Calculating image storage space", "Completed calculating image storage space.");
-                tracker.Display();
+                var tracker = ProgressTracker.CreateAndDisplay(args.CoverImages.Length,
+                    "Calculating image storage space", "Completed calculating image storage space.");
                 foreach (string imagePath in args.CoverImages)
                 {
                     using (var image = Image.Load(imagePath))
                     {
                         binarySpace += (image.Width * image.Height);
                     }
-                    tracker.TickAndDisplay();
+                    tracker.UpdateAndDisplayProgress();
                 }
                 binarySpace *= 3;
 
@@ -152,6 +151,7 @@ namespace SteganographyAppCalculator
         /// line arguments.</param>
         private static void CalculateEncryptedSize(IInputArguments args)
         {
+            Console.WriteLine("Calculating encypted size of file {0}.", args.FileToEncode);
             try
             {
                 double size = GetSize(args);
@@ -181,20 +181,20 @@ namespace SteganographyAppCalculator
         /// <returns>The size of the file in bits.</returns>
         private static double GetSize(IInputArguments args)
         {
-            double length = 0;
+            double encodedBitCount = 0;
             using (var reader = new ContentReader(args))
             {
-                var tracker = new ProgressTracker(reader.RequiredNumberOfReads, "Calculating file size", "Completed calculating file size");
-                tracker.Display();
+                var tracker = ProgressTracker.CreateAndDisplay(reader.RequiredNumberOfReads,
+                    "Calculating file size", "Completed calculating file size");
                 string content = "";
                 while ((content = reader.ReadContentChunk()) != null)
                 {
-                    tracker.TickAndDisplay();
-                    length += content.Length;
+                    tracker.UpdateAndDisplayProgress();
+                    encodedBitCount += content.Length;
                 }
             }
-            length += new ImageStore(args).RequiredContentChunkTableBitSize;
-            return length;
+            encodedBitCount += new ImageStore(args).RequiredContentChunkTableBitSize;
+            return encodedBitCount;
         }
 
         /// <summary>

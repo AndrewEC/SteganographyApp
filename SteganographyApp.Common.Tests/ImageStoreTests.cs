@@ -3,6 +3,7 @@
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
 
+using System.Linq;
 using System.Collections.Generic;
 
 namespace SteganographyApp.Common.Tests
@@ -10,6 +11,9 @@ namespace SteganographyApp.Common.Tests
     [TestClass]
     public class ImageStoreTests
     {
+
+        private readonly int TestImagePixelCount = 1_064_000;
+        private readonly int BitsPerPixel = 3;
 
         private ImageStore store;
         private InputArguments args;
@@ -32,29 +36,18 @@ namespace SteganographyApp.Common.Tests
         {
             if (store != null && args.CoverImages != null)
             {
-                store.CleanAll();
+                wrapper.CleanImageLSBs();
             }
             wrapper.Dispose();
-        }
-
-        [TestMethod]
-        public void TestReturnsProperCurrentImage()
-        {
-            Assert.AreEqual(args.CoverImages[0], store.CurrentImage);
-            wrapper.Next();
-            Assert.AreEqual(args.CoverImages[1], store.CurrentImage);
-
-            wrapper.ResetTo(0);
-            Assert.AreEqual(args.CoverImages[0], store.CurrentImage);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ImageProcessingException), AllowDerivedTypes = false)]
         public void TestNotEnoughImagesProducesException()
         {
-            wrapper.Next();
-            wrapper.Next();
-            wrapper.Next();
+            int size = TestImagePixelCount * BitsPerPixel + 1;
+            string binary = new string(Enumerable.Repeat('0', size).ToArray());
+            wrapper.WriteBinaryChunk(binary);
         }
 
         [TestMethod]
@@ -74,9 +67,9 @@ namespace SteganographyApp.Common.Tests
             var entries = new List<int>();
             entries.Add(3000);
             entries.Add(4000);
-            store.WriteContentChunkTable(entries);
-            wrapper.ResetTo(0);
-            var read = store.ReadContentChunkTable();
+            wrapper.WriteContentChunkTable(entries);
+            wrapper.ResetToImage(0);
+            var read = wrapper.ReadContentChunkTable();
 
             Assert.AreEqual(entries.Count, read.Count);
             for (int i = 0; i < entries.Count; i++)
@@ -89,11 +82,13 @@ namespace SteganographyApp.Common.Tests
         public void TestWriteAndReadContentMatches()
         {
             string binary = "00101001110010100100011001101010";
-            int written = wrapper.Write(binary);
+            int written = -1;
+            using(wrapper){
+                written = wrapper.WriteBinaryChunk(binary);
+                wrapper.Complete();
+            }
             Assert.AreEqual(binary.Length, written);
-            wrapper.Finish(true);
-            wrapper.ResetTo(0);
-            Assert.AreEqual(binary, wrapper.Read(binary.Length));
+            Assert.AreEqual(binary, wrapper.ReadBinaryChunk(binary.Length));
         }
     }
 }

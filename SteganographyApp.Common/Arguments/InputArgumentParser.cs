@@ -182,7 +182,7 @@ namespace SteganographyApp.Common.Arguments
                     throw new ArgumentParseException(string.Format("Invalid arguments provided. {0}", validationResult));
                 }
             }
-            catch (Exception e)
+            catch (Exception e) when (!(e is ArgumentParseException))
             {
                 throw new ValidationException(string.Format("An error occurred while validation your input: {0}", e.Message), e);
             }
@@ -206,10 +206,10 @@ namespace SteganographyApp.Common.Arguments
         public void PrintCommonErrorMessage()
         {
             readWriteUtils.Writer.WriteLine(string.Format("An exception occured while parsing provided arguments: {0}", LastError.Message));
-            var exception = LastError;
-            while (exception.InnerException != null)
+            var exception = LastError.InnerException;
+            while (exception != null)
             {
-                readWriteUtils.Writer.WriteLine(string.Format("Caused by: {0}", LastError.InnerException.Message));
+                readWriteUtils.Writer.WriteLine(string.Format("Caused by: {0}", exception.Message));
                 exception = exception.InnerException;
             }
             readWriteUtils.Writer.WriteLine("\nRun the program with --help to get more information.");

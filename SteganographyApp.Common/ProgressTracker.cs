@@ -36,6 +36,13 @@ namespace SteganographyApp.Common
         public ProgressTracker(double maxProgress, string progressMessage, string completeMessage)
             : this(maxProgress, progressMessage, completeMessage, new ConsoleWriter()) {}
 
+        public static ProgressTracker CreateAndDisplay(double maxProgress, string progressMessage, string completeMessage)
+        {
+            var tracker = new ProgressTracker(maxProgress, progressMessage, completeMessage);
+            tracker.Display();
+            return tracker;
+        }
+
         /// <summary>
         /// Displays the progress message with a progress of 0.
         /// </summary>
@@ -50,7 +57,7 @@ namespace SteganographyApp.Common
         /// <para>If the tick puts the progress at 100% or higher than the completeMessage provided
         /// in the constructor will be printed.</para>
         /// </summary>
-        public void TickAndDisplay()
+        public void UpdateAndDisplayProgress()
         {
             currentProgress = currentProgress + 1;
             double percent = currentProgress / maxProgress * 100.0;

@@ -33,7 +33,7 @@ namespace SteganographyApp.Converter
                 return;
             }
             
-            ConvertImages(arguments);
+            ConvertImagesToPng(arguments);
         }
 
         /// <summary>
@@ -58,20 +58,19 @@ namespace SteganographyApp.Converter
         /// the original images after convertion if the delete option was specified
         /// by the user.
         /// </summary>
-        private static void ConvertImages(IInputArguments args)
+        private static void ConvertImagesToPng(IInputArguments args)
         {
-            string[] images = args.CoverImages.Where(FilterImage).ToArray();
-            Console.WriteLine("Converting {0} images.", images.Length);
-            var tracker = new ProgressTracker(images.Length, "Converting images", "Finished converting all images");
-            tracker.Display();
+            string[] lossyImages = args.CoverImages.Where(FilterOutPngImages).ToArray();
+            Console.WriteLine("Converting {0} images.", lossyImages.Length);
+            var tracker = ProgressTracker.CreateAndDisplay(lossyImages.Length, "Converting images", "Finished converting all images");
 
-            foreach (string coverImage in images)
+            foreach (string coverImage in lossyImages)
             {
                 var encoder = new PngEncoder();
                 encoder.CompressionLevel = args.CompressionLevel;
                 using(var image = Image.Load(coverImage))
                 {
-                    image.Save(AppendPngExtension(coverImage), encoder);
+                    image.Save(ReplaceFileExtension(coverImage), encoder);
                 }
 
                 if (args.DeleteAfterConversion)
@@ -79,14 +78,14 @@ namespace SteganographyApp.Converter
                     File.Delete(coverImage);
                 }
 
-                tracker.TickAndDisplay();
+                tracker.UpdateAndDisplayProgress();
             }
         }
 
         /// <summary>
         /// Filters out any images that already have the png format.
         /// </summary>
-        private static bool FilterImage(string image)
+        private static bool FilterOutPngImages(string image)
         {
             return Image.DetectFormat(image).DefaultMimeType != PngMimeType;
         }
@@ -96,7 +95,7 @@ namespace SteganographyApp.Converter
         /// and replaces it with a png extension.
         /// </summary>
         /// <param name="image">The path to the image being converted</param>
-        private static string AppendPngExtension(string image)
+        private static string ReplaceFileExtension(string image)
         {
             int index = image.LastIndexOf('.');
             return string.Format("{0}.png", image.Substring(0, index));

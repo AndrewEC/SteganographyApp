@@ -33,13 +33,13 @@ namespace SteganographyApp
             switch (args.EncodeOrDecode)
             {
                 case ActionEnum.Clean:
-                    StartClean();
+                    CleanImages();
                     break;
                 case ActionEnum.Encode:
-                    StartEncode();
+                    EncodeFileToImages();
                     break;
                 case ActionEnum.Decode:
-                    StartDecode();
+                    DecodeImagesToFile();
                     break;
             }
         }
@@ -49,16 +49,15 @@ namespace SteganographyApp
         /// Uses the image store to reset the LSB values in all the user provided
         /// images to a value of 0.
         /// </summary>
-        private void StartClean()
+        private void CleanImages()
         {
-            var tracker = new ProgressTracker(args.CoverImages.Length, "Cleaning image LSB data", "Finished cleaning all images.");
-            tracker.Display();
+            var tracker = ProgressTracker.CreateAndDisplay(args.CoverImages.Length, "Cleaning image LSB data", "Finished cleaning all images.");
             var store = new ImageStore(args);
             store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs eventArg) =>
             {
-                tracker.TickAndDisplay();
+                tracker.UpdateAndDisplayProgress();
             };
-            store.CleanAll();
+            store.CreateIOWrapper().CleanImageLSBs();
         }
 
         /// <summary>
@@ -67,25 +66,22 @@ namespace SteganographyApp
         /// encode the read content, write the content to the images, and then write the
         /// content chunk table to the leading image.
         /// </summary>
-        private void StartEncode()
+        private void EncodeFileToImages()
         {
             Console.WriteLine("Started encoding file {0}", args.FileToEncode);
 
-            var store = new ImageStore(args);
-            var table = new List<int>();
+            var imageStore = new ImageStore(args);
+            var contentChunkTable = new List<int>();
 
-            var imagesUsed = new HashSet<string>();
-            store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs args) =>
-            {
-                imagesUsed.Add(args.ImageName);
-            };
+            var unusedTracker = UnusedImageTracker.StartRecordingFor(args, imageStore);
 
-            using (var wrapper = store.CreateIOWrapper())
+            var wrapper = imageStore.CreateIOWrapper();
+            using (wrapper)
             {
-                int start = store.RequiredContentChunkTableBitSize;
+                int start = imageStore.RequiredContentChunkTableBitSize;
 
                 // check that the leading image has enough storage space to store the content table
-                if (!store.HasEnoughSpaceForContentChunkTable())
+                if (!wrapper.HasEnoughSpaceForContentChunkTable())
                 {
                     Console.WriteLine("There is not enough space in the leading image to store the content chunk table.");
                     Console.WriteLine("The content chunk table requires {0} bits to store for the specified input file.", start);
@@ -94,31 +90,31 @@ namespace SteganographyApp
 
                 // skip past the first few pixels as the leading pixels of the first image will
                 // be used to store the content chunk table.
-                wrapper.Seek(start);
+                wrapper.SeekToPixel(start);
 
                 using (var reader = new ContentReader(args))
                 {
-                    var tracker = new ProgressTracker(reader.RequiredNumberOfReads, "Encoding file contents", "All input file contents have been encoded.");
-                    tracker.Display();
+                    var tracker = ProgressTracker.CreateAndDisplay(reader.RequiredNumberOfReads,
+                        "Encoding file contents", "All input file contents have been encoded.");
 
-                    string content = "";
-                    while ((content = reader.ReadContentChunk()) != null)
+                    string binaryChunk = "";
+                    while ((binaryChunk = reader.ReadContentChunk()) != null)
                     {
                         // record the length of the encoded content so it can be stored in the
                         // content chunk table once the total encoding process has been completed.
-                        table.Add(content.Length);
-                        wrapper.Write(content);
-                        tracker.TickAndDisplay();
+                        contentChunkTable.Add(binaryChunk.Length);
+                        wrapper.WriteBinaryChunk(binaryChunk);
+                        tracker.UpdateAndDisplayProgress();
                     }
                 }
 
                 wrapper.Complete();
             }
 
-            PrintUnused(imagesUsed);
             Console.WriteLine("Writing content chunk table.");
-            store.WriteContentChunkTable(table);
+            wrapper.WriteContentChunkTable(contentChunkTable);
             Console.WriteLine("Encoding process complete.");
+            unusedTracker.PrintUnusedImages();
         }
 
         /// <summary>
@@ -126,62 +122,36 @@ namespace SteganographyApp
         /// Reads the content chunk table, reads each chunk, decodes it, writes it to
         /// the output file.
         /// </summary>
-        private void StartDecode()
+        private void DecodeImagesToFile()
         {
             Console.WriteLine("Decoding data to file {0}", args.DecodedOutputFile);
 
             var store = new ImageStore(args);
-            var imagesUsed = new HashSet<string>();
-            store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs args) =>
-            {
-                imagesUsed.Add(args.ImageName);
-            };
+            var unusedTracker = UnusedImageTracker.StartRecordingFor(args, store);
             
             using (var wrapper = store.CreateIOWrapper())
             {
                 // read in the content chunk table so we know how many bits to read 
                 Console.WriteLine("Reading content chunk table.");
-                var chunkTable = store.ReadContentChunkTable();
-                var tracker = new ProgressTracker(chunkTable.Count, "Decoding file contents", "All encoded file contents have been decoded.");
-                tracker.Display();
+                var contentChunkTable = wrapper.ReadContentChunkTable();
+                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Count,
+                    "Decoding file contents", "All encoded file contents have been decoded.");
 
                 using (var writer = new ContentWriter(args))
                 {
-                    foreach (int length in chunkTable)
+                    foreach (int chunkBinaryLength in contentChunkTable)
                     {
                         // as we read in each chunk from the images start writing the decoded
                         // values to the target output file.
-                        string binary = wrapper.Read(length);
+                        string binary = wrapper.ReadBinaryChunk(chunkBinaryLength);
                         writer.WriteContentChunk(binary);
-                        tracker.TickAndDisplay();
+                        tracker.UpdateAndDisplayProgress();
                     }
                 }
             }
 
-            PrintUnused(imagesUsed);
+            unusedTracker.PrintUnusedImages();
             Console.WriteLine("Decoding process complete.");
-        }
-
-        /// <summary>
-        /// Utility method to print out a list the list of images that were used in the
-        /// encoding decoding process. Will only print something out it the number of image
-        /// uses was less than the number of images parsed in the arguments.
-        /// </summary>
-        /// <param name="imagesUsed">A list containing the names of the images used in the
-        /// encoding/decoding process.</param>
-        private void PrintUnused(HashSet<string> imagesUsed)
-        {
-            if (imagesUsed.Count == args.CoverImages.Length)
-            {
-                return;
-            }
-            Console.WriteLine("Not all images were used when encoding/decoding the file contents.");
-            Console.WriteLine("The following files were used:");
-            foreach (string image in imagesUsed)
-            {
-                Console.WriteLine("\t{0}", image);
-            }
-            Console.Write("Any image not specified in the list is not needed to decode the original file.\n");
         }
 
     }

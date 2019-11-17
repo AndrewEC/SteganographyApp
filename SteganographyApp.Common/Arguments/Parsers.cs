@@ -100,7 +100,7 @@ namespace SteganographyApp.Common.Arguments
             }
             catch(Exception e) when (e is FormatException || e is OverflowException)
             {
-                throw new ArgumentValueException(String.Format("Could not parse chunk value from value {0}", value), e);
+                throw new ArgumentValueException(String.Format("Could not parse chunk size from value {0}", value), e);
             }
         }
 

@@ -6,33 +6,74 @@ using System.Collections.Generic;
 namespace SteganographyApp.Common.Tests
 {
 
+    class MockWriter : IWriter
+    {
+
+        public LinkedList<string> WriteValues { get; private set; } = new LinkedList<string>();
+        public LinkedList<string> WriteLineValues { get; private set; } = new LinkedList<string>();
+
+        public void Write(string line)
+        {
+            WriteValues.AddLast(line);
+        }
+
+        public void WriteLine(string line)
+        {
+            WriteLineValues.AddLast(line);
+        }
+
+    }
+
     [TestClass]
     public class ProgressTrackerTests
     {
 
-        [TestMethod]
-        public void TestProgressTrackerInvokesWriteWithProperValues()
+        private readonly int DesiredWriteCount = 10;
+        private readonly int DesiredWriteLineCount = 1;
+        private readonly string Message = "testing";
+        private readonly string CompleteMessage = "testing complete";
+
+        private MockWriter mockWriter;
+        private ProgressTracker tracker;
+
+        [TestInitialize]
+        public void BeforeEach()
         {
-            var mockWriter = new Mock<IWriter>();
-            var lines = new List<string>();
-            var newLines = new List<string>();
-            mockWriter.Setup(writer => writer.Write(It.IsAny<string>())).Callback<string>(line => lines.Add(line));
-            mockWriter.Setup(writer => writer.WriteLine(It.IsAny<string>())).Callback<string>(line => newLines.Add(line));
+            mockWriter = new MockWriter();
+            tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage, mockWriter);
+        }
 
-            var tracker = new ProgressTracker(10, "testing", "testing complete", mockWriter.Object);
+        private void ExecuteUpdates(ProgressTracker tracker)
+        {
             tracker.Display();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < DesiredWriteCount; i++)
             {
-                tracker.TickAndDisplay();
+                tracker.UpdateAndDisplayProgress();
             }
+        }
 
-            mockWriter.Verify(writer => writer.Write(It.IsAny<string>()), Times.Exactly(10));
-            mockWriter.Verify(writer => writer.WriteLine(It.IsAny<string>()), Times.Once());
+        [TestMethod]
+        public void TestProgressTrackerIsInvokedCorrectNumberOfTimes()
+        {
+            ExecuteUpdates(tracker);
 
+            Assert.AreEqual(DesiredWriteCount, mockWriter.WriteValues.Count);
+            Assert.AreEqual(DesiredWriteLineCount, mockWriter.WriteLineValues.Count);
+        }
+
+        [TestMethod]
+        public void TestProgressTrackerInvokesWriteAndWriteLineWithCorrectPercentageIndicators()
+        {
+            ExecuteUpdates(tracker);
+
+            int index = 0;
             int[] percents = new int[] { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-            for (int i = 0; i < lines.Count; i++)
+            var currentNode = mockWriter.WriteValues.First;
+            while (currentNode != null)
             {
-                Assert.IsTrue(lines[i].Contains(percents[i].ToString()));
+                Assert.IsTrue(currentNode.Value.Contains(percents[index].ToString()));
+                index++;
+                currentNode = currentNode.Next;
             }
         }
 
