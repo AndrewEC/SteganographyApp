@@ -130,7 +130,7 @@ namespace SteganographyApp
             {
                 // read in the content chunk table so we know how many bits to read 
                 Console.WriteLine("Reading content chunk table.");
-                var contentChunkTable = wrapper.ReadContentChunkTable();
+                var contentChunkTable = store.ReadContentChunkTable();
                 var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Count,
                     "Decoding file contents", "All encoded file contents have been decoded.");
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -89,11 +90,6 @@ namespace SteganographyApp.Common.IO
             public void CleanImageLSBs()
             {
                 store.CleanImageLSBs();
-            }
-
-            public List<int> ReadContentChunkTable()
-            {
-                return store.ReadContentChunkTable();
             }
 
             public bool HasEnoughSpaceForContentChunkTable()
@@ -354,11 +350,14 @@ namespace SteganographyApp.Common.IO
         /// of data stored in the current set of images.</returns>
         /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
         /// storage space to read the entire content chunk table.</exception>
-        private List<int> ReadContentChunkTable()
+        public List<int> ReadContentChunkTable()
         {
             try
             {
-                //The size of each table entry plus the one padding bit to fill out a full pixel
+                // The size of each table entry is 32 bits but is made up of 11 pixels.
+                // Each pixel can store 3 bits so we end up with one bit of padding on the
+                // end. So we need to move in increments of 33 bits as we are reading sequential
+                // entries in the chunk table.
                 int chunkSizeAndPadding = ChunkDefinitionBitSize + 1;
 
                 //Read the number of entries in the table
@@ -374,15 +373,9 @@ namespace SteganographyApp.Common.IO
                     throw new ImageProcessingException("There are not enough available bits in the image to read the entire content chunk table.");
                 }
 
-                var chunkTable = new List<int>();
-                for (int i = 0; i < chunkTableBinary.Length; i += chunkSizeAndPadding)
-                {
-                    // Although we have 33 bits read for the table entry the last bit of the table entry is purely
-                    // padding so we need to substring 33 bits minus the one padding bit.
-                    int entry = Convert.ToInt32(chunkTableBinary.Substring(i, ChunkDefinitionBitSize), 2);
-                    chunkTable.Add(entry);
-                }
-                return chunkTable;
+                return Enumerable.Range(0, chunkCount)
+                    .Select(index => Convert.ToInt32(chunkTableBinary.Substring(index * chunkSizeAndPadding, ChunkDefinitionBitSize), 2))
+                    .ToList();
             }
             catch (Exception e)
             {

@@ -67,7 +67,7 @@ namespace SteganographyApp.Common.Tests
             imageStore.WriteContentChunkTable(table);
 
             wrapper.ResetToImage(0);
-            var readTable = wrapper.ReadContentChunkTable();
+            var readTable = imageStore.ReadContentChunkTable();
             using(var writer = new ContentWriter(args))
             {
                 string binary = wrapper.ReadBinaryChunk(readTable[0]);
@@ -102,7 +102,7 @@ namespace SteganographyApp.Common.Tests
             // reading file content from image
             args.Password = "Wrong Password";
             wrapper.ResetToImage(0);
-            var readTable = wrapper.ReadContentChunkTable();
+            var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.ReadBinaryChunk(readTable[0]);
@@ -133,7 +133,7 @@ namespace SteganographyApp.Common.Tests
             // reading file content from image
             args.DummyCount = 5;
             wrapper.ResetToImage(0);
-            var readTable = wrapper.ReadContentChunkTable();
+            var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.ReadBinaryChunk(readTable[0]);
@@ -163,7 +163,7 @@ namespace SteganographyApp.Common.Tests
             // reading file content from image
             args.UseCompression = false;
             wrapper.ResetToImage(0);
-            var readTable = wrapper.ReadContentChunkTable();
+            var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.ReadBinaryChunk(readTable[0]);
@@ -199,7 +199,7 @@ namespace SteganographyApp.Common.Tests
             // reading file content from image
             args.RandomSeed = "";
             wrapper.ResetToImage(0);
-            var readTable = wrapper.ReadContentChunkTable();
+            var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.ReadBinaryChunk(readTable[0]);

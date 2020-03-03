@@ -70,7 +70,7 @@ namespace SteganographyApp.Common.Tests
             
             imageStore.WriteContentChunkTable(entries);
             wrapper.ResetToImage(0);
-            var read = wrapper.ReadContentChunkTable();
+            var read = imageStore.ReadContentChunkTable();
 
             Assert.AreEqual(entries.Count, read.Count);
             Assert.AreEqual(read[0], 3000);
