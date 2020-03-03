@@ -6,6 +6,10 @@ namespace SteganographyApp.Common.Data
 
     public static class DummyUtil
     {
+
+        static readonly int MAX_LENGTH_PER_DUMMY = 50;
+        static readonly int MIN_LENGTH_PER_DUMMY = 10;
+
         /// <summary>
         /// Inserts the specified number of dummy entries into the current
         /// binary string.
@@ -51,7 +55,7 @@ namespace SteganographyApp.Common.Data
             int[] lengths = new int[numDummies];
             for(int i = 0; i < lengths.Length; i++)
             {
-                lengths[i] = lengthGenerator.Next(10) + 1;
+                lengths[i] = lengthGenerator.Next(MAX_LENGTH_PER_DUMMY) + MIN_LENGTH_PER_DUMMY;
             }
             return lengths;
         }

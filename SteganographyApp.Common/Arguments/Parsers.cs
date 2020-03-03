@@ -10,6 +10,9 @@ namespace SteganographyApp.Common.Arguments
     static class Parsers
     {
 
+        static readonly int MAX_DUMMY_COUNT = 100;
+        static readonly int MIN_DUMMY_COUNT = 20;
+
         /// <summary>
         /// Parses a boolean from the value parameter and sets the InsertDummies property.
         /// Will also attempt to call <see cref="ParseDummyCount"/>
@@ -49,13 +52,13 @@ namespace SteganographyApp.Common.Arguments
             int[] imageIndexes = new int[] { 0, arguments.CoverImages.Length - 1 };
             foreach (int imageIndex in imageIndexes)
             {
-                using(Image<Rgba32> image = Image.Load(arguments.CoverImages[imageIndex]))
+                using (Image<Rgba32> image = Image.Load(arguments.CoverImages[imageIndex]))
                 {
                     dummyCount += dummyCount * (image.Width * image.Height);
                 }
             }
             string seed = dummyCount.ToString();
-            arguments.DummyCount = IndexGenerator.FromString(seed).Next(10);
+            arguments.DummyCount = IndexGenerator.FromString(seed).Next(MAX_DUMMY_COUNT) + MIN_DUMMY_COUNT;
         }
 
         /// <summary>

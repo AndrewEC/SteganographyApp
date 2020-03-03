@@ -71,12 +71,10 @@ namespace SteganographyApp
             Console.WriteLine("Started encoding file {0}", args.FileToEncode);
 
             var imageStore = new ImageStore(args);
-            var contentChunkTable = new List<int>();
-
+            var tableTracker = new TableChunkTracker(imageStore);
             var unusedTracker = UnusedImageTracker.StartRecordingFor(args, imageStore);
 
-            var wrapper = imageStore.CreateIOWrapper();
-            using (wrapper)
+            using (var wrapper = imageStore.CreateIOWrapper())
             {
                 int start = imageStore.RequiredContentChunkTableBitSize;
 
@@ -94,7 +92,7 @@ namespace SteganographyApp
 
                 using (var reader = new ContentReader(args))
                 {
-                    var tracker = ProgressTracker.CreateAndDisplay(reader.RequiredNumberOfReads,
+                    var progressTracker = ProgressTracker.CreateAndDisplay(reader.RequiredNumberOfReads,
                         "Encoding file contents", "All input file contents have been encoded.");
 
                     string binaryChunk = "";
@@ -102,9 +100,8 @@ namespace SteganographyApp
                     {
                         // record the length of the encoded content so it can be stored in the
                         // content chunk table once the total encoding process has been completed.
-                        contentChunkTable.Add(binaryChunk.Length);
                         wrapper.WriteBinaryChunk(binaryChunk);
-                        tracker.UpdateAndDisplayProgress();
+                        progressTracker.UpdateAndDisplayProgress();
                     }
                 }
 
@@ -112,7 +109,7 @@ namespace SteganographyApp
             }
 
             Console.WriteLine("Writing content chunk table.");
-            wrapper.WriteContentChunkTable(contentChunkTable);
+            imageStore.WriteContentChunkTable(tableTracker.ContentTable);
             Console.WriteLine("Encoding process complete.");
             unusedTracker.PrintUnusedImages();
         }

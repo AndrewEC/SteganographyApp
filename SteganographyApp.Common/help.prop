@@ -24,12 +24,13 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t\t\tExample: --images [r]<^[\w\W]+\.(png|bmp|tiff)$><.> matches all files in the current directory with a png, bmp, or tiff extension.
 
 ~Password
-\t--passsword | -p :: The password to encrypt the input file when 'encode' was specified in the action argument.
+\t--password | -p :: The password to encrypt the input file when 'encode' was specified in the action argument.
 \t\tEnter ? for the password to input the real password in interactive mode.
 
 ~PrintStack
 \t--printStack | -stack :: Specifies whether or not to print the full stack trace if an error occurs.
 \t\tNo value is required for this argument. When provided it will always be true otherwise it will be false.
+\t\tThis value will only be taken into consideration when running debug builds.
 
 ~EnableCompression
 \t--enableCompression | -c :: Specifies whether or not to compress/decompress the encoded/decoded content.
@@ -40,6 +41,7 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t\tValue needs to be a positive whole number.
 \t\tLarger numbers can quicken the process of encoding larger files and make the encoded file size smaller.
 \t\tValues that are too large can produce out of memory errors.
+\t\tDefaults to: 131,072
 
 ~RandomSeed
 \t--randomSeed | -rs :: Randomizes the order in which bytes will be written from input file to image.

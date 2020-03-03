@@ -15,7 +15,7 @@ namespace SteganographyApp.Common.Tests
         private readonly int TestImagePixelCount = 1_064_000;
         private readonly int BitsPerPixel = 3;
 
-        private ImageStore store;
+        private ImageStore imageStore;
         private InputArguments args;
         private ImageStore.ImageStoreWrapper wrapper;
 
@@ -27,14 +27,14 @@ namespace SteganographyApp.Common.Tests
                 FileToEncode = "TestAssets/test.zip",
                 CoverImages = new string[] { "TestAssets/001.png", "TestAssets/002.png" }
             };
-            store = new ImageStore(args);
-            wrapper = store.CreateIOWrapper();
+            imageStore = new ImageStore(args);
+            wrapper = imageStore.CreateIOWrapper();
         }
 
         [TestCleanup]
         public void TearDown()
         {
-            if (store != null && args.CoverImages != null)
+            if (imageStore != null && args.CoverImages != null)
             {
                 wrapper.CleanImageLSBs();
             }
@@ -53,29 +53,28 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestRequiredChunkSizeMatchesExpected()
         {
-            Assert.AreEqual(65, store.RequiredContentChunkTableBitSize);
+            Assert.AreEqual(65, imageStore.RequiredContentChunkTableBitSize);
 
             args = new InputArguments();
             args.FileToEncode = "TestAssets/001.png";
-            store = new ImageStore(args);
-            Assert.AreEqual(65, store.RequiredContentChunkTableBitSize);
+            imageStore = new ImageStore(args);
+            Assert.AreEqual(65, imageStore.RequiredContentChunkTableBitSize);
         }
 
         [TestMethod]
         public void TestWrittenReadContentTableMatches()
         {
-            var entries = new List<int>();
-            entries.Add(3000);
-            entries.Add(4000);
-            wrapper.WriteContentChunkTable(entries);
+            var entries = new LinkedList<int>();
+            entries.AddFirst(new LinkedListNode<int>(3000));
+            entries.AddLast(new LinkedListNode<int>(4000));
+            
+            imageStore.WriteContentChunkTable(entries);
             wrapper.ResetToImage(0);
             var read = wrapper.ReadContentChunkTable();
 
             Assert.AreEqual(entries.Count, read.Count);
-            for (int i = 0; i < entries.Count; i++)
-            {
-                Assert.AreEqual(entries[i], read[i]);
-            }
+            Assert.AreEqual(read[0], 3000);
+            Assert.AreEqual(read[1], 4000);
         }
 
         [TestMethod]

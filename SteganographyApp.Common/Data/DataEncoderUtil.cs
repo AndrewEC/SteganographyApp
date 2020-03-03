@@ -34,11 +34,16 @@ namespace SteganographyApp.Common.Data
         /// <exception cref="TransformationException">Thrown
         /// if there was an issue trying to pass the base64 encoded string through the AES
         /// cipher.</exception>
-        public static string Encode(byte[] bytes, string password, bool useCompression, int dummyCount)
+        public static string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed)
         {
             if (useCompression)
             {
                 bytes = CompressionUtil.Compress(bytes);
+            }
+
+            if (randomSeed != "")
+            {
+                bytes = RandomizeUtil.RandomizeBytes(bytes, randomSeed);
             }
 
             string base64 = Convert.ToBase64String(bytes);
@@ -79,8 +84,8 @@ namespace SteganographyApp.Common.Data
         /// <returns>A byte array containing the original decoded bytes of the file inputted during
         /// encoding.</returns>
         /// <exception cref="TransformationException">Thrown if an error
-        /// occured while decrypting the base64 string.</exception>
-        public static byte[] Decode(string binary, string password, bool useCompression, int dummyCount)
+        /// occured while decrypting the base64 string or when decompressing the byte stream.</exception>
+        public static byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed)
         {
             if(dummyCount > 0)
             {
@@ -101,9 +106,23 @@ namespace SteganographyApp.Common.Data
             }
 
             byte[] decoded = Convert.FromBase64String(decoded64String);
+
+            if (randomSeed != "")
+            {
+                decoded = RandomizeUtil.ReorderBytes(decoded, randomSeed);
+                
+            }
+
             if (useCompression)
             {
-                return CompressionUtil.Decompress(decoded);
+                try
+                {
+                    return CompressionUtil.Decompress(decoded);
+                }
+                catch (Exception e)
+                {
+                    throw new TransformationException("An exception occurred while decompressing content.", e);
+                }
             }
             else
             {

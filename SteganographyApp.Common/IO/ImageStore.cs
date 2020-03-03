@@ -31,6 +31,11 @@ namespace SteganographyApp.Common.IO
         public int ImageIndex { get; set; }
     }
 
+    public class ChunkWrittenArgs
+    {
+        public int ChunkLength { get; set; }
+    }
+
     /// <summary>
     /// Class that handles positioning a make shift write stream in the proper position so
     /// data can be reliably read and written to the storage images.
@@ -91,11 +96,6 @@ namespace SteganographyApp.Common.IO
                 return store.ReadContentChunkTable();
             }
 
-            public void WriteContentChunkTable(List<int> chunkTable)
-            {
-                store.WriteContentChunkTable(chunkTable);
-            }
-
             public bool HasEnoughSpaceForContentChunkTable()
             {
                 return store.HasEnoughSpaceForContentChunkTable();
@@ -107,6 +107,8 @@ namespace SteganographyApp.Common.IO
                 store.ResetToImage(0);
             }
         }
+
+        public event EventHandler<ChunkWrittenArgs> OnChunkWritten;
 
         /// <summary>
         /// Event handle the will be invoked whenever the Next method is internally
@@ -294,6 +296,7 @@ namespace SteganographyApp.Common.IO
                     LoadNextImage(true);
                 }
             }
+            OnChunkWritten?.Invoke(this, new ChunkWrittenArgs { ChunkLength = written });
             return written;
         }
 
@@ -396,7 +399,7 @@ namespace SteganographyApp.Common.IO
         /// originally written to the target images during the encoding process.</param>
         /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
         /// storage space to store the entire content chunk table.</exception>
-        private void WriteContentChunkTable(List<int> chunkTable)
+        public void WriteContentChunkTable(LinkedList<int> chunkTable)
         {
             try
             {

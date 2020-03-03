@@ -29,17 +29,23 @@ namespace SteganographyApp
             }
             catch (Exception e)
             {
-                Console.WriteLine("An error occured during execution: ");
-                Console.WriteLine("\tException Message: {0}", e.Message);
-                if (arguments.PrintStack)
-                {
-                    Console.WriteLine(e.StackTrace);
-                }
+                switch (e){
+                    case ArgumentParseException e1:
+                    case ArgumentValueException e2:
+                        Console.WriteLine("An error ocurred during execution: \n\t{0}", e.Message);
+                        break;
+                    default:
+                        #if DEBUG
+                        if (arguments.PrintStack)
+                        {
+                            Console.WriteLine("Message Trace: ");
+                            Console.WriteLine(e.StackTrace);
+                        }
+                        #endif
 
-                switch (e)
-                {
-                    case TransformationException t:
-                        Console.WriteLine("This error often occurs as a result of an incorrect password or incorrect dummy count when decrypting a file.");
+                        #if !DEBUG
+                        Console.WriteLine("The action could not be completed. This can often indicate incorrect random seeds, passwords, images, etc.");
+                        #endif
                         break;
                 }
             }

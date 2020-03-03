@@ -57,12 +57,7 @@ namespace SteganographyApp.Common.IO.Content
                 buffer = actual;
             }
 
-            if (args.RandomSeed != "")
-            {
-                buffer = RandomizeBytes(buffer);
-            }
-
-            return DataEncoderUtil.Encode(buffer, args.Password, args.UseCompression, args.DummyCount);
+            return DataEncoderUtil.Encode(buffer, args.Password, args.UseCompression, args.DummyCount, args.RandomSeed);
         }
 
     }
