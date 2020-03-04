@@ -193,7 +193,7 @@ namespace SteganographyAppCalculator
                     encodedBitCount += content.Length;
                 }
             }
-            encodedBitCount += new ImageStore(args).RequiredContentChunkTableBitSize;
+            encodedBitCount += new ImageStore(args).RequiredBitsForContentChunkTable;
             return encodedBitCount;
         }
 

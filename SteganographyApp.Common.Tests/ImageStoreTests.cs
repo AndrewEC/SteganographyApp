@@ -36,7 +36,7 @@ namespace SteganographyApp.Common.Tests
         {
             if (imageStore != null && args.CoverImages != null)
             {
-                wrapper.CleanImageLSBs();
+                imageStore.CleanImageLSBs();
             }
             wrapper.Dispose();
         }
@@ -53,28 +53,26 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestRequiredChunkSizeMatchesExpected()
         {
-            Assert.AreEqual(65, imageStore.RequiredContentChunkTableBitSize);
+            Assert.AreEqual(65, imageStore.RequiredBitsForContentChunkTable);
 
             args = new InputArguments();
             args.FileToEncode = "TestAssets/001.png";
             imageStore = new ImageStore(args);
-            Assert.AreEqual(65, imageStore.RequiredContentChunkTableBitSize);
+            Assert.AreEqual(65, imageStore.RequiredBitsForContentChunkTable);
         }
 
         [TestMethod]
         public void TestWrittenReadContentTableMatches()
         {
-            var entries = new LinkedList<int>();
-            entries.AddFirst(new LinkedListNode<int>(3000));
-            entries.AddLast(new LinkedListNode<int>(4000));
+            var entries = new int[] { 3000, 4000 };
             
             imageStore.WriteContentChunkTable(entries);
             wrapper.ResetToImage(0);
             var read = imageStore.ReadContentChunkTable();
 
-            Assert.AreEqual(entries.Count, read.Count);
-            Assert.AreEqual(read[0], 3000);
-            Assert.AreEqual(read[1], 4000);
+            Assert.AreEqual(entries.Length, read.Length);
+            Assert.AreEqual(read[0], entries[0]);
+            Assert.AreEqual(read[1], entries[1]);
         }
 
         [TestMethod]

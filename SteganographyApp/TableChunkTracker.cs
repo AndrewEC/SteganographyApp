@@ -1,5 +1,4 @@
-using System;
-using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 
 using SteganographyApp.Common.IO;
@@ -14,11 +13,11 @@ namespace SteganographyApp
 
         private LinkedListNode<int> lastNode = null;
 
-        public LinkedList<int> ContentTable
+        public int[] ContentTable
         {
             get
             {
-                return contentChunks;
+                return contentChunks.ToArray();
             }
         }
 

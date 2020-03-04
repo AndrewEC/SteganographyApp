@@ -57,7 +57,7 @@ namespace SteganographyApp
             {
                 tracker.UpdateAndDisplayProgress();
             };
-            store.CreateIOWrapper().CleanImageLSBs();
+            store.CleanImageLSBs();
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace SteganographyApp
 
             using (var wrapper = imageStore.CreateIOWrapper())
             {
-                int start = imageStore.RequiredContentChunkTableBitSize;
+                int start = imageStore.RequiredBitsForContentChunkTable;
 
                 // check that the leading image has enough storage space to store the content table
                 if (!wrapper.HasEnoughSpaceForContentChunkTable())
@@ -131,7 +131,7 @@ namespace SteganographyApp
                 // read in the content chunk table so we know how many bits to read 
                 Console.WriteLine("Reading content chunk table.");
                 var contentChunkTable = store.ReadContentChunkTable();
-                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Count,
+                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length,
                     "Decoding file contents", "All encoded file contents have been decoded.");
 
                 using (var writer = new ContentWriter(args))

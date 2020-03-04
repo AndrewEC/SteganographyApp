@@ -52,7 +52,7 @@ namespace SteganographyApp.Common
                         "PrintStack", "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"};
                     break;
                 case HelpItemSet.Calculator:
-                    labels = new string[] {"CalculatorDescription", "AppAction", "Input", "Images", "Password",
+                    labels = new string[] {"CalculatorDescription", "CalculatorAction", "Input", "Images", "Password",
                         "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"};
                     break;
                 case HelpItemSet.Converter:

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -77,19 +76,14 @@ namespace SteganographyApp.Common.IO
                 return store.ReadBinaryChunk(length);
             }
 
-            public void SeekToPixel(int position)
+            public void SeekToPixel(int bitsToSkip)
             {
-                store.SeekToPixel(position);
+                store.SeekToPixel(bitsToSkip);
             }
 
             public void ResetToImage(int index)
             {
                 store.ResetToImage(index);
-            }
-
-            public void CleanImageLSBs()
-            {
-                store.CleanImageLSBs();
             }
 
             public bool HasEnoughSpaceForContentChunkTable()
@@ -154,7 +148,7 @@ namespace SteganographyApp.Common.IO
         /// <para>If no FileToEncode has been specified in the args field then this value will
         /// always be 0.</para>
         /// </summary>
-        public int RequiredContentChunkTableBitSize { get; private set; }
+        public int RequiredBitsForContentChunkTable { get; private set; }
 
         /// <summary>
         /// Readonly property that returns the name of the current image being used in the write
@@ -188,7 +182,7 @@ namespace SteganographyApp.Common.IO
                 // Each time we read and encode the a portion of the input file we will write an entry to the content chunk table
                 // outlining the number of bits that were written at the time of the write so we know how to decode
                 // and rebuild the input file when we are decoding.
-                RequiredContentChunkTableBitSize = requiredWrites * ChunkDefinitionBitSize + ChunkDefinitionBitSize + requiredWrites;
+                RequiredBitsForContentChunkTable = requiredWrites * ChunkDefinitionBitSize + ChunkDefinitionBitSize + requiredWrites;
             }
         }
 
@@ -209,12 +203,11 @@ namespace SteganographyApp.Common.IO
         /// Will look over all images specified in the InputArguments
         /// and set the LSB in all pixels in all images to 0.
         /// </summary>
-        private void CleanImageLSBs()
+        public void CleanImageLSBs()
         {
             try
             {
-                currentImageIndex = -1;
-                LoadNextImage();
+                ResetToImage(0);
                 for (int i = 0; i < args.CoverImages.Length; i++)
                 {
                     while (true)
@@ -350,7 +343,7 @@ namespace SteganographyApp.Common.IO
         /// of data stored in the current set of images.</returns>
         /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
         /// storage space to read the entire content chunk table.</exception>
-        public List<int> ReadContentChunkTable()
+        public int[] ReadContentChunkTable()
         {
             try
             {
@@ -360,22 +353,23 @@ namespace SteganographyApp.Common.IO
                 // entries in the chunk table.
                 int chunkSizeAndPadding = ChunkDefinitionBitSize + 1;
 
-                //Read the number of entries in the table
+                // The first 32 bits of the table represent the number of chunk lengths
+                // contained within the table.
                 int chunkCount = Convert.ToInt32(ReadBinaryChunk(ChunkDefinitionBitSize), 2);
 
-                int tableBitCount = chunkCount * chunkSizeAndPadding;
+                int bitsForAllTableEntries = chunkCount * chunkSizeAndPadding;
 
                 //Read all the available entries in the table
-                string chunkTableBinary = ReadBinaryChunk(tableBitCount);
+                string tableEntriesBinary = ReadBinaryChunk(bitsForAllTableEntries);
 
-                if (chunkTableBinary.Length < tableBitCount)
+                if (tableEntriesBinary.Length < bitsForAllTableEntries)
                 {
                     throw new ImageProcessingException("There are not enough available bits in the image to read the entire content chunk table.");
                 }
 
                 return Enumerable.Range(0, chunkCount)
-                    .Select(index => Convert.ToInt32(chunkTableBinary.Substring(index * chunkSizeAndPadding, ChunkDefinitionBitSize), 2))
-                    .ToList();
+                    .Select(index => Convert.ToInt32(tableEntriesBinary.Substring(index * chunkSizeAndPadding, ChunkDefinitionBitSize), 2))
+                    .ToArray();
             }
             catch (Exception e)
             {
@@ -392,7 +386,7 @@ namespace SteganographyApp.Common.IO
         /// originally written to the target images during the encoding process.</param>
         /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
         /// storage space to store the entire content chunk table.</exception>
-        public void WriteContentChunkTable(LinkedList<int> chunkTable)
+        public void WriteContentChunkTable(int[] chunkTable)
         {
             try
             {
@@ -401,7 +395,7 @@ namespace SteganographyApp.Common.IO
                 // Each table entry is 32 bits in size meaning that since each pixel can store 3 bits it will take
                 // 11 pixels. Since 11 pixels can actually store 33 bits we pad the 32 bit table entry with an additional
                 // zero at the end which will be ignored when reading the table.
-                binary.Append(Convert.ToString(chunkTable.Count, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
+                binary.Append(Convert.ToString(chunkTable.Length, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
 
                 foreach (int chunkLength in chunkTable)
                 {
@@ -426,7 +420,7 @@ namespace SteganographyApp.Common.IO
         /// bits required for the content chunk table.</returns>
         private bool HasEnoughSpaceForContentChunkTable()
         {
-            return (currentImage.Width * currentImage.Height * 3) > RequiredContentChunkTableBitSize;
+            return (currentImage.Width * currentImage.Height * 3) > RequiredBitsForContentChunkTable;
         }
 
         /// <summary>
@@ -456,15 +450,7 @@ namespace SteganographyApp.Common.IO
         /// image index exeeds the available number of images an exception will be thrown.</exception>
         private void LoadNextImage(bool saveImageChanges = false)
         {
-            if (currentImage != null)
-            {
-                if (saveImageChanges)
-                {
-                    currentImage.Save(args.CoverImages[currentImageIndex]);
-                }
-                currentImage.Dispose();
-                currentImage = null;
-            }
+            CloseOpenImage(saveImageChanges);
 
             x = 0;
             y = 0;
@@ -490,24 +476,15 @@ namespace SteganographyApp.Common.IO
         /// <param name="pixelIndex">The number of pixels to skip through in the current image.</param>
         /// <exception cref="ImageProcessingException">Thrown if the value of position is greater than
         /// the number of available pixels the current image has.</exception>
-        private void SeekToPixel(int pixelIndex)
+        private void SeekToPixel(int bitsToSkip)
         {
             x = 0;
             y = 0;
-            int count = 0;
-            while (count < pixelIndex)
+
+            int pixelIndex = (int) Math.Ceiling((double) bitsToSkip / 3.0);
+            for (int i = 0; i < pixelIndex; i++)
             {
-                count += 3;
-                x++;
-                if (x == currentImage.Width)
-                {
-                    x = 0;
-                    y++;
-                    if (y == currentImage.Height)
-                    {
-                        throw new ImageProcessingException(string.Format("There are not enough available bits in this image to seek to the specified length of {0}", pixelIndex));
-                    }
-                }
+                TryMoveToNextPixel();
             }
         }
 
