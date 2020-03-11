@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SteganographyApp.Common.Data;
@@ -181,35 +182,41 @@ namespace SteganographyApp.Common.Arguments
         /// could not be found at the specified path.</exception>
         public static void ParseImages(InputArguments arguments, string value)
         {
-            string[] images = null;
+            string[] images = RetrieveImagePaths(value);
+            ValidateImagePaths(images);
+            arguments.CoverImages = images;
+            ParseDummyCount(arguments);
+        }
 
+        private static string[] RetrieveImagePaths(string value) {
+            string[] imagePaths = null;
             if (value.Contains("[r]"))
             {
-                images = ImageRegexParser.ImagesFromRegex(value);
+                imagePaths = ImageRegexParser.ImagesFromRegex(value);
             }
             else if (value.Contains(","))
             {
-                images = value.Split(',');
+                imagePaths = value.Split(',');
             }
             else
             {
-                images = new string[] { value };
+                imagePaths = new string[] { value };
             }
+            return imagePaths.Select(imagePath => imagePath.Trim()).ToArray();
+        }
 
-            for (int i = 0; i < images.Length; i++)
+        private static void ValidateImagePaths(string[] imagePaths) {
+            for (int i = 0; i < imagePaths.Length; i++)
             {
-                images[i] = images[i].Trim();
-                if (!File.Exists(images[i]))
+                if (!File.Exists(imagePaths[i]))
                 {
-                    throw new ArgumentValueException($"Image could not be found at {images[i]}");
+                    throw new ArgumentValueException($"Image could not be found at {imagePaths[i]}");
                 }
-                else if (File.GetAttributes(images[i]).HasFlag(FileAttributes.Directory))
+                else if (File.GetAttributes(imagePaths[i]).HasFlag(FileAttributes.Directory))
                 {
-                    throw new ArgumentValueException($"File found at {images[i]} was a directory instead of an image.");
+                    throw new ArgumentValueException($"File found at {imagePaths[i]} was a directory instead of an image.");
                 }
             }
-            arguments.CoverImages = images;
-            ParseDummyCount(arguments);
         }
 
     }

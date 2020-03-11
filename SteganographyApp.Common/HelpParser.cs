@@ -26,7 +26,7 @@ namespace SteganographyApp.Common
         /// message or the parameter that it corresponds to and a value 
         /// being the actual help message.
         /// </summary>
-        public ImmutableDictionary<string, string> helpItems;
+        private ImmutableDictionary<string, string> helpItems;
 
         public HelpInfo(ImmutableDictionary<string, string> helpItems)
         {
@@ -74,7 +74,7 @@ namespace SteganographyApp.Common
         /// messages for.</param>
         /// <returns>An array of help messages whose order is based on the order of the names
         /// provided to lookup.</returns>
-        private string[] GetMessagesFor(params string[] helpLabels)
+        private string[] GetMessagesFor(string[] helpLabels)
         {
             string[] messages = new string[helpLabels.Length];
             for (int i = 0; i < helpLabels.Length; i++)
@@ -126,7 +126,7 @@ namespace SteganographyApp.Common
 
             try
             {
-                info = new HelpInfo(ParseHelpItems(helpFileLocation).ToImmutableDictionary());
+                info = new HelpInfo(ParseHelpItems(helpFileLocation));
             }
             catch (Exception e)
             {
@@ -138,7 +138,7 @@ namespace SteganographyApp.Common
             return true;
         }
 
-        public Dictionary<string, string> ParseHelpItems(string helpFileLocation)
+        public ImmutableDictionary<string, string> ParseHelpItems(string helpFileLocation)
         {
             Dictionary<string, string> helpItems = new Dictionary<string, string>();
             string[] lines = File.ReadAllLines(helpFileLocation);
@@ -149,7 +149,7 @@ namespace SteganographyApp.Common
                     helpItems[lines[i].Substring(1)] = ReadHelpItem(lines, i + 1);
                 }
             }
-            return helpItems;
+            return helpItems.ToImmutableDictionary();
         }
 
         private string GetAssemblyPath()

@@ -1,8 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace SteganographyApp.Common.Arguments
@@ -38,6 +36,7 @@ namespace SteganographyApp.Common.Arguments
 
         /// <summary>
         /// Parses the regular expression and path from the value of the --images parameter.
+        /// Input strings will be in the format [r]&lt;REGEX&gt;&lt;DIRECTORY&gt;
         /// </summary>
         /// <param name="value">The value of the --images parameter</param>
         /// <returns>A tuple containing the regex nd directory in that order.</returns>
