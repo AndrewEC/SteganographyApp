@@ -126,7 +126,7 @@ namespace SteganographyApp.Common.Arguments
             {
                 if (!TryGetArgument(userArguments[i], out Argument argument))
                 {
-                    throw new ArgumentParseException(string.Format("An unrecognized argument was provided: {0}", userArguments[i]));
+                    throw new ArgumentParseException($"An unrecognized argument was provided: {userArguments[i]}");
                 }
 
                 if (sensitiveArgumentParser.IsSensitiveArgument(argument))
@@ -166,7 +166,7 @@ namespace SteganographyApp.Common.Arguments
             {
                 if (i + 1 >= userArguments.Length)
                 {
-                    throw new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", userArguments[i]));
+                    throw new ArgumentParseException($"Missing required value for ending argument: {userArguments[i]}");
                 }
                 return userArguments[i + 1];
             }
@@ -179,12 +179,12 @@ namespace SteganographyApp.Common.Arguments
                 string validationResult = validation(parsed);
                 if (!Checks.IsNullOrEmpty(validationResult))
                 {
-                    throw new ArgumentParseException(string.Format("Invalid arguments provided. {0}", validationResult));
+                    throw new ArgumentParseException($"Invalid arguments provided. {validationResult}");
                 }
             }
             catch (Exception e) when (!(e is ArgumentParseException))
             {
-                throw new ValidationException(string.Format("An error occurred while validation your input: {0}", e.Message), e);
+                throw new ValidationException($"An error occurred while validation your input: {e.Message}", e);
             }
         }
 
@@ -196,7 +196,7 @@ namespace SteganographyApp.Common.Arguments
             }
             catch (Exception e)
             {
-                throw new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", argument.Name), e);
+                throw new ArgumentParseException($"Invalid value provided for argument: {argument.Name}", e);
             }
         }
 
@@ -205,11 +205,11 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         public void PrintCommonErrorMessage()
         {
-            readWriteUtils.Writer.WriteLine(string.Format("An exception occured while parsing provided arguments: {0}", LastError.Message));
+            readWriteUtils.Writer.WriteLine($"An exception occured while parsing provided arguments: {LastError.Message}");
             var exception = LastError.InnerException;
             while (exception != null)
             {
-                readWriteUtils.Writer.WriteLine(string.Format("Caused by: {0}", exception.Message));
+                readWriteUtils.Writer.WriteLine($"Caused by: {exception.Message}");
                 exception = exception.InnerException;
             }
             readWriteUtils.Writer.WriteLine("\nRun the program with --help to get more information.");

@@ -433,7 +433,7 @@ namespace SteganographyApp.Common.IO
         {
             if (coverImageIndex < 0 || coverImageIndex >= args.CoverImages.Length)
             {
-                throw new ImageProcessingException(string.Format("An invalid image index was provided in ResetTo. Expected value between {0} and {1}, instead got {2}", 0, args.CoverImages.Length - 1, coverImageIndex));
+                throw new ImageProcessingException($"An invalid image index was provided in ResetTo. Expected value between {0} and {args.CoverImages.Length - 1}, instead got {coverImageIndex}");
             }
             currentImageIndex = coverImageIndex - 1;
             LoadNextImage();

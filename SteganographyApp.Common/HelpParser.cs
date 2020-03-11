@@ -81,7 +81,7 @@ namespace SteganographyApp.Common
             {
                 if (!helpItems.ContainsKey(helpLabels[i]))
                 {
-                    messages[i] = string.Format("No help information configured for {0}.\n", helpLabels[i]);
+                    messages[i] = $"No help information configured for {helpLabels[i]}.\n";
                     continue;
                 }
                 messages[i] = helpItems[helpLabels[i]];
@@ -115,11 +115,11 @@ namespace SteganographyApp.Common
         {
 
             string assemblyPath = GetAssemblyPath();
-            string helpFileLocation = string.Format("{0}\\{1}", assemblyPath, fileName);
+            string helpFileLocation = $"{assemblyPath}\\{fileName}";
             
             if (!File.Exists(helpFileLocation))
             {
-                LastError = string.Format("The help file named {0} could not be found.", helpFileLocation);
+                LastError = $"The help file named {helpFileLocation} could not be found.";
                 info = new HelpInfo(null);
                 return false;
             }

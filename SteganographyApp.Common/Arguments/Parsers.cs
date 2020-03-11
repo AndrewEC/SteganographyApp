@@ -75,12 +75,12 @@ namespace SteganographyApp.Common.Arguments
                 arguments.CompressionLevel = Convert.ToInt32(value);
                 if (arguments.CompressionLevel < 0 || arguments.CompressionLevel > 9)
                 {
-                    throw new ArgumentValueException(string.Format("The compression level must be a whole number between 0 and 9 inclusive."));
+                    throw new ArgumentValueException("The compression level must be a whole number between 0 and 9 inclusive.");
                 }
             }
-            catch (Exception e) when (e is FormatException || e is OverflowException)
+            catch (Exception e) when (!(e is ArgumentValueException))
             {
-                throw new ArgumentValueException(string.Format("Could not parse compression level from value: {0}", value), e);
+                throw new ArgumentValueException($"Could not parse compression level from value: {value}", e);
             }
         }
 
@@ -101,9 +101,9 @@ namespace SteganographyApp.Common.Arguments
                     throw new ArgumentValueException("The chunk size value must be a positive whole number with a value more than 0.");
                 }
             }
-            catch(Exception e) when (e is FormatException || e is OverflowException)
+            catch(Exception e) when (!(e is ArgumentValueException))
             {
-                throw new ArgumentValueException(String.Format("Could not parse chunk size from value {0}", value), e);
+                throw new ArgumentValueException($"Could not parse chunk size from value {value}", e);
             }
         }
 
@@ -131,11 +131,11 @@ namespace SteganographyApp.Common.Arguments
         {
             if (!File.Exists(value))
             {
-                throw new ArgumentValueException(String.Format("File to decode could not be found at {0}", value));
+                throw new ArgumentValueException($"File to decode could not be found at {value}");
             }
             else if (File.GetAttributes(value).HasFlag(FileAttributes.Directory))
             {
-                throw new ArgumentValueException(String.Format("Input file at {0} was a directory but a file is required.", value));
+                throw new ArgumentValueException($"Input file at {value} was a directory but a file is required.");
             }
             arguments.FileToEncode = value;
         }
@@ -164,7 +164,7 @@ namespace SteganographyApp.Common.Arguments
             value = value.Replace("-", "");
             if(!Enum.TryParse(value, true, out ActionEnum action))
             {
-                throw new ArgumentValueException(String.Format("Invalid value for action argument. Expected 'encode', 'decode', 'clean', 'calculate-storage-space', or 'calculate-encrypted-size' got {0}", value));
+                throw new ArgumentValueException($"Invalid value for action argument. Expected 'encode', 'decode', 'clean', 'calculate-storage-space', or 'calculate-encrypted-size' got {value}");
             }
             args.EncodeOrDecode = action;
         }
@@ -201,11 +201,11 @@ namespace SteganographyApp.Common.Arguments
                 images[i] = images[i].Trim();
                 if (!File.Exists(images[i]))
                 {
-                    throw new ArgumentValueException(String.Format("Image could not be found at {0}", images[i]));
+                    throw new ArgumentValueException($"Image could not be found at {images[i]}");
                 }
                 else if (File.GetAttributes(images[i]).HasFlag(FileAttributes.Directory))
                 {
-                    throw new ArgumentValueException(String.Format("File found at {0} was a directory instead of an image.", images[i]));
+                    throw new ArgumentValueException($"File found at {images[i]} was a directory instead of an image.");
                 }
             }
             arguments.CoverImages = images;

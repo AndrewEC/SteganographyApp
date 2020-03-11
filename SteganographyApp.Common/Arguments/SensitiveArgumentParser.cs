@@ -10,6 +10,8 @@ namespace SteganographyApp.Common.Arguments
     public sealed class SensitiveArgumentParser
     {
 
+        private static readonly string HIDDEN_INPUT_INDICATOR = "?";
+
         private readonly string PasswordPrompt = "Password";
         private readonly string RandomSeedPrompt = "Random Seed";
         private readonly string PasswordName = "--password";
@@ -38,7 +40,7 @@ namespace SteganographyApp.Common.Arguments
         {
             if(argumentIndex + 1 >= userArguments.Length)
             {
-                throw new ArgumentParseException(string.Format("Missing required value for ending argument: {0}", userArguments[argumentIndex]));
+                throw new ArgumentParseException($"Missing required value for ending argument: {userArguments[argumentIndex]}");
             }
             if(argument.Name == PasswordName)
             {
@@ -76,7 +78,7 @@ namespace SteganographyApp.Common.Arguments
             }
             catch (Exception e)
             {
-                throw new ArgumentParseException(string.Format("Invalid value provided for argument: {0}", argumentName), e);
+                throw new ArgumentParseException($"Invalid value provided for argument: {argumentName}", e);
             }
         }
 
@@ -124,25 +126,25 @@ namespace SteganographyApp.Common.Arguments
         /// if the original value string value was a question mark.</returns>
         private string ReadUserInput(string value, string messagePrompt)
         {
-            if(value == "?")
+            if(value == HIDDEN_INPUT_INDICATOR)
             {
-                readWriteUtils.Writer.Write(string.Format("Enter {0}: ", messagePrompt));
-                var builder = new StringBuilder();
+                readWriteUtils.Writer.Write($"Enter {messagePrompt}: ");
+                var currentUserInput = new StringBuilder();
                 while (true)
                 {
                     var key = readWriteUtils.Reader.ReadKey(true);
                     if (key.Key == ConsoleKey.Enter)
                     {
                         readWriteUtils.Writer.WriteLine("");
-                        return builder.ToString();
+                        return currentUserInput.ToString();
                     }
-                    else if (key.Key == ConsoleKey.Backspace && builder.Length > 0)
+                    else if (key.Key == ConsoleKey.Backspace && currentUserInput.Length > 0)
                     {
-                        builder.Remove(builder.Length - 1, 1);
+                        currentUserInput.Remove(currentUserInput.Length - 1, 1);
                     }
                     else
                     {
-                        builder.Append(key.KeyChar);
+                        currentUserInput.Append(key.KeyChar);
                     }
                 }
             }

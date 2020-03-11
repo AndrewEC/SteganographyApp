@@ -98,7 +98,7 @@ namespace SteganographyApp.Converter
         private static string ReplaceFileExtension(string image)
         {
             int index = image.LastIndexOf('.');
-            return string.Format("{0}.png", image.Substring(0, index));
+            return $"{image.Substring(0, index)}.png";
         }
 
         /// <summary>

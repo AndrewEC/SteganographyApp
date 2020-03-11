@@ -48,7 +48,7 @@ namespace SteganographyApp.Common
         /// </summary>
         public void Display()
         {
-            outputWriter.Write(string.Format("{0} :: 0%\r", progressMessage));
+            outputWriter.Write($"{progressMessage} :: 0%\r");
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace SteganographyApp.Common
             }
             else
             {
-                outputWriter.Write(string.Format("{0} :: {1}%\r", progressMessage, (int)percent));
+                outputWriter.Write($"{progressMessage} :: {(int)percent}%\r");
             }
         }
 

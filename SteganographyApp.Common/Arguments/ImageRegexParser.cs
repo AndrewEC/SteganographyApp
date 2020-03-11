@@ -31,7 +31,7 @@ namespace SteganographyApp.Common.Arguments
             
             if (images.Length == 0)
             {
-                throw new ArgumentValueException(String.Format("The provided regex expression returned 0 usable files in the directory {0}", path));
+                throw new ArgumentValueException($"The provided regex expression returned 0 usable files in the directory {path}");
             }
             return images;
         }
