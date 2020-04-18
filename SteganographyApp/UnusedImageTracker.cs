@@ -42,13 +42,13 @@ namespace SteganographyApp
             {
                 return;
             }
-            Console.WriteLine("Not all images were used when encoding/decoding the file contents.");
+            Console.WriteLine("Not all images were written to.");
+            Console.WriteLine("While these images don't contain encoded data they will be needed to properly decode.");
             Console.WriteLine("The following files were used:");
             foreach (string image in imagesUsed)
             {
                 Console.WriteLine("\t{0}", image);
             }
-            Console.Write("Any image not specified in the list is not needed to decode the original file.\n");
         }
 
     }

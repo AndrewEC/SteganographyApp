@@ -26,6 +26,8 @@ namespace SteganographyAppCalculator
     class Program
     {
 
+        private static readonly int BitsPerPixel = 3;
+
         static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography Calculator\n");
@@ -114,23 +116,12 @@ namespace SteganographyAppCalculator
         private static void CalculateStorageSpace(IInputArguments args)
         {
             Console.WriteLine("Calculating storage space in {0} images.", args.CoverImages.Length);
-            double binarySpace = 0;
             try
             {
-                var tracker = ProgressTracker.CreateAndDisplay(args.CoverImages.Length,
-                    "Calculating image storage space", "Completed calculating image storage space.");
-                foreach (string imagePath in args.CoverImages)
-                {
-                    using (var image = Image.Load(imagePath))
-                    {
-                        binarySpace += (image.Width * image.Height);
-                    }
-                    tracker.UpdateAndDisplayProgress();
-                }
-                binarySpace *= 3;
+                long availableSpace = CalculateNumberOfPixelsForImages(args.CoverImages) * BitsPerPixel;
 
                 Console.WriteLine("\nImages are able to store:");
-                PrintSize(binarySpace);
+                PrintSize(availableSpace);
             }
             catch (Exception e)
             {
@@ -141,6 +132,22 @@ namespace SteganographyAppCalculator
                 }
                 return;
             }
+        }
+
+        private static long CalculateNumberOfPixelsForImages(string[] coverImages)
+        {
+            var tracker = ProgressTracker.CreateAndDisplay(coverImages.Length,
+                    "Calculating image storage space", "Completed calculating image storage space.");
+            long pixelCount = 0;
+            foreach (string imagePath in coverImages)
+            {
+                using (var image = Image.Load(imagePath))
+                {
+                    pixelCount += (image.Width * image.Height);
+                }
+                tracker.UpdateAndDisplayProgress();
+            }
+            return pixelCount;
         }
 
         /// <summary>
@@ -154,7 +161,7 @@ namespace SteganographyAppCalculator
             Console.WriteLine("Calculating encypted size of file {0}.", args.FileToEncode);
             try
             {
-                double size = GetSize(args);
+                double size = CalculateInputFileSize(args);
 
                 Console.WriteLine("\nEncrypted file size is:");
                 PrintSize(size);
@@ -179,7 +186,7 @@ namespace SteganographyAppCalculator
         /// <param name="compressed">States whether or not to compress the file or not. Overwrites the current
         /// value in the args parameter.</param>
         /// <returns>The size of the file in bits.</returns>
-        private static double GetSize(IInputArguments args)
+        private static double CalculateInputFileSize(IInputArguments args)
         {
             double encodedBitCount = 0;
             using (var reader = new ContentReader(args))

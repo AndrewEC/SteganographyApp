@@ -61,8 +61,15 @@ namespace SteganographyApp.Converter
         private static void ConvertImagesToPng(IInputArguments args)
         {
             string[] lossyImages = args.CoverImages.Where(FilterOutPngImages).ToArray();
+            if (lossyImages.Length == 0)
+            {
+                Console.WriteLine("All images found are png images and will not be converted.");
+                return;
+            }
+
             Console.WriteLine("Converting {0} images.", lossyImages.Length);
-            var tracker = ProgressTracker.CreateAndDisplay(lossyImages.Length, "Converting images", "Finished converting all images");
+            var tracker = ProgressTracker.CreateAndDisplay(lossyImages.Length, "Converting images",
+                "Finished converting all images");
 
             foreach (string coverImage in lossyImages)
             {
