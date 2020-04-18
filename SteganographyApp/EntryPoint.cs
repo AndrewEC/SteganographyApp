@@ -3,10 +3,26 @@ using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.IO.Content;
 using System;
-using System.Collections.Generic;
 
 namespace SteganographyApp
 {
+
+    class EncodingUtilities
+    {
+
+        public ImageStore ImageStore { get; }
+        public TableChunkTracker TableTracker { get; }
+        public ImageTracker ImageTracker { get; }
+
+        public EncodingUtilities(IInputArguments args)
+        {
+            ImageStore = new ImageStore(args);
+            TableTracker = new TableChunkTracker(ImageStore);
+            ImageTracker = ImageTracker.CreateTrackerFrom(args, ImageStore);
+        }
+
+    }
+
     public class EntryPoint
     {
 
@@ -70,13 +86,11 @@ namespace SteganographyApp
         {
             Console.WriteLine("Started encoding file {0}", args.FileToEncode);
 
-            var imageStore = new ImageStore(args);
-            var tableTracker = new TableChunkTracker(imageStore);
-            var unusedTracker = UnusedImageTracker.StartRecordingFor(args, imageStore);
+            var utilities = new EncodingUtilities(args);
 
-            using (var wrapper = imageStore.CreateIOWrapper())
+            using (var wrapper = utilities.ImageStore.CreateIOWrapper())
             {
-                int start = imageStore.RequiredBitsForContentChunkTable;
+                int start = utilities.ImageStore.RequiredBitsForContentChunkTable;
 
                 // check that the leading image has enough storage space to store the content table
                 if (!wrapper.HasEnoughSpaceForContentChunkTable())
@@ -96,22 +110,27 @@ namespace SteganographyApp
                         "Encoding file contents", "All input file contents have been encoded.");
 
                     string binaryChunk = "";
-                    while ((binaryChunk = reader.ReadContentChunk()) != null)
+                    while ((binaryChunk = reader.ReadContentChunkFromFile()) != null)
                     {
                         // record the length of the encoded content so it can be stored in the
                         // content chunk table once the total encoding process has been completed.
-                        wrapper.WriteBinaryChunk(binaryChunk);
+                        wrapper.WriteContentChunkToImage(binaryChunk);
                         progressTracker.UpdateAndDisplayProgress();
                     }
                 }
 
-                wrapper.Complete();
+                wrapper.EncodeComplete();
             }
 
+            EncodeCleanup(utilities);
+        }
+
+        private void EncodeCleanup(EncodingUtilities utilities)
+        {
             Console.WriteLine("Writing content chunk table.");
-            imageStore.WriteContentChunkTable(tableTracker.ContentTable);
+            utilities.ImageStore.WriteContentChunkTable(utilities.TableTracker.ContentTable);
             Console.WriteLine("Encoding process complete.");
-            unusedTracker.PrintUnusedImages();
+            utilities.ImageTracker.PrintImagesUtilized();
         }
 
         /// <summary>
@@ -124,7 +143,7 @@ namespace SteganographyApp
             Console.WriteLine("Decoding data to file {0}", args.DecodedOutputFile);
 
             var store = new ImageStore(args);
-            var unusedTracker = UnusedImageTracker.StartRecordingFor(args, store);
+            var imageTracker = ImageTracker.CreateTrackerFrom(args, store);
             
             using (var wrapper = store.CreateIOWrapper())
             {
@@ -140,14 +159,14 @@ namespace SteganographyApp
                     {
                         // as we read in each chunk from the images start writing the decoded
                         // values to the target output file.
-                        string binary = wrapper.ReadBinaryChunk(chunkBinaryLength);
-                        writer.WriteContentChunk(binary);
+                        string binary = wrapper.ReadBinaryChunkFromImage(chunkBinaryLength);
+                        writer.WriteContentChunkToFile(binary);
                         tracker.UpdateAndDisplayProgress();
                     }
                 }
             }
 
-            unusedTracker.PrintUnusedImages();
+            imageTracker.PrintImagesUtilized();
             Console.WriteLine("Decoding process complete.");
         }
 

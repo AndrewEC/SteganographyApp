@@ -56,12 +56,12 @@ namespace SteganographyApp.Common.Tests
                 wrapper.SeekToPixel(imageStore.RequiredBitsForContentChunkTable);
                 using(var reader = new ContentReader(args))
                 {
-                    content = reader.ReadContentChunk();
-                    int written = wrapper.WriteBinaryChunk(content);
+                    content = reader.ReadContentChunkFromFile();
+                    int written = wrapper.WriteContentChunkToImage(content);
                     table[0] = written;
                     Assert.AreEqual(content.Length, written);
                 }
-                wrapper.Complete();
+                wrapper.EncodeComplete();
             }
             imageStore.WriteContentChunkTable(table);
 
@@ -69,9 +69,9 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using(var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunk(readTable[0]);
+                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
                 Assert.AreEqual(content, binary);
-                writer.WriteContentChunk(binary);
+                writer.WriteContentChunkToFile(binary);
             }
             long target = new FileInfo(args.FileToEncode).Length;
             long actual = new FileInfo(args.DecodedOutputFile).Length;
@@ -89,12 +89,12 @@ namespace SteganographyApp.Common.Tests
                 wrapper.SeekToPixel(imageStore.RequiredBitsForContentChunkTable);
                 using (var reader = new ContentReader(args))
                 {
-                    content = reader.ReadContentChunk();
-                    int written = wrapper.WriteBinaryChunk(content);
+                    content = reader.ReadContentChunkFromFile();
+                    int written = wrapper.WriteContentChunkToImage(content);
                     table[0] = written;
                     Assert.AreEqual(content.Length, written);
                 }
-                wrapper.Complete();
+                wrapper.EncodeComplete();
             }
             imageStore.WriteContentChunkTable(table);
 
@@ -104,8 +104,8 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunk(readTable[0]);
-                writer.WriteContentChunk(binary);
+                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
+                writer.WriteContentChunkToFile(binary);
             }
         }
 
@@ -120,12 +120,12 @@ namespace SteganographyApp.Common.Tests
                 string content = "";
                 using (var reader = new ContentReader(args))
                 {
-                    content = reader.ReadContentChunk();
-                    int written = wrapper.WriteBinaryChunk(content);
+                    content = reader.ReadContentChunkFromFile();
+                    int written = wrapper.WriteContentChunkToImage(content);
                     table[0] = written;
                     Assert.AreEqual(content.Length, written);
                 }
-                wrapper.Complete();
+                wrapper.EncodeComplete();
             }
             imageStore.WriteContentChunkTable(table);
 
@@ -135,8 +135,8 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunk(readTable[0]);
-                writer.WriteContentChunk(binary);
+                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
+                writer.WriteContentChunkToFile(binary);
             }
         }
 
@@ -150,12 +150,12 @@ namespace SteganographyApp.Common.Tests
                 wrapper.SeekToPixel(imageStore.RequiredBitsForContentChunkTable);
                 using (var reader = new ContentReader(args))
                 {
-                    content = reader.ReadContentChunk();
-                    int written = wrapper.WriteBinaryChunk(content);
+                    content = reader.ReadContentChunkFromFile();
+                    int written = wrapper.WriteContentChunkToImage(content);
                     table[0] = written;
                     Assert.AreEqual(content.Length, written);
                 }
-                wrapper.Complete();
+                wrapper.EncodeComplete();
             }
             imageStore.WriteContentChunkTable(table);
 
@@ -165,9 +165,9 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunk(readTable[0]);
+                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
                 Assert.AreEqual(content, binary);
-                writer.WriteContentChunk(binary);
+                writer.WriteContentChunkToFile(binary);
             }
             long target = new FileInfo(args.FileToEncode).Length;
             long actual = new FileInfo(args.DecodedOutputFile).Length;
@@ -186,12 +186,12 @@ namespace SteganographyApp.Common.Tests
                 wrapper.SeekToPixel(imageStore.RequiredBitsForContentChunkTable);
                 using (var reader = new ContentReader(args))
                 {
-                    content = reader.ReadContentChunk();
-                    int written = wrapper.WriteBinaryChunk(content);
+                    content = reader.ReadContentChunkFromFile();
+                    int written = wrapper.WriteContentChunkToImage(content);
                     table[0] = written;
                     Assert.AreEqual(content.Length, written);
                 }
-                wrapper.Complete();
+                wrapper.EncodeComplete();
             }
             imageStore.WriteContentChunkTable(table);
 
@@ -201,9 +201,9 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunk(readTable[0]);
+                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
                 Assert.AreEqual(content, binary);
-                writer.WriteContentChunk(binary);
+                writer.WriteContentChunkToFile(binary);
             }
         }
 

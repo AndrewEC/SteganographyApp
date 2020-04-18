@@ -187,7 +187,7 @@ namespace SteganographyAppCalculator
                 var tracker = ProgressTracker.CreateAndDisplay(reader.RequiredNumberOfReads,
                     "Calculating file size", "Completed calculating file size");
                 string content = "";
-                while ((content = reader.ReadContentChunk()) != null)
+                while ((content = reader.ReadContentChunkFromFile()) != null)
                 {
                     tracker.UpdateAndDisplayProgress();
                     encodedBitCount += content.Length;

@@ -61,19 +61,19 @@ namespace SteganographyApp.Common.IO
                 store.LoadNextImage();
             }
 
-            public void Complete()
+            public void EncodeComplete()
             {
                 save = true;
             }
 
-            public int WriteBinaryChunk(string binary)
+            public int WriteContentChunkToImage(string binary)
             {
-                return store.WriteBinaryChunk(binary);
+                return store.WriteBinaryString(binary);
             }
 
-            public string ReadBinaryChunk(int length)
+            public string ReadBinaryChunkFromImage(int length)
             {
-                return store.ReadBinaryChunk(length);
+                return store.ReadBinaryString(length);
             }
 
             public void SeekToPixel(int bitsToSkip)
@@ -251,7 +251,7 @@ namespace SteganographyApp.Common.IO
         /// <returns>The number of bits written to the image. This is mostly important when
         /// writing the content chunk table to the start of the leading image.</returns>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        private int WriteBinaryChunk(string binary)
+        private int WriteBinaryString(string binary)
         {
             int written = 0;
             for (int i = 0; i < binary.Length; i += 3)
@@ -299,7 +299,7 @@ namespace SteganographyApp.Common.IO
         /// <returns>A binary string whose length is equal to the length specified in the length
         /// parameter.</returns>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        private string ReadBinaryChunk(int bitsToRead)
+        private string ReadBinaryString(int bitsToRead)
         {
             var binary = new StringBuilder();
             int bitsRead = 0;
@@ -355,12 +355,12 @@ namespace SteganographyApp.Common.IO
 
                 // The first 32 bits of the table represent the number of chunk lengths
                 // contained within the table.
-                int chunkCount = Convert.ToInt32(ReadBinaryChunk(ChunkDefinitionBitSize), 2);
+                int chunkCount = Convert.ToInt32(ReadBinaryString(ChunkDefinitionBitSize), 2);
 
                 int bitsForAllTableEntries = chunkCount * chunkSizeAndPadding;
 
                 //Read all the available entries in the table
-                string tableEntriesBinary = ReadBinaryChunk(bitsForAllTableEntries);
+                string tableEntriesBinary = ReadBinaryString(bitsForAllTableEntries);
 
                 if (tableEntriesBinary.Length < bitsForAllTableEntries)
                 {
@@ -402,7 +402,7 @@ namespace SteganographyApp.Common.IO
                     binary.Append(Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
                 }
 
-                WriteBinaryChunk(binary.ToString());
+                WriteBinaryString(binary.ToString());
                 CloseOpenImage(true);
             }
             catch (Exception e)

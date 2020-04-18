@@ -6,20 +6,20 @@ using SteganographyApp.Common.IO;
 namespace SteganographyApp
 {
 
-    sealed class UnusedImageTracker
+    sealed class ImageTracker
     {
 
         private readonly HashSet<string> imagesUsed = new HashSet<string>();
         private readonly int AvailableImages;
 
-        private UnusedImageTracker(int availableImages)
+        private ImageTracker(int availableImages)
         {
             AvailableImages = availableImages;
         }
 
-        public static UnusedImageTracker StartRecordingFor(IInputArguments arguments, ImageStore store)
+        public static ImageTracker CreateTrackerFrom(IInputArguments arguments, ImageStore store)
         {
-            var tracker = new UnusedImageTracker(arguments.CoverImages.Length);
+            var tracker = new ImageTracker(arguments.CoverImages.Length);
             store.OnNextImageLoaded += tracker.RecordLoadedImage;
             return tracker;
         }
@@ -36,7 +36,7 @@ namespace SteganographyApp
         /// </summary>
         /// <param name="imagesUsed">A list containing the names of the images used in the
         /// encoding/decoding process.</param>
-        public void PrintUnusedImages()
+        public void PrintImagesUtilized()
         {
             if (imagesUsed.Count == AvailableImages)
             {

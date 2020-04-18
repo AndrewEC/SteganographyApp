@@ -47,7 +47,7 @@ namespace SteganographyApp.Common.Tests
         {
             int size = TestImagePixelCount * BitsPerPixel + 1;
             string binary = new string(Enumerable.Repeat('0', size).ToArray());
-            wrapper.WriteBinaryChunk(binary);
+            wrapper.WriteContentChunkToImage(binary);
         }
 
         [TestMethod]
@@ -81,11 +81,11 @@ namespace SteganographyApp.Common.Tests
             string binary = "00101001110010100100011001101010";
             int written = -1;
             using(wrapper){
-                written = wrapper.WriteBinaryChunk(binary);
-                wrapper.Complete();
+                written = wrapper.WriteContentChunkToImage(binary);
+                wrapper.EncodeComplete();
             }
             Assert.AreEqual(binary.Length, written);
-            Assert.AreEqual(binary, wrapper.ReadBinaryChunk(binary.Length));
+            Assert.AreEqual(binary, wrapper.ReadBinaryChunkFromImage(binary.Length));
         }
     }
 }
