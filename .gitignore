@@ -6,3 +6,4 @@ Properties/
 coverage.json
 coverage.opencover.xml
 reports/
+publish/
