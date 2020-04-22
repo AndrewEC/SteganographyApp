@@ -159,7 +159,7 @@ namespace SteganographyApp
                     {
                         // as we read in each chunk from the images start writing the decoded
                         // values to the target output file.
-                        string binary = wrapper.ReadBinaryChunkFromImage(chunkBinaryLength);
+                        string binary = wrapper.ReadContentChunkFromImage(chunkBinaryLength);
                         writer.WriteContentChunkToFile(binary);
                         tracker.UpdateAndDisplayProgress();
                     }

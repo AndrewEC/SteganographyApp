@@ -1,21 +1,15 @@
-param (
-    [switch] $clean
-)
-
-if($clean){
-    Write-Host("Cleaning out existing build artifacts")
-    if(Test-Path ./SteganographyApp.Common.Tests/bin){
-        Write-Host("Cleaning bin")
-        Remove-Item -Recurse -Force ./SteganographyApp.Common.Tests/bin | Out-Null
-    }
-    if(Test-Path ./SteganographyApp.Common.Tests/obj){
-        Write-Host("Cleaning obj")
-        Remove-Item -Recurse -Force ./SteganographyApp.Common.Tests/obj | Out-Null
-    }
-
-    Write-Host("`n----------Rebuilding Project----------`n")
-    dotnet build SteganographyApp.sln
+Write-Host("Cleaning out existing build artifacts")
+if(Test-Path ./SteganographyApp.Common.Tests/bin){
+    Write-Host("Cleaning bin")
+    Remove-Item -Recurse -Force ./SteganographyApp.Common.Tests/bin | Out-Null
 }
+if(Test-Path ./SteganographyApp.Common.Tests/obj){
+    Write-Host("Cleaning obj")
+    Remove-Item -Recurse -Force ./SteganographyApp.Common.Tests/obj | Out-Null
+}
+
+Write-Host("`n----------Rebuilding Project----------`n")
+dotnet build SteganographyApp.sln
 
 if(Test-Path ./reports){
     Write-Host("Removing old report directory and contents")

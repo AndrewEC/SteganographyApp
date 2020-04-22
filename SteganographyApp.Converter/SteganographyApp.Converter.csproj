@@ -9,13 +9,13 @@
     <ProjectReference Include="..\SteganographyApp.Common\SteganographyApp.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
     <None Update="obfuscar.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <PostBuildEvent>"$(Obfuscar)" obfuscar.xml</PostBuildEvent>
   </PropertyGroup>
 

@@ -85,7 +85,7 @@ namespace SteganographyApp.Common.Tests
                 wrapper.EncodeComplete();
             }
             Assert.AreEqual(binary.Length, written);
-            Assert.AreEqual(binary, wrapper.ReadBinaryChunkFromImage(binary.Length));
+            Assert.AreEqual(binary, wrapper.ReadContentChunkFromImage(binary.Length));
         }
     }
 }

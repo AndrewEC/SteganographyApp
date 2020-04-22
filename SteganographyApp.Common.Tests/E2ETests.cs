@@ -69,7 +69,7 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using(var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
+                string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
                 Assert.AreEqual(content, binary);
                 writer.WriteContentChunkToFile(binary);
             }
@@ -104,7 +104,7 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
+                string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
                 writer.WriteContentChunkToFile(binary);
             }
         }
@@ -135,7 +135,7 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
+                string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
                 writer.WriteContentChunkToFile(binary);
             }
         }
@@ -165,7 +165,7 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
+                string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
                 Assert.AreEqual(content, binary);
                 writer.WriteContentChunkToFile(binary);
             }
@@ -201,7 +201,7 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadBinaryChunkFromImage(readTable[0]);
+                string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
                 Assert.AreEqual(content, binary);
                 writer.WriteContentChunkToFile(binary);
             }

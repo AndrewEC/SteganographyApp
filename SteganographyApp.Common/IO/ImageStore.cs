@@ -71,7 +71,7 @@ namespace SteganographyApp.Common.IO
                 return store.WriteBinaryString(binary);
             }
 
-            public string ReadBinaryChunkFromImage(int length)
+            public string ReadContentChunkFromImage(int length)
             {
                 return store.ReadBinaryString(length);
             }
