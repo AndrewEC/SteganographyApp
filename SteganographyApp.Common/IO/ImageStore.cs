@@ -12,31 +12,6 @@ namespace SteganographyApp.Common.IO
 {
 
     /// <summary>
-    /// A general exception to represent a specific error occured
-    /// while reading or writing data to the images.
-    /// </summary>
-    public class ImageProcessingException : Exception
-    {
-        public ImageProcessingException(string message) : base(message) { }
-        public ImageProcessingException(string message, Exception inner) : base(message, inner) { }
-    }
-
-    /// <summary>
-    /// Event arguments passed into the OnNextImageLoaded event handler whenever the next image
-    /// has been loaded in the read, write, or clean process.
-    /// </summary>
-    public class NextImageLoadedEventArgs
-    {
-        public string ImageName { get; set; }
-        public int ImageIndex { get; set; }
-    }
-
-    public class ChunkWrittenArgs
-    {
-        public int ChunkLength { get; set; }
-    }
-
-    /// <summary>
     /// Class that handles positioning a make shift write stream in the proper position so
     /// data can be reliably read and written to the storage images.
     /// </summary>
@@ -110,12 +85,7 @@ namespace SteganographyApp.Common.IO
         /// <summary>
         /// The x position to start the next read/write operation from.
         /// </summary>
-        private int x = 0;
-
-        /// <summary>
-        /// The y position to start the next read/write operation from.
-        /// </summary>
-        private int y = 0;
+        private readonly Position position = new Position();
 
         /// <summary>
         /// The index used to determine which image will be read/written to in the
@@ -137,24 +107,10 @@ namespace SteganographyApp.Common.IO
         private readonly IInputArguments args;
 
         /// <summary>
-        /// Specifies the number of bits that will be reserved for each entry in the content
-        /// chunk table.
-        /// </summary>
-        private readonly int ChunkDefinitionBitSize = 32;
-
-        /// <summary>
-        /// Specifies the number of bits that will be required to write the content chunk table to
-        /// the leading image.
-        /// <para>If no FileToEncode has been specified in the args field then this value will
-        /// always be 0.</para>
-        /// </summary>
-        public int RequiredBitsForContentChunkTable { get; private set; }
-
-        /// <summary>
         /// Readonly property that returns the name of the current image being used in the write
         /// process.
         /// </summary>
-        public string CurrentImage
+        private string CurrentImage
         {
             get
             {
@@ -170,20 +126,6 @@ namespace SteganographyApp.Common.IO
         public ImageStore(IInputArguments args)
         {
             this.args = args;
-
-            if (args.FileToEncode.Length > 0)
-            {
-                // Specifies the number of times the file has to be read from, encoded, and written to the storage
-                // image. The number of writes is essentially based on the total size of the image divided by the
-                // number of bytes to read from each iteration from the input file.
-                int requiredWrites = (int)(Math.Ceiling((double)(new FileInfo(args.FileToEncode).Length) / args.ChunkByteSize));
-                // The table size is essentially the number of read/encode/write iterations times the number
-                // of RGB bytes required to store the content chunk table.
-                // Each time we read and encode the a portion of the input file we will write an entry to the content chunk table
-                // outlining the number of bits that were written at the time of the write so we know how to decode
-                // and rebuild the input file when we are decoding.
-                RequiredBitsForContentChunkTable = requiredWrites * ChunkDefinitionBitSize + ChunkDefinitionBitSize + requiredWrites;
-            }
         }
 
         /// <summary>
@@ -212,11 +154,11 @@ namespace SteganographyApp.Common.IO
                 {
                     while (true)
                     {
-                        byte newRed = (byte)(currentImage[x, y].R & ~1);
-                        byte newGreen = (byte)(currentImage[x, y].G & ~1);
-                        byte newBlue = (byte)(currentImage[x, y].B & ~1);
+                        byte newRed = (byte)(currentImage[position.X, position.Y].R & ~1);
+                        byte newGreen = (byte)(currentImage[position.X, position.Y].G & ~1);
+                        byte newBlue = (byte)(currentImage[position.X, position.Y].B & ~1);
 
-                        currentImage[x, y] = new Rgba32(newRed, newGreen, newBlue, currentImage[x, y].A);
+                        currentImage[position.X, position.Y] = new Rgba32(newRed, newGreen, newBlue, currentImage[position.X, position.Y].A);
 
                         if (!TryMoveToNextPixel())
                         {
@@ -256,7 +198,7 @@ namespace SteganographyApp.Common.IO
             int written = 0;
             for (int i = 0; i < binary.Length; i += 3)
             {
-                Rgba32 pixel = currentImage[x, y];
+                Rgba32 pixel = currentImage[position.X, position.Y];
 
                 pixel.R = (binary[i] == '0') ? (byte)(pixel.R & ~1) : (byte)(pixel.R | 1);
                 written++;
@@ -273,7 +215,7 @@ namespace SteganographyApp.Common.IO
                     }
                 }
 
-                currentImage[x, y] = new Rgba32(
+                currentImage[position.X, position.Y] = new Rgba32(
                         pixel.R,
                         pixel.G,
                         pixel.B,
@@ -305,7 +247,7 @@ namespace SteganographyApp.Common.IO
             int bitsRead = 0;
             while (bitsRead < bitsToRead)
             {
-                Rgba32 pixel = currentImage[x, y];
+                Rgba32 pixel = currentImage[position.X, position.Y];
 
                 string redBit = Convert.ToString(pixel.R, 2);
                 binary.Append(redBit.Substring(redBit.Length - 1));
@@ -351,11 +293,11 @@ namespace SteganographyApp.Common.IO
                 // Each pixel can store 3 bits so we end up with one bit of padding on the
                 // end. So we need to move in increments of 33 bits as we are reading sequential
                 // entries in the chunk table.
-                int chunkSizeAndPadding = ChunkDefinitionBitSize + 1;
+                int chunkSizeAndPadding = Calculator.ChunkDefinitionBitSize + 1;
 
                 // The first 32 bits of the table represent the number of chunk lengths
                 // contained within the table.
-                int chunkCount = Convert.ToInt32(ReadBinaryString(ChunkDefinitionBitSize), 2);
+                int chunkCount = Convert.ToInt32(ReadBinaryString(Calculator.ChunkDefinitionBitSize), 2);
 
                 int bitsForAllTableEntries = chunkCount * chunkSizeAndPadding;
 
@@ -368,7 +310,7 @@ namespace SteganographyApp.Common.IO
                 }
 
                 return Enumerable.Range(0, chunkCount)
-                    .Select(index => Convert.ToInt32(tableEntriesBinary.Substring(index * chunkSizeAndPadding, ChunkDefinitionBitSize), 2))
+                    .Select(index => Convert.ToInt32(tableEntriesBinary.Substring(index * chunkSizeAndPadding, Calculator.ChunkDefinitionBitSize), 2))
                     .ToArray();
             }
             catch (Exception e)
@@ -395,11 +337,11 @@ namespace SteganographyApp.Common.IO
                 // Each table entry is 32 bits in size meaning that since each pixel can store 3 bits it will take
                 // 11 pixels. Since 11 pixels can actually store 33 bits we pad the 32 bit table entry with an additional
                 // zero at the end which will be ignored when reading the table.
-                binary.Append(Convert.ToString(chunkTable.Length, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
+                binary.Append(Convert.ToString(chunkTable.Length, 2).PadLeft(Calculator.ChunkDefinitionBitSize, '0')).Append('0');
 
                 foreach (int chunkLength in chunkTable)
                 {
-                    binary.Append(Convert.ToString(chunkLength, 2).PadLeft(ChunkDefinitionBitSize, '0')).Append('0');
+                    binary.Append(Convert.ToString(chunkLength, 2).PadLeft(Calculator.ChunkDefinitionBitSize, '0')).Append('0');
                 }
 
                 WriteBinaryString(binary.ToString());
@@ -420,7 +362,8 @@ namespace SteganographyApp.Common.IO
         /// bits required for the content chunk table.</returns>
         private bool HasEnoughSpaceForContentChunkTable()
         {
-            return (currentImage.Width * currentImage.Height * 3) > RequiredBitsForContentChunkTable;
+            int requiredBitsForContentTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
+            return (currentImage.Width * currentImage.Height * 3) > requiredBitsForContentTable;
         }
 
         /// <summary>
@@ -452,8 +395,7 @@ namespace SteganographyApp.Common.IO
         {
             CloseOpenImage(saveImageChanges);
 
-            x = 0;
-            y = 0;
+            position.Reset();
             currentImageIndex++;
             if (currentImageIndex == args.CoverImages.Length)
             {
@@ -478,8 +420,7 @@ namespace SteganographyApp.Common.IO
         /// the number of available pixels the current image has.</exception>
         private void SeekToPixel(int bitsToSkip)
         {
-            x = 0;
-            y = 0;
+            position.Reset();
 
             int pixelIndex = (int) Math.Ceiling((double) bitsToSkip / 3.0);
             for (int i = 0; i < pixelIndex; i++)
@@ -496,15 +437,13 @@ namespace SteganographyApp.Common.IO
         /// returns true.</returns>
         private bool TryMoveToNextPixel()
         {
-            x++;
-            if (x == currentImage.Width)
+            position.NextColumn();
+            if (position.X == currentImage.Width)
             {
-                x = 0;
-                y++;
-                if (y == currentImage.Height)
+                position.NextRow();
+                if (position.Y == currentImage.Height)
                 {
-                    x = 0;
-                    y = 0;
+                    position.Reset();
                     return false;
                 }
             }

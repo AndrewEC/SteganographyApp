@@ -1,3 +1,5 @@
+Write-Host("`n---------- Removing publish directories ----------`n")
+
 if(Test-Path ./publish){
     Write-Host("Removing publish_release output folder")
     Remove-Item -Recurse -Force ./publish | Out-Null
@@ -18,13 +20,14 @@ if(Test-Path ./SteganographyApp.Converter/bin/release){
     Remove-Item -Recurse -Force ./SteganographyApp.Converter/bin/release | Out-Null
 }
 
-Write-Host("Publishing release build")
+Write-Host("`n---------- Publishing release build ----------`n")
 dotnet publish -c release
 if($LastExitCode -ne 0){
     Write-Host("publish failed with status: $LastExitCode")
     Exit
 }
 
+Write-Host("`n---------- Copying build output to publish directory ----------`n")
 Write-Host("Copying output from SteganographyApp publish")
 Copy-Item ./SteganographyApp/bin/release/netcoreapp3.1/publish -Recurse -Destination .
 Get-ChildItem -Path ./SteganographyApp/bin/release/netcoreapp3.1/obfuscated | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish

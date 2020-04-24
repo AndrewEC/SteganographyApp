@@ -1,5 +1,4 @@
 ﻿using SteganographyApp.Common;
-using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Arguments;
 using System;
 
@@ -29,28 +28,33 @@ namespace SteganographyApp
             }
             catch (Exception e)
             {
-                switch (e){
-                    case ArgumentParseException e1:
-                    case ArgumentValueException e2:
-                        Console.WriteLine("An error ocurred during execution: \n\t{0}", e.Message);
-                        break;
-                    default:
-                        #if DEBUG
-                        if (arguments.PrintStack)
-                        {
-                            Console.WriteLine("Message Trace: ");
-                            Console.WriteLine(e.StackTrace);
-                        }
-                        #endif
-
-                        #if !DEBUG
-                        Console.WriteLine("The action could not be completed. This can often indicate incorrect random seeds, passwords, images, etc.");
-                        #endif
-                        break;
-                }
+                HandleException(e, arguments);
             }
 
             Console.WriteLine("");
+        }
+
+        private static void HandleException(Exception e, IInputArguments arguments)
+        {
+            switch (e){
+                case ArgumentParseException e1:
+                case ArgumentValueException e2:
+                    Console.WriteLine("An error ocurred during execution: \n\t{0}", e.Message);
+                    break;
+                default:
+                    #if DEBUG
+                    if (arguments.PrintStack)
+                    {
+                        Console.WriteLine("Message Trace: ");
+                        Console.WriteLine(e.StackTrace);
+                    }
+                    #endif
+
+                    #if !DEBUG
+                    Console.WriteLine("The action could not be completed. This can often indicate incorrect random seeds, passwords, images, etc.");
+                    #endif
+                    break;
+            }
         }
 
         /// <summary>

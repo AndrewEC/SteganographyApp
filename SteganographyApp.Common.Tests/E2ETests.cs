@@ -53,7 +53,8 @@ namespace SteganographyApp.Common.Tests
             var table = new int[1];
             using (wrapper)
             {
-                wrapper.SeekToPixel(imageStore.RequiredBitsForContentChunkTable);
+                int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
+                wrapper.SeekToPixel(requiredBitsForTable);
                 using(var reader = new ContentReader(args))
                 {
                     content = reader.ReadContentChunkFromFile();
@@ -86,7 +87,8 @@ namespace SteganographyApp.Common.Tests
             string content = "";
             var table = new int[1];
             using(wrapper){
-                wrapper.SeekToPixel(imageStore.RequiredBitsForContentChunkTable);
+                int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
+                wrapper.SeekToPixel(requiredBitsForTable);
                 using (var reader = new ContentReader(args))
                 {
                     content = reader.ReadContentChunkFromFile();
@@ -116,7 +118,8 @@ namespace SteganographyApp.Common.Tests
             // writing file content to image
             var table = new int[1];
             using(wrapper) {
-                wrapper.SeekToPixel(imageStore.RequiredBitsForContentChunkTable);
+                int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
+                wrapper.SeekToPixel(requiredBitsForTable);
                 string content = "";
                 using (var reader = new ContentReader(args))
                 {
@@ -147,7 +150,8 @@ namespace SteganographyApp.Common.Tests
             var table = new int[1];
             string content = "";
             using(wrapper){
-                wrapper.SeekToPixel(imageStore.RequiredBitsForContentChunkTable);
+                int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
+                wrapper.SeekToPixel(requiredBitsForTable);
                 using (var reader = new ContentReader(args))
                 {
                     content = reader.ReadContentChunkFromFile();
@@ -183,7 +187,8 @@ namespace SteganographyApp.Common.Tests
             string content = "";
             var table = new int[1];
             using(wrapper){
-                wrapper.SeekToPixel(imageStore.RequiredBitsForContentChunkTable);
+                int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
+                wrapper.SeekToPixel(requiredBitsForTable);
                 using (var reader = new ContentReader(args))
                 {
                     content = reader.ReadContentChunkFromFile();

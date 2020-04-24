@@ -136,7 +136,7 @@ namespace SteganographyAppCalculator
 
         private static long CalculateNumberOfPixelsForImages(string[] coverImages)
         {
-            var tracker = ProgressTracker.CreateAndDisplay(coverImages.Length,
+            var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length,
                     "Calculating image storage space", "Completed calculating image storage space.");
             long pixelCount = 0;
             foreach (string imagePath in coverImages)
@@ -145,7 +145,7 @@ namespace SteganographyAppCalculator
                 {
                     pixelCount += (image.Width * image.Height);
                 }
-                tracker.UpdateAndDisplayProgress();
+                progressTracker.UpdateAndDisplayProgress();
             }
             return pixelCount;
         }
@@ -191,16 +191,17 @@ namespace SteganographyAppCalculator
             double encodedBitCount = 0;
             using (var reader = new ContentReader(args))
             {
-                var tracker = ProgressTracker.CreateAndDisplay(reader.RequiredNumberOfReads,
+                int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(args.FileToEncode, args.ChunkByteSize);
+                var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
                     "Calculating file size", "Completed calculating file size");
                 string content = "";
                 while ((content = reader.ReadContentChunkFromFile()) != null)
                 {
-                    tracker.UpdateAndDisplayProgress();
+                    progressTracker.UpdateAndDisplayProgress();
                     encodedBitCount += content.Length;
                 }
             }
-            encodedBitCount += new ImageStore(args).RequiredBitsForContentChunkTable;
+            encodedBitCount += Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
             return encodedBitCount;
         }
 

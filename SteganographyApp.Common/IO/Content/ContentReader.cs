@@ -15,21 +15,10 @@ namespace SteganographyApp.Common.IO.Content
     {
 
         /// <summary>
-        /// Specifies the number of iterations it will take to read the file based on the size
-        /// of the file and the size of the file.
-        /// <para>Value is readonly.</para>
-        /// </summary>
-        public int RequiredNumberOfReads { get; private set; }
-
-        /// <summary>
-        /// Creates a new instance of the ContentReader and calculates the
-        /// RequiredNumberOfReads property value.
+        /// Creates a new instance of the ContentReader.
         /// </summary>
         /// <param name="args">The values parsed from the command line values.</param>
-        public ContentReader(IInputArguments args) : base(args)
-        {
-            RequiredNumberOfReads = (int)Math.Ceiling(new FileInfo(args.FileToEncode).Length / (double)args.ChunkByteSize);
-        }
+        public ContentReader(IInputArguments args) : base(args) { }
 
         /// <summary>
         /// Reads in the next unread chunk of data from the input file, encodes it,

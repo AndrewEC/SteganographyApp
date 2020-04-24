@@ -90,7 +90,7 @@ namespace SteganographyApp
 
             using (var wrapper = utilities.ImageStore.CreateIOWrapper())
             {
-                int start = utilities.ImageStore.RequiredBitsForContentChunkTable;
+                int start = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
 
                 // check that the leading image has enough storage space to store the content table
                 if (!wrapper.HasEnoughSpaceForContentChunkTable())
@@ -106,7 +106,8 @@ namespace SteganographyApp
 
                 using (var reader = new ContentReader(args))
                 {
-                    var progressTracker = ProgressTracker.CreateAndDisplay(reader.RequiredNumberOfReads,
+                    int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(args.FileToEncode, args.ChunkByteSize);
+                    var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
                         "Encoding file contents", "All input file contents have been encoded.");
 
                     string binaryChunk = "";

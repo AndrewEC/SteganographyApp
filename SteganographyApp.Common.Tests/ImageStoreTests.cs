@@ -4,7 +4,6 @@ using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
 
 using System.Linq;
-using System.Collections.Generic;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -48,17 +47,6 @@ namespace SteganographyApp.Common.Tests
             int size = TestImagePixelCount * BitsPerPixel + 1;
             string binary = new string(Enumerable.Repeat('0', size).ToArray());
             wrapper.WriteContentChunkToImage(binary);
-        }
-
-        [TestMethod]
-        public void TestRequiredChunkSizeMatchesExpected()
-        {
-            Assert.AreEqual(65, imageStore.RequiredBitsForContentChunkTable);
-
-            args = new InputArguments();
-            args.FileToEncode = "TestAssets/001.png";
-            imageStore = new ImageStore(args);
-            Assert.AreEqual(65, imageStore.RequiredBitsForContentChunkTable);
         }
 
         [TestMethod]
