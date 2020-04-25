@@ -98,6 +98,12 @@ namespace SteganographyApp.Common
     {
 
         /// <summary>
+        /// When found at the beginning of a line it indicates a new help item
+        /// entry.
+        /// </summary>
+        private readonly string HelpItemIndicator = "~";
+
+        /// <summary>
         /// The last error that occured during the execution of TryParse.
         /// </summary>
         public string LastError { get; private set; }
@@ -138,18 +144,23 @@ namespace SteganographyApp.Common
             return true;
         }
 
-        public ImmutableDictionary<string, string> ParseHelpItems(string helpFileLocation)
+        private ImmutableDictionary<string, string> ParseHelpItems(string helpFileLocation)
         {
             Dictionary<string, string> helpItems = new Dictionary<string, string>();
             string[] lines = File.ReadAllLines(helpFileLocation);
             for(int i = 0; i < lines.Length; i++)
             {
-                if (lines[i].StartsWith("~"))
+                if (lines[i].StartsWith(HelpItemIndicator))
                 {
-                    helpItems[lines[i].Substring(1)] = ReadHelpItem(lines, i + 1);
+                    helpItems[LineWithoutTilde(lines[i])] = ReadHelpItem(lines, i + 1);
                 }
             }
             return helpItems.ToImmutableDictionary();
+        }
+
+        private string LineWithoutTilde(string line)
+        {
+            return line.Substring(1);
         }
 
         private string GetAssemblyPath()
@@ -178,7 +189,7 @@ namespace SteganographyApp.Common
             string message = "";
             for(int i = startLine; i < lines.Length; i++)
             {
-                if (lines[i].StartsWith("~"))
+                if (lines[i].StartsWith(HelpItemIndicator))
                 {
                     break;
                 }

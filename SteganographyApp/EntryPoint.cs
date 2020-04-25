@@ -100,30 +100,35 @@ namespace SteganographyApp
                     return;
                 }
 
-                // skip past the first few pixels as the leading pixels of the first image will
-                // be used to store the content chunk table.
-                wrapper.SeekToPixel(start);
-
-                using (var reader = new ContentReader(args))
-                {
-                    int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(args.FileToEncode, args.ChunkByteSize);
-                    var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
-                        "Encoding file contents", "All input file contents have been encoded.");
-
-                    string binaryChunk = "";
-                    while ((binaryChunk = reader.ReadContentChunkFromFile()) != null)
-                    {
-                        // record the length of the encoded content so it can be stored in the
-                        // content chunk table once the total encoding process has been completed.
-                        wrapper.WriteContentChunkToImage(binaryChunk);
-                        progressTracker.UpdateAndDisplayProgress();
-                    }
-                }
-
-                wrapper.EncodeComplete();
+                StartEncoding(utilities, wrapper, start);
             }
 
             EncodeCleanup(utilities);
+        }
+
+        private void StartEncoding(EncodingUtilities utilities, ImageStore.ImageStoreWrapper wrapper, int startingPixel)
+        {
+            // skip past the first few pixels as the leading pixels of the first image will
+            // be used to store the content chunk table.
+            wrapper.SeekToPixel(startingPixel);
+
+            using (var reader = new ContentReader(args))
+            {
+                int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(args.FileToEncode, args.ChunkByteSize);
+                var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
+                    "Encoding file contents", "All input file contents have been encoded.");
+
+                string binaryChunk = "";
+                while ((binaryChunk = reader.ReadContentChunkFromFile()) != null)
+                {
+                    // record the length of the encoded content so it can be stored in the
+                    // content chunk table once the total encoding process has been completed.
+                    wrapper.WriteContentChunkToImage(binaryChunk);
+                    progressTracker.UpdateAndDisplayProgress();
+                }
+            }
+
+            wrapper.EncodeComplete();
         }
 
         private void EncodeCleanup(EncodingUtilities utilities)
