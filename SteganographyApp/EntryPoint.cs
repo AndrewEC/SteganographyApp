@@ -1,11 +1,8 @@
 ﻿using SteganographyApp.Common;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
-using SteganographyApp.Common.IO.Content;
 using SteganographyApp.Encode;
 using SteganographyApp.Decode;
-
-using System;
 
 namespace SteganographyApp
 {
@@ -71,7 +68,7 @@ namespace SteganographyApp
         /// </summary>
         private void EncodeFileToImages()
         {
-            new Encoder(args).EncodeFileToImage();
+            Encoder.CreateAndEncode(args);
         }
 
 
@@ -82,7 +79,7 @@ namespace SteganographyApp
         /// </summary>
         private void DecodeImagesToFile()
         {
-            new Decoder(args).DecodeFileFromImage();
+            Decoder.CreateAndDecode(args);
         }
 
     }

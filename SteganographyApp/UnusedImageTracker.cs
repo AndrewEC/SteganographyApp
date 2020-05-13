@@ -6,15 +6,20 @@ using SteganographyApp.Common.IO;
 namespace SteganographyApp
 {
 
+    /// <summary>
+    /// Helps track the images being used during the encoding process.
+    /// All images are using during the encoding process if the enableDummies
+    /// flag has been provided even if they have not been written to.
+    /// </summary>
     sealed class ImageTracker
     {
 
         private readonly HashSet<string> imagesUsed = new HashSet<string>();
-        private readonly int AvailableImages;
+        private readonly int availableImages;
 
         private ImageTracker(int availableImages)
         {
-            AvailableImages = availableImages;
+            this.availableImages = availableImages;
         }
 
         public static ImageTracker CreateTrackerFrom(IInputArguments arguments, ImageStore store)
@@ -38,13 +43,15 @@ namespace SteganographyApp
         /// encoding/decoding process.</param>
         public void PrintImagesUtilized()
         {
-            if (imagesUsed.Count == AvailableImages)
+            if (imagesUsed.Count == availableImages)
             {
                 return;
             }
+
             Console.WriteLine("Not all images were written to.");
             Console.WriteLine("While these images don't contain encoded data they will be needed to properly decode.");
             Console.WriteLine("The following files were used:");
+
             foreach (string image in imagesUsed)
             {
                 Console.WriteLine("\t{0}", image);
