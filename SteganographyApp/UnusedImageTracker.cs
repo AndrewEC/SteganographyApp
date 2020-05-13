@@ -22,6 +22,11 @@ namespace SteganographyApp
             this.availableImages = availableImages;
         }
 
+        /// <summary>
+        /// Creates a new <see cref="ImageTracker"/> instance from the provided arguments and
+        /// hooks the tracker into the <see cref="ImageStore.OnNextImageLoaded"/> event to
+        /// listen to when new images are loaded.
+        /// <summary>
         public static ImageTracker CreateTrackerFrom(IInputArguments arguments, ImageStore store)
         {
             var tracker = new ImageTracker(arguments.CoverImages.Length);

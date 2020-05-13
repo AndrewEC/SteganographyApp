@@ -8,6 +8,10 @@ using System.Collections.Concurrent;
 namespace SteganographyApp.Decode
 {
 
+    /// <summary>
+    /// Specifies the values to be added to the queue whenever data is read
+    /// from the file to encode.
+    /// </summary>
     struct WriteArgs
     {
         public Status Status;
@@ -30,8 +34,8 @@ namespace SteganographyApp.Decode
         private readonly IInputArguments arguments;
 
         /// <summary>
-        /// This queue allows for communication between the decoder and the write
-        /// thread. Once each content chunk is read from the ImageStore it will be
+        /// This queue allows for communication between the decoder and the <see cref="FileWriteThread"/>.
+        /// Once each content chunk is read from the ImageStore it will be
         /// added to the this collection so the raw binary content from the image can
         /// be decoded and written to the decoded output file location.
         /// </summary>
@@ -51,6 +55,10 @@ namespace SteganographyApp.Decode
             errorQueue = new BlockingCollection<Exception>(1);
         }
 
+        /// <summary>
+        /// Creates a decode instance and invokes the
+        /// <see cref="DecodeFileFromImage" method.
+        /// </summary>
         public static void CreateAndDecode(IInputArguments arguments)
         {
             new Decoder(arguments).DecodeFileFromImage();
@@ -83,10 +91,10 @@ namespace SteganographyApp.Decode
                     writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete });
                     tracker.UpdateAndDisplayProgress();
 
-                    if (errorQueue.TryTake(out Exception exception1))
+                    if (errorQueue.TryTake(out Exception exception))
                     {
                         thread.Join();
-                        throw exception1;
+                        throw exception;
                     }
                 }
 

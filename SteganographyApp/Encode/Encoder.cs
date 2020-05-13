@@ -29,6 +29,10 @@ namespace SteganographyApp.Encode
         public string Data;
     }
 
+    /// <summary>
+    /// Helps initialize the utilitiy classes required to fulfill the encoding
+    /// process.
+    /// </summary>
     class EncodingUtilities
     {
 
@@ -71,6 +75,10 @@ namespace SteganographyApp.Encode
             errorQueue = new BlockingCollection<Exception>(1);
         }
 
+        /// <summary>
+        /// Creates an Encoder instances and invokes the private
+        /// <see cref="EncodeFileToImage"/> method.
+        /// </summary>
         public static void CreateAndEncode(IInputArguments arguments)
         {
             new Encoder(arguments).EncodeFileToImage();
@@ -83,7 +91,7 @@ namespace SteganographyApp.Encode
         /// The item on the read queue will then be picked up by the main thread and written
         /// to the target storage images.
         /// </summary>
-        public void EncodeFileToImage()
+        private void EncodeFileToImage()
         {
             Console.WriteLine("Encoding File: {0}", arguments.FileToEncode);
 
@@ -142,7 +150,7 @@ namespace SteganographyApp.Encode
         private void Cleanup(EncodingUtilities utilities)
         {
             Console.WriteLine("Writing content chunk table.");
-            utilities.ImageStore.WriteContentChunkTable(utilities.TableTracker.ContentTable);
+            utilities.ImageStore.WriteContentChunkTable(utilities.TableTracker.GetContentTable());
             Console.WriteLine("Encoding process complete.");
             utilities.ImageTracker.PrintImagesUtilized();
         }
