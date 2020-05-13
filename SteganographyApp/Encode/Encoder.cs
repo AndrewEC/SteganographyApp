@@ -41,15 +41,19 @@ namespace SteganographyApp.Encode
 
         private readonly IInputArguments arguments;
         private readonly BlockingCollection<ReadArgs> readQueue;
+        private readonly BlockingCollection<Exception> errorQueue;
 
         public Encoder(IInputArguments arguments)
         {
             this.arguments = arguments;
             readQueue = new BlockingCollection<ReadArgs>(2);
+            errorQueue = new BlockingCollection<Exception>(1);
         }
 
         public void EncodeFileToImage()
         {
+            Console.WriteLine("Encoding File: {0}", arguments.FileToEncode);
+
             var utilities = new EncodingUtilities(arguments);
 
             using (var wrapper = utilities.ImageStore.CreateIOWrapper())
@@ -69,7 +73,7 @@ namespace SteganographyApp.Encode
                 var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
                     "Encoding file contents", "All input file contents have been encoded.");
 
-                var thread = FileReadThread.CreateAndStart(readQueue, arguments);
+                var thread = FileReadThread.CreateAndStart(readQueue, arguments, errorQueue);
 
                 while(true)
                 {
@@ -85,9 +89,20 @@ namespace SteganographyApp.Encode
                         wrapper.WriteContentChunkToImage(readArgs.Data);
                         progressTracker.UpdateAndDisplayProgress();
                     }
+
+                    if (errorQueue.TryTake(out Exception exception))
+                    {
+                        thread.Join();
+                        throw exception;
+                    }
                 }
             }
 
+            EncodeCleanup(utilities);
+        }
+
+        private void EncodeCleanup(EncodingUtilities utilities)
+        {
             Console.WriteLine("Writing content chunk table.");
             utilities.ImageStore.WriteContentChunkTable(utilities.TableTracker.ContentTable);
             Console.WriteLine("Encoding process complete.");
