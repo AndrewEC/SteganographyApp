@@ -31,7 +31,7 @@ namespace SteganographyApp.Encode
         public static FileReadThread CreateAndStart(BlockingCollection<ReadArgs> queue, IInputArguments arguments, BlockingCollection<Exception> errorQueue)
         {
             var thread = new FileReadThread(queue, arguments, errorQueue);
-            thread.Read();
+            thread.StartReading();
             return thread;
         }
 
