@@ -2,26 +2,13 @@
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.IO.Content;
+using SteganographyApp.Encode;
+using SteganographyApp.Decode;
+
 using System;
 
 namespace SteganographyApp
 {
-
-    class EncodingUtilities
-    {
-
-        public ImageStore ImageStore { get; }
-        public TableChunkTracker TableTracker { get; }
-        public ImageTracker ImageTracker { get; }
-
-        public EncodingUtilities(IInputArguments args)
-        {
-            ImageStore = new ImageStore(args);
-            TableTracker = new TableChunkTracker(ImageStore);
-            ImageTracker = ImageTracker.CreateTrackerFrom(args, ImageStore);
-        }
-
-    }
 
     public class EntryPoint
     {
@@ -84,60 +71,9 @@ namespace SteganographyApp
         /// </summary>
         private void EncodeFileToImages()
         {
-            Console.WriteLine("Started encoding file {0}", args.FileToEncode);
-
-            var utilities = new EncodingUtilities(args);
-
-            using (var wrapper = utilities.ImageStore.CreateIOWrapper())
-            {
-                int start = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
-
-                // check that the leading image has enough storage space to store the content table
-                if (!wrapper.HasEnoughSpaceForContentChunkTable())
-                {
-                    Console.WriteLine("There is not enough space in the leading image to store the content chunk table.");
-                    Console.WriteLine("The content chunk table requires {0} bits to store for the specified input file.", start);
-                    return;
-                }
-
-                StartEncoding(utilities, wrapper, start);
-            }
-
-            EncodeCleanup(utilities);
+            new Encoder(args).EncodeFileToImage();
         }
 
-        private void StartEncoding(EncodingUtilities utilities, ImageStore.ImageStoreWrapper wrapper, int startingPixel)
-        {
-            // skip past the first few pixels as the leading pixels of the first image will
-            // be used to store the content chunk table.
-            wrapper.SeekToPixel(startingPixel);
-
-            using (var reader = new ContentReader(args))
-            {
-                int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(args.FileToEncode, args.ChunkByteSize);
-                var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
-                    "Encoding file contents", "All input file contents have been encoded.");
-
-                string binaryChunk = "";
-                while ((binaryChunk = reader.ReadContentChunkFromFile()) != null)
-                {
-                    // record the length of the encoded content so it can be stored in the
-                    // content chunk table once the total encoding process has been completed.
-                    wrapper.WriteContentChunkToImage(binaryChunk);
-                    progressTracker.UpdateAndDisplayProgress();
-                }
-            }
-
-            wrapper.EncodeComplete();
-        }
-
-        private void EncodeCleanup(EncodingUtilities utilities)
-        {
-            Console.WriteLine("Writing content chunk table.");
-            utilities.ImageStore.WriteContentChunkTable(utilities.TableTracker.ContentTable);
-            Console.WriteLine("Encoding process complete.");
-            utilities.ImageTracker.PrintImagesUtilized();
-        }
 
         /// <summary>
         /// Starts the decoding process.
@@ -146,34 +82,7 @@ namespace SteganographyApp
         /// </summary>
         private void DecodeImagesToFile()
         {
-            Console.WriteLine("Decoding data to file {0}", args.DecodedOutputFile);
-
-            var store = new ImageStore(args);
-            var imageTracker = ImageTracker.CreateTrackerFrom(args, store);
-            
-            using (var wrapper = store.CreateIOWrapper())
-            {
-                // read in the content chunk table so we know how many bits to read 
-                Console.WriteLine("Reading content chunk table.");
-                var contentChunkTable = store.ReadContentChunkTable();
-                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length,
-                    "Decoding file contents", "All encoded file contents have been decoded.");
-
-                using (var writer = new ContentWriter(args))
-                {
-                    foreach (int chunkBinaryLength in contentChunkTable)
-                    {
-                        // as we read in each chunk from the images start writing the decoded
-                        // values to the target output file.
-                        string binary = wrapper.ReadContentChunkFromImage(chunkBinaryLength);
-                        writer.WriteContentChunkToFile(binary);
-                        tracker.UpdateAndDisplayProgress();
-                    }
-                }
-            }
-
-            imageTracker.PrintImagesUtilized();
-            Console.WriteLine("Decoding process complete.");
+            new Decoder(args).DecodeFileFromImage();
         }
 
     }
