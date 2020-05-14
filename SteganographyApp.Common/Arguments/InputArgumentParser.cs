@@ -48,7 +48,7 @@ namespace SteganographyApp.Common.Arguments
                 new Argument("--input", "-in", Parsers.ParseFileToEncode),
                 new Argument("--enableCompression", "-c", Parsers.ParseUseCompression, true),
                 new Argument("--printStack", "-stack", Parsers.ParsePrintStack, true),
-                new Argument("--images", "-im", Parsers.ParseImages),
+                new Argument("--images", "-im", ImagePathParser.ParseImages),
                 new Argument("--password", "-p", sensitiveArgumentParser.ParsePassword),
                 new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
                 new Argument("--chunkSize", "-cs", Parsers.ParseChunkSize),
@@ -113,7 +113,7 @@ namespace SteganographyApp.Common.Arguments
             }
         }
 
-        public IInputArguments DoTryParse(string[] userArguments, PostValidation postValidationMethod)
+        private IInputArguments DoTryParse(string[] userArguments, PostValidation postValidationMethod)
         {
             if(userArguments == null || userArguments.Length == 0)
             {

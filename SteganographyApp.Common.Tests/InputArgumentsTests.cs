@@ -28,6 +28,7 @@ namespace SteganographyApp.Common.Tests
 
             var inputs = new string[] { "--chunkSize", "abc" };
             var parser = new ArgumentParser(new NullReader(), mockWriter.Object);
+            
             Assert.IsFalse(parser.TryParse(inputs, out IInputArguments inputArguments, NullReturningPostValidator));
             parser.PrintCommonErrorMessage();
 
@@ -117,7 +118,7 @@ namespace SteganographyApp.Common.Tests
         [DataRow("convert", ActionEnum.Convert)]
         [DataRow("calculate-storage-space", ActionEnum.CalculateStorageSpace)]
         [DataRow("calculate-encrypted-size", ActionEnum.CalculateEncryptedSize)]
-        public void TestParseActionWithValidValuesProducesValidResult(string actionString, ActionEnum action)
+        public void TestParseActionWithValidActionValueDoesntProduceException(string actionString, ActionEnum action)
         {
             string[] inputArgs = new string[] { "--action", actionString };
             var parser = new ArgumentParser();
@@ -139,7 +140,7 @@ namespace SteganographyApp.Common.Tests
 
         #region Parse input
         [TestMethod]
-        public void TestFileToEncodeWithValidValueProducesValidResult() 
+        public void TestFileToEncodeWithValidFile() 
         {
             string path = "TestAssets/test.zip";
             string[] inputArgs = new string[] { "--input", path };
@@ -165,7 +166,7 @@ namespace SteganographyApp.Common.Tests
 
         #region Parse enableCompression
         [TestMethod]
-        public void TestEnableCompressionWithValidValueProducesValueResult()
+        public void TestEnableCompressionWithValidValue()
         {
             string[] inputArgs = new string[] { "--enableCompression" };
             var parser = new ArgumentParser();
@@ -177,7 +178,7 @@ namespace SteganographyApp.Common.Tests
 
         #region Parse printStack
         [TestMethod]
-        public void TestPrintStackWithValidValueProducesValidResult()
+        public void TestPrintStackWithValidValue()
         {
             string[] inputArgs = new string[] { "--printStack" };
             var parser = new ArgumentParser();
@@ -189,20 +190,22 @@ namespace SteganographyApp.Common.Tests
 
         #region Parse images
         [TestMethod]
-        public void TestParseImagesWithValidSingleValueProducesValidResult()
+        public void TestParseImagesWithValidSingleValue()
         {
             string image = "TestAssets/001.png";
             string[] inputArgs = new string[] { "--images", image };
             var parser = new ArgumentParser();
+
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
+
             string[] images = arguments.CoverImages;
             Assert.AreEqual(1, images.Length);
             Assert.AreEqual(image, images[0]);
         }
 
         [TestMethod]
-        public void TestParseImagesWithValidRegexProducesValidResult()
+        public void TestParseImagesWithValidRegex()
         {
             string expression = "[r]<^[\\w\\W]+\\.(png)$><./TestAssets>";
             string[] inputArgs = new string[] { "--images", expression };
@@ -229,7 +232,7 @@ namespace SteganographyApp.Common.Tests
 
         #region Parse password
         [TestMethod]
-        public void TestParsePasswordWithValidValueProducesValidResult()
+        public void TestParsePasswordWithValidValue()
         {
             string[] inputArgs = new string[] { "--password", "testing" };
             var parser = new ArgumentParser();
@@ -239,7 +242,7 @@ namespace SteganographyApp.Common.Tests
         }
 
         [TestMethod]
-        public void TestParsePasswordWithInteractiveInputProducesValidResult()
+        public void TestParsePasswordWithInteractiveInput()
         {
             string[] inputArgs = new string[] { "--password", "?" };
 
@@ -280,7 +283,7 @@ namespace SteganographyApp.Common.Tests
 
         #region Parse output
         [TestMethod]
-        public void TestParseOutputFileWithValidValueProducesValidResult()
+        public void TestParseOutputFileWithValidValue()
         {
             string[] inputArgs = new string[] { "--output", "testing.txt" };
             var parser = new ArgumentParser();
@@ -295,7 +298,7 @@ namespace SteganographyApp.Common.Tests
         [DataRow(1)]
         [DataRow(10_000)]
         [DataRow(1_000_000)]
-        public void TestParseChunkSizeWithValidValueProducesValidResult(int value)
+        public void TestParseChunkSizeWithValidValue(int value)
         {
             string[] inputArgs = new string[] { "--chunkSize", value.ToString() };
             var parser = new ArgumentParser();
@@ -324,7 +327,7 @@ namespace SteganographyApp.Common.Tests
         [DataTestMethod]
         [DataRow(3)]
         [DataRow(235)]
-        public void TestParseRandomSeedWithValidValueProducesValidResult(int stringLength)
+        public void TestParseRandomSeedWithValidValue(int stringLength)
         {
             string seedValue = CreateString(stringLength);
             string[] inputArgs = new string[] { "--randomSeed", seedValue };
@@ -361,7 +364,7 @@ namespace SteganographyApp.Common.Tests
 
         #region Parsing enableDummies
         [TestMethod]
-        public void TestParseInsertDummiesWithValidValueProducesValidResult()
+        public void TestParseInsertDummiesWithValidValue()
         {
             string[] inputArgs = new string[] { "--enableDummies" };
             var parser = new ArgumentParser();
@@ -373,7 +376,7 @@ namespace SteganographyApp.Common.Tests
 
         #region Parse deleteOriginals
         [TestMethod]
-        public void TestParseDeleteOriginalsWithValidValueProducesValidResult()
+        public void TestParseDeleteOriginalsWithValidValue()
         {
             string[] inputArgs = new string[] { "--deleteOriginals" };
             var parser = new ArgumentParser();
@@ -388,7 +391,7 @@ namespace SteganographyApp.Common.Tests
         [DataRow(0)]
         [DataRow(5)]
         [DataRow(9)]
-        public void TestCompressionLevelWithValidValueProducesValidResult(int value)
+        public void TestCompressionLevelWithValidValue(int value)
         {
             string[] inputArgs = new string[] { "--compressionLevel", value.ToString() };
             var parser = new ArgumentParser();

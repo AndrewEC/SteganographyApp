@@ -21,6 +21,7 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t\tThe order of the images affects the encoding and decoding results.
 \t\tThis parameter will also accept a regular expression to find images.
 \t\t\tA regex value will appear in the format [r]<regex><directory>
+\t\t\tYou can also specify PNG_IMAGES as a shorthand to use all png images in the current directory
 \t\t\tExample: --images [r]<^[\w\W]+\.(png|bmp|tiff)$><.> matches all files in the current directory with a png, bmp, or tiff extension.
 
 ~Password
