@@ -16,7 +16,8 @@ namespace SteganographyApp.Encode
     enum Status
     {
         Incomplete,
-        Complete
+        Complete,
+        Failure
     }
 
     /// <summary>
@@ -27,6 +28,7 @@ namespace SteganographyApp.Encode
     {
         public Status Status;
         public string Data;
+        public Exception Exception;
     }
 
     /// <summary>
@@ -58,21 +60,15 @@ namespace SteganographyApp.Encode
         /// Allows for communication between the file read thread and the main thread.
         /// In each iteration the read thread will read in a chunk from a file, encode it,
         /// and add it to this collection so it can be picked up and written to an image.
+        /// <para>This also enables the read thread to send errors back to the main thread
+        /// so a proper error message can be displayed back to the user.</para>
         /// </summary>
         private readonly BlockingCollection<ReadArgs> readQueue;
-        
-        /// <summary>
-        /// Allows the thread performing the file read and encoding to communicate errors
-        /// back to the encoder so the thread can be closed and a proper exception message
-        /// displayed.
-        /// <summary>
-        private readonly BlockingCollection<Exception> errorQueue;
 
         private Encoder(IInputArguments arguments)
         {
             this.arguments = arguments;
             readQueue = new BlockingCollection<ReadArgs>(2);
-            errorQueue = new BlockingCollection<Exception>(1);
         }
 
         /// <summary>
@@ -122,7 +118,7 @@ namespace SteganographyApp.Encode
             var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
                 "Encoding file contents", "All input file contents have been encoded.");
 
-            var thread = FileReadThread.CreateAndStart(readQueue, arguments, errorQueue);
+            var thread = FileReadThread.CreateAndStart(readQueue, arguments);
 
             while(true)
             {
@@ -133,16 +129,15 @@ namespace SteganographyApp.Encode
                     wrapper.EncodeComplete();
                     break;
                 }
-                else
+                else if (readArgs.Status == Status.Failure)
+                {
+                    thread.Join();
+                    throw readArgs.Exception;
+                }
+                else if (readArgs.Status == Status.Incomplete)
                 {
                     wrapper.WriteContentChunkToImage(readArgs.Data);
                     progressTracker.UpdateAndDisplayProgress();
-                }
-
-                if (errorQueue.TryTake(out Exception exception))
-                {
-                    thread.Join();
-                    throw exception;
                 }
             }
         }

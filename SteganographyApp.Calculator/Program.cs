@@ -1,7 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 using SteganographyApp.Common;
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.IO;
 using SteganographyApp.Common.IO.Content;
 using SteganographyApp.Common.Arguments;
 using System;
@@ -197,8 +196,8 @@ namespace SteganographyAppCalculator
                 string content = "";
                 while ((content = reader.ReadContentChunkFromFile()) != null)
                 {
-                    progressTracker.UpdateAndDisplayProgress();
                     encodedBitCount += content.Length;
+                    progressTracker.UpdateAndDisplayProgress();
                 }
             }
             encodedBitCount += Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);

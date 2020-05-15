@@ -41,18 +41,13 @@ namespace SteganographyApp.Decode
         /// </summary>
         private readonly BlockingCollection<WriteArgs> writeQueue;
 
-        /// <summary>
-        /// This queue allows the file write thread to communicate errors back to the
-        /// main thread so we can properly fail and throw an error whenever we
-        /// fail to decode any of the binary content.
-        /// </summary>
-        private readonly BlockingCollection<Exception> errorQueue;
+        private readonly DecodeError decodeError;
 
         private Decoder(IInputArguments arguments)
         {
             this.arguments = arguments;
             writeQueue = new BlockingCollection<WriteArgs>(2);
-            errorQueue = new BlockingCollection<Exception>(1);
+            decodeError = new DecodeError();
         }
 
         /// <summary>
@@ -79,7 +74,7 @@ namespace SteganographyApp.Decode
 
             using (var wrapper = store.CreateIOWrapper())
             {
-                var thread = FileWriteThread.CreateAndStartThread(writeQueue, errorQueue, arguments);
+                var thread = FileWriteThread.CreateAndStartThread(writeQueue, decodeError, arguments);
 
                 var contentChunkTable = store.ReadContentChunkTable();
                 var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length,
@@ -91,10 +86,10 @@ namespace SteganographyApp.Decode
                     writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete });
                     tracker.UpdateAndDisplayProgress();
 
-                    if (errorQueue.TryTake(out Exception exception))
+                    if (decodeError.HasException())
                     {
                         thread.Join();
-                        throw exception;
+                        throw decodeError.TakeException();
                     }
                 }
 
