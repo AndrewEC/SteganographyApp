@@ -41,6 +41,9 @@ namespace SteganographyApp.Decode
         /// </summary>
         private readonly BlockingCollection<WriteArgs> writeQueue;
 
+        /// <summary>
+        /// Used to allow the <see cref="FileWriteThread" /> to communicate an exception back to the Decoder.
+        /// </summary>
         private readonly DecodeError decodeError;
 
         private Decoder(IInputArguments arguments)
