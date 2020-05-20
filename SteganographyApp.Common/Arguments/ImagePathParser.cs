@@ -48,9 +48,9 @@ namespace SteganographyApp.Common.Arguments
         {
             value = TryConvertShortcutToRegex(value);
             string[] imagePaths = null;
-            if (value.Contains("[r]"))
+            if (ImageRegexParser.IsValidRegex(value))
             {
-                imagePaths = ImageRegexParser.ImagesFromRegex(value);
+                imagePaths = ImageRegexParser.ImagePathsFromRegex(value);
             }
             else if (value.Contains(","))
             {

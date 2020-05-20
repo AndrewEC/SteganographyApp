@@ -9,6 +9,14 @@ namespace SteganographyApp.Common.Arguments
     static class ImageRegexParser
     {
 
+        private static readonly string ImageRegexExpression = @"^\[r\]\<(.+)\>\<(.+)\>$";
+        private static readonly Regex ImageRegex = new Regex(ImageRegexExpression);
+
+        public static bool IsValidRegex(string value)
+        {
+            return ImageRegex.Match(value).Success;
+        }
+
         /// <summary>
         /// If a regular expression is detected in the --images parameter this method
         /// will load the images in the specified directory based on matches against
@@ -19,13 +27,14 @@ namespace SteganographyApp.Common.Arguments
         /// <returns>An array of images from the specified directory.</returns>
         /// <exception cref="ArgumentValueException">Thrown if an invalid regular expression is provided or if the
         /// regular expression doesn't match any files in the provided directory.</exception>
-        public static string[] ImagesFromRegex(string value)
+        public static string[] ImagePathsFromRegex(string value)
         {
-            (string regex, string path) = ParseRegex(value);
+            (string regexExpression, string path) = ParseRegex(value);
+            var regex = new Regex(regexExpression);
 
             string[] files = Directory.GetFiles(path);
-            string[] images = files.Where(file => Regex.Match(file, regex).Success).ToArray();
-            Array.Sort(images, (first, second) => string.Compare(first, second));
+            string[] images = files.Where(file => regex.Match(file).Success).ToArray();
+            Array.Sort(images, string.Compare);
             
             if (images.Length == 0)
             {
@@ -44,22 +53,12 @@ namespace SteganographyApp.Common.Arguments
         /// does not match the expected format.</exception>
         private static (string, string) ParseRegex(string value)
         {
-            value = value.Replace("[r]", "");
 
-            if (value[value.Length - 1] != '>' || value[0] != '<')
-            {
-                throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
-            }
+            var match = ImageRegex.Match(value);
+            var fileNameRegex = match.Groups[1].Value;
+            var directory = match.Groups[2].Value;
 
-            string[] parts = value.Split('>');
-            if (parts.Length != 3 || parts[0] == "<" || parts[1] == "<")
-            {
-                throw new ArgumentValueException("The value supplied for the --images key is invalid. Expected the format [r]<regex><directory>");
-            }
-
-            string regex = parts[0].Replace("<", "");
-            string path = parts[1].Replace("<", "");
-            return (regex, path);
+            return (fileNameRegex, directory);
         }
 
     }
