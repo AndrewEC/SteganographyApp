@@ -136,7 +136,7 @@ namespace SteganographyApp.Common.Arguments
                     continue;
                 }
 
-                string inputValue = getRawArgumentValue(argument, userArguments, i);
+                string inputValue = GetRawArgumentValue(argument, userArguments, i);
                 ParseArgument(argument, parsedArguments, inputValue);
 
                 if (!argument.IsFlag)
@@ -145,7 +145,7 @@ namespace SteganographyApp.Common.Arguments
                 }
             }
 
-            invokePostValidation(postValidationMethod, parsedArguments);
+            InvokePostValidation(postValidationMethod, parsedArguments);
 
             sensitiveArgumentParser.ParseSecureArguments(parsedArguments);
 
@@ -156,7 +156,7 @@ namespace SteganographyApp.Common.Arguments
         /// Retrieves the raw unparsed value that corresponds to a given argument from the set
         /// of command line arguments passed to the program.
         /// </summary>
-        private string getRawArgumentValue(Argument argument, string[] userArguments, int i)
+        private string GetRawArgumentValue(Argument argument, string[] userArguments, int i)
         {
             if (argument.IsFlag)
             {
@@ -172,7 +172,7 @@ namespace SteganographyApp.Common.Arguments
             }
         }
 
-        private void invokePostValidation(PostValidation validation, InputArguments parsed)
+        private void InvokePostValidation(PostValidation validation, InputArguments parsed)
         {
             try
             {

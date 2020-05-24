@@ -36,10 +36,6 @@ namespace SteganographyApp.Common.Arguments
             string[] images = files.Where(file => regex.Match(file).Success).ToArray();
             Array.Sort(images, string.Compare);
             
-            if (images.Length == 0)
-            {
-                throw new ArgumentValueException($"The provided regex expression returned 0 usable files in the directory {path}");
-            }
             return images;
         }
 

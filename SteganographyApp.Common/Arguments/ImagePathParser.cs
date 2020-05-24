@@ -65,6 +65,11 @@ namespace SteganographyApp.Common.Arguments
 
         private static void ValidateImagePaths(string[] imagePaths)
         {
+            if (imagePaths.Length == 0)
+            {
+                throw new ArgumentValueException($"No images were found using the provided regular expression.");
+            }
+
             for (int i = 0; i < imagePaths.Length; i++)
             {
                 if (!File.Exists(imagePaths[i]))
