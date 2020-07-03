@@ -150,13 +150,14 @@ namespace SteganographyApp.Common.IO
             try
             {
                 ResetToImage(0);
+                var randomBit = RandomBitGenerator();
                 for (int i = 0; i < args.CoverImages.Length; i++)
                 {
                     while (true)
                     {
-                        byte newRed = (byte)(currentImage[position.X, position.Y].R & ~1);
-                        byte newGreen = (byte)(currentImage[position.X, position.Y].G & ~1);
-                        byte newBlue = (byte)(currentImage[position.X, position.Y].B & ~1);
+                        byte newRed = (byte)(currentImage[position.X, position.Y].R & ~randomBit());
+                        byte newGreen = (byte)(currentImage[position.X, position.Y].G & ~randomBit());
+                        byte newBlue = (byte)(currentImage[position.X, position.Y].B & ~randomBit());
 
                         currentImage[position.X, position.Y] = new Rgba32(newRed, newGreen, newBlue, currentImage[position.X, position.Y].A);
 
@@ -180,6 +181,12 @@ namespace SteganographyApp.Common.IO
                 CloseOpenImage();
                 throw e;
             }
+        }
+
+        public Func<int> RandomBitGenerator()
+        {
+            var random = new Random();
+            return () => (int) Math.Round(random.NextDouble());
         }
 
         /// <summary>
