@@ -25,8 +25,6 @@ namespace SteganographyAppCalculator
     class Program
     {
 
-        private static readonly int BitsPerPixel = 3;
-
         static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography Calculator\n");
@@ -101,7 +99,7 @@ namespace SteganographyAppCalculator
 
             Console.WriteLine("SteganographyApp Help\n");
 
-            foreach(string message in info.GetHelpMessagesFor(HelpItemSet.Calculator))
+            foreach (string message in info.GetHelpMessagesFor(HelpItemSet.Calculator))
             {
                 Console.WriteLine("{0}\n", message);
             }
@@ -117,7 +115,7 @@ namespace SteganographyAppCalculator
             Console.WriteLine("Calculating storage space in {0} images.", args.CoverImages.Length);
             try
             {
-                long availableSpace = CalculateNumberOfPixelsForImages(args.CoverImages) * BitsPerPixel;
+                long availableSpace = CalculateNumberOfPixelsForImages(args.CoverImages) * Calculator.BitsPerPixel;
 
                 Console.WriteLine("\nImages are able to store:");
                 PrintSize(availableSpace);

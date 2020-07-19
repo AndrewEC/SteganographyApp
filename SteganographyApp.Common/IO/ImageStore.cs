@@ -73,17 +73,22 @@ namespace SteganographyApp.Common.IO
             }
         }
 
+        /// <summary>
+        /// Event handler that's invoked whenever the WriteContentChunkToImage method completes.
+        /// The main argument of the event will indicate the total number of bits written to the
+        /// image(s).
+        /// </summary>
         public event EventHandler<ChunkWrittenArgs> OnChunkWritten;
 
         /// <summary>
-        /// Event handle the will be invoked whenever the Next method is internally
-        /// invoked so that the calling entry point can record which images
-        /// have been used in the encoding or decoding process.
+        /// Event handler that's invoked whenever the internal Next method is called.
+        /// In the Next method another image will be loaded so it can be read/written to.
+        /// The path of the file will be the main argument passed to the event handler.
         /// </summary>
         public event EventHandler<NextImageLoadedEventArgs> OnNextImageLoaded;
 
         /// <summary>
-        /// The x position to start the next read/write operation from.
+        /// Stores the current x and y position for the current read/write operation.
         /// </summary>
         private readonly Position position = new Position();
 
@@ -183,7 +188,11 @@ namespace SteganographyApp.Common.IO
             }
         }
 
-        public Func<int> RandomBitGenerator()
+        /// <summary>
+        /// Provides a consumable function that uses the standard Random class to generate
+        /// a random int value of either 0 or 1.
+        /// </summary>
+        private Func<int> RandomBitGenerator()
         {
             var random = new Random();
             return () => (int) Math.Round(random.NextDouble());
@@ -290,7 +299,7 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <returns>A list of int32 values specifies the bit length of each encrypted chunk
         /// of data stored in the current set of images.</returns>
-        /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
+        /// <exception cref="ImageProcessingException">Thrown if images do not have enough
         /// storage space to read the entire content chunk table.</exception>
         public int[] ReadContentChunkTable()
         {
@@ -306,15 +315,9 @@ namespace SteganographyApp.Common.IO
                 // contained within the table.
                 int chunkCount = Convert.ToInt32(ReadBinaryString(Calculator.ChunkDefinitionBitSize), 2);
 
-                int bitsForAllTableEntries = chunkCount * chunkSizeAndPadding;
-
                 //Read all the available entries in the table
+                int bitsForAllTableEntries = chunkCount * chunkSizeAndPadding;
                 string tableEntriesBinary = ReadBinaryString(bitsForAllTableEntries);
-
-                if (tableEntriesBinary.Length < bitsForAllTableEntries)
-                {
-                    throw new ImageProcessingException("There are not enough available bits in the image to read the entire content chunk table.");
-                }
 
                 return Enumerable.Range(0, chunkCount)
                     .Select(index => Convert.ToInt32(tableEntriesBinary.Substring(index * chunkSizeAndPadding, Calculator.ChunkDefinitionBitSize), 2))
@@ -370,7 +373,7 @@ namespace SteganographyApp.Common.IO
         private bool HasEnoughSpaceForContentChunkTable()
         {
             int requiredBitsForContentTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
-            return (currentImage.Width * currentImage.Height * 3) > requiredBitsForContentTable;
+            return (currentImage.Width * currentImage.Height * Calculator.BitsPerPixel) > requiredBitsForContentTable;
         }
 
         /// <summary>
@@ -429,7 +432,7 @@ namespace SteganographyApp.Common.IO
         {
             position.Reset();
 
-            int pixelIndex = (int) Math.Ceiling((double) bitsToSkip / 3.0);
+            int pixelIndex = (int) Math.Ceiling((double) bitsToSkip / (double) Calculator.BitsPerPixel);
             for (int i = 0; i < pixelIndex; i++)
             {
                 TryMoveToNextPixel();

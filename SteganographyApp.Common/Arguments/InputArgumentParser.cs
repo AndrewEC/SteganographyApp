@@ -120,7 +120,7 @@ namespace SteganographyApp.Common.Arguments
                 throw new ArgumentParseException("No arguments provided to parse.");
             }
 
-            InputArguments parsedArguments = new InputArguments();
+            var parsedArguments = new InputArguments();
 
             for (int i = 0; i < userArguments.Length; i++)
             {
@@ -148,6 +148,8 @@ namespace SteganographyApp.Common.Arguments
             InvokePostValidation(postValidationMethod, parsedArguments);
 
             sensitiveArgumentParser.ParseSecureArguments(parsedArguments);
+
+            Parsers.ParseDummyCount(parsedArguments);
 
             return parsedArguments.ToImmutable();
         }

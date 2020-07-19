@@ -7,8 +7,8 @@ namespace SteganographyApp.Common.Data
     public static class DummyUtil
     {
 
-        static readonly int MAX_LENGTH_PER_DUMMY = 50;
-        static readonly int MIN_LENGTH_PER_DUMMY = 10;
+        private static readonly int MAX_LENGTH_PER_DUMMY = 1000;
+        private static readonly int MIN_LENGTH_PER_DUMMY = 50;
 
         /// <summary>
         /// Inserts the specified number of dummy entries into the current
@@ -28,11 +28,9 @@ namespace SteganographyApp.Common.Data
             var generator = new IndexGenerator(length, length);
 
             // storing the positions instead of calculating on the fly will make decoding easier
-            int[] positions = new int[numDummies];
-            for(int i = 0; i < positions.Length; i++)
-            {
-                positions[i] = generator.Next(binary.Length - 1);
-            }
+            int[] positions = Enumerable.Range(0, numDummies)
+                .Select(i => generator.Next(binary.Length - 1))
+                .ToArray();
 
             for (int i = 0; i < positions.Length; i++)
             {
@@ -52,12 +50,9 @@ namespace SteganographyApp.Common.Data
         private static int[] GenerateLengthsForDummies(int numDummies)
         {
             var lengthGenerator = new IndexGenerator(numDummies, numDummies);
-            int[] lengths = new int[numDummies];
-            for(int i = 0; i < lengths.Length; i++)
-            {
-                lengths[i] = lengthGenerator.Next(MAX_LENGTH_PER_DUMMY) + MIN_LENGTH_PER_DUMMY;
-            }
-            return lengths;
+            return Enumerable.Range(0, numDummies)
+                .Select(i => lengthGenerator.Next(MAX_LENGTH_PER_DUMMY - MIN_LENGTH_PER_DUMMY) + MIN_LENGTH_PER_DUMMY)
+                .ToArray();
         }
 
         /// <summary>
@@ -103,12 +98,10 @@ namespace SteganographyApp.Common.Data
             int length = (int)Math.Ceiling(Math.Pow(actualLength, (double)1 / 3)) + 1;
             var generator = new IndexGenerator(length, length);
 
-            int[] positions = new int[numDummies];
-            for(int i = 0; i < positions.Length; i++)
-            {
-                positions[i] = generator.Next(actualLength - 1);
-            }
-            Array.Reverse(positions);
+            int[] positions = Enumerable.Range(0, numDummies)
+                .Select(i => generator.Next(actualLength - 1))
+                .Reverse()
+                .ToArray();
 
             try
             {
