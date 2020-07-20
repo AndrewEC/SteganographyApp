@@ -36,5 +36,24 @@ namespace SteganographyApp.Common.Arguments
         {
             return Array.IndexOf(values, action) != -1;
         }
+
+        /// <summary>
+        /// Checks if the action value is either CalculateStorageSpace or its alias CSS.
+        /// </summary>
+        /// <param name="action">The parsed action value to check.</param>
+        public static bool IsCalculateStorageSpaceAction(ActionEnum action)
+        {
+            return action == ActionEnum.CalculateStorageSpace || action == ActionEnum.CSS;
+        }
+
+        /// <summary>
+        /// Checks if the action value is either CalculateEncryptedSize or its alias CES.
+        /// </summary>
+        /// <param name="action">The parsed action value to check.</param>
+        public static bool IsCalculateEncryptedSpaceAction(ActionEnum action)
+        {
+            return action == ActionEnum.CalculateEncryptedSize || action == ActionEnum.CES;
+        }
+
     }
 }

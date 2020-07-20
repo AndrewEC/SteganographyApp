@@ -41,11 +41,11 @@ namespace SteganographyAppCalculator
                 return;
             }
 
-            if (arguments.EncodeOrDecode == ActionEnum.CalculateStorageSpace)
+            if (Checks.IsCalculateStorageSpaceAction(arguments.EncodeOrDecode))
             {
                 CalculateStorageSpace(arguments);
             }
-            else if (arguments.EncodeOrDecode == ActionEnum.CalculateEncryptedSize)
+            else if (Checks.IsCalculateEncryptedSpaceAction(arguments.EncodeOrDecode))
             {
                 CalculateEncryptedSize(arguments);
             }
@@ -59,13 +59,13 @@ namespace SteganographyAppCalculator
         /// </summary>
         private static string PostValidate(IInputArguments input)
         {
-            if (input.EncodeOrDecode != ActionEnum.CalculateStorageSpace
-                && input.EncodeOrDecode != ActionEnum.CalculateEncryptedSize)
+            if (Checks.IsOneOf(input.EncodeOrDecode, ActionEnum.CalculateEncryptedSize, ActionEnum.CES, 
+                ActionEnum.CalculateStorageSpace, ActionEnum.CSS))
             {
                 return "The action must either be calculate-storage-space or calculate-encrypted-size.";    
             }
 
-            if (input.EncodeOrDecode == ActionEnum.CalculateEncryptedSize && Checks.IsNullOrEmpty(input.FileToEncode))
+            if (Checks.IsCalculateEncryptedSpaceAction(input.EncodeOrDecode))
             {
                 if (Checks.IsNullOrEmpty(input.FileToEncode))
                 {
@@ -77,11 +77,11 @@ namespace SteganographyAppCalculator
                         + "to properly calculate the number of dummy entries to insert.";
                 }
             }
-
-            if (input.EncodeOrDecode == ActionEnum.CalculateStorageSpace && Checks.IsNullOrEmpty(input.CoverImages))
+            else if (Checks.IsCalculateStorageSpaceAction(input.EncodeOrDecode) && Checks.IsNullOrEmpty(input.CoverImages))
             {
                 return "At least one image must be specified in order to calculate the available storage space of those images.";
             }
+
             return null;
         }
 
@@ -131,6 +131,10 @@ namespace SteganographyAppCalculator
             }
         }
 
+        /// <summary>
+        /// Calculate the total number of pixels within all images.
+        /// </summary>
+        /// <param name="coverImages">The array of string paths to the images to check.</param>
         private static long CalculateNumberOfPixelsForImages(string[] coverImages)
         {
             var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length,

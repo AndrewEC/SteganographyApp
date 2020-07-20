@@ -62,7 +62,7 @@ Arguments must be specified as <argument_name>space<argument_value>.
 
 ~CalculatorAction
 \t--action | -a :: Specifies whether to calculate the encrypted size of a file or the amount of storage space offered by a set of images.
-\t\tValue must be either 'calculate-storage-space' or 'calculate-encrypted-size'.
+\t\tValue must be either 'calculate-storage-space'/'css' or 'calculate-encrypted-size'/'ces'.
 
 ~ConverterDescription
 Arguments must be specified as <argument_name>space<argument_value>.

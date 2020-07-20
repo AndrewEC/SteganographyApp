@@ -80,6 +80,8 @@ namespace SteganographyApp.Common.Arguments
         Clean,
         CalculateStorageSpace,
         CalculateEncryptedSize,
+        CSS, // shorthand alias for CalculateStorageSpace
+        CES, // shorthand alias for CalculateEncryptedSize
         Convert
     }
 
@@ -107,7 +109,7 @@ namespace SteganographyApp.Common.Arguments
         /// <para>Higher values will improve the time to encode a larger file and reduce
         /// ther overall encoded file size though values too high run the risk of
         /// having memory related errors.</para>
-        /// <para>Value of 131,072</para>
+        /// <para>Default value of 131,072</para>
         /// </summary>
         public int ChunkByteSize { get; set; } = 131_072;
 

@@ -166,7 +166,7 @@ namespace SteganographyApp.Common.Arguments
             value = value.Replace("-", "");
             if(!Enum.TryParse(value, true, out ActionEnum action))
             {
-                throw new ArgumentValueException($"Invalid value for action argument. Expected 'encode', 'decode', 'clean', 'calculate-storage-space', or 'calculate-encrypted-size' got {value}");
+                throw new ArgumentValueException($"Invalid value for action argument. Expected one of 'encode', 'decode', 'clean', 'calculate-storage-space', 'css', 'calculate-encrypted-size', 'ces' got {value}");
             }
             args.EncodeOrDecode = action;
         }
