@@ -20,7 +20,7 @@ namespace SteganographyApp.Converter
         static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography Converter\n");
-            if (Array.IndexOf(args, "--help") != -1 || Array.IndexOf(args, "-h") != -1)
+            if (Checks.WasHelpRequested(args))
             {
                 PrintHelp();
                 return;

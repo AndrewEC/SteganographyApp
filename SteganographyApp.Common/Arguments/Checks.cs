@@ -6,6 +6,9 @@ namespace SteganographyApp.Common.Arguments
     public static class Checks
     {
 
+        private static readonly string HelpArgument = "--help";
+        private static readonly string HelpArgumentShortened = "-h";
+
         /// <summary>
         /// Checks whether a string is null or contains no characters.
         /// </summary>
@@ -38,21 +41,12 @@ namespace SteganographyApp.Common.Arguments
         }
 
         /// <summary>
-        /// Checks if the action value is either CalculateStorageSpace or its alias CSS.
+        /// Checks to see if the help argument or the shortened help argument has been provided
+        /// indicating that we should present the user with the help log.
         /// </summary>
-        /// <param name="action">The parsed action value to check.</param>
-        public static bool IsCalculateStorageSpaceAction(ActionEnum action)
+        public static bool WasHelpRequested(string[] args)
         {
-            return action == ActionEnum.CalculateStorageSpace || action == ActionEnum.CSS;
-        }
-
-        /// <summary>
-        /// Checks if the action value is either CalculateEncryptedSize or its alias CES.
-        /// </summary>
-        /// <param name="action">The parsed action value to check.</param>
-        public static bool IsCalculateEncryptedSpaceAction(ActionEnum action)
-        {
-            return action == ActionEnum.CalculateEncryptedSize || action == ActionEnum.CES;
+            return Array.IndexOf(args, HelpArgument) != -1 || Array.IndexOf(args, HelpArgumentShortened) != -1;
         }
 
     }

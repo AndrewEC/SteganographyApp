@@ -1,13 +1,13 @@
 using System;
 
-namespace SteganographyApp.Decode
+namespace SteganographyApp
 {
 
     /// <summary>
     /// Thread-safe method to hold onto an error object so it can be shared
     /// between threads.
     /// </summary>
-    class DecodeError
+    class ErrorContainer
     {
 
         private readonly object _lock = new object();

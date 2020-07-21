@@ -16,21 +16,21 @@ namespace SteganographyApp.Decode
     {
 
         private readonly BlockingCollection<WriteArgs> queue;
-        private readonly DecodeError decodeError;
+        private readonly ErrorContainer decodeError;
         private readonly IInputArguments arguments;
         private Thread readThread;
 
-        private FileWriteThread(BlockingCollection<WriteArgs> queue, DecodeError decodeError, IInputArguments arguments)
+        private FileWriteThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer, IInputArguments arguments)
         {
             this.arguments = arguments;
             this.queue = queue;
-            this.decodeError = decodeError;
+            this.decodeError = errorContainer;
         }
 
-        public static FileWriteThread CreateAndStartThread(BlockingCollection<WriteArgs> queue, DecodeError decodeError,
+        public static FileWriteThread CreateAndStartThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer,
             IInputArguments arguments)
         {
-            var thread = new FileWriteThread(queue, decodeError, arguments);
+            var thread = new FileWriteThread(queue, errorContainer, arguments);
             thread.StartWriting();
             return thread;
         }

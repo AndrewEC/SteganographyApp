@@ -118,6 +118,8 @@ namespace SteganographyApp.Common.Tests
         [DataRow("convert", ActionEnum.Convert)]
         [DataRow("calculate-storage-space", ActionEnum.CalculateStorageSpace)]
         [DataRow("calculate-encrypted-size", ActionEnum.CalculateEncryptedSize)]
+        [DataRow("ces", ActionEnum.CES)]
+        [DataRow("css", ActionEnum.CSS)]
         public void TestParseActionWithValidActionValueDoesntProduceException(string actionString, ActionEnum action)
         {
             string[] inputArgs = new string[] { "--action", actionString };

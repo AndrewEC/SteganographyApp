@@ -174,6 +174,11 @@ namespace SteganographyApp.Common.Arguments
             }
         }
 
+        /// <summary>
+        /// Invokes the custom post validation function.
+        /// <para>If the invocation returns a non-null or non-empty string then an ArgumentParseException
+        /// will be thrown.</para>
+        /// </summary>
         private void InvokePostValidation(PostValidation validation, InputArguments parsed)
         {
             try

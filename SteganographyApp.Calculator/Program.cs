@@ -25,10 +25,13 @@ namespace SteganographyAppCalculator
     class Program
     {
 
+        private static readonly ActionEnum[] CalculateEncryptedSizeActions = new ActionEnum[] { ActionEnum.CalculateEncryptedSize, ActionEnum.CES };
+        private static readonly ActionEnum[] CalculateStorageSpaceActions = new ActionEnum[] { ActionEnum.CalculateStorageSpace, ActionEnum.CSS };
+
         static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography Calculator\n");
-            if (Array.IndexOf(args, "--help") != -1 || Array.IndexOf(args, "-h") != -1)
+            if (Checks.WasHelpRequested(args))
             {
                 PrintHelp();
                 return;
@@ -41,16 +44,26 @@ namespace SteganographyAppCalculator
                 return;
             }
 
-            if (Checks.IsCalculateStorageSpaceAction(arguments.EncodeOrDecode))
+            if (IsCalculateStorageSpaceAction(arguments.EncodeOrDecode))
             {
                 CalculateStorageSpace(arguments);
             }
-            else if (Checks.IsCalculateEncryptedSpaceAction(arguments.EncodeOrDecode))
+            else if (IsCalculateEncryptedSpaceAction(arguments.EncodeOrDecode))
             {
                 CalculateEncryptedSize(arguments);
             }
 
             Console.WriteLine("");
+        }
+
+        private static bool IsCalculateStorageSpaceAction(ActionEnum action)
+        {
+            return Array.IndexOf(CalculateStorageSpaceActions, action) != -1;
+        }
+
+        private static bool IsCalculateEncryptedSpaceAction(ActionEnum action)
+        {
+            return Array.IndexOf(CalculateEncryptedSizeActions, action) != -1;
         }
 
         /// <summary>
@@ -59,13 +72,12 @@ namespace SteganographyAppCalculator
         /// </summary>
         private static string PostValidate(IInputArguments input)
         {
-            if (Checks.IsOneOf(input.EncodeOrDecode, ActionEnum.CalculateEncryptedSize, ActionEnum.CES, 
-                ActionEnum.CalculateStorageSpace, ActionEnum.CSS))
+            if (!IsCalculateEncryptedSpaceAction(input.EncodeOrDecode) && !IsCalculateStorageSpaceAction(input.EncodeOrDecode))
             {
-                return "The action must either be calculate-storage-space or calculate-encrypted-size.";    
+                return "The action must either be calculate-storage-space/css or calculate-encrypted-size/ces.";
             }
 
-            if (Checks.IsCalculateEncryptedSpaceAction(input.EncodeOrDecode))
+            if (IsCalculateEncryptedSpaceAction(input.EncodeOrDecode))
             {
                 if (Checks.IsNullOrEmpty(input.FileToEncode))
                 {
@@ -77,7 +89,7 @@ namespace SteganographyAppCalculator
                         + "to properly calculate the number of dummy entries to insert.";
                 }
             }
-            else if (Checks.IsCalculateStorageSpaceAction(input.EncodeOrDecode) && Checks.IsNullOrEmpty(input.CoverImages))
+            else if (IsCalculateStorageSpaceAction(input.EncodeOrDecode) && Checks.IsNullOrEmpty(input.CoverImages))
             {
                 return "At least one image must be specified in order to calculate the available storage space of those images.";
             }
