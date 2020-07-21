@@ -1,7 +1,9 @@
 using System;
-using System.IO;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+
+using SteganographyApp.Common.Providers;
 using SteganographyApp.Common.Data;
 
 namespace SteganographyApp.Common.Arguments
@@ -131,13 +133,9 @@ namespace SteganographyApp.Common.Arguments
         /// could not be found.</exception>
         public static void ParseFileToEncode(InputArguments arguments, string value)
         {
-            if (!File.Exists(value))
+            if (!Injector.Provide<IFileProvider>().IsExistingFile(value))
             {
-                throw new ArgumentValueException($"File to decode could not be found at {value}");
-            }
-            else if (File.GetAttributes(value).HasFlag(FileAttributes.Directory))
-            {
-                throw new ArgumentValueException($"Input file at {value} was a directory but a file is required.");
+                throw new ArgumentValueException($"Input file could not be found or is not a file: {value}");
             }
             arguments.FileToEncode = value;
         }

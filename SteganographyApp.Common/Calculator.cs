@@ -1,5 +1,6 @@
 using System;
-using System.IO;
+
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common
 {
@@ -27,7 +28,8 @@ namespace SteganographyApp.Common
         /// <param name="chunkByteSize">The number of bytes to read in at a time.</param>
         public static int CalculateRequiredNumberOfWrites(string fileToEncode, int chunkByteSize)
         {
-           return (int)(Math.Ceiling((double)(new FileInfo(fileToEncode).Length) / chunkByteSize));
+            long fileSizeBytes = Injector.Provide<IFileProvider>().GetFileSizeBytes(fileToEncode);
+           return (int)(Math.Ceiling((double)fileSizeBytes / chunkByteSize));
         }
 
         /// <summary>

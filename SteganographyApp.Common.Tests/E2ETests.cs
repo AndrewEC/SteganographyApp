@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System.Collections.Generic;
 using System.IO;
 
 using SteganographyApp.Common.IO;
@@ -10,7 +9,7 @@ using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
-    [TestClass]
+    // [TestClass]
     public class E2ETests
     {
 

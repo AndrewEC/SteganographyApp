@@ -4,7 +4,13 @@ using System.Linq;
 namespace SteganographyApp.Common.Data
 {
 
-    public static class DummyUtil
+    public interface IDummyUtil
+    {
+        string InsertDummies(int numDummies, string binary);
+        string RemoveDummies(int numDummies, string binary);
+    }
+
+    public class DummyUtil : IDummyUtil
     {
 
         private static readonly int MAX_LENGTH_PER_DUMMY = 1000;
@@ -19,7 +25,7 @@ namespace SteganographyApp.Common.Data
         /// <param name="binary">The original binary string to be modified with the
         /// dummy entries.</param>
         /// <returns>Returns the binary string with the new dummy entries.</returns>
-        public static string InsertDummies(int numDummies, string binary)
+        public string InsertDummies(int numDummies, string binary)
         {
             int[] lengths = GenerateLengthsForDummies(numDummies);
 
@@ -47,7 +53,7 @@ namespace SteganographyApp.Common.Data
         /// <param name="numDummies">The number of random numbers to generate. Will also
         /// determine the length of the array being returned.</param>
         /// <returns>A new array of random numbers of the specified length.</returns>
-        private static int[] GenerateLengthsForDummies(int numDummies)
+        private int[] GenerateLengthsForDummies(int numDummies)
         {
             var lengthGenerator = new IndexGenerator(numDummies, numDummies);
             return Enumerable.Range(0, numDummies)
@@ -62,7 +68,7 @@ namespace SteganographyApp.Common.Data
         /// <param name="generator">The index generator instance to determine whether
         /// each character in the dummy string should be a 1 or a 0.</param>
         /// <returns>Returns a random binary string of a length equal to
-        private static string GenerateDummy(IndexGenerator generator, int length)
+        private string GenerateDummy(IndexGenerator generator, int length)
         {
             string dummy = "";
             for(int i = 0; i < length; i++)
@@ -83,7 +89,7 @@ namespace SteganographyApp.Common.Data
         /// otherwise will return the binary string with the dummy entries removed.</returns>
         /// <exception cref="TransformationException">Thrown if an our of range exception is caught
         /// while trying to remove the dummy entries from the chunk.</exception>
-        public static string RemoveDummies(int numDummies, string binary)
+        public string RemoveDummies(int numDummies, string binary)
         {
 
             // calculate the length of the dummies originally added to the string

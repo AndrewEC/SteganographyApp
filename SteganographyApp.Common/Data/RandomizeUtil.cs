@@ -3,7 +3,13 @@ using System;
 namespace SteganographyApp.Common.Data
 {
 
-    static class RandomizeUtil
+    public interface IRandomizeUtil
+    {
+        string RandomizeBinaryString(string binaryString, string randomSeed);
+        string ReorderBinaryString(string binaryString, string randomSeed);
+    }
+
+    public class RandomizeUtil : IRandomizeUtil
     {
 
         private static readonly int RandomizeGenerationsModifier = 10;
@@ -13,7 +19,7 @@ namespace SteganographyApp.Common.Data
         /// </summary>
         /// <param name="binaryString">The binary string to randomize</param>
         /// <returns>A randomized binary string.</returns>
-        public static string RandomizeBinaryString(string binaryString, string randomSeed)
+        public string RandomizeBinaryString(string binaryString, string randomSeed)
         {
             char[] characters = binaryString.ToCharArray();
 
@@ -39,7 +45,7 @@ namespace SteganographyApp.Common.Data
         /// </summary>
         /// <param name="bytes">The randomized bytes read from the input images</param>
         /// <returns>A non-randomized array of bytes matching the original input file.</returns>
-        public static string ReorderBinaryString(string binaryString, string randomSeed)
+        public string ReorderBinaryString(string binaryString, string randomSeed)
         {
             char[] characters = binaryString.ToCharArray();
             var generator = IndexGenerator.FromString(randomSeed);

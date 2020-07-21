@@ -1,7 +1,8 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.Arguments
 {
@@ -32,7 +33,7 @@ namespace SteganographyApp.Common.Arguments
             (string regexExpression, string path) = ParseRegex(value);
             var regex = new Regex(regexExpression);
 
-            string[] files = Directory.GetFiles(path);
+            string[] files = Injector.Provide<IFileProvider>().GetFiles(path);
             string[] images = files.Where(file => regex.Match(file).Success).ToArray();
             Array.Sort(images, string.Compare);
             

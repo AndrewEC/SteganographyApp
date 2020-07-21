@@ -2,6 +2,7 @@
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.IO.Content
 {
@@ -36,7 +37,7 @@ namespace SteganographyApp.Common.IO.Content
                 stream = File.Open(args.DecodedOutputFile, FileMode.OpenOrCreate);
             }
 
-            byte[] decoded = DataEncoderUtil.Decode(binary, args.Password, args.UseCompression, args.DummyCount, args.RandomSeed);
+            byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, args.Password, args.UseCompression, args.DummyCount, args.RandomSeed);
             stream.Write(decoded, 0, decoded.Length);
             stream.Flush();
         }
