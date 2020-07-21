@@ -6,6 +6,9 @@ namespace SteganographyApp.Common.Arguments
     public static class Checks
     {
 
+        private static readonly string HelpArgument = "--help";
+        private static readonly string HelpArgumentShortened = "-h";
+
         /// <summary>
         /// Checks whether a string is null or contains no characters.
         /// </summary>
@@ -36,5 +39,15 @@ namespace SteganographyApp.Common.Arguments
         {
             return Array.IndexOf(values, action) != -1;
         }
+
+        /// <summary>
+        /// Checks to see if the help argument or the shortened help argument has been provided
+        /// indicating that we should present the user with the help log.
+        /// </summary>
+        public static bool WasHelpRequested(string[] args)
+        {
+            return Array.IndexOf(args, HelpArgument) != -1 || Array.IndexOf(args, HelpArgumentShortened) != -1;
+        }
+
     }
 }

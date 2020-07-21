@@ -25,12 +25,13 @@ namespace SteganographyAppCalculator
     class Program
     {
 
-        private static readonly int BitsPerPixel = 3;
+        private static readonly ActionEnum[] CalculateEncryptedSizeActions = new ActionEnum[] { ActionEnum.CalculateEncryptedSize, ActionEnum.CES };
+        private static readonly ActionEnum[] CalculateStorageSpaceActions = new ActionEnum[] { ActionEnum.CalculateStorageSpace, ActionEnum.CSS };
 
         static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography Calculator\n");
-            if (Array.IndexOf(args, "--help") != -1 || Array.IndexOf(args, "-h") != -1)
+            if (Checks.WasHelpRequested(args))
             {
                 PrintHelp();
                 return;
@@ -43,16 +44,26 @@ namespace SteganographyAppCalculator
                 return;
             }
 
-            if (arguments.EncodeOrDecode == ActionEnum.CalculateStorageSpace)
+            if (IsCalculateStorageSpaceAction(arguments.EncodeOrDecode))
             {
                 CalculateStorageSpace(arguments);
             }
-            else if (arguments.EncodeOrDecode == ActionEnum.CalculateEncryptedSize)
+            else if (IsCalculateEncryptedSpaceAction(arguments.EncodeOrDecode))
             {
                 CalculateEncryptedSize(arguments);
             }
 
             Console.WriteLine("");
+        }
+
+        private static bool IsCalculateStorageSpaceAction(ActionEnum action)
+        {
+            return Array.IndexOf(CalculateStorageSpaceActions, action) != -1;
+        }
+
+        private static bool IsCalculateEncryptedSpaceAction(ActionEnum action)
+        {
+            return Array.IndexOf(CalculateEncryptedSizeActions, action) != -1;
         }
 
         /// <summary>
@@ -61,13 +72,12 @@ namespace SteganographyAppCalculator
         /// </summary>
         private static string PostValidate(IInputArguments input)
         {
-            if (input.EncodeOrDecode != ActionEnum.CalculateStorageSpace
-                && input.EncodeOrDecode != ActionEnum.CalculateEncryptedSize)
+            if (!IsCalculateEncryptedSpaceAction(input.EncodeOrDecode) && !IsCalculateStorageSpaceAction(input.EncodeOrDecode))
             {
-                return "The action must either be calculate-storage-space or calculate-encrypted-size.";    
+                return "The action must either be calculate-storage-space/css or calculate-encrypted-size/ces.";
             }
 
-            if (input.EncodeOrDecode == ActionEnum.CalculateEncryptedSize && Checks.IsNullOrEmpty(input.FileToEncode))
+            if (IsCalculateEncryptedSpaceAction(input.EncodeOrDecode))
             {
                 if (Checks.IsNullOrEmpty(input.FileToEncode))
                 {
@@ -79,11 +89,11 @@ namespace SteganographyAppCalculator
                         + "to properly calculate the number of dummy entries to insert.";
                 }
             }
-
-            if (input.EncodeOrDecode == ActionEnum.CalculateStorageSpace && Checks.IsNullOrEmpty(input.CoverImages))
+            else if (IsCalculateStorageSpaceAction(input.EncodeOrDecode) && Checks.IsNullOrEmpty(input.CoverImages))
             {
                 return "At least one image must be specified in order to calculate the available storage space of those images.";
             }
+
             return null;
         }
 
@@ -101,7 +111,7 @@ namespace SteganographyAppCalculator
 
             Console.WriteLine("SteganographyApp Help\n");
 
-            foreach(string message in info.GetHelpMessagesFor(HelpItemSet.Calculator))
+            foreach (string message in info.GetHelpMessagesFor(HelpItemSet.Calculator))
             {
                 Console.WriteLine("{0}\n", message);
             }
@@ -117,7 +127,7 @@ namespace SteganographyAppCalculator
             Console.WriteLine("Calculating storage space in {0} images.", args.CoverImages.Length);
             try
             {
-                long availableSpace = CalculateNumberOfPixelsForImages(args.CoverImages) * BitsPerPixel;
+                long availableSpace = CalculateNumberOfPixelsForImages(args.CoverImages) * Calculator.BitsPerPixel;
 
                 Console.WriteLine("\nImages are able to store:");
                 PrintSize(availableSpace);
@@ -133,6 +143,10 @@ namespace SteganographyAppCalculator
             }
         }
 
+        /// <summary>
+        /// Calculate the total number of pixels within all images.
+        /// </summary>
+        /// <param name="coverImages">The array of string paths to the images to check.</param>
         private static long CalculateNumberOfPixelsForImages(string[] coverImages)
         {
             var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length,

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SteganographyApp.Common.Data;
@@ -11,19 +10,17 @@ namespace SteganographyApp.Common.Arguments
     static class Parsers
     {
 
-        static readonly int MAX_DUMMY_COUNT = 100;
-        static readonly int MIN_DUMMY_COUNT = 20;
+        private static readonly int MAX_DUMMY_COUNT = 500;
+        private static readonly int MIN_DUMMY_COUNT = 50;
 
         /// <summary>
         /// Parses a boolean from the value parameter and sets the InsertDummies property.
-        /// Will also attempt to call <see cref="ParseDummyCount"/>
         /// </summary>
         /// <param name="arguments">The InputArguments instance to modify.</param>
         /// <param name="value">The string representation of the InsertDummies boolean flag.</param>
         public static void ParseInsertDummies(InputArguments arguments, string value)
         {
             arguments.InsertDummies = Boolean.Parse(value);
-            ParseDummyCount(arguments);
         }
 
         /// <summary>
@@ -58,8 +55,10 @@ namespace SteganographyApp.Common.Arguments
                     dummyCount += dummyCount * (image.Width * image.Height);
                 }
             }
-            string seed = dummyCount.ToString();
-            arguments.DummyCount = IndexGenerator.FromString(seed).Next(MAX_DUMMY_COUNT) + MIN_DUMMY_COUNT;
+            
+            string userRandomSeed = Checks.IsNullOrEmpty(arguments.RandomSeed) ? "" : arguments.RandomSeed;
+            string seed = userRandomSeed + dummyCount.ToString();
+            arguments.DummyCount = IndexGenerator.FromString(seed).Next(MAX_DUMMY_COUNT - MIN_DUMMY_COUNT) + MIN_DUMMY_COUNT;
         }
 
         /// <summary>
@@ -74,14 +73,15 @@ namespace SteganographyApp.Common.Arguments
             try
             {
                 arguments.CompressionLevel = Convert.ToInt32(value);
-                if (arguments.CompressionLevel < 0 || arguments.CompressionLevel > 9)
-                {
-                    throw new ArgumentValueException("The compression level must be a whole number between 0 and 9 inclusive.");
-                }
             }
-            catch (Exception e) when (!(e is ArgumentValueException))
+            catch (Exception e)
             {
                 throw new ArgumentValueException($"Could not parse compression level from value: {value}", e);
+            }
+
+            if (arguments.CompressionLevel < 0 || arguments.CompressionLevel > 9)
+            {
+                throw new ArgumentValueException("The compression level must be a whole number between 0 and 9 inclusive.");
             }
         }
 
@@ -97,14 +97,15 @@ namespace SteganographyApp.Common.Arguments
             try
             {
                 arguments.ChunkByteSize = Convert.ToInt32(value);
-                if(arguments.ChunkByteSize <= 0)
-                {
-                    throw new ArgumentValueException("The chunk size value must be a positive whole number with a value more than 0.");
-                }
             }
-            catch(Exception e) when (!(e is ArgumentValueException))
+            catch (Exception e)
             {
                 throw new ArgumentValueException($"Could not parse chunk size from value {value}", e);
+            }
+
+            if(arguments.ChunkByteSize <= 0)
+            {
+                throw new ArgumentValueException("The chunk size value must be a positive whole number with a value more than 0.");
             }
         }
 
@@ -165,7 +166,7 @@ namespace SteganographyApp.Common.Arguments
             value = value.Replace("-", "");
             if(!Enum.TryParse(value, true, out ActionEnum action))
             {
-                throw new ArgumentValueException($"Invalid value for action argument. Expected 'encode', 'decode', 'clean', 'calculate-storage-space', or 'calculate-encrypted-size' got {value}");
+                throw new ArgumentValueException($"Invalid value for action argument. Expected one of 'encode', 'decode', 'clean', 'calculate-storage-space', 'css', 'calculate-encrypted-size', 'ces' got {value}");
             }
             args.EncodeOrDecode = action;
         }

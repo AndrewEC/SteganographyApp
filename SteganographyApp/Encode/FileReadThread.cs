@@ -18,17 +18,19 @@ namespace SteganographyApp.Encode
 
         private readonly BlockingCollection<ReadArgs> queue;
         private readonly IInputArguments arguments;
+        private readonly ErrorContainer errorContainer;
         private Thread readThread;
 
-        private FileReadThread(BlockingCollection<ReadArgs> queue, IInputArguments arguments)
+        private FileReadThread(BlockingCollection<ReadArgs> queue, IInputArguments arguments, ErrorContainer errorContainer)
         {
             this.queue = queue;
             this.arguments = arguments;
+            this.errorContainer = errorContainer;
         }
 
-        public static FileReadThread CreateAndStart(BlockingCollection<ReadArgs> queue, IInputArguments arguments)
+        public static FileReadThread CreateAndStart(BlockingCollection<ReadArgs> queue, IInputArguments arguments, ErrorContainer errorContainer)
         {
-            var thread = new FileReadThread(queue, arguments);
+            var thread = new FileReadThread(queue, arguments, errorContainer);
             thread.StartReading();
             return thread;
         }
@@ -54,6 +56,10 @@ namespace SteganographyApp.Encode
                     string contentChunk = "";
                     while((contentChunk = reader.ReadContentChunkFromFile()) != null)
                     {
+                        if (errorContainer.HasException())
+                        {
+                            return;
+                        }
                         queue.Add(new ReadArgs { Status = Status.Incomplete, Data = contentChunk });
                     }
                     queue.Add(new ReadArgs { Status = Status.Complete });

@@ -14,6 +14,11 @@ namespace SteganographyApp.Common
         public static readonly int ChunkDefinitionBitSize = 32;
 
         /// <summary>
+        /// Indicates the maximum number of bits that can be stored in a single pixel.
+        /// </summary>
+        public static readonly int BitsPerPixel = 3;
+
+        /// <summary>
         /// Specifies the number of times the file has to be read from, encoded, and written to the storage
         /// image. The number of writes is essentially based on the total size of the image divided by the
         /// number of bytes to read from each iteration from the input file.

@@ -120,7 +120,7 @@ namespace SteganographyApp.Common.Arguments
                 throw new ArgumentParseException("No arguments provided to parse.");
             }
 
-            InputArguments parsedArguments = new InputArguments();
+            var parsedArguments = new InputArguments();
 
             for (int i = 0; i < userArguments.Length; i++)
             {
@@ -149,6 +149,8 @@ namespace SteganographyApp.Common.Arguments
 
             sensitiveArgumentParser.ParseSecureArguments(parsedArguments);
 
+            Parsers.ParseDummyCount(parsedArguments);
+
             return parsedArguments.ToImmutable();
         }
 
@@ -172,6 +174,11 @@ namespace SteganographyApp.Common.Arguments
             }
         }
 
+        /// <summary>
+        /// Invokes the custom post validation function.
+        /// <para>If the invocation returns a non-null or non-empty string then an ArgumentParseException
+        /// will be thrown.</para>
+        /// </summary>
         private void InvokePostValidation(PostValidation validation, InputArguments parsed)
         {
             try

@@ -53,7 +53,7 @@ namespace SteganographyApp.Common
                     break;
                 case HelpItemSet.Calculator:
                     labels = new string[] {"CalculatorDescription", "CalculatorAction", "Input", "Images", "Password",
-                        "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"};
+                        "EnableCompression", "ChunkSize", "EnableDummies"};
                     break;
                 case HelpItemSet.Converter:
                     labels = new string[] {"ConverterDescription", "ConvertAction", "Images", "DeleteOriginals",

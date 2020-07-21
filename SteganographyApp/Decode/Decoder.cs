@@ -44,13 +44,13 @@ namespace SteganographyApp.Decode
         /// <summary>
         /// Used to allow the <see cref="FileWriteThread" /> to communicate an exception back to the Decoder.
         /// </summary>
-        private readonly DecodeError decodeError;
+        private readonly ErrorContainer errorContainer;
 
         private Decoder(IInputArguments arguments)
         {
             this.arguments = arguments;
             writeQueue = new BlockingCollection<WriteArgs>(2);
-            decodeError = new DecodeError();
+            errorContainer = new ErrorContainer();
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace SteganographyApp.Decode
 
             using (var wrapper = store.CreateIOWrapper())
             {
-                var thread = FileWriteThread.CreateAndStartThread(writeQueue, decodeError, arguments);
+                var thread = FileWriteThread.CreateAndStartThread(writeQueue, errorContainer, arguments);
 
                 var contentChunkTable = store.ReadContentChunkTable();
                 var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length,
@@ -89,10 +89,10 @@ namespace SteganographyApp.Decode
                     writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete });
                     tracker.UpdateAndDisplayProgress();
 
-                    if (decodeError.HasException())
+                    if (errorContainer.HasException())
                     {
                         thread.Join();
-                        throw decodeError.TakeException();
+                        throw errorContainer.TakeException();
                     }
                 }
 

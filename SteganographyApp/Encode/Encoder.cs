@@ -65,10 +65,17 @@ namespace SteganographyApp.Encode
         /// </summary>
         private readonly BlockingCollection<ReadArgs> readQueue;
 
+        /// <summary>
+        /// Used to help communicate the ocurrence of an error to the file read thread so
+        /// it can attempt to shutdown gracefully.
+        /// </summary>
+        private readonly ErrorContainer errorContainer;
+
         private Encoder(IInputArguments arguments)
         {
             this.arguments = arguments;
             readQueue = new BlockingCollection<ReadArgs>(2);
+            errorContainer = new ErrorContainer();
         }
 
         /// <summary>
@@ -118,7 +125,7 @@ namespace SteganographyApp.Encode
             var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
                 "Encoding file contents", "All input file contents have been encoded.");
 
-            var thread = FileReadThread.CreateAndStart(readQueue, arguments);
+            var thread = FileReadThread.CreateAndStart(readQueue, arguments, errorContainer);
 
             while(true)
             {
@@ -136,7 +143,16 @@ namespace SteganographyApp.Encode
                 }
                 else if (readArgs.Status == Status.Incomplete)
                 {
-                    wrapper.WriteContentChunkToImage(readArgs.Data);
+                    try
+                    {
+                        wrapper.WriteContentChunkToImage(readArgs.Data);
+                    }
+                    catch (Exception e)
+                    {
+                        errorContainer.PutException(e);
+                        thread.Join();
+                        throw e;
+                    }
                     progressTracker.UpdateAndDisplayProgress();
                 }
             }

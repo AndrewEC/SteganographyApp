@@ -41,11 +41,6 @@ namespace SteganographyApp.Common.Data
                 bytes = CompressionUtil.Compress(bytes);
             }
 
-            if (randomSeed != "")
-            {
-                bytes = RandomizeUtil.RandomizeBytes(bytes, randomSeed);
-            }
-
             string base64 = Convert.ToBase64String(bytes);
 
             if (password != "")
@@ -62,14 +57,17 @@ namespace SteganographyApp.Common.Data
 
             string binary = BinaryUtil.ToBinaryString(base64);
 
-            if(dummyCount == 0)
+            if (dummyCount > 0)
             {
-                return binary;
+                binary = DummyUtil.InsertDummies(dummyCount, binary);
             }
-            else
+
+            if (randomSeed != "")
             {
-                return DummyUtil.InsertDummies(dummyCount, binary);
+                binary = RandomizeUtil.RandomizeBinaryString(binary, randomSeed);
             }
+
+            return binary;
         }
 
         /// <summary>
@@ -87,6 +85,12 @@ namespace SteganographyApp.Common.Data
         /// occured while decrypting the base64 string or when decompressing the byte stream.</exception>
         public static byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed)
         {
+            
+            if (randomSeed != "")
+            {
+                binary = RandomizeUtil.ReorderBinaryString(binary, randomSeed);   
+            }
+
             if(dummyCount > 0)
             {
                 binary = DummyUtil.RemoveDummies(dummyCount, binary);
@@ -107,12 +111,6 @@ namespace SteganographyApp.Common.Data
 
             byte[] decoded = Convert.FromBase64String(decoded64String);
 
-            if (randomSeed != "")
-            {
-                decoded = RandomizeUtil.ReorderBytes(decoded, randomSeed);
-                
-            }
-
             if (useCompression)
             {
                 try
@@ -124,10 +122,8 @@ namespace SteganographyApp.Common.Data
                     throw new TransformationException("An exception occurred while decompressing content.", e);
                 }
             }
-            else
-            {
-                return decoded;
-            }
+            
+            return decoded;
         }
 
     }

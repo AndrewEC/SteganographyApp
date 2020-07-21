@@ -9,7 +9,7 @@ namespace SteganographyApp
         static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography App\n");
-            if (Array.IndexOf(args, "--help") != -1 || Array.IndexOf(args, "-h") != -1)
+            if (Checks.WasHelpRequested(args))
             {
                 PrintHelp();
                 return;
@@ -39,20 +39,16 @@ namespace SteganographyApp
             switch (e){
                 case ArgumentParseException e1:
                 case ArgumentValueException e2:
-                    Console.WriteLine("An error ocurred during execution: \n\t{0}", e.Message);
+                    Console.WriteLine("An error ocurred parsing the provided arguments: \n\t{0}", e.Message);
                     break;
                 default:
-                    #if DEBUG
                     if (arguments.PrintStack)
                     {
                         Console.WriteLine("Message Trace: ");
                         Console.WriteLine(e.StackTrace);
                     }
-                    #endif
 
-                    #if !DEBUG
-                    Console.WriteLine("The action could not be completed. This can often indicate incorrect random seeds, passwords, images, etc.");
-                    #endif
+                    Console.WriteLine($"An error ocurred during execution: {e.Message}");
                     break;
             }
         }
