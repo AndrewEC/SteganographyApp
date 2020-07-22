@@ -47,7 +47,6 @@ namespace SteganographyApp.Common.Arguments
 
             var imageProvider = Injector.Provide<IImageProvider>();
             
-            // TODO: change this to ulong
             long dummyCount = 1;
             int[] imageIndexes = new int[] { 0, arguments.CoverImages.Length - 1 };
             foreach (int imageIndex in imageIndexes)

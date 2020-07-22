@@ -7,7 +7,7 @@ using SteganographyApp.Common.Data;
 namespace SteganographyApp.Common.Benchmarks
 {
 
-    [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 10, targetCount: 10)]
+    [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 3, targetCount: 3)]
     [MeanColumn, MinColumn, MaxColumn]
     public class EncodeBench
     {
@@ -65,7 +65,7 @@ namespace SteganographyApp.Common.Benchmarks
 
     }
 
-    [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 10, targetCount: 10)]
+    [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 3, targetCount: 3)]
     [MeanColumn, MinColumn, MaxColumn]
     public class DecodeBench
     {

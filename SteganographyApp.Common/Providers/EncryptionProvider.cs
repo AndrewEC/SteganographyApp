@@ -3,6 +3,9 @@ using Rijndael256;
 namespace SteganographyApp.Common.Providers
 {
 
+    /// <summary>
+    /// Provides a wrapper interface for interacting with the Rijndael encryption library.
+    /// </summary>
     public interface IEncryptionProvider
     {
         string Encrypt(string base64String, string password);

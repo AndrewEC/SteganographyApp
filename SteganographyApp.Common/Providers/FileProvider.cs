@@ -4,6 +4,10 @@ using System.IO;
 namespace SteganographyApp.Common.Providers
 {
 
+    /// <summary>
+    /// Provides an interface wrapper for some of the basic
+    /// read/write stream operations.
+    /// </summary>
     public interface IReadWriteStream : IDisposable
     {
         int Read(byte[] array, int offset, int count);
@@ -55,6 +59,10 @@ namespace SteganographyApp.Common.Providers
 
     }
 
+    /// <summary>
+    /// Provides an interface wrapper for some of the basic file IO operations
+    /// so they can be stubbed out in unit tests.
+    /// </summary>
     public interface IFileProvider
     {
         long GetFileSizeBytes(string pathToFile);

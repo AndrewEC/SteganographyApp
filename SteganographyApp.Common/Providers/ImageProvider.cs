@@ -6,6 +6,9 @@ using SixLabors.ImageSharp.PixelFormats;
 namespace SteganographyApp.Common.Providers
 {
 
+    /// <summary>
+    /// An interface wrapper for the ImageSharp Image class instance.
+    /// </summary>
     public interface IBasicImageInfo : IDisposable
     {
         int Width { get; }
@@ -72,6 +75,12 @@ namespace SteganographyApp.Common.Providers
 
     }
 
+    /// <summary>
+    /// An interface wrapper for the SixLabors Image loader class.
+    /// Intended to allow mocking of the load function so unit tests can
+    /// test with a loaded image without the need for an actual image file
+    /// to be present.
+    /// </summary>
     public interface IImageProvider
     {
         IBasicImageInfo LoadImage(string pathToImage);

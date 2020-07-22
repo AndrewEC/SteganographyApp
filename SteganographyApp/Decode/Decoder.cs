@@ -81,7 +81,7 @@ namespace SteganographyApp.Decode
 
                 var contentChunkTable = store.ReadContentChunkTable();
                 var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length,
-                    "Encoding file contents", "All input file contents have been decoded.");
+                    "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
 
                 foreach (int chunkLength in contentChunkTable)
                 {
