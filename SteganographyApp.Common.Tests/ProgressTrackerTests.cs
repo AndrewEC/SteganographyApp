@@ -1,7 +1,9 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SteganographyApp.Common.Test;
 using Moq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System.Collections.Generic;
+
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -40,7 +42,14 @@ namespace SteganographyApp.Common.Tests
         public void BeforeEach()
         {
             mockWriter = new MockWriter();
-            tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage, mockWriter);
+            Injector.UseProvider<IWriter>(mockWriter);
+            tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Injector.ResetProviders();
         }
 
         private void ExecuteUpdates(ProgressTracker tracker)

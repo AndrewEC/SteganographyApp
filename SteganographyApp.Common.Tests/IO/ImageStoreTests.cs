@@ -70,7 +70,7 @@ namespace SteganographyApp.Common.IO
             using (var wrapper = imageStore.CreateIOWrapper())
             {
                 var exception = Assert.ThrowsException<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
-                Assert.AreEqual("There is not enough available storage space in the provided images to process this request.",
+                Assert.AreEqual("There is not enough available storage space in the provided images to store the encoded file.",
                     exception.Message);
             }
 

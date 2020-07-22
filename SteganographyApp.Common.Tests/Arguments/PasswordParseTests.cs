@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 
 using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Test;
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -14,6 +14,13 @@ namespace SteganographyApp.Common.Tests
     [TestClass]
     public class PasswordParseTests
     {
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Injector.ResetProviders();
+        }
+
         [TestMethod]
         public void TestParsePasswordWithValidValue()
         {
@@ -27,14 +34,16 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestParsePasswordWithInteractiveInput()
         {
-            string[] inputArgs = new string[] { "--password", "?" };
 
             var queue = CreateUserInputQueue();
-
             var mockReader = new Mock<IReader>();
             mockReader.Setup(reader => reader.ReadKey(It.IsAny<bool>())).Returns<bool>((intercept) => queue.Dequeue());
 
-            var parser = new ArgumentParser(mockReader.Object, new NullWriter());
+            Injector.UseProvider(mockReader.Object);
+            Injector.UseProvider(new Mock<IWriter>().Object);
+
+            string[] inputArgs = new string[] { "--password", "?" };
+            var parser = new ArgumentParser();
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments inputArguments, NullReturningPostValidator));
 
             mockReader.Verify(reader => reader.ReadKey(It.IsAny<bool>()), Times.Exactly(9));
@@ -57,16 +66,7 @@ namespace SteganographyApp.Common.Tests
             return queue;
         }
 
-        public class NullWriter : IWriter
-        {
-            public void Write(string line) {}
-            public void WriteLine(string line) {}
-        }
-
-        private string NullReturningPostValidator(IInputArguments input)
-        {
-            return null;
-        }
+        private string NullReturningPostValidator(IInputArguments input) => null;
 
     }
 

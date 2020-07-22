@@ -36,10 +36,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
         }
 
-        private string NullReturningPostValidator(IInputArguments input)
-        {
-            return null;
-        }
+        private string NullReturningPostValidator(IInputArguments input) => null;
 
     }
 

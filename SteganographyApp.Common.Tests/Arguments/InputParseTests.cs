@@ -58,10 +58,7 @@ namespace SteganographyApp.Common.Tests
             mockFileProvider.Verify(provider => provider.IsExistingFile(path), Times.Once());
         }
 
-        private string NullReturningPostValidator(IInputArguments input)
-        {
-            return null;
-        }
+        private string NullReturningPostValidator(IInputArguments input) => null;
 
     }
 

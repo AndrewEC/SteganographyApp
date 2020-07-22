@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
-using SteganographyApp.Common.Test;
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.Arguments
 {
@@ -37,8 +37,10 @@ namespace SteganographyApp.Common.Arguments
 
         private readonly SensitiveArgumentParser sensitiveArgumentParser;
 
-        public ArgumentParser(IReader reader, IWriter writer)
+        public ArgumentParser()
         {
+            var writer = Injector.Provide<IWriter>();
+            var reader = Injector.Provide<IReader>();
             readWriteUtils = new ReadWriteUtils { Reader = reader, Writer = writer };
 
             sensitiveArgumentParser = new SensitiveArgumentParser(readWriteUtils);
@@ -58,8 +60,6 @@ namespace SteganographyApp.Common.Arguments
                 new Argument("--compressionLevel", "-co", Parsers.ParseCompressionLevel)
             );
         }
-
-        public ArgumentParser() : this(new ConsoleKeyReader(), new ConsoleWriter()) {}
 
         /// <summary>
         /// Attempts to lookup an Argument instance from the list of arguments.

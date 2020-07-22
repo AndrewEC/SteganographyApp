@@ -48,10 +48,7 @@ namespace SteganographyApp.Common.Tests
             return builder.ToString();
         }
 
-        private string NullReturningPostValidator(IInputArguments input)
-        {
-            return null;
-        }
+        private string NullReturningPostValidator(IInputArguments input) => null;
 
     }
 

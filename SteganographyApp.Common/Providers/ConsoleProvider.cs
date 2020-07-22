@@ -1,6 +1,6 @@
 using System;
 
-namespace SteganographyApp.Common.Test
+namespace SteganographyApp.Common.Providers
 {
 
     /// <summary>
