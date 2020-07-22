@@ -1,5 +1,6 @@
-﻿using Rijndael256;
-using System;
+﻿using System;
+
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.Data
 {
@@ -13,11 +14,17 @@ namespace SteganographyApp.Common.Data
         public TransformationException(string message, Exception inner) : base(message, inner) { }
     }
 
+    public interface IDataEncoderUtil
+    {
+        string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed);
+        byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed);
+    }
+
     /// <summary>
     /// Utility class to encode a file to encrypted binary data or decode the encrypted binary string to the
     /// original file bytes.
     /// </summary>
-    public static class DataEncoderUtil
+    public class DataEncoderUtil : IDataEncoderUtil
     {   
 
         /// <summary>
@@ -34,11 +41,11 @@ namespace SteganographyApp.Common.Data
         /// <exception cref="TransformationException">Thrown
         /// if there was an issue trying to pass the base64 encoded string through the AES
         /// cipher.</exception>
-        public static string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed)
+        public string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed)
         {
             if (useCompression)
             {
-                bytes = CompressionUtil.Compress(bytes);
+                bytes = Injector.Provide<ICompressionUtil>().Compress(bytes);
             }
 
             string base64 = Convert.ToBase64String(bytes);
@@ -47,7 +54,7 @@ namespace SteganographyApp.Common.Data
             {
                 try
                 {
-                    base64 = Rijndael.Encrypt(base64, password, KeySize.Aes256);
+                    base64 = Injector.Provide<IEncryptionProvider>().Encrypt(base64, password);
                 }
                 catch (Exception e)
                 {
@@ -55,16 +62,16 @@ namespace SteganographyApp.Common.Data
                 }
             }
 
-            string binary = BinaryUtil.ToBinaryString(base64);
+            string binary = Injector.Provide<IBinaryUtil>().ToBinaryString(base64);
 
             if (dummyCount > 0)
             {
-                binary = DummyUtil.InsertDummies(dummyCount, binary);
+                binary = Injector.Provide<IDummyUtil>().InsertDummies(dummyCount, binary);
             }
 
             if (randomSeed != "")
             {
-                binary = RandomizeUtil.RandomizeBinaryString(binary, randomSeed);
+                binary = Injector.Provide<IRandomizeUtil>().RandomizeBinaryString(binary, randomSeed);
             }
 
             return binary;
@@ -83,25 +90,25 @@ namespace SteganographyApp.Common.Data
         /// encoding.</returns>
         /// <exception cref="TransformationException">Thrown if an error
         /// occured while decrypting the base64 string or when decompressing the byte stream.</exception>
-        public static byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed)
+        public byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed)
         {
             
             if (randomSeed != "")
             {
-                binary = RandomizeUtil.ReorderBinaryString(binary, randomSeed);   
+                binary = Injector.Provide<IRandomizeUtil>().ReorderBinaryString(binary, randomSeed);   
             }
 
             if(dummyCount > 0)
             {
-                binary = DummyUtil.RemoveDummies(dummyCount, binary);
+                binary = Injector.Provide<IDummyUtil>().RemoveDummies(dummyCount, binary);
             }
 
-            var decoded64String = BinaryUtil.ToBase64String(binary);
+            var decoded64String = Injector.Provide<IBinaryUtil>().ToBase64String(binary);
             if (password != "")
             {
                 try
                 {
-                    decoded64String = Rijndael.Decrypt(decoded64String, password, KeySize.Aes256);
+                    decoded64String = Injector.Provide<IEncryptionProvider>().Decrypt(decoded64String, password);
                 }
                 catch (Exception e)
                 {
@@ -115,7 +122,7 @@ namespace SteganographyApp.Common.Data
             {
                 try
                 {
-                    return CompressionUtil.Decompress(decoded);
+                    return Injector.Provide<ICompressionUtil>().Decompress(decoded);
                 }
                 catch (Exception e)
                 {

@@ -7,3 +7,4 @@ coverage.json
 coverage.opencover.xml
 reports/
 publish/
+BenchmarkDotNet.Artifacts/

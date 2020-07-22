@@ -3,6 +3,7 @@ using System.IO;
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.IO.Content
 {
@@ -31,7 +32,7 @@ namespace SteganographyApp.Common.IO.Content
         {
             if (stream == null)
             {
-                stream = File.OpenRead(args.FileToEncode);
+                stream = Injector.Provide<IFileProvider>().OpenFileForRead(args.FileToEncode);
             }
             byte[] buffer = new byte[args.ChunkByteSize];
             int read = stream.Read(buffer, 0, buffer.Length);
@@ -46,7 +47,7 @@ namespace SteganographyApp.Common.IO.Content
                 buffer = actual;
             }
 
-            return DataEncoderUtil.Encode(buffer, args.Password, args.UseCompression, args.DummyCount, args.RandomSeed);
+            return Injector.Provide<IDataEncoderUtil>().Encode(buffer, args.Password, args.UseCompression, args.DummyCount, args.RandomSeed);
         }
 
     }

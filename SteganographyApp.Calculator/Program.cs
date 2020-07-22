@@ -127,7 +127,7 @@ namespace SteganographyAppCalculator
             Console.WriteLine("Calculating storage space in {0} images.", args.CoverImages.Length);
             try
             {
-                long availableSpace = CalculateNumberOfPixelsForImages(args.CoverImages) * Calculator.BitsPerPixel;
+                ulong availableSpace = CalculateNumberOfPixelsForImages(args.CoverImages) * (uint) Calculator.BitsPerPixel;
 
                 Console.WriteLine("\nImages are able to store:");
                 PrintSize(availableSpace);
@@ -147,16 +147,16 @@ namespace SteganographyAppCalculator
         /// Calculate the total number of pixels within all images.
         /// </summary>
         /// <param name="coverImages">The array of string paths to the images to check.</param>
-        private static long CalculateNumberOfPixelsForImages(string[] coverImages)
+        private static ulong CalculateNumberOfPixelsForImages(string[] coverImages)
         {
             var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length,
                     "Calculating image storage space", "Completed calculating image storage space.");
-            long pixelCount = 0;
+            ulong pixelCount = 0;
             foreach (string imagePath in coverImages)
             {
                 using (var image = Image.Load(imagePath))
                 {
-                    pixelCount += (image.Width * image.Height);
+                    pixelCount += (ulong) (image.Width * image.Height);
                 }
                 progressTracker.UpdateAndDisplayProgress();
             }

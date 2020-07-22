@@ -45,6 +45,27 @@ namespace SteganographyApp.Common.Tests
             Assert.IsFalse(Checks.IsOneOf(ActionEnum.Encode, ActionEnum.Clean, ActionEnum.Decode));
         }
 
+        [TestMethod]
+        public void TestWasHelpRequestedWhenShorthandHelpFlagIsInArgsReturnsTrue()
+        {
+            string[] args = new string[] { "-h" };
+            Assert.IsTrue(Checks.WasHelpRequested(args));
+        }
+
+        [TestMethod]
+        public void TestWasHelpRequestWhenHelpFlagIsInArgsReturnsTrue()
+        {
+            string[] args = new string[] { "--help" };
+            Assert.IsTrue(Checks.WasHelpRequested(args));
+        }
+
+        [TestMethod]
+        public void TestWasHelPRequestedWhenNoHelpFlagInArgsReturnsFalse()
+        {
+            string[] args = new string[0];
+            Assert.IsFalse(Checks.WasHelpRequested(args));
+        }
+
     }
 
 }

@@ -4,7 +4,13 @@ using System.IO.Compression;
 namespace SteganographyApp.Common.Data
 {
 
-    public static class CompressionUtil
+    public interface ICompressionUtil
+    {
+        byte[] Compress(byte[] fileBytes);
+        byte[] Decompress(byte[] readBytes);
+    }
+
+    public class CompressionUtil : ICompressionUtil
     {
 
         /// <summary>
@@ -12,7 +18,7 @@ namespace SteganographyApp.Common.Data
         /// </summary>
         /// <param name="src">The source stream where the data is coming from.</param>
         /// <param name="dest">The destination stream the data is being written to.</param>
-        private static void CopyTo(Stream src, Stream dest)
+        private void CopyTo(Stream src, Stream dest)
         {
             byte[] bytes = new byte[2048];
             int read = 0;
@@ -27,7 +33,7 @@ namespace SteganographyApp.Common.Data
         /// </summary>
         /// <param name="fileBytes">The array of bytes read from the input file.</param>
         /// <returns>The gzip compressed array of bytes.</returns>
-        public static byte[] Compress(byte[] fileBytes)
+        public byte[] Compress(byte[] fileBytes)
         {
             using (var msi = new MemoryStream(fileBytes))
             using (var mso = new MemoryStream())
@@ -48,7 +54,7 @@ namespace SteganographyApp.Common.Data
         /// <param name="readBytes">The array of bytes read and decoded from the
         /// cover images.</param>
         /// <returns>A byte array after being decompressed using standard gzip compression.</returns>
-        public static byte[] Decompress(byte[] readBytes)
+        public byte[] Decompress(byte[] readBytes)
         {
             using (var msi = new MemoryStream(readBytes))
             using (var mso = new MemoryStream())

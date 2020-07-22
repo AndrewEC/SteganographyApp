@@ -4,7 +4,13 @@ using System.Text;
 namespace SteganographyApp.Common.Data
 {
 
-    public static class BinaryUtil
+    public interface IBinaryUtil
+    {
+        string ToBase64String(string binary);
+        string ToBinaryString(string base64String);
+    }
+
+    public class BinaryUtil : IBinaryUtil
     {
 
         /// <summary>
@@ -12,7 +18,7 @@ namespace SteganographyApp.Common.Data
         /// </summary>
         /// <param name="binary">The original string representation of a binary figure to
         /// convert to base64.</param>
-        public static string ToBase64String(string binary)
+        public string ToBase64String(string binary)
         {
             byte[] bytes = new byte[binary.Length / 8];
             for (int i = 0; i < bytes.Length; i++)
@@ -28,7 +34,7 @@ namespace SteganographyApp.Common.Data
         /// </summary>
         /// <param name="base64String">The base64 encoded string to convert to
         /// binary.</param>
-        public static string ToBinaryString(string base64String)
+        public string ToBinaryString(string base64String)
         {
             byte[] converted = Convert.FromBase64String(base64String);
             var builder = new StringBuilder();

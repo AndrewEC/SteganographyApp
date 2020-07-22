@@ -7,7 +7,7 @@ using SteganographyApp.Common.Data;
 namespace SteganographyApp.Common.Benchmarks
 {
 
-    [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 10, targetCount: 10)]
+    [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 3, targetCount: 3)]
     [MeanColumn, MinColumn, MaxColumn]
     public class EncodeBench
     {
@@ -24,48 +24,48 @@ namespace SteganographyApp.Common.Benchmarks
         [Benchmark]
         public string Encode()
         {
-            return DataEncoderUtil.Encode(data, "", false, 0, "");
+            return new DataEncoderUtil().Encode(data, "", false, 0, "");
         }
 
         [Benchmark]
         public string EncodeWithPassword()
         {
-            return DataEncoderUtil.Encode(data, "Password123!@#", false, 0, "");
+            return new DataEncoderUtil().Encode(data, "Password123!@#", false, 0, "");
         }
 
         [Benchmark]
         public string EncodeWithCompression()
         {
-            return DataEncoderUtil.Encode(data, "", true, 0, "");
+            return new DataEncoderUtil().Encode(data, "", true, 0, "");
         }
 
         [Benchmark]
         public string EncodeWithDummies()
         {
-            return DataEncoderUtil.Encode(data, "", false, 10, "");
+            return new DataEncoderUtil().Encode(data, "", false, 10, "");
         }
 
         [Benchmark]
         public string EncodeWithPasswordAndCompression()
         {
-            return DataEncoderUtil.Encode(data, "Password123!@#", true, 0, "");
+            return new DataEncoderUtil().Encode(data, "Password123!@#", true, 0, "");
         }
 
         [Benchmark]
         public string EncodeWithPasswordAndCompressionAndDummies()
         {
-            return DataEncoderUtil.Encode(data, "Password123!@#", true, 10, "");
+            return new DataEncoderUtil().Encode(data, "Password123!@#", true, 10, "");
         }
 
         [Benchmark]
         public string EncodeWithPasswordAndCompressionAndDummiesAndRandomization()
         {
-            return DataEncoderUtil.Encode(data, "Password123!@#", true, 10, "randomSeed");
+            return new DataEncoderUtil().Encode(data, "Password123!@#", true, 10, "randomSeed");
         }
 
     }
 
-    [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 10, targetCount: 10)]
+    [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 3, targetCount: 3)]
     [MeanColumn, MinColumn, MaxColumn]
     public class DecodeBench
     {
@@ -82,13 +82,13 @@ namespace SteganographyApp.Common.Benchmarks
         {
             byte[] rawData = new byte[4_000_000];
             new Random(100).NextBytes(rawData);
-            data = DataEncoderUtil.Encode(rawData, Password, false, 0, "");
+            data = new DataEncoderUtil().Encode(rawData, Password, false, 0, "");
         }
 
         [Benchmark]
         public byte[] DecodeWithPassword()
         {
-            return DataEncoderUtil.Decode(data, Password, false, 0, "");
+            return new DataEncoderUtil().Decode(data, Password, false, 0, "");
         }
 
         [GlobalSetup(Target=nameof(DecodeWithPasswordAndCompression))]
@@ -96,13 +96,13 @@ namespace SteganographyApp.Common.Benchmarks
         {
             byte[] rawData = new byte[4_000_000];
             new Random(100).NextBytes(rawData);
-            data = DataEncoderUtil.Encode(rawData, Password, true, 0, "");
+            data = new DataEncoderUtil().Encode(rawData, Password, true, 0, "");
         }
 
         [Benchmark]
         public byte[] DecodeWithPasswordAndCompression()
         {
-            return DataEncoderUtil.Decode(data, Password, true, 0, "");
+            return new DataEncoderUtil().Decode(data, Password, true, 0, "");
         }
 
         [GlobalSetup(Target=nameof(DecodeWithPasswordAndCompressionAndDummies))]
@@ -110,13 +110,13 @@ namespace SteganographyApp.Common.Benchmarks
         {
             byte[] rawData = new byte[4_000_000];
             new Random(100).NextBytes(rawData);
-            data = DataEncoderUtil.Encode(rawData, Password, true, DummyCount, "");
+            data = new DataEncoderUtil().Encode(rawData, Password, true, DummyCount, "");
         }
 
         [Benchmark]
         public byte[] DecodeWithPasswordAndCompressionAndDummies()
         {
-            return DataEncoderUtil.Decode(data, Password, true, DummyCount, "");
+            return new DataEncoderUtil().Decode(data, Password, true, DummyCount, "");
         }
 
         [GlobalSetup(Target=nameof(DecodeWithPasswordAndCompressionAndDummiesAndRandomization))]
@@ -124,13 +124,13 @@ namespace SteganographyApp.Common.Benchmarks
         {
             byte[] rawData = new byte[4_000_000];
             new Random(100).NextBytes(rawData);
-            data = DataEncoderUtil.Encode(rawData, Password, true, DummyCount, RandomSeed);
+            data = new DataEncoderUtil().Encode(rawData, Password, true, DummyCount, RandomSeed);
         }
 
         [Benchmark]
         public byte[] DecodeWithPasswordAndCompressionAndDummiesAndRandomization()
         {
-            return DataEncoderUtil.Decode(data, Password, true, DummyCount, RandomSeed);
+            return new DataEncoderUtil().Decode(data, Password, true, DummyCount, RandomSeed);
         }
 
     }

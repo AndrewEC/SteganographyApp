@@ -13,13 +13,17 @@ Using other formats, such as JPG, can cause data loss when saving any modificati
 
 Running Tests
 ---
-// Install Global Tools
-1. dotnet tool install --global coverlet.console
-2. dotnet tool install -g dotnet-reportgenerator-globaltool
-3. dotnet tool install -g dotnet-stryker
+Install the required global tools.
+1. `dotnet tool install --global coverlet.console`
+2. `dotnet tool install -g dotnet-reportgenerator-globaltool`
+3. `dotnet tool install -g dotnet-stryker`
 
 After installing the global tools you can run the unit tests and generate the coverage reports by executing the script `run_tests.ps1`.
 To run and view the mutation test results execute the script `run_mutations.ps1`.
+
+Running Benchmarks
+---
+From the root directory execute `dotnet run --project ./SteganographyApp.Common.Benchmarks -c release`
 
 Current Features
 ---

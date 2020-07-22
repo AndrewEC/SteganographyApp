@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 
 namespace SteganographyApp.Common.Data
 {
@@ -60,7 +59,7 @@ namespace SteganographyApp.Common.Data
             int count = 0;
             while (count < generations)
             {
-                Next(100);
+                Next(Int32.MaxValue);
                 count++;
             }
         }
@@ -95,15 +94,12 @@ namespace SteganographyApp.Common.Data
         ///  number of times based on the provided seed string byte size.</returns>
         public static IndexGenerator FromString(string seed)
         {
-            byte[] bytes = Encoding.ASCII.GetBytes(seed);
-            seed = Convert.ToBase64String(bytes);
             Int32 total = 0;
             foreach (char c in seed)
             {
                 total += c * c;
             }
-            IndexGenerator temp = new IndexGenerator(total / (total >> 2), seed.Length);
-            return new IndexGenerator(total, bytes.Length * temp.Next(bytes.Length * 5));
+            return new IndexGenerator(total, seed.Length);
         }
 
         /// <summary>

@@ -1,7 +1,8 @@
 using System.Linq;
-using System.IO;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.Arguments
 {
@@ -59,15 +60,12 @@ namespace SteganographyApp.Common.Arguments
                 throw new ArgumentValueException($"No images were found using the provided regular expression.");
             }
 
-            for (int i = 0; i < imagePaths.Length; i++)
+            var fileProvider = Injector.Provide<IFileProvider>();
+            foreach (string path in imagePaths)
             {
-                if (!File.Exists(imagePaths[i]))
+                if (!fileProvider.IsExistingFile(path))
                 {
-                    throw new ArgumentValueException($"Image could not be found at {imagePaths[i]}");
-                }
-                else if (File.GetAttributes(imagePaths[i]).HasFlag(FileAttributes.Directory))
-                {
-                    throw new ArgumentValueException($"File found at {imagePaths[i]} was a directory instead of an image.");
+                    throw new ArgumentValueException($"The file specified could not be found or is not a file: {path}");
                 }
             }
         }

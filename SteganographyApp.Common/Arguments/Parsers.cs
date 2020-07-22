@@ -1,7 +1,6 @@
 using System;
-using System.IO;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+
+using SteganographyApp.Common.Providers;
 using SteganographyApp.Common.Data;
 
 namespace SteganographyApp.Common.Arguments
@@ -45,12 +44,14 @@ namespace SteganographyApp.Common.Arguments
             {
                 return;
             }
+
+            var imageProvider = Injector.Provide<IImageProvider>();
             
             long dummyCount = 1;
             int[] imageIndexes = new int[] { 0, arguments.CoverImages.Length - 1 };
             foreach (int imageIndex in imageIndexes)
             {
-                using (Image<Rgba32> image = Image.Load(arguments.CoverImages[imageIndex]))
+                using (IBasicImageInfo image = imageProvider.LoadImage(arguments.CoverImages[imageIndex]))
                 {
                     dummyCount += dummyCount * (image.Width * image.Height);
                 }
@@ -131,13 +132,9 @@ namespace SteganographyApp.Common.Arguments
         /// could not be found.</exception>
         public static void ParseFileToEncode(InputArguments arguments, string value)
         {
-            if (!File.Exists(value))
+            if (!Injector.Provide<IFileProvider>().IsExistingFile(value))
             {
-                throw new ArgumentValueException($"File to decode could not be found at {value}");
-            }
-            else if (File.GetAttributes(value).HasFlag(FileAttributes.Directory))
-            {
-                throw new ArgumentValueException($"Input file at {value} was a directory but a file is required.");
+                throw new ArgumentValueException($"Input file could not be found or is not a file: {value}");
             }
             arguments.FileToEncode = value;
         }

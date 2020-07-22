@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
-using System.IO;
 using System.Text;
 
-using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
 using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.IO
 {
@@ -104,7 +103,7 @@ namespace SteganographyApp.Common.IO
         /// The currently loaded image. The image is loaded whenever the Next
         /// method is called and the currentImageIndex has been incremented.
         /// </summary>
-        private Image<Rgba32> currentImage;
+        private IBasicImageInfo currentImage;
 
         /// <summary>
         /// The values parsed from the command line arguments.
@@ -382,7 +381,7 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <param name="imageName">The image name to start reading and writing from.</param>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        private void ResetToImage(int coverImageIndex)
+        public void ResetToImage(int coverImageIndex)
         {
             if (coverImageIndex < 0 || coverImageIndex >= args.CoverImages.Length)
             {
@@ -409,10 +408,10 @@ namespace SteganographyApp.Common.IO
             currentImageIndex++;
             if (currentImageIndex == args.CoverImages.Length)
             {
-                throw new ImageProcessingException("There are not enough available store space in the provided images to process this request.");
+                throw new ImageProcessingException("There is not enough available storage space in the provided images to process this request.");
             }
 
-            currentImage = Image.Load(args.CoverImages[currentImageIndex]);
+            currentImage = Injector.Provide<IImageProvider>().LoadImage(args.CoverImages[currentImageIndex]);
 
             OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
             {
