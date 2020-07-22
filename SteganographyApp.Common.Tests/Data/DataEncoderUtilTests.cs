@@ -23,6 +23,7 @@ namespace SteganographyApp.Common.Tests
         private Mock<IBinaryUtil> mockBinaryUtil;
         private Mock<IDummyUtil> mockDummyUtil;
         private Mock<IRandomizeUtil> mockRandomUtil;
+        private Mock<ICompressionUtil> mockCompressionUtil;
 
         [TestInitialize]
         public void Initialize()
@@ -31,11 +32,13 @@ namespace SteganographyApp.Common.Tests
             mockBinaryUtil = new Mock<IBinaryUtil>();
             mockDummyUtil = new Mock<IDummyUtil>();
             mockRandomUtil = new Mock<IRandomizeUtil>();
+            mockCompressionUtil = new Mock<ICompressionUtil>();
 
             Injector.UseProvider<IEncryptionProvider>(mockEncryptionProvider.Object);
             Injector.UseProvider<IBinaryUtil>(mockBinaryUtil.Object);
             Injector.UseProvider<IDummyUtil>(mockDummyUtil.Object);
             Injector.UseProvider<IRandomizeUtil>(mockRandomUtil.Object);
+            Injector.UseProvider<ICompressionUtil>(mockCompressionUtil.Object);
         }
 
         [TestCleanup]
@@ -66,22 +69,38 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(randomizedString, result);
 
             mockEncryptionProvider.Verify(provider => provider.Encrypt(It.IsAny<string>(), Password), Times.Once());
-            mockBinaryUtil.Verify(provider => provider.ToBinaryString(encryptedString), Times.Once());
-            mockDummyUtil.Verify(provider => provider.InsertDummies(DummyCount, binaryString), Times.Once());
-            mockRandomUtil.Verify(provider => provider.RandomizeBinaryString(dummyString, RandomSeed), Times.Once());
+            mockBinaryUtil.Verify(util => util.ToBinaryString(encryptedString), Times.Once());
+            mockDummyUtil.Verify(util => util.InsertDummies(DummyCount, binaryString), Times.Once());
+            mockRandomUtil.Verify(util => util.RandomizeBinaryString(dummyString, RandomSeed), Times.Once());
+            mockCompressionUtil.Verify(util => util.Compress(It.IsAny<byte[]>()), Times.Never());
+        }
+
+        [TestMethod]
+        public void TestEncodeWithCompressionEnabled()
+        {
+            mockEncryptionProvider.Setup(provider => provider.Encrypt(It.IsAny<string>(), It.IsAny<string>())).Returns("encrypted_string");
+            mockBinaryUtil.Setup(util => util.ToBinaryString(It.IsAny<string>())).Returns("binary_string");
+            mockDummyUtil.Setup(util => util.InsertDummies(It.IsAny<int>(), It.IsAny<string>())).Returns("dummy_string");
+            mockRandomUtil.Setup(util => util.RandomizeBinaryString(It.IsAny<string>(), It.IsAny<string>())).Returns("randomized_string");
+
+            var util = new DataEncoderUtil();
+
+            string result = util.Encode(InputBytes, Password, true, DummyCount, RandomSeed);
+
+            mockCompressionUtil.Verify(util => util.Compress(InputBytes), Times.Once());
         }
 
         [TestMethod]
         public void TestDecode()
         {
             string randomizedString = "randomized_string";
-            mockRandomUtil.Setup(provider => provider.ReorderBinaryString(It.IsAny<string>(), It.IsAny<string>())).Returns(randomizedString);
+            mockRandomUtil.Setup(util => util.ReorderBinaryString(It.IsAny<string>(), It.IsAny<string>())).Returns(randomizedString);
 
             string dummyString = "dummy_string";
-            mockDummyUtil.Setup(provider => provider.RemoveDummies(It.IsAny<int>(), It.IsAny<string>())).Returns(dummyString);
+            mockDummyUtil.Setup(util => util.RemoveDummies(It.IsAny<int>(), It.IsAny<string>())).Returns(dummyString);
 
             string base64String = "base64String";
-            mockBinaryUtil.Setup(provider => provider.ToBase64String(It.IsAny<string>())).Returns(base64String);
+            mockBinaryUtil.Setup(util => util.ToBase64String(It.IsAny<string>())).Returns(base64String);
 
             string encryptedString = "ZW5jcnlwdGVkX3N0cmluZw==";
             mockEncryptionProvider.Setup(provider => provider.Decrypt(It.IsAny<string>(), It.IsAny<string>())).Returns(encryptedString);
@@ -94,6 +113,22 @@ namespace SteganographyApp.Common.Tests
             mockDummyUtil.Verify(provider => provider.RemoveDummies(DummyCount, randomizedString), Times.Once());
             mockBinaryUtil.Verify(provider => provider.ToBase64String(dummyString), Times.Once());
             mockEncryptionProvider.Verify(provider => provider.Decrypt(base64String, Password), Times.Once());
+            mockCompressionUtil.Verify(util => util.Decompress(It.IsAny<byte[]>()), Times.Never());
+        }
+
+        [TestMethod]
+        public void TestDecodWithCompressionDisabled()
+        {
+            mockRandomUtil.Setup(util => util.ReorderBinaryString(It.IsAny<string>(), It.IsAny<string>())).Returns("randomized_string");
+            mockDummyUtil.Setup(util => util.RemoveDummies(It.IsAny<int>(), It.IsAny<string>())).Returns("dummy_string");
+            mockBinaryUtil.Setup(util => util.ToBase64String(It.IsAny<string>())).Returns("base64String");
+            mockEncryptionProvider.Setup(provider => provider.Decrypt(It.IsAny<string>(), It.IsAny<string>())).Returns("ZW5jcnlwdGVkX3N0cmluZw==");
+
+            var util = new DataEncoderUtil();
+
+            byte[] result = util.Decode(StringToDecode, Password, true, DummyCount, RandomSeed);
+
+            mockCompressionUtil.Verify(util => util.Decompress(It.IsAny<byte[]>()), Times.Once());
         }
 
     }

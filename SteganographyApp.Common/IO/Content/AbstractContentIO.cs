@@ -2,6 +2,7 @@
 using System.IO;
 
 using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common.IO.Content
 {
@@ -12,7 +13,7 @@ namespace SteganographyApp.Common.IO.Content
         /// The stream used by the underlying implementation to read
         /// or write data to a specified file.
         /// </summary>
-        protected FileStream stream;
+        protected IReadWriteStream stream;
 
         /// <summary>
         /// The values parsed from the command line arguments.

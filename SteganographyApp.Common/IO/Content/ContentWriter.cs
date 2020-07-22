@@ -30,11 +30,12 @@ namespace SteganographyApp.Common.IO.Content
         {
             if(stream == null)
             {
-                if (File.Exists(args.DecodedOutputFile))
+                var fileProvider = Injector.Provide<IFileProvider>();
+                if (fileProvider.IsExistingFile(args.DecodedOutputFile))
                 {
-                    File.Delete(args.DecodedOutputFile);
+                    fileProvider.Delete(args.DecodedOutputFile);
                 }
-                stream = File.Open(args.DecodedOutputFile, FileMode.OpenOrCreate);
+                stream = fileProvider.OpenFileForWrite(args.DecodedOutputFile);
             }
 
             byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, args.Password, args.UseCompression, args.DummyCount, args.RandomSeed);

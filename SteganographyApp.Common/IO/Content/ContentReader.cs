@@ -32,7 +32,7 @@ namespace SteganographyApp.Common.IO.Content
         {
             if (stream == null)
             {
-                stream = File.OpenRead(args.FileToEncode);
+                stream = Injector.Provide<IFileProvider>().OpenFileForRead(args.FileToEncode);
             }
             byte[] buffer = new byte[args.ChunkByteSize];
             int read = stream.Read(buffer, 0, buffer.Length);

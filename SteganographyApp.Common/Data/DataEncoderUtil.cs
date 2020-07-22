@@ -45,7 +45,7 @@ namespace SteganographyApp.Common.Data
         {
             if (useCompression)
             {
-                bytes = CompressionUtil.Compress(bytes);
+                bytes = Injector.Provide<ICompressionUtil>().Compress(bytes);
             }
 
             string base64 = Convert.ToBase64String(bytes);
@@ -122,7 +122,7 @@ namespace SteganographyApp.Common.Data
             {
                 try
                 {
-                    return CompressionUtil.Decompress(decoded);
+                    return Injector.Provide<ICompressionUtil>().Decompress(decoded);
                 }
                 catch (Exception e)
                 {

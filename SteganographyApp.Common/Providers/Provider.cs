@@ -19,7 +19,9 @@ namespace SteganographyApp.Common.Providers
             { typeof(IBinaryUtil), CreateProviderFor(new BinaryUtil()) },
             { typeof(IDummyUtil), CreateProviderFor(new DummyUtil()) },
             { typeof(IRandomizeUtil), CreateProviderFor(new RandomizeUtil()) },
-            { typeof(IDataEncoderUtil), CreateProviderFor(new DataEncoderUtil()) }
+            { typeof(IDataEncoderUtil), CreateProviderFor(new DataEncoderUtil()) },
+            { typeof(IImageProvider), CreateProviderFor(new ImageProvider()) },
+            { typeof(ICompressionUtil), CreateProviderFor(new CompressionUtil()) }
         }
         .ToImmutableDictionary();
 

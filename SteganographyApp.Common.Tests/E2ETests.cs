@@ -9,7 +9,7 @@ using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
-    // [TestClass]
+    [TestClass]
     public class E2ETests
     {
 

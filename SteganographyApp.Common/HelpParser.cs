@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Reflection;
+
+using SteganographyApp.Common.Providers;
 
 namespace SteganographyApp.Common
 {
@@ -123,7 +124,7 @@ namespace SteganographyApp.Common
             string assemblyPath = GetAssemblyPath();
             string helpFileLocation = $"{assemblyPath}\\{fileName}";
             
-            if (!File.Exists(helpFileLocation))
+            if (!Injector.Provide<IFileProvider>().IsExistingFile(helpFileLocation))
             {
                 LastError = $"The help file named {helpFileLocation} could not be found.";
                 info = new HelpInfo(null);
@@ -147,18 +148,18 @@ namespace SteganographyApp.Common
         private ImmutableDictionary<string, string> ParseHelpItems(string helpFileLocation)
         {
             Dictionary<string, string> helpItems = new Dictionary<string, string>();
-            string[] lines = File.ReadAllLines(helpFileLocation);
+            string[] lines = Injector.Provide<IFileProvider>().ReadAllLines(helpFileLocation);
             for(int i = 0; i < lines.Length; i++)
             {
                 if (lines[i].StartsWith(HelpItemIndicator))
                 {
-                    helpItems[LineWithoutTilde(lines[i])] = ReadHelpItem(lines, i + 1);
+                    helpItems[LineWithoutHelpItemIndicator(lines[i])] = ReadHelpItem(lines, i + 1);
                 }
             }
             return helpItems.ToImmutableDictionary();
         }
 
-        private string LineWithoutTilde(string line)
+        private string LineWithoutHelpItemIndicator(string line)
         {
             return line.Substring(1);
         }

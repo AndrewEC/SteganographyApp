@@ -31,7 +31,7 @@ namespace SteganographyApp.Common.Tests
         {
             mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);
 
-            string path = "TestAssets/test.zip";
+            string path = "file_that_exists.zip";
             string[] inputArgs = new string[] { "--input", path };
             var parser = new ArgumentParser();
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
@@ -46,7 +46,7 @@ namespace SteganographyApp.Common.Tests
         {
             mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(false);
 
-            string path = "TestAssets/FileDoesntExist";
+            string path = "file_that_doesnt_exist.zip";
             string[] inputArgs = new string[] { "--input", path };
             var parser = new ArgumentParser();
             Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));

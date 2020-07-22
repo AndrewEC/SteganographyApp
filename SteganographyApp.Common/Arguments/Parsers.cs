@@ -1,8 +1,5 @@
 using System;
 
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-
 using SteganographyApp.Common.Providers;
 using SteganographyApp.Common.Data;
 
@@ -47,12 +44,15 @@ namespace SteganographyApp.Common.Arguments
             {
                 return;
             }
+
+            var imageProvider = Injector.Provide<IImageProvider>();
             
+            // TODO: change this to ulong
             long dummyCount = 1;
             int[] imageIndexes = new int[] { 0, arguments.CoverImages.Length - 1 };
             foreach (int imageIndex in imageIndexes)
             {
-                using (Image<Rgba32> image = Image.Load(arguments.CoverImages[imageIndex]))
+                using (IBasicImageInfo image = imageProvider.LoadImage(arguments.CoverImages[imageIndex]))
                 {
                     dummyCount += dummyCount * (image.Width * image.Height);
                 }

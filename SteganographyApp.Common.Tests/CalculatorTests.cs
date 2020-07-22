@@ -10,7 +10,7 @@ namespace SteganographyApp.Common.Tests
     public class CalculatorTests
     {
 
-        private static readonly string TestFile = "TestAssets/001.png";
+        private static readonly string TestFile = "Test001.png";
         private static readonly int ChunkSize = 131_072;
 
         private Mock<IFileProvider> mockFileProvider;

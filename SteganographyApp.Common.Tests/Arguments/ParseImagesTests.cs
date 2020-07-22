@@ -31,7 +31,7 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestParseImagesWithValidSingleValue()
         {
-            string image = "TestAssets/001.png";
+            string image = "Test001.png";
             string[] inputArgs = new string[] { "--images", image };
             var parser = new ArgumentParser();
 
@@ -48,7 +48,7 @@ namespace SteganographyApp.Common.Tests
         [TestMethod]
         public void TestParseImagesWithValidRegex()
         {
-            mockFileProvider.Setup(provider => provider.GetFiles(It.IsAny<string>())).Returns(new string[] { "./TestAssets\\001.png", "./TestAssets\\002.png" });
+            mockFileProvider.Setup(provider => provider.GetFiles(It.IsAny<string>())).Returns(new string[] { "./Test001.png", "./Test002.png" });
 
             string expression = "[r]<^[\\w\\W]+\\.(png)$><./TestAssets>";
             string[] inputArgs = new string[] { "--images", expression };
@@ -58,8 +58,8 @@ namespace SteganographyApp.Common.Tests
 
             string[] images = arguments.CoverImages;
             Assert.AreEqual(2, images.Length);
-            Assert.AreEqual("./TestAssets\\001.png", images[0]);
-            Assert.AreEqual("./TestAssets\\002.png", images[1]);
+            Assert.AreEqual("./Test001.png", images[0]);
+            Assert.AreEqual("./Test002.png", images[1]);
 
             mockFileProvider.Verify(provider => provider.IsExistingFile(It.IsAny<string>()), Times.Exactly(2));
         }
