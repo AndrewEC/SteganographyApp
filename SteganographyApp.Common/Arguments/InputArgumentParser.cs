@@ -57,7 +57,7 @@ namespace SteganographyApp.Common.Arguments
                 new Argument("--randomSeed", "-rs", sensitiveArgumentParser.ParseRandomSeed),
                 new Argument("--enableDummies", "-d", Parsers.ParseInsertDummies, true),
                 new Argument("--deleteOriginals", "-do", Parsers.ParseDeleteOriginals, true),
-                new Argument("--compressionLevel", "-co", Parsers.ParseCompressionLevel)
+                new Argument("--compressionLevel", "-cl", Parsers.ParseCompressionLevel)
             );
         }
 

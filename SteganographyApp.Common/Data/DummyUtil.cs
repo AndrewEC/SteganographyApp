@@ -73,7 +73,8 @@ namespace SteganographyApp.Common.Data
             string dummy = "";
             for(int i = 0; i < length; i++)
             {
-                dummy += (generator.Next(2) == 0) ? "0" : "1";
+                int next = generator.Next(10);
+                dummy += (next % 2 == 0) ? "0" : "1";
             }
             return dummy;
         }
