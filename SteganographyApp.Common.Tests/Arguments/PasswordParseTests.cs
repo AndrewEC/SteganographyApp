@@ -36,11 +36,11 @@ namespace SteganographyApp.Common.Tests
         {
 
             var queue = CreateUserInputQueue();
-            var mockReader = new Mock<IReader>();
+            var mockReader = new Mock<IConsoleReader>();
             mockReader.Setup(reader => reader.ReadKey(It.IsAny<bool>())).Returns<bool>((intercept) => queue.Dequeue());
 
             Injector.UseProvider(mockReader.Object);
-            Injector.UseProvider(new Mock<IWriter>().Object);
+            Injector.UseProvider(new Mock<IConsoleWriter>().Object);
 
             string[] inputArgs = new string[] { "--password", "?" };
             var parser = new ArgumentParser();

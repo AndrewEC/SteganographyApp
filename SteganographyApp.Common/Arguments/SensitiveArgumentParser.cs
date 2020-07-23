@@ -1,6 +1,8 @@
 using System;
 using System.Text;
 
+using SteganographyApp.Common.Providers;
+
 namespace SteganographyApp.Common.Arguments
 {
 
@@ -17,14 +19,16 @@ namespace SteganographyApp.Common.Arguments
         private readonly string PasswordName = "--password";
         private readonly string RandomSeedName = "--randomSeed";
 
-        private readonly ReadWriteUtils readWriteUtils;
+        private readonly IConsoleWriter writer;
+        private readonly IConsoleReader reader;
 
         private ValueTuple<string, Argument> password;
         private ValueTuple<string, Argument> randomSeed;
 
-        public SensitiveArgumentParser(ReadWriteUtils readWriteUtils)
+        public SensitiveArgumentParser()
         {
-            this.readWriteUtils = readWriteUtils;
+            writer = Injector.Provide<IConsoleWriter>();
+            reader = Injector.Provide<IConsoleReader>();
         }
 
         public bool IsSensitiveArgument(Argument argument)
@@ -128,14 +132,14 @@ namespace SteganographyApp.Common.Arguments
         {
             if(value == HIDDEN_INPUT_INDICATOR)
             {
-                readWriteUtils.Writer.Write($"Enter {messagePrompt}: ");
+                writer.Write($"Enter {messagePrompt}: ");
                 var currentUserInput = new StringBuilder();
                 while (true)
                 {
-                    var key = readWriteUtils.Reader.ReadKey(true);
+                    var key = reader.ReadKey(true);
                     if (key.Key == ConsoleKey.Enter)
                     {
-                        readWriteUtils.Writer.WriteLine("");
+                        writer.WriteLine("");
                         return currentUserInput.ToString();
                     }
                     else if (key.Key == ConsoleKey.Backspace && currentUserInput.Length > 0)

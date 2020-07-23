@@ -1,8 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
+
 using SteganographyApp.Common;
 using SteganographyApp.Common.Arguments;
 
@@ -71,13 +74,18 @@ namespace SteganographyApp.Converter
             var tracker = ProgressTracker.CreateAndDisplay(lossyImages.Length, "Converting images",
                 "Finished converting all images");
 
+            var failures = new List<string>();
+
+            var encoder = new PngEncoder();
+            encoder.CompressionLevel = args.CompressionLevel;
             foreach (string coverImage in lossyImages)
             {
-                var encoder = new PngEncoder();
-                encoder.CompressionLevel = args.CompressionLevel;
-                using(var image = Image.Load(coverImage))
+                string result = TrySaveImage(coverImage, encoder);
+                if (!Checks.IsNullOrEmpty(result))
                 {
-                    image.Save(ReplaceFileExtension(coverImage), encoder);
+                    failures.Add($"{coverImage}: {result}");
+                    tracker.UpdateAndDisplayProgress();
+                    continue;
                 }
 
                 if (args.DeleteAfterConversion)
@@ -86,6 +94,36 @@ namespace SteganographyApp.Converter
                 }
 
                 tracker.UpdateAndDisplayProgress();
+            }
+        }
+
+        private static string TrySaveImage(string coverImage, PngEncoder encoder)
+        {
+            try
+            {
+                using (var image = Image.Load(coverImage))
+                {
+                    image.Save(ReplaceFileExtension(coverImage), encoder);
+                }
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+            return null;
+        }
+
+        private static void PrintFailures(List<string> failures)
+        {
+            if (failures.Count == 0)
+            {
+                return;
+            }
+            Console.WriteLine("\nOne or more of the specified images could not be converted.");
+            Console.WriteLine("Failed to convert: ");
+            foreach (string failure in failures)
+            {
+                Console.WriteLine($"\t{failure}");
             }
         }
 

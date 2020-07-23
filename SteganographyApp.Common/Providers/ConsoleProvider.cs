@@ -9,7 +9,7 @@ namespace SteganographyApp.Common.Providers
     /// argument when testing to verify the proper output is being sent to
     /// the console.</para>
     /// </summary>
-    public interface IWriter
+    public interface IConsoleWriter
     {
         void Write(string line);
         void WriteLine(string line);
@@ -20,7 +20,7 @@ namespace SteganographyApp.Common.Providers
     /// <para>Simply proxies the Write and WriteLine methods of the
     /// console class.</para>
     /// </summary>
-    public class ConsoleWriter : IWriter
+    public class ConsoleWriter : IConsoleWriter
     {
 
         public void Write(string line)
@@ -40,7 +40,7 @@ namespace SteganographyApp.Common.Providers
     /// the ArgumentParser class.
     /// <para>This will allow the test to stub out the user input operations for some tests.</para>
     /// </summary>
-    public interface IReader
+    public interface IConsoleReader
     {
         ConsoleKeyInfo ReadKey(bool intercept);
     }
@@ -49,7 +49,7 @@ namespace SteganographyApp.Common.Providers
     /// The default IInputReader instance that acts as a proxy to the <see cref="Console.ReadKey(bool)">
     /// method.
     /// </summary>
-    public class ConsoleKeyReader : IReader
+    public class ConsoleKeyReader : IConsoleReader
     {
 
         public ConsoleKeyInfo ReadKey(bool intercept)

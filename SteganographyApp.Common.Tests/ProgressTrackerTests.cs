@@ -8,7 +8,7 @@ using SteganographyApp.Common.Providers;
 namespace SteganographyApp.Common.Tests
 {
 
-    class MockWriter : IWriter
+    class MockWriter : IConsoleWriter
     {
 
         public LinkedList<string> WriteValues { get; private set; } = new LinkedList<string>();
@@ -42,7 +42,7 @@ namespace SteganographyApp.Common.Tests
         public void BeforeEach()
         {
             mockWriter = new MockWriter();
-            Injector.UseProvider<IWriter>(mockWriter);
+            Injector.UseProvider<IConsoleWriter>(mockWriter);
             tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage);
         }
 

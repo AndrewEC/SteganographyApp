@@ -7,8 +7,8 @@ namespace SteganographyApp.Common.Arguments
 
     public struct ReadWriteUtils
     {
-        public IReader Reader { get; set; }
-        public IWriter Writer { get; set; }
+        public IConsoleReader Reader { get; set; }
+        public IConsoleWriter Writer { get; set; }
     }
 
     ///<summary>
@@ -28,22 +28,12 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         public Exception LastError { get; private set; }
 
-        /// <summary>
-        /// Contains the IWriter and IReader instance for both receiving interactive user input and
-        /// outputing information.
-        /// <para>Primary used to create a new seam to help with testing console input and output.</para>
-        /// </summary>
-        private readonly ReadWriteUtils readWriteUtils;
-
         private readonly SensitiveArgumentParser sensitiveArgumentParser;
 
         public ArgumentParser()
         {
-            var writer = Injector.Provide<IWriter>();
-            var reader = Injector.Provide<IReader>();
-            readWriteUtils = new ReadWriteUtils { Reader = reader, Writer = writer };
 
-            sensitiveArgumentParser = new SensitiveArgumentParser(readWriteUtils);
+            sensitiveArgumentParser = new SensitiveArgumentParser();
 
             arguments = ImmutableList.Create(
                 new Argument("--action", "-a", Parsers.ParseEncodeOrDecodeAction),
@@ -212,14 +202,15 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         public void PrintCommonErrorMessage()
         {
-            readWriteUtils.Writer.WriteLine($"An exception occured while parsing provided arguments: {LastError.Message}");
+            var writer = Injector.Provide<IConsoleWriter>();
+            writer.WriteLine($"An exception occured while parsing provided arguments: {LastError.Message}");
             var exception = LastError.InnerException;
             while (exception != null)
             {
-                readWriteUtils.Writer.WriteLine($"Caused by: {exception.Message}");
+                writer.WriteLine($"Caused by: {exception.Message}");
                 exception = exception.InnerException;
             }
-            readWriteUtils.Writer.WriteLine("\nRun the program with --help to get more information.");
+            writer.WriteLine("\nRun the program with --help to get more information.");
         }
     }
 }

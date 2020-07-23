@@ -29,8 +29,8 @@ namespace SteganographyApp.Common.Providers
             { typeof(IDataEncoderUtil), CreateProviderFor(new DataEncoderUtil()) },
             { typeof(IImageProvider), CreateProviderFor(new ImageProvider()) },
             { typeof(ICompressionUtil), CreateProviderFor(new CompressionUtil()) },
-            { typeof(IWriter), CreateProviderFor(new ConsoleWriter()) },
-            { typeof(IReader), CreateProviderFor(new ConsoleKeyReader()) }
+            { typeof(IConsoleWriter), CreateProviderFor(new ConsoleWriter()) },
+            { typeof(IConsoleReader), CreateProviderFor(new ConsoleKeyReader()) }
         }
         .ToImmutableDictionary();
 

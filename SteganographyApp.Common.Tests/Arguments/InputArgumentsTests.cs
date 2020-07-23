@@ -24,11 +24,11 @@ namespace SteganographyApp.Common.Tests
         public void TestPrintCommonMessageOutputsCorrectMessagesToWriter()
         {
             var lines = new List<string>();
-            var mockWriter = new Mock<IWriter>();
+            var mockWriter = new Mock<IConsoleWriter>();
             mockWriter.Setup(writer => writer.WriteLine(It.IsAny<string>())).Callback<string>(line => lines.Add(line));
 
             Injector.UseProvider(mockWriter.Object);
-            Injector.UseProvider<IReader>(new NullReader());
+            Injector.UseProvider<IConsoleReader>(new NullReader());
 
             var inputs = new string[] { "--chunkSize", "abc" };
             var parser = new ArgumentParser();
@@ -100,7 +100,7 @@ namespace SteganographyApp.Common.Tests
             throw new NullReferenceException("Failed Null");
         }
 
-        private class NullReader : IReader
+        private class NullReader : IConsoleReader
         {
             public ConsoleKeyInfo ReadKey(bool trap)
             {

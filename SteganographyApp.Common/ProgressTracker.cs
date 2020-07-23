@@ -14,7 +14,7 @@ namespace SteganographyApp.Common
         private readonly double maxProgress;
         private readonly string progressMessage;
         private readonly string completeMessage;
-        private readonly IWriter outputWriter;
+        private readonly IConsoleWriter outputWriter;
         private double currentProgress;
 
         public ProgressTracker(double maxProgress, string progressMessage, string completeMessage)
@@ -22,7 +22,7 @@ namespace SteganographyApp.Common
             this.maxProgress = maxProgress;
             this.progressMessage = progressMessage;
             this.completeMessage = completeMessage;
-            outputWriter = Injector.Provide<IWriter>();
+            outputWriter = Injector.Provide<IConsoleWriter>();
         }
 
         public static ProgressTracker CreateAndDisplay(double maxProgress, string progressMessage, string completeMessage)
