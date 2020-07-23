@@ -48,9 +48,16 @@ namespace SteganographyAppCalculator
             ulong pixelCount = 0;
             foreach (string imagePath in coverImages)
             {
-                using (var image = Image.Load(imagePath))
+                try
                 {
-                    pixelCount += (ulong) (image.Width * image.Height);
+                    using (var image = Image.Load(imagePath))
+                    {
+                        pixelCount += (ulong) (image.Width * image.Height);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Could not get the width and height for image: {imagePath}", e);
                 }
                 progressTracker.UpdateAndDisplayProgress();
             }

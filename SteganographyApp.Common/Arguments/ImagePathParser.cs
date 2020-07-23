@@ -13,7 +13,7 @@ namespace SteganographyApp.Common.Arguments
         private static readonly ImmutableDictionary<string, string> ShorthandMappings = new Dictionary<string, string>()
         {
             { "PNG_IMAGES", @"[r]<^[\W\w]+\.png$><.>" },
-            { "JPG_IMAGES", @"[r]<^[\W\w]+\.jpg$><.>" }
+            { "JPG_IMAGES", @"[r]<^[\W\w]+\.(jpg|jpeg)$><.>" }
         }
         .ToImmutableDictionary();
 

@@ -9,8 +9,8 @@ namespace SteganographyApp.Common.Arguments
     static class Parsers
     {
 
-        private static readonly int MAX_DUMMY_COUNT = 500;
-        private static readonly int MIN_DUMMY_COUNT = 50;
+        private static readonly int MaxDummyCount = 1000;
+        private static readonly int MinDummyCount = 100;
 
         /// <summary>
         /// Parses a boolean from the value parameter and sets the InsertDummies property.
@@ -59,7 +59,7 @@ namespace SteganographyApp.Common.Arguments
             
             string userRandomSeed = Checks.IsNullOrEmpty(arguments.RandomSeed) ? "" : arguments.RandomSeed;
             string seed = userRandomSeed + dummyCount.ToString();
-            arguments.DummyCount = IndexGenerator.FromString(seed).Next(MAX_DUMMY_COUNT - MIN_DUMMY_COUNT) + MIN_DUMMY_COUNT;
+            arguments.DummyCount = IndexGenerator.FromString(seed).Next(MaxDummyCount - MinDummyCount) + MinDummyCount;
         }
 
         /// <summary>

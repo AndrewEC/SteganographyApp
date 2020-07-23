@@ -341,7 +341,7 @@ namespace SteganographyApp.Common.IO
         {
             try
             {
-                var binary = new StringBuilder("");
+                var binary = new StringBuilder();
 
                 // Each table entry is 32 bits in size meaning that since each pixel can store 3 bits it will take
                 // 11 pixels. Since 11 pixels can actually store 33 bits we pad the 32 bit table entry with an additional

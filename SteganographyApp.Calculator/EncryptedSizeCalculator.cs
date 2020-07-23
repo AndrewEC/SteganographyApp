@@ -81,7 +81,7 @@ namespace SteganographyAppCalculator
     {
 
         private static readonly object _lock = new object();
-        private static readonly int MaxThreadCount = 6;
+        private static readonly int MaxThreadCount = 4;
 
         private readonly ProgressTracker progressTracker;
         private readonly int requiredNumberOfWrites;
@@ -123,7 +123,8 @@ namespace SteganographyAppCalculator
 
         private ChunkSizeCalculatorThread[] CreateAndStartThreads()
         {
-            var calculationThreads = Enumerable.Range(0, GetThreadCount())
+            int threadCount = Math.Min(requiredNumberOfWrites, MaxThreadCount);
+            var calculationThreads = Enumerable.Range(0, threadCount)
                 .Select(i => new ChunkSizeCalculatorThread(arguments, this))
                 .ToArray();
 
@@ -143,19 +144,6 @@ namespace SteganographyAppCalculator
             {
                 thread.Join();
             }
-        }
-
-        /// <summary>
-        /// Retrieves the number of thread appropriate to handle the calculation of the
-        /// encoded file size. The number of threads will be between 1 and MaxThreadCount inclusive.
-        /// </summary>
-        private int GetThreadCount()
-        {
-            if (requiredNumberOfWrites >= MaxThreadCount)
-            {
-                return MaxThreadCount;
-            }
-            return requiredNumberOfWrites;
         }
 
         /// <summary>

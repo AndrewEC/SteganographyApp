@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Linq;
 
 namespace SteganographyApp.Common.Data
@@ -13,8 +14,8 @@ namespace SteganographyApp.Common.Data
     public class DummyUtil : IDummyUtil
     {
 
-        private static readonly int MAX_LENGTH_PER_DUMMY = 1000;
-        private static readonly int MIN_LENGTH_PER_DUMMY = 50;
+        private static readonly int MaxLengthPerDummy = 500;
+        private static readonly int MinLengthPerDummy = 100;
 
         /// <summary>
         /// Inserts the specified number of dummy entries into the current
@@ -30,12 +31,12 @@ namespace SteganographyApp.Common.Data
             int[] lengths = GenerateLengthsForDummies(numDummies);
 
             // cubed root
-            int length = (int)Math.Ceiling(Math.Pow(binary.Length, (double)1 / 3)) + 1;
-            var generator = new IndexGenerator(length, length);
+            int generatorSeed = (int)Math.Ceiling(Math.Pow(binary.Length, (double)1 / 3)) + 1;
+            var generator = new IndexGenerator(generatorSeed, generatorSeed);
 
             // storing the positions instead of calculating on the fly will make decoding easier
             int[] positions = Enumerable.Range(0, numDummies)
-                .Select(i => generator.Next(binary.Length - 1))
+                .Select(i => generator.Next(binary.Length))
                 .ToArray();
 
             for (int i = 0; i < positions.Length; i++)
@@ -57,7 +58,7 @@ namespace SteganographyApp.Common.Data
         {
             var lengthGenerator = new IndexGenerator(numDummies, numDummies);
             return Enumerable.Range(0, numDummies)
-                .Select(i => lengthGenerator.Next(MAX_LENGTH_PER_DUMMY - MIN_LENGTH_PER_DUMMY) + MIN_LENGTH_PER_DUMMY)
+                .Select(i => lengthGenerator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
                 .ToArray();
         }
 
@@ -70,13 +71,13 @@ namespace SteganographyApp.Common.Data
         /// <returns>Returns a random binary string of a length equal to
         private string GenerateDummy(IndexGenerator generator, int length)
         {
-            string dummy = "";
+            var dummy = new StringBuilder(length, length);
             for(int i = 0; i < length; i++)
             {
                 int next = generator.Next(10);
-                dummy += (next % 2 == 0) ? "0" : "1";
+                dummy.Append((next % 2 == 0) ? '0' : '1');
             }
-            return dummy;
+            return dummy.ToString();
         }
 
         /// <summary>
@@ -99,14 +100,14 @@ namespace SteganographyApp.Common.Data
             int totalLength = lengths.Sum();
 
             // determine the length of the binary string before the dummies were added
-            int actualLength = binary.Length - totalLength;
+            int binaryLengthWithoutDummies = binary.Length - totalLength;
 
             // cubed root
-            int length = (int)Math.Ceiling(Math.Pow(actualLength, (double)1 / 3)) + 1;
-            var generator = new IndexGenerator(length, length);
+            int generatorSeed = (int)Math.Ceiling(Math.Pow(binaryLengthWithoutDummies, (double)1 / 3)) + 1;
+            var generator = new IndexGenerator(generatorSeed, generatorSeed);
 
             int[] positions = Enumerable.Range(0, numDummies)
-                .Select(i => generator.Next(actualLength - 1))
+                .Select(i => generator.Next(binaryLengthWithoutDummies))
                 .Reverse()
                 .ToArray();
 

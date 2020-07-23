@@ -12,7 +12,7 @@ namespace SteganographyApp.Common.Data
     public class RandomizeUtil : IRandomizeUtil
     {
 
-        private static readonly int RandomizeGenerationsModifier = 10;
+        private static readonly int RandomizeGenerationsModifier = 7;
 
         /// <summary>
         /// Randomizes the encrypted binary string from the file to encode.
