@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
