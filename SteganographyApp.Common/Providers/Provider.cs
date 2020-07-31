@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 
 using SteganographyApp.Common.Data;
+using SteganographyApp.Common.IO;
 
 namespace SteganographyApp.Common.Providers
 {
 
-    public delegate object ProviderFunction(params object[] arguments);
 
     /// <summary>
     /// An on request injection utility to help provide an implementation of a particular requested
@@ -19,22 +19,23 @@ namespace SteganographyApp.Common.Providers
     public static class Injector
     {
 
-        private static readonly ImmutableDictionary<Type, ProviderFunction> DefaultInjectionProviders = new Dictionary<Type, ProviderFunction>
+        private static readonly ImmutableDictionary<Type, object> DefaultInjectionProviders = new Dictionary<Type, object>
         {
-            { typeof(IEncryptionProvider), CreateProviderFor(new EncryptionProvider()) },
-            { typeof(IFileProvider), CreateProviderFor(new FileProvider()) },
-            { typeof(IBinaryUtil), CreateProviderFor(new BinaryUtil()) },
-            { typeof(IDummyUtil), CreateProviderFor(new DummyUtil()) },
-            { typeof(IRandomizeUtil), CreateProviderFor(new RandomizeUtil()) },
-            { typeof(IDataEncoderUtil), CreateProviderFor(new DataEncoderUtil()) },
-            { typeof(IImageProvider), CreateProviderFor(new ImageProvider()) },
-            { typeof(ICompressionUtil), CreateProviderFor(new CompressionUtil()) },
-            { typeof(IConsoleWriter), CreateProviderFor(new ConsoleWriter()) },
-            { typeof(IConsoleReader), CreateProviderFor(new ConsoleKeyReader()) }
+            { typeof(IEncryptionProvider), new EncryptionProvider() },
+            { typeof(IFileProvider), new FileProvider() },
+            { typeof(IBinaryUtil), new BinaryUtil() },
+            { typeof(IDummyUtil), new DummyUtil() },
+            { typeof(IRandomizeUtil), new RandomizeUtil() },
+            { typeof(IDataEncoderUtil), new DataEncoderUtil() },
+            { typeof(IImageProvider), new ImageProvider() },
+            { typeof(ICompressionUtil), new CompressionUtil() },
+            { typeof(IConsoleWriter), new ConsoleWriter() },
+            { typeof(IConsoleReader), new ConsoleKeyReader() },
+            { typeof(IChunkTableHelper), new ChunkTableHelper() }
         }
         .ToImmutableDictionary();
 
-        private static readonly Dictionary<Type, ProviderFunction> InjectionProviders = new Dictionary<Type, ProviderFunction>();
+        private static readonly Dictionary<Type, object> InjectionProviders = new Dictionary<Type, object>();
 
         static Injector()
         {
@@ -45,9 +46,9 @@ namespace SteganographyApp.Common.Providers
         /// Returns an instance from the dictionary of injection provides using the generic
         /// parameter T as the lookup key.
         /// </summary>
-        public static T Provide<T>(params object[] arguments)
+        public static T Provide<T>()
         {
-            return (T) InjectionProviders[typeof(T)](arguments);
+            return (T) InjectionProviders[typeof(T)];
         }
 
         /// <summary>
@@ -57,7 +58,7 @@ namespace SteganographyApp.Common.Providers
         /// </summary>
         public static void UseProvider<T>(T instance)
         {
-            InjectionProviders[typeof(T)] = CreateProviderFor(instance);
+            InjectionProviders[typeof(T)] = instance;
         }
 
         /// <summary>
@@ -69,11 +70,6 @@ namespace SteganographyApp.Common.Providers
             {
                 InjectionProviders[key] = DefaultInjectionProviders[key];
             }
-        }
-
-        public static ProviderFunction CreateProviderFor(object toReturn)
-        {
-            return (object[] arguments) => toReturn;
         }
 
     }

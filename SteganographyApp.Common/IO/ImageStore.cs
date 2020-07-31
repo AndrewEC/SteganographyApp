@@ -314,13 +314,9 @@ namespace SteganographyApp.Common.IO
                 // contained within the table.
                 int chunkCount = Convert.ToInt32(ReadBinaryString(Calculator.ChunkDefinitionBitSize), 2);
 
-                //Read all the available entries in the table
-                int bitsForAllTableEntries = chunkCount * chunkSizeAndPadding;
-                string tableEntriesBinary = ReadBinaryString(bitsForAllTableEntries);
+                string chunkTableBinary = ReadBinaryString(chunkCount * chunkSizeAndPadding);
 
-                return Enumerable.Range(0, chunkCount)
-                    .Select(index => Convert.ToInt32(tableEntriesBinary.Substring(index * chunkSizeAndPadding, Calculator.ChunkDefinitionBitSize), 2))
-                    .ToArray();
+                return Injector.Provide<IChunkTableHelper>().ConvertBinaryToChunkTable(chunkTableBinary, chunkCount, args.RandomSeed);
             }
             catch (Exception e)
             {
@@ -341,17 +337,7 @@ namespace SteganographyApp.Common.IO
         {
             try
             {
-                var binary = new StringBuilder();
-
-                // Each table entry is 32 bits in size meaning that since each pixel can store 3 bits it will take
-                // 11 pixels. Since 11 pixels can actually store 33 bits we pad the 32 bit table entry with an additional
-                // zero at the end which will be ignored when reading the table.
-                binary.Append(Convert.ToString(chunkTable.Length, 2).PadLeft(Calculator.ChunkDefinitionBitSize, '0')).Append('0');
-
-                foreach (int chunkLength in chunkTable)
-                {
-                    binary.Append(Convert.ToString(chunkLength, 2).PadLeft(Calculator.ChunkDefinitionBitSize, '0')).Append('0');
-                }
+                var binary = Injector.Provide<IChunkTableHelper>().ConvertChunkTableToBinary(chunkTable, args.RandomSeed);
 
                 WriteBinaryString(binary.ToString());
                 CloseOpenImage(true);

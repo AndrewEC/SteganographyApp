@@ -179,7 +179,7 @@ namespace SteganographyApp.Common.Tests
 
 
         [TestMethod]
-        [ExpectedException(typeof(TransformationException), AllowDerivedTypes = false)]
+        [ExpectedException(typeof(ImageProcessingException), AllowDerivedTypes = false)]
         public void TestRandomSeedMissmatchProducesCompressionException()
         {
             // writing file content to image
