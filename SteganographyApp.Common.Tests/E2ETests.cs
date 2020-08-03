@@ -20,6 +20,8 @@ namespace SteganographyApp.Common.Tests
         [TestInitialize]
         public void SetUp()
         {
+            GlobalCounter.Instance.Reset();
+
             args = new InputArguments()
             {
                 FileToEncode = "TestAssets/test.zip",
@@ -37,6 +39,8 @@ namespace SteganographyApp.Common.Tests
         [TestCleanup]
         public void TearDown()
         {
+            GlobalCounter.Instance.Reset();
+
             imageStore.CleanImageLSBs();
             wrapper.ResetToImage(0);
             if(File.Exists(args.DecodedOutputFile))
@@ -64,6 +68,8 @@ namespace SteganographyApp.Common.Tests
                 wrapper.EncodeComplete();
             }
             imageStore.WriteContentChunkTable(table);
+
+            GlobalCounter.Instance.Reset();
 
             wrapper.ResetToImage(0);
             var readTable = imageStore.ReadContentChunkTable();
@@ -99,6 +105,8 @@ namespace SteganographyApp.Common.Tests
             }
             imageStore.WriteContentChunkTable(table);
 
+            GlobalCounter.Instance.Reset();
+
             // reading file content from image
             args.Password = "Wrong Password";
             wrapper.ResetToImage(0);
@@ -131,6 +139,8 @@ namespace SteganographyApp.Common.Tests
             }
             imageStore.WriteContentChunkTable(table);
 
+            GlobalCounter.Instance.Reset();
+
             // reading file content from image
             args.DummyCount = 5;
             wrapper.ResetToImage(0);
@@ -161,6 +171,8 @@ namespace SteganographyApp.Common.Tests
                 wrapper.EncodeComplete();
             }
             imageStore.WriteContentChunkTable(table);
+
+            GlobalCounter.Instance.Reset();
 
             // reading file content from image
             args.UseCompression = false;
@@ -198,6 +210,8 @@ namespace SteganographyApp.Common.Tests
                 wrapper.EncodeComplete();
             }
             imageStore.WriteContentChunkTable(table);
+
+            GlobalCounter.Instance.Reset();
 
             // reading file content from image
             args.RandomSeed = "";

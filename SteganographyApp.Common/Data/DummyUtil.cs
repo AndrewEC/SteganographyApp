@@ -7,8 +7,58 @@ namespace SteganographyApp.Common.Data
 
     public interface IDummyUtil
     {
-        string InsertDummies(int numDummies, string binary);
-        string RemoveDummies(int numDummies, string binary);
+        string InsertDummies(int numDummies, string binary, string randomSeed);
+        string RemoveDummies(int numDummies, string binary, string randomSeed);
+    }
+
+    /// <summary>
+    /// Keeps track of an arbitrary counter as to help increase the randomness
+    /// of the size and the position of the dummy entries to make the dummies
+    /// more variable in nature and more difficult to discern any possible pattern.
+    /// </summary>
+    public class GlobalCounter
+    {
+
+        public static GlobalCounter Instance = new GlobalCounter();
+
+        private static object _lock = new object();
+
+        private long count = 0;
+
+        public long Count
+        {
+            private set
+            {
+                count = value;
+            }
+
+            get
+            {
+                lock (_lock)
+                {
+                    return count;
+                }
+            }
+        }
+
+        private GlobalCounter() {}
+
+        public void Increment(long amount)
+        {
+            lock (_lock)
+            {
+                Count = Count + amount;
+            }
+        }
+
+        public void Reset()
+        {
+            lock (_lock)
+            {
+                Count = 0;
+            }
+        }
+
     }
 
     public class DummyUtil : IDummyUtil
@@ -26,13 +76,16 @@ namespace SteganographyApp.Common.Data
         /// <param name="binary">The original binary string to be modified with the
         /// dummy entries.</param>
         /// <returns>Returns the binary string with the new dummy entries.</returns>
-        public string InsertDummies(int numDummies, string binary)
+        public string InsertDummies(int numDummies, string binary, string randomSeed)
         {
+
+            int amountToIncrement = SumBinaryString(binary);
+
             int[] lengths = GenerateLengthsForDummies(numDummies);
 
             // cubed root
-            int generatorSeed = (int)Math.Ceiling(Math.Pow(binary.Length, (double)1 / 3)) + 1;
-            var generator = new IndexGenerator(generatorSeed, generatorSeed);
+            string generatedRandomSeed = CreateRandomSeed(randomSeed);
+            var generator = IndexGenerator.FromString(generatedRandomSeed);
 
             // storing the positions instead of calculating on the fly will make decoding easier
             int[] positions = Enumerable.Range(0, numDummies)
@@ -44,7 +97,27 @@ namespace SteganographyApp.Common.Data
                 binary = binary.Insert(positions[i], GenerateDummy(generator, lengths[i]));
             }
 
+            GlobalCounter.Instance.Increment(amountToIncrement);
+
             return binary;
+        }
+
+        private int SumBinaryString(string binary)
+        {
+            int count = 0;
+            foreach (char c in binary.ToCharArray())
+            {
+                if (c == '1')
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private string CreateRandomSeed(string randomSeed)
+        {
+            return $"{randomSeed}{GlobalCounter.Instance.Count}";
         }
 
         /// <summary>
@@ -91,7 +164,7 @@ namespace SteganographyApp.Common.Data
         /// otherwise will return the binary string with the dummy entries removed.</returns>
         /// <exception cref="TransformationException">Thrown if an our of range exception is caught
         /// while trying to remove the dummy entries from the chunk.</exception>
-        public string RemoveDummies(int numDummies, string binary)
+        public string RemoveDummies(int numDummies, string binary, string randomSeed)
         {
 
             // calculate the length of the dummies originally added to the string
@@ -103,8 +176,8 @@ namespace SteganographyApp.Common.Data
             int binaryLengthWithoutDummies = binary.Length - totalLength;
 
             // cubed root
-            int generatorSeed = (int)Math.Ceiling(Math.Pow(binaryLengthWithoutDummies, (double)1 / 3)) + 1;
-            var generator = new IndexGenerator(generatorSeed, generatorSeed);
+            string generatedRandomSeed = CreateRandomSeed(randomSeed);
+            var generator = IndexGenerator.FromString(generatedRandomSeed);
 
             int[] positions = Enumerable.Range(0, numDummies)
                 .Select(i => generator.Next(binaryLengthWithoutDummies))
@@ -122,6 +195,9 @@ namespace SteganographyApp.Common.Data
             {
                 throw new TransformationException("Unable to remove all dummy entries from chunk.", e);
             }
+
+            GlobalCounter.Instance.Increment(SumBinaryString(binary));
+
             return binary;
         }
     }

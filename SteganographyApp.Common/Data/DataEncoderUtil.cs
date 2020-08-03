@@ -66,7 +66,7 @@ namespace SteganographyApp.Common.Data
 
             if (dummyCount > 0)
             {
-                binary = Injector.Provide<IDummyUtil>().InsertDummies(dummyCount, binary);
+                binary = Injector.Provide<IDummyUtil>().InsertDummies(dummyCount, binary, randomSeed);
             }
 
             if (randomSeed != "")
@@ -100,7 +100,7 @@ namespace SteganographyApp.Common.Data
 
             if(dummyCount > 0)
             {
-                binary = Injector.Provide<IDummyUtil>().RemoveDummies(dummyCount, binary);
+                binary = Injector.Provide<IDummyUtil>().RemoveDummies(dummyCount, binary, randomSeed);
             }
 
             var decoded64String = Injector.Provide<IBinaryUtil>().ToBase64String(binary);

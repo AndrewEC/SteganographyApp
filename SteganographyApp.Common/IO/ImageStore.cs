@@ -394,7 +394,7 @@ namespace SteganographyApp.Common.IO
             currentImageIndex++;
             if (currentImageIndex == args.CoverImages.Length)
             {
-                throw new ImageProcessingException("There is not enough available storage space in the provided images to store the encoded file.");
+                throw new ImageProcessingException("There is not enough available storage space in the provided images to continue.");
             }
 
             currentImage = Injector.Provide<IImageProvider>().LoadImage(args.CoverImages[currentImageIndex]);
