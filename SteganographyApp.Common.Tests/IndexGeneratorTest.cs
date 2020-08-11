@@ -1,12 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SteganographyApp.Common.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
+using NUnit.Framework;
+
+using SteganographyApp.Common.Data;
+
 namespace SteganographyApp.Common.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class IndexGeneratorTest
     {
 
@@ -49,7 +51,7 @@ namespace SteganographyApp.Common.Tests
             return nums;
         }
 
-        [TestMethod]
+        [Test]
         public void TestDifferentSeedsDontMatch()
         {
             var generator = new IndexGenerator(100, 5);
@@ -63,7 +65,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsFalse(HaveSameElements(nums, nums2));
         }
 
-        [TestMethod]
+        [Test]
         public void TestDifferentGenerationsDontMatch()
         {
             var generator = new IndexGenerator(100, 6);
@@ -77,7 +79,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsFalse(HaveSameElements(nums, nums2));
         }
 
-        [TestMethod]
+        [Test]
         public void TestSameSeedsMatch()
         {
             var generator = new IndexGenerator(100, 5);

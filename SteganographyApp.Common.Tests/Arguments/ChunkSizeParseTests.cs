@@ -1,18 +1,17 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
+    [TestFixture]
     public class ChunkSizeParseTests
     {
 
-        [DataTestMethod]
-        [DataRow(1)]
-        [DataRow(10_000)]
-        [DataRow(1_000_000)]
+        [TestCase(1)]
+        [TestCase(10_000)]
+        [TestCase(1_000_000)]
         public void TestParseChunkSizeWithValidValue(int value)
         {
             string[] inputArgs = new string[] { "--chunkSize", value.ToString() };
@@ -22,10 +21,9 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(value, arguments.ChunkByteSize);
         }
 
-        [DataTestMethod]
-        [DataRow(0)]
-        [DataRow(-1)]
-        [DataRow("test")]
+        [TestCase(0)]
+        [TestCase(-1)]
+        [TestCase("test")]
         public void TestParseChunkSizeWithInvalidValueProducesFalseAndParseException(object value)
         {
             string[] inputArgs = new string[] { "--chunkSize", value.ToString() };

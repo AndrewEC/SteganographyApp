@@ -1,5 +1,4 @@
-using Moq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using System.Collections.Generic;
 
@@ -26,8 +25,8 @@ namespace SteganographyApp.Common.Tests
 
     }
 
-    [TestClass]
-    public class ProgressTrackerTests
+    [TestFixture]
+    public class ProgressTrackerTests : FixtureWithTestObjects
     {
 
         private readonly int DesiredWriteCount = 10;
@@ -38,18 +37,12 @@ namespace SteganographyApp.Common.Tests
         private MockWriter mockWriter;
         private ProgressTracker tracker;
 
-        [TestInitialize]
+        [SetUp]
         public void BeforeEach()
         {
             mockWriter = new MockWriter();
             Injector.UseInstance<IConsoleWriter>(mockWriter);
             tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage);
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
         }
 
         private void ExecuteUpdates(ProgressTracker tracker)
@@ -61,7 +54,7 @@ namespace SteganographyApp.Common.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestProgressTrackerIsInvokedCorrectNumberOfTimes()
         {
             ExecuteUpdates(tracker);
@@ -70,7 +63,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(DesiredWriteLineCount, mockWriter.WriteLineValues.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestProgressTrackerInvokesWriteAndWriteLineWithCorrectPercentageIndicators()
         {
             ExecuteUpdates(tracker);

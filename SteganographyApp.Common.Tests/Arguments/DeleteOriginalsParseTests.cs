@@ -1,15 +1,15 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
+    [TestFixture]
     public class DeleteOriginalParseTests
     {
 
-        [TestMethod]
+        [Test]
         public void TestParseDeleteOriginalsWithValidValue()
         {
             string[] inputArgs = new string[] { "--deleteOriginals" };

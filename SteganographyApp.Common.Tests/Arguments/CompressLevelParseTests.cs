@@ -1,18 +1,17 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
+    [TestFixture]
     public class CompressLevelParseTests
     {
 
-        [DataTestMethod]
-        [DataRow(0)]
-        [DataRow(5)]
-        [DataRow(9)]
+        [TestCase(0)]
+        [TestCase(5)]
+        [TestCase(9)]
         public void TestCompressionLevelWithValidValue(int value)
         {
             string[] inputArgs = new string[] { "--compressionLevel", value.ToString() };
@@ -22,9 +21,8 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(value, arguments.CompressionLevel);
         }
 
-        [DataTestMethod]
-        [DataRow(-1)]
-        [DataRow(10)]
+        [TestCase(-1)]
+        [TestCase(10)]
         public void TestCompressionLevelWithInvalidValueProducesFalseAndParseException(int value)
         {
             string[] inputArgs = new string[] { "--compressionLevel", value.ToString() };

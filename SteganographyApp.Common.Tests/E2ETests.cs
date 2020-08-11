@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 
 using System.IO;
 
@@ -9,16 +9,16 @@ using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
-    [TestClass]
-    public class E2ETests
+    [TestFixture]
+    public class E2ETests : FixtureWithRealObjects
     {
 
         private InputArguments args;
         private ImageStore imageStore;
         private ImageStore.ImageStoreWrapper wrapper;
 
-        [TestInitialize]
-        public void SetUp()
+        [SetUp]
+        public void E2ESetUp()
         {
             GlobalCounter.Instance.Reset();
 
@@ -36,8 +36,8 @@ namespace SteganographyApp.Common.Tests
             wrapper = imageStore.CreateIOWrapper();
         }
 
-        [TestCleanup]
-        public void TearDown()
+        [TearDown]
+        public void E2ETearDown()
         {
             GlobalCounter.Instance.Reset();
 
@@ -49,7 +49,7 @@ namespace SteganographyApp.Common.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestFullWriteReadHappyPath()
         {
             string content = "";
@@ -84,8 +84,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(target, actual);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(TransformationException), AllowDerivedTypes = false)]
+        [Test]
         public void TestPasswordMismatchError()
         {
             // writing file content to image
@@ -114,12 +113,11 @@ namespace SteganographyApp.Common.Tests
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                writer.WriteContentChunkToFile(binary);
+                Assert.Throws<TransformationException>(() => writer.WriteContentChunkToFile(binary));
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(TransformationException), AllowDerivedTypes = false)]
+        [Test]
         public void TestDummyCountMissmatchProducesException()
         {
             // writing file content to image
@@ -148,11 +146,11 @@ namespace SteganographyApp.Common.Tests
             using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                writer.WriteContentChunkToFile(binary);
+                Assert.Throws<TransformationException>(() => writer.WriteContentChunkToFile(binary));
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCompressMismatchProducesBadFile()
         {
             // writing file content to image
@@ -190,8 +188,7 @@ namespace SteganographyApp.Common.Tests
         }
 
 
-        [TestMethod]
-        [ExpectedException(typeof(ImageProcessingException), AllowDerivedTypes = false)]
+        [Test]
         public void TestRandomSeedMissmatchProducesCompressionException()
         {
             // writing file content to image
@@ -219,9 +216,7 @@ namespace SteganographyApp.Common.Tests
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
             {
-                string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                Assert.AreEqual(content, binary);
-                writer.WriteContentChunkToFile(binary);
+                Assert.Throws<ImageProcessingException>(() => wrapper.ReadContentChunkFromImage(readTable[0]));
             }
         }
 

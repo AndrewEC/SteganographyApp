@@ -1,15 +1,15 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class EnableCompressParseTests
+    [TestFixture]
+    public class EnableCompressParseTests : FixtureWithMockConsoleReaderAndWriter
     {
 
-        [TestMethod]
+        [Test]
         public void TestEnableCompressionWithValidValue()
         {
             string[] inputArgs = new string[] { "--enableCompression" };

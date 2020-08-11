@@ -1,11 +1,11 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Data;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
+    [TestFixture]
     public class RandomizeUtilTests
     {
 
@@ -13,7 +13,7 @@ namespace SteganographyApp.Common.Tests
         private static string RandomSeed = "randomSeed";
         private static string BadRandomSeed = "badRandomSeed";
 
-        [TestMethod]
+        [Test]
         public void TestRandomizeAndReorder()
         {
             var util = new RandomizeUtil();
@@ -25,7 +25,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(OriginalBinaryString, unrandomized);
         }
 
-        [TestMethod]
+        [Test]
         public void TestRandomizeWithIncorrectRandomSeedReturnsBadResult()
         {
             var util = new RandomizeUtil();

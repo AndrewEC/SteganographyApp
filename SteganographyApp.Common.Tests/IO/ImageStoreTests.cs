@@ -3,18 +3,19 @@ using System.Text;
 using System.Linq;
 
 using Moq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SixLabors.ImageSharp.PixelFormats;
 
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common.IO;
 
-namespace SteganographyApp.Common.IO
+namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class ImageStoreTests
+    [TestFixture]
+    public class ImageStoreTests : FixtureWithRealObjects
     {
 
         private static readonly int BinaryStringLength = 100_000;
@@ -28,20 +29,14 @@ namespace SteganographyApp.Common.IO
 
         private Mock<IImageProvider> mockImageProvider;
 
-        [TestInitialize]
+        [SetUp]
         public void Initialize()
         {
             mockImageProvider = new Mock<IImageProvider>();
             Injector.UseInstance(mockImageProvider.Object);
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestCleanImages()
         {
             var mockImage = GenerateMockImage(100, 100);
@@ -57,7 +52,7 @@ namespace SteganographyApp.Common.IO
             mockImageProvider.Verify(provider => provider.LoadImage(Arguments.CoverImages[0]), Times.Once());
         }
 
-        [TestMethod]
+        [Test]
         public void TestWriteToImageWhenNotEnoughImageSpacesThrowsImageProcessingException()
         {
             var mockImage = GenerateMockImage(100, 100);
@@ -69,7 +64,7 @@ namespace SteganographyApp.Common.IO
 
             using (var wrapper = imageStore.CreateIOWrapper())
             {
-                var exception = Assert.ThrowsException<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
+                var exception = Assert.Throws<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
                 Assert.AreEqual("There is not enough available storage space in the provided images to continue.",
                     exception.Message);
             }
@@ -78,7 +73,7 @@ namespace SteganographyApp.Common.IO
             Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);
         }
 
-        [TestMethod]
+        [Test]
         public void TestReadAndWriteContentChunkTable()
         {
             var mockImage = GenerateMockImage(1000, 1000);
@@ -98,7 +93,7 @@ namespace SteganographyApp.Common.IO
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestWriteContentChunkTableWithNotEnoughSpaceInImageThrowsImageProcessingException()
         {
             var mockImage = GenerateMockImage(1, 1);
@@ -108,7 +103,7 @@ namespace SteganographyApp.Common.IO
             int[] chunkTable = Enumerable.Range(0, 100).ToArray();
 
             imageStore.ResetToImage(0);
-            Assert.ThrowsException<ImageProcessingException>(() => imageStore.WriteContentChunkTable(chunkTable));
+            Assert.Throws<ImageProcessingException>(() => imageStore.WriteContentChunkTable(chunkTable));
 
             Assert.IsTrue(mockImage.DisposeCalled);
             Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);

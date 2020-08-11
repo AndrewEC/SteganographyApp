@@ -1,5 +1,5 @@
 using Moq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
@@ -9,8 +9,8 @@ using SteganographyApp.Common.Data;
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class ContentWriterTests
+    [TestFixture]
+    public class ContentWriterTests : FixtureWithTestObjects
     {
 
         private static readonly string BinaryString = "00010010100100111110101001001001";
@@ -37,8 +37,8 @@ namespace SteganographyApp.Common.Tests
         private Mock<IReadWriteStream> mockReadWriteStream;
         private Mock<IDataEncoderUtil> mockEncoderUtil;
 
-        [TestInitialize]
-        public void Initialize()
+        [SetUp]
+        public void ContentWriterSetUp()
         {
             mockReadWriteStream = new Mock<IReadWriteStream>();
 
@@ -50,13 +50,7 @@ namespace SteganographyApp.Common.Tests
             Injector.UseInstance(mockEncoderUtil.Object);
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestWriteContentChunkToFile()
         {
             byte[] bytes = new byte[1024];
@@ -80,7 +74,7 @@ namespace SteganographyApp.Common.Tests
             mockReadWriteStream.Verify(stream => stream.Write(bytes, 0, bytes.Length), Times.Once());
         }
 
-        [TestMethod]
+        [Test]
         public void TestWriteContentChunkToFileWhenOutputFileExistsTriesToDeleteFileFirst()
         {
             mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);

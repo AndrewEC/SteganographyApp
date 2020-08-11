@@ -1,15 +1,15 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class OutputParseTests
+    [TestFixture]
+    public class OutputParseTests : FixtureWithMockConsoleReaderAndWriter
     {
 
-        [TestMethod]
+        [Test]
         public void TestParseOutputFileWithValidValue()
         {
             string[] inputArgs = new string[] { "--output", "testing.txt" };

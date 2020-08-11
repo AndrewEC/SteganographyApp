@@ -1,13 +1,13 @@
 using Moq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class CalculatorTests
+    [TestFixture]
+    public class CalculatorTests : FixtureWithTestObjects
     {
 
         private static readonly string TestFile = "Test001.png";
@@ -15,21 +15,15 @@ namespace SteganographyApp.Common.Tests
 
         private Mock<IFileProvider> mockFileProvider;
 
-        [TestInitialize]
-        public void Initialize()
+        [SetUp]
+        public void SetUp()
         {
             mockFileProvider = new Mock<IFileProvider>();
             mockFileProvider.Setup(provider => provider.GetFileSizeBytes(It.IsAny<string>())).Returns(ChunkSize * 5);
             Injector.UseInstance<IFileProvider>(mockFileProvider.Object);
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestRequiredChunkSizeMatchesExpected()
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(TestFile, ChunkSize);
@@ -38,7 +32,7 @@ namespace SteganographyApp.Common.Tests
             mockFileProvider.Verify(provider => provider.GetFileSizeBytes(TestFile), Times.Once());
         }
 
-        [TestMethod]
+        [Test]
         public void TestCalculateRequiredBitsForContentTable()
         {
             int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(TestFile, ChunkSize);

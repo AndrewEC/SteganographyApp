@@ -1,20 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using System.Linq;
 
 namespace SteganographyApp.Common.Tests
 {
-    [TestClass]
-    public class HelpParserTests
+    [TestFixture]
+    public class HelpParserTests : FixtureWithRealObjects
     {
 
         private readonly string POSITIVE_TEST_PATH = "TestAssets/positive-help.prop";
         private readonly string NEGATIVE_TEST_PATH = "TestAssets/negative-help.prop";
 
-        [TestMethod]
-        [DataTestMethod]
-        [DataRow(HelpItemSet.Main)]
-        [DataRow(HelpItemSet.Calculator)]
-        [DataRow(HelpItemSet.Converter)]
+        [TestCase(HelpItemSet.Main)]
+        [TestCase(HelpItemSet.Calculator)]
+        [TestCase(HelpItemSet.Converter)]
         public void TestHelpParserHappyPath(HelpItemSet itemSet)
         {
             var parser = new HelpParser();
@@ -27,7 +25,7 @@ namespace SteganographyApp.Common.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestMissingFileReturnsFalse()
         {
             var parser = new HelpParser();
@@ -35,7 +33,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsNotNull(parser.LastError);
         }
 
-        [TestMethod]
+        [Test]
         public void TestHelpParserWithMissingPropertiesProducesErrorInHelpItems()
         {
             var parser = new HelpParser();

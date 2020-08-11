@@ -1,6 +1,6 @@
 using Moq;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using System;
 using System.Collections.Generic;
@@ -11,17 +11,11 @@ using SteganographyApp.Common.Injection;
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class PasswordParseTests
+    [TestFixture]
+    public class PasswordParseTests : FixtureWithMockConsoleReaderAndWriter
     {
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestParsePasswordWithValidValue()
         {
             string[] inputArgs = new string[] { "--password", "testing" };
@@ -31,7 +25,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual("testing", arguments.Password);
         }
 
-        [TestMethod]
+        [Test]
         public void TestParsePasswordWithInteractiveInput()
         {
 

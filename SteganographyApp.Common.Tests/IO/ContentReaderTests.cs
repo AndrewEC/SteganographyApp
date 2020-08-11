@@ -1,5 +1,5 @@
 using Moq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
@@ -9,8 +9,8 @@ using SteganographyApp.Common.Data;
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class ContentReaderTests
+    [TestFixture]
+    public class ContentReaderTests : FixtureWithTestObjects
     {
 
         private static readonly int ChunkByteSize = 100;
@@ -35,8 +35,8 @@ namespace SteganographyApp.Common.Tests
         private Mock<IReadWriteStream> mockReadWriteStream;
         private Mock<IDataEncoderUtil> mockDataEncoderUtil;
 
-        [TestInitialize]
-        public void Initialize()
+        [SetUp]
+        public void ContentReaderSetUp()
         {
             mockReadWriteStream = new Mock<IReadWriteStream>();
 
@@ -48,13 +48,7 @@ namespace SteganographyApp.Common.Tests
             Injector.UseInstance(mockFileProvider.Object);
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestReadContentChunkFromFile()
         {
             mockReadWriteStream.Setup(stream => stream.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(100);
@@ -79,7 +73,7 @@ namespace SteganographyApp.Common.Tests
                 Times.Once());
         }
 
-        [TestMethod]
+        [Test]
         public void TestReadContentChunkFromFile0BitesAreReadreturnsNull()
         {
             mockReadWriteStream.Setup(stream => stream.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(0);
@@ -100,7 +94,7 @@ namespace SteganographyApp.Common.Tests
                 Times.Never());
         }
 
-        [TestMethod]
+        [Test]
         public void TestReadContentChunkWhenBitsReadIsLessThanChunkSize()
         {
             int alternateByteCount = 10;

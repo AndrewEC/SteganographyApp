@@ -1,22 +1,21 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
+    [TestFixture]
     public class ActionParsingTests
     {
-        [DataTestMethod]
-        [DataRow("encode", ActionEnum.Encode)]
-        [DataRow("decode", ActionEnum.Decode)]
-        [DataRow("clean", ActionEnum.Clean)]
-        [DataRow("convert", ActionEnum.Convert)]
-        [DataRow("calculate-storage-space", ActionEnum.CalculateStorageSpace)]
-        [DataRow("calculate-encrypted-size", ActionEnum.CalculateEncryptedSize)]
-        [DataRow("ces", ActionEnum.CES)]
-        [DataRow("css", ActionEnum.CSS)]
+        [TestCase("encode", ActionEnum.Encode)]
+        [TestCase("decode", ActionEnum.Decode)]
+        [TestCase("clean", ActionEnum.Clean)]
+        [TestCase("convert", ActionEnum.Convert)]
+        [TestCase("calculate-storage-space", ActionEnum.CalculateStorageSpace)]
+        [TestCase("calculate-encrypted-size", ActionEnum.CalculateEncryptedSize)]
+        [TestCase("ces", ActionEnum.CES)]
+        [TestCase("css", ActionEnum.CSS)]
         public void TestParseActionWithValidActionValueDoesntProduceException(string actionString, ActionEnum action)
         {
             string[] inputArgs = new string[] { "--action", actionString };
@@ -26,7 +25,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(action, arguments.EncodeOrDecode);
         }
 
-        [TestMethod]
+        [Test]
         public void TestParseActionWithInvalidActionReturnsFalseAndProducesParseException()
         {
             string[] inputArgs = new string[] { "--action", "invalid-action" };

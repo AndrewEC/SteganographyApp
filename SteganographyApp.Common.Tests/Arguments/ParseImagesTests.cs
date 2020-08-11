@@ -1,6 +1,6 @@
 using Moq;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Arguments;
@@ -8,27 +8,21 @@ using SteganographyApp.Common.Arguments;
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class ParseImagesTests
+    [TestFixture]
+    public class ParseImagesTests : FixtureWithMockConsoleReaderAndWriter
     {
 
         private Mock<IFileProvider> mockFileProvider;
 
-        [TestInitialize]
-        public void Initialize()
+        [SetUp]
+        public void ParseSetUp()
         {
             mockFileProvider = new Mock<IFileProvider>();
             mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);
             Injector.UseInstance<IFileProvider>(mockFileProvider.Object);
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestParseImagesWithValidSingleValue()
         {
             string image = "Test001.png";
@@ -45,7 +39,7 @@ namespace SteganographyApp.Common.Tests
             mockFileProvider.Verify(provider => provider.IsExistingFile(image), Times.Once());
         }
 
-        [TestMethod]
+        [Test]
         public void TestParseImagesWithValidRegex()
         {
             mockFileProvider.Setup(provider => provider.GetFiles(It.IsAny<string>())).Returns(new string[] { "./Test001.png", "./Test002.png" });
@@ -64,7 +58,7 @@ namespace SteganographyApp.Common.Tests
             mockFileProvider.Verify(provider => provider.IsExistingFile(It.IsAny<string>()), Times.Exactly(2));
         }
 
-        [TestMethod]
+        [Test]
         public void TestParseImagesWithInvalidSingleValuesReturnsFalseAndProducesParseException()
         {
             mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(false);

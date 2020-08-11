@@ -1,65 +1,66 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
+    [TestFixture]
     public class ChecksTests
     {
 
-        [TestMethod]
+        [Test]
         public void TestChecksIsNullOrEmptyReturnsTrueOnEmptyAndNullStrings()
         {
             Assert.IsTrue(Checks.IsNullOrEmpty(""));
             Assert.IsTrue(Checks.IsNullOrEmpty(null));
         }
 
-        [TestMethod]
+        [Test]
         public void TestCheckIsNullOrEmptyReturnsTrueOnNonNullString()
         {
             Assert.IsFalse(Checks.IsNullOrEmpty("testing"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestChecksIsNullOrEmptyReturnsTrueOnEmptyArray()
         {
             Assert.IsTrue(Checks.IsNullOrEmpty(new string[0]));
         }
 
-        [TestMethod]
+        [Test]
         public void TestCheckIsNullOrEmptyReturnsFalseOnNonEmptyArray()
         {
             Assert.IsFalse(Checks.IsNullOrEmpty(new string[] { "test" }));
         }
 
-        [TestMethod]
+        [Test]
         public void TestCheckIsOneOfReturnsTrueWhenArrayContainsAction()
         {
             Assert.IsTrue(Checks.IsOneOf(ActionEnum.Encode, ActionEnum.Clean, ActionEnum.Decode, ActionEnum.Encode));
         }
 
-        [TestMethod]
+        [Test]
         public void TestCheckIsOneOfReturnsFalseWhenArrayContainsAction()
         {
             Assert.IsFalse(Checks.IsOneOf(ActionEnum.Encode, ActionEnum.Clean, ActionEnum.Decode));
         }
 
-        [TestMethod]
+        [Test]
         public void TestWasHelpRequestedWhenShorthandHelpFlagIsInArgsReturnsTrue()
         {
             string[] args = new string[] { "-h" };
             Assert.IsTrue(Checks.WasHelpRequested(args));
         }
 
-        [TestMethod]
+        [Test]
         public void TestWasHelpRequestWhenHelpFlagIsInArgsReturnsTrue()
         {
             string[] args = new string[] { "--help" };
             Assert.IsTrue(Checks.WasHelpRequested(args));
         }
 
-        [TestMethod]
+        [Test]
         public void TestWasHelPRequestedWhenNoHelpFlagInArgsReturnsFalse()
         {
             string[] args = new string[0];

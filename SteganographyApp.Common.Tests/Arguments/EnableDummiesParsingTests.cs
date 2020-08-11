@@ -1,6 +1,6 @@
 using Moq;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
@@ -8,17 +8,11 @@ using SteganographyApp.Common.Injection;
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class EnableDummiesParsingTests
+    [TestFixture]
+    public class EnableDummiesParsingTests : FixtureWithMockConsoleReaderAndWriter
     {
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestParseInsertDummiesWithValidValue()
         {
             string[] inputArgs = new string[] { "--enableDummies" };
@@ -28,7 +22,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsTrue(arguments.InsertDummies);
         }
 
-        [TestMethod]
+        [Test]
         public void TestParseDummyCountIsParsedWhenDummiesAreEnabledAndCoverImagesAreProvided()
         {
             var mockFileProvider = new Mock<IFileProvider>();

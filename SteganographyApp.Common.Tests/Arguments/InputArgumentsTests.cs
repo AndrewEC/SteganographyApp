@@ -1,5 +1,5 @@
 ﻿using Moq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using System;
 using System.Collections.Generic;
@@ -10,17 +10,11 @@ using SteganographyApp.Common.Injection;
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class InputArgumentsTests
+    [TestFixture]
+    public class InputArgumentsTests : FixtureWithMockConsoleReaderAndWriter
     {
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestPrintCommonMessageOutputsCorrectMessagesToWriter()
         {
             var lines = new List<string>();
@@ -40,7 +34,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsTrue(lines[1].Contains("chunk size"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestParseNullArgumentsReturnsFalseAndProducesParseException()
         {
             var parser = new ArgumentParser();
@@ -50,7 +44,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual("No arguments provided to parse.", parser.LastError.Message);
         }
 
-        [TestMethod]
+        [Test]
         public void TestParseWithBadArgumentReturnsFalseAndProducesParseException()
         {
             string[] inputsArgs = new string[] { "test", "1" };
@@ -61,7 +55,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsTrue(parser.LastError.Message.Contains("test"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestParseArgumentWithMissingAssociatedValuesProducesParseException()
         {
             string[] inputArgs = new string[] { "--action" };
@@ -71,7 +65,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
         }
 
-        [TestMethod]
+        [Test]
         public void TestParseWithPostValidationMessageProducesException()
         {
             string[] inputs = new string[] {  "--action", "encode" };
@@ -82,7 +76,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsTrue(parser.LastError.Message.Contains("Failed"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestParseWithPostValidationErrorProducesException()
         {
             string[] inputs = new string[] { "--action", "encode" };

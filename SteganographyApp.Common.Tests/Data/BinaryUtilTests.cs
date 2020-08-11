@@ -1,17 +1,17 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Data;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
+    [TestFixture]
     public class BinaryUtilTests
     {
 
         private static readonly string OriginalBinaryString = "1101010101000011101011111000000010101010";
 
-        [TestMethod]
+        [Test]
         public void TestToBase64AndBackToBinary()
         {
             var util = new BinaryUtil();

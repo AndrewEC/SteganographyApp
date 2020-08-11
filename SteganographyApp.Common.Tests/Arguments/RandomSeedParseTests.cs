@@ -1,19 +1,18 @@
 using System.Text;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class RandomSeedParseTests
+    [TestFixture]
+    public class RandomSeedParseTests : FixtureWithMockConsoleReaderAndWriter
     {
 
-        [DataTestMethod]
-        [DataRow(3)]
-        [DataRow(235)]
+        [TestCase(3)]
+        [TestCase(235)]
         public void TestParseRandomSeedWithValidValue(int stringLength)
         {
             string seedValue = CreateString(stringLength);
@@ -24,9 +23,8 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(seedValue, arguments.RandomSeed);
         }
 
-        [DataTestMethod]
-        [DataRow(2)]
-        [DataRow(236)]
+        [TestCase(2)]
+        [TestCase(236)]
         public void TestParseRandomSeedWithBadStringLengthProducesFalseAndParseException(int stringLength)
         {
             string[] inputArgs = new string[] { "--randomSeed", CreateString(stringLength) };

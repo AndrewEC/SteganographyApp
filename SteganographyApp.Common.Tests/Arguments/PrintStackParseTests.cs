@@ -1,15 +1,15 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
-    public class PrintStackParseTest
+    [TestFixture]
+    public class PrintStackParseTest : FixtureWithMockConsoleReaderAndWriter
     {
 
-        [TestMethod]
+        [Test]
         public void TestPrintStackWithValidValue()
         {
             string[] inputArgs = new string[] { "--printStack" };

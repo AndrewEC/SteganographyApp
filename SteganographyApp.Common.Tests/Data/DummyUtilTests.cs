@@ -1,11 +1,11 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Data;
 
 namespace SteganographyApp.Common.Tests
 {
 
-    [TestClass]
+    [TestFixture]
     public class DummyUtilTests
     {
 
@@ -14,19 +14,19 @@ namespace SteganographyApp.Common.Tests
         private static readonly int IncorrectNumberOfDummies = 3;
         private static readonly string RandomSeed = "random_seed";
 
-        [TestInitialize]
+        [SetUp]
         public void Initialize()
         {
             GlobalCounter.Instance.Reset();
         }
 
-        [TestCleanup]
+        [TearDown]
         public void Cleanup()
         {
             GlobalCounter.Instance.Reset();
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertAndRemoveDummies()
         {
             var util = new DummyUtil();
@@ -40,7 +40,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(OriginalBinaryString, removed);
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertAndRemoveWithIncorrectDummyCountReturnsBadResult()
         {
             var util = new DummyUtil();

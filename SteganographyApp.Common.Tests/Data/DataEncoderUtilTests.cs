@@ -1,14 +1,14 @@
 ﻿using Moq;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Tests
 {
-    [TestClass]
-    public class DataEncoderUtilTests
+    [TestFixture]
+    public class DataEncoderUtilTests : FixtureWithTestObjects
     {
 
         private static readonly byte[] InputBytes = new byte[1];
@@ -25,8 +25,8 @@ namespace SteganographyApp.Common.Tests
         private Mock<IRandomizeUtil> mockRandomUtil;
         private Mock<ICompressionUtil> mockCompressionUtil;
 
-        [TestInitialize]
-        public void Initialize()
+        [SetUp]
+        public void EncodeSetUp()
         {
             mockEncryptionProvider = new Mock<IEncryptionProvider>();
             mockBinaryUtil = new Mock<IBinaryUtil>();
@@ -41,13 +41,7 @@ namespace SteganographyApp.Common.Tests
             Injector.UseInstance<ICompressionUtil>(mockCompressionUtil.Object);
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Injector.ResetInstances();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestEncode()
         {
             string encryptedString = "encrypted_string";
@@ -75,7 +69,7 @@ namespace SteganographyApp.Common.Tests
             mockCompressionUtil.Verify(util => util.Compress(It.IsAny<byte[]>()), Times.Never());
         }
 
-        [TestMethod]
+        [Test]
         public void TestEncodeWithCompressionEnabled()
         {
             mockEncryptionProvider.Setup(provider => provider.Encrypt(It.IsAny<string>(), It.IsAny<string>())).Returns("encrypted_string");
@@ -90,7 +84,7 @@ namespace SteganographyApp.Common.Tests
             mockCompressionUtil.Verify(util => util.Compress(InputBytes), Times.Once());
         }
 
-        [TestMethod]
+        [Test]
         public void TestDecode()
         {
             string randomizedString = "randomized_string";
@@ -116,7 +110,7 @@ namespace SteganographyApp.Common.Tests
             mockCompressionUtil.Verify(util => util.Decompress(It.IsAny<byte[]>()), Times.Never());
         }
 
-        [TestMethod]
+        [Test]
         public void TestDecodWithCompressionDisabled()
         {
             mockRandomUtil.Setup(util => util.ReorderBinaryString(It.IsAny<string>(), It.IsAny<string>())).Returns("randomized_string");
