@@ -4,7 +4,7 @@ using System.IO;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
 
-namespace SteganographyApp.Common.IO.Content
+namespace SteganographyApp.Common.IO
 {
     public abstract class AbstractContentIO : IDisposable
     {

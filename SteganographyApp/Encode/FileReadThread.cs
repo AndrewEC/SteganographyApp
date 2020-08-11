@@ -1,5 +1,5 @@
 using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.IO.Content;
+using SteganographyApp.Common.IO;
 
 using System;
 using System.Threading;
