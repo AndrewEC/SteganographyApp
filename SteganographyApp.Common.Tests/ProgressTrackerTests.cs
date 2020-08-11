@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System.Collections.Generic;
 
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -42,14 +42,14 @@ namespace SteganographyApp.Common.Tests
         public void BeforeEach()
         {
             mockWriter = new MockWriter();
-            Injector.UseProvider<IConsoleWriter>(mockWriter);
+            Injector.UseInstance<IConsoleWriter>(mockWriter);
             tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            Injector.ResetProviders();
+            Injector.ResetInstances();
         }
 
         private void ExecuteUpdates(ProgressTracker tracker)

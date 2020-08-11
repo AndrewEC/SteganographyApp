@@ -5,7 +5,7 @@ using System.Text;
 using SixLabors.ImageSharp.PixelFormats;
 
 using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.IO
 {

@@ -2,7 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Arguments
 {

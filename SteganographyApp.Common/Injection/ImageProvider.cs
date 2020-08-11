@@ -3,7 +3,7 @@ using System;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace SteganographyApp.Common.Providers
+namespace SteganographyApp.Common.Injection
 {
 
     /// <summary>
@@ -86,6 +86,7 @@ namespace SteganographyApp.Common.Providers
         IBasicImageInfo LoadImage(string pathToImage);
     }
 
+    [Injectable(typeof(IImageProvider))]
     public class ImageProvider : IImageProvider
     {
 

@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using SixLabors.ImageSharp.PixelFormats;
 
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyApp.Common.IO
@@ -32,13 +32,13 @@ namespace SteganographyApp.Common.IO
         public void Initialize()
         {
             mockImageProvider = new Mock<IImageProvider>();
-            Injector.UseProvider(mockImageProvider.Object);
+            Injector.UseInstance(mockImageProvider.Object);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            Injector.ResetProviders();
+            Injector.ResetInstances();
         }
 
         [TestMethod]

@@ -2,14 +2,10 @@ using System;
 using System.Text;
 using System.Linq;
 
+using SteganographyApp.Common.Injection;
+
 namespace SteganographyApp.Common.Data
 {
-
-    public interface IDummyUtil
-    {
-        string InsertDummies(int numDummies, string binary, string randomSeed);
-        string RemoveDummies(int numDummies, string binary, string randomSeed);
-    }
 
     /// <summary>
     /// Keeps track of an arbitrary counter as to help increase the randomness
@@ -61,6 +57,13 @@ namespace SteganographyApp.Common.Data
 
     }
 
+    public interface IDummyUtil
+    {
+        string InsertDummies(int numDummies, string binary, string randomSeed);
+        string RemoveDummies(int numDummies, string binary, string randomSeed);
+    }
+
+    [Injectable(typeof(IDummyUtil))]
     public class DummyUtil : IDummyUtil
     {
 

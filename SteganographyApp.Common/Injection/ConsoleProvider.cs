@@ -1,6 +1,6 @@
 using System;
 
-namespace SteganographyApp.Common.Providers
+namespace SteganographyApp.Common.Injection
 {
 
     /// <summary>
@@ -20,6 +20,7 @@ namespace SteganographyApp.Common.Providers
     /// <para>Simply proxies the Write and WriteLine methods of the
     /// console class.</para>
     /// </summary>
+    [InjectableAttribute(typeof(IConsoleWriter))]
     public class ConsoleWriter : IConsoleWriter
     {
 
@@ -49,6 +50,7 @@ namespace SteganographyApp.Common.Providers
     /// The default IInputReader instance that acts as a proxy to the <see cref="Console.ReadKey(bool)">
     /// method.
     /// </summary>
+    [InjectableAttribute(typeof(IConsoleReader))]
     public class ConsoleKeyReader : IConsoleReader
     {
 

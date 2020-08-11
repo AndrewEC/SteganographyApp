@@ -1,4 +1,4 @@
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common
 {

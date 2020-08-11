@@ -2,7 +2,7 @@
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.IO.Content
 {

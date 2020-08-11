@@ -3,7 +3,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -34,17 +34,17 @@ namespace SteganographyApp.Common.Tests
             mockRandomUtil = new Mock<IRandomizeUtil>();
             mockCompressionUtil = new Mock<ICompressionUtil>();
 
-            Injector.UseProvider<IEncryptionProvider>(mockEncryptionProvider.Object);
-            Injector.UseProvider<IBinaryUtil>(mockBinaryUtil.Object);
-            Injector.UseProvider<IDummyUtil>(mockDummyUtil.Object);
-            Injector.UseProvider<IRandomizeUtil>(mockRandomUtil.Object);
-            Injector.UseProvider<ICompressionUtil>(mockCompressionUtil.Object);
+            Injector.UseInstance<IEncryptionProvider>(mockEncryptionProvider.Object);
+            Injector.UseInstance<IBinaryUtil>(mockBinaryUtil.Object);
+            Injector.UseInstance<IDummyUtil>(mockDummyUtil.Object);
+            Injector.UseInstance<IRandomizeUtil>(mockRandomUtil.Object);
+            Injector.UseInstance<ICompressionUtil>(mockCompressionUtil.Object);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            Injector.ResetProviders();
+            Injector.ResetInstances();
         }
 
         [TestMethod]

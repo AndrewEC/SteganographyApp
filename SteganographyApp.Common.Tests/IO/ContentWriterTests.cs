@@ -2,7 +2,7 @@ using Moq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO.Content;
 using SteganographyApp.Common.Data;
 
@@ -44,16 +44,16 @@ namespace SteganographyApp.Common.Tests
 
             mockFileProvider = new Mock<IFileProvider>();
             mockFileProvider.Setup(provider => provider.OpenFileForWrite(It.IsAny<string>())).Returns(mockReadWriteStream.Object);
-            Injector.UseProvider(mockFileProvider.Object);
+            Injector.UseInstance(mockFileProvider.Object);
 
             mockEncoderUtil = new Mock<IDataEncoderUtil>();
-            Injector.UseProvider(mockEncoderUtil.Object);
+            Injector.UseInstance(mockEncoderUtil.Object);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            Injector.ResetProviders();
+            Injector.ResetInstances();
         }
 
         [TestMethod]

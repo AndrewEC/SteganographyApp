@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace SteganographyApp.Common.Providers
+namespace SteganographyApp.Common.Injection
 {
 
     /// <summary>
@@ -74,6 +74,7 @@ namespace SteganographyApp.Common.Providers
         string[] ReadAllLines(string pathToFile);
     }
 
+    [Injectable(typeof(IFileProvider))]
     public class FileProvider : IFileProvider
     {
 

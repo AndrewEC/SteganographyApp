@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Arguments
 {

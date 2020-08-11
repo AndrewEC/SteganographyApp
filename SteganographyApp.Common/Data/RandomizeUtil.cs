@@ -1,5 +1,7 @@
 using System;
 
+using SteganographyApp.Common.Injection;
+
 namespace SteganographyApp.Common.Data
 {
 
@@ -9,6 +11,7 @@ namespace SteganographyApp.Common.Data
         string ReorderBinaryString(string binaryString, string randomSeed);
     }
 
+    [Injectable(typeof(IRandomizeUtil))]
     public class RandomizeUtil : IRandomizeUtil
     {
 

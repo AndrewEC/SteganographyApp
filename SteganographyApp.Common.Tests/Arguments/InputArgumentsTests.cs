@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -17,7 +17,7 @@ namespace SteganographyApp.Common.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            Injector.ResetProviders();
+            Injector.ResetInstances();
         }
 
         [TestMethod]
@@ -27,8 +27,8 @@ namespace SteganographyApp.Common.Tests
             var mockWriter = new Mock<IConsoleWriter>();
             mockWriter.Setup(writer => writer.WriteLine(It.IsAny<string>())).Callback<string>(line => lines.Add(line));
 
-            Injector.UseProvider(mockWriter.Object);
-            Injector.UseProvider<IConsoleReader>(new NullReader());
+            Injector.UseInstance(mockWriter.Object);
+            Injector.UseInstance<IConsoleReader>(new NullReader());
 
             var inputs = new string[] { "--chunkSize", "abc" };
             var parser = new ArgumentParser();

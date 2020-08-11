@@ -1,6 +1,6 @@
 using System;
 
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Data;
 
 namespace SteganographyApp.Common.Arguments

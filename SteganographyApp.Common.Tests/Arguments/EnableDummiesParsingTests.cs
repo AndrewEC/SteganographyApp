@@ -3,7 +3,7 @@ using Moq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -15,7 +15,7 @@ namespace SteganographyApp.Common.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            Injector.ResetProviders();
+            Injector.ResetInstances();
         }
 
         [TestMethod]
@@ -33,7 +33,7 @@ namespace SteganographyApp.Common.Tests
         {
             var mockFileProvider = new Mock<IFileProvider>();
             mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);
-            Injector.UseProvider(mockFileProvider.Object);
+            Injector.UseInstance(mockFileProvider.Object);
 
             var mockImage = new Mock<IBasicImageInfo>();
             mockImage.Setup(image => image.Width).Returns(100);
@@ -41,7 +41,7 @@ namespace SteganographyApp.Common.Tests
 
             var mockImageProvider = new Mock<IImageProvider>();
             mockImageProvider.Setup(provider => provider.LoadImage(It.IsAny<string>())).Returns(mockImage.Object);
-            Injector.UseProvider(mockImageProvider.Object);
+            Injector.UseInstance(mockImageProvider.Object);
 
             string imagePath = "Test001.png";
             string[] inputArgs = new string[] { "--enableDummies", "--images", imagePath };

@@ -3,7 +3,7 @@ using System.Text;
 using System.Linq;
 
 using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Data;
 
 namespace SteganographyApp.Common.IO
@@ -15,6 +15,7 @@ namespace SteganographyApp.Common.IO
         int[] ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed);
     }
 
+    [Injectable(typeof(IChunkTableHelper))]
     public class ChunkTableHelper : IChunkTableHelper
     {
 

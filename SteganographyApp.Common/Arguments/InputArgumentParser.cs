@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Arguments
 {

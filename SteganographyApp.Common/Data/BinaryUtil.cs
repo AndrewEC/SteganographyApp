@@ -1,6 +1,8 @@
 using System;
 using System.Text;
 
+using SteganographyApp.Common.Injection;
+
 namespace SteganographyApp.Common.Data
 {
 
@@ -10,6 +12,7 @@ namespace SteganographyApp.Common.Data
         string ToBinaryString(string base64String);
     }
 
+    [Injectable(typeof(IBinaryUtil))]
     public class BinaryUtil : IBinaryUtil
     {
 

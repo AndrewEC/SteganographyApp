@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 
 using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -18,7 +18,7 @@ namespace SteganographyApp.Common.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            Injector.ResetProviders();
+            Injector.ResetInstances();
         }
 
         [TestMethod]
@@ -39,8 +39,8 @@ namespace SteganographyApp.Common.Tests
             var mockReader = new Mock<IConsoleReader>();
             mockReader.Setup(reader => reader.ReadKey(It.IsAny<bool>())).Returns<bool>((intercept) => queue.Dequeue());
 
-            Injector.UseProvider(mockReader.Object);
-            Injector.UseProvider(new Mock<IConsoleWriter>().Object);
+            Injector.UseInstance(mockReader.Object);
+            Injector.UseInstance(new Mock<IConsoleWriter>().Object);
 
             string[] inputArgs = new string[] { "--password", "?" };
             var parser = new ArgumentParser();

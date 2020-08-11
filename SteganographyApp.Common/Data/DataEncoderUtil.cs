@@ -1,6 +1,6 @@
 ﻿using System;
 
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Data
 {
@@ -24,6 +24,7 @@ namespace SteganographyApp.Common.Data
     /// Utility class to encode a file to encrypted binary data or decode the encrypted binary string to the
     /// original file bytes.
     /// </summary>
+    [Injectable(typeof(IDataEncoderUtil))]
     public class DataEncoderUtil : IDataEncoderUtil
     {   
 

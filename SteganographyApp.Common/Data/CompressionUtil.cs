@@ -1,6 +1,8 @@
 using System.IO;
 using System.IO.Compression;
 
+using SteganographyApp.Common.Injection;
+
 namespace SteganographyApp.Common.Data
 {
 
@@ -10,6 +12,7 @@ namespace SteganographyApp.Common.Data
         byte[] Decompress(byte[] readBytes);
     }
 
+    [Injectable(typeof(ICompressionUtil))]
     public class CompressionUtil : ICompressionUtil
     {
 

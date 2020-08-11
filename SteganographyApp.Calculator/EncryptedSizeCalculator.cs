@@ -6,7 +6,7 @@ using System.Threading;
 
 using SteganographyApp.Common;
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Providers;
+using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Arguments;
 
 namespace SteganographyAppCalculator

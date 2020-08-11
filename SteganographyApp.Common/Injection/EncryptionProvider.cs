@@ -1,6 +1,6 @@
 using Rijndael256;
 
-namespace SteganographyApp.Common.Providers
+namespace SteganographyApp.Common.Injection
 {
 
     /// <summary>
@@ -12,6 +12,7 @@ namespace SteganographyApp.Common.Providers
         string Decrypt(string base64String, string password);
     }
 
+    [InjectableAttribute(typeof(IEncryptionProvider))]
     public class EncryptionProvider : IEncryptionProvider
     {
 
