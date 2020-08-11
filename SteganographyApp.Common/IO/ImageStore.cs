@@ -60,11 +60,6 @@ namespace SteganographyApp.Common.IO
                 store.ResetToImage(index);
             }
 
-            public bool HasEnoughSpaceForContentChunkTable()
-            {
-                return store.HasEnoughSpaceForContentChunkTable();
-            }
-
             public void Dispose()
             {
                 store.CloseOpenImage(save);
@@ -347,18 +342,6 @@ namespace SteganographyApp.Common.IO
                 CloseOpenImage();
                 throw e;
             }
-        }
-
-        /// <summary>
-        /// Checks to see if the current image has enough available storage space to store the entirety
-        /// of the content chunk table.
-        /// </summary>
-        /// <returns>Returns true if the number of bits the image can store is more than the estimated number of
-        /// bits required for the content chunk table.</returns>
-        private bool HasEnoughSpaceForContentChunkTable()
-        {
-            int requiredBitsForContentTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
-            return (currentImage.Width * currentImage.Height * Calculator.BitsPerPixel) > requiredBitsForContentTable;
         }
 
         /// <summary>

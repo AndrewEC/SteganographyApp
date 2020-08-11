@@ -29,7 +29,7 @@ namespace SteganographyApp.Common
         public static int CalculateRequiredNumberOfWrites(string fileToEncode, int chunkByteSize)
         {
             long fileSizeBytes = Injector.Provide<IFileProvider>().GetFileSizeBytes(fileToEncode);
-           return (int)(Math.Ceiling((double)fileSizeBytes / chunkByteSize));
+            return (int)(Math.Ceiling((double)fileSizeBytes / chunkByteSize));
         }
 
         /// <summary>

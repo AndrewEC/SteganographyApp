@@ -102,23 +102,16 @@ namespace SteganographyApp.Encode
 
             using (var wrapper = utilities.ImageStore.CreateIOWrapper())
             {
-                int start = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
-
-                if (!wrapper.HasEnoughSpaceForContentChunkTable())
-                {
-                    Console.WriteLine("There is not enough space in the leading image to store the content chunk table.");
-                    Console.WriteLine("The content chunk table requires {0} bits to store for the specified input file.", start);
-                    return;
-                }
-
-                Encode(wrapper, start);
+                Encode(wrapper);
             }
 
             Cleanup(utilities);
         }
 
-        private void Encode(ImageStore.ImageStoreWrapper wrapper, int startingPixel)
+        private void Encode(ImageStore.ImageStoreWrapper wrapper)
         {
+            
+            int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
             wrapper.SeekToPixel(startingPixel);
 
             int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
