@@ -15,12 +15,21 @@ namespace SteganographyApp.Common.IO
         int[] ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed);
     }
 
+    /// <summary>
+    /// Utility class to help read and write a potentially randomized content chunk table.
+    /// </summary>
     [Injectable(typeof(IChunkTableHelper))]
     public class ChunkTableHelper : IChunkTableHelper
     {
 
         private static readonly int ChunkSizeAndPadding = Calculator.ChunkDefinitionBitSize + 1;
 
+        /// <summary>
+        /// Converts the lengths of all the chunks in the table to a binary string and,
+        /// if the randomSeed is not null or blank, ranmizes that binary string.
+        /// </summary>
+        /// <param name="chunkLengths">The array of chunk lengths to write.</param>
+        /// <param name="randomSeed">The seed to ranomize the binary string with.</param>
         public string ConvertChunkTableToBinary(int[] chunkLengths, string randomSeed)
         {
             var tableHeader = to33BitBinaryString(chunkLengths.Length);
@@ -39,6 +48,13 @@ namespace SteganographyApp.Common.IO
             return tableHeader + binaryString;
         }
 
+        /// <summary>
+        /// Converts the raw binary string containing the content chunk table and converts it to an array
+        /// of integers representing the lenghts of each entry in the chunk table.
+        /// </summary>
+        /// <param name="binary">The binary string containing the content chunk table to un-randomize</param>
+        /// <param name="chunkCount">The number of expected chunks in the content chunk table.</param>
+        /// <param name="randomSeed">The random seed required to re-order the binary string.</param>
         public int[] ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed)
         {
 
