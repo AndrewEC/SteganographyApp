@@ -13,14 +13,12 @@ namespace SteganographyApp.Common.Tests
         private static readonly string TestFile = "Test001.png";
         private static readonly int ChunkSize = 131_072;
 
-        private Mock<IFileProvider> mockFileProvider;
+        [InjectMock(typeof(IFileProvider))]
+        public Mock<IFileProvider> mockFileProvider;
 
-        [SetUp]
-        public void SetUp()
+        protected override void SetupMocks()
         {
-            mockFileProvider = new Mock<IFileProvider>();
             mockFileProvider.Setup(provider => provider.GetFileSizeBytes(It.IsAny<string>())).Returns(ChunkSize * 5);
-            Injector.UseInstance<IFileProvider>(mockFileProvider.Object);
         }
 
         [Test]

@@ -33,21 +33,18 @@ namespace SteganographyApp.Common.Tests
         }
         .ToImmutable();
 
-        private Mock<IFileProvider> mockFileProvider;
-        private Mock<IReadWriteStream> mockReadWriteStream;
-        private Mock<IDataEncoderUtil> mockEncoderUtil;
+        [InjectMock(typeof(IFileProvider))]
+        public Mock<IFileProvider> mockFileProvider;
 
-        [SetUp]
-        public void ContentWriterSetUp()
+        [InjectMock(typeof(IReadWriteStream))]
+        public Mock<IReadWriteStream> mockReadWriteStream;
+
+        [InjectMock(typeof(IDataEncoderUtil))]
+        public Mock<IDataEncoderUtil> mockEncoderUtil;
+
+        protected override void SetupMocks()
         {
-            mockReadWriteStream = new Mock<IReadWriteStream>();
-
-            mockFileProvider = new Mock<IFileProvider>();
             mockFileProvider.Setup(provider => provider.OpenFileForWrite(It.IsAny<string>())).Returns(mockReadWriteStream.Object);
-            Injector.UseInstance(mockFileProvider.Object);
-
-            mockEncoderUtil = new Mock<IDataEncoderUtil>();
-            Injector.UseInstance(mockEncoderUtil.Object);
         }
 
         [Test]

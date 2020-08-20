@@ -19,27 +19,20 @@ namespace SteganographyApp.Common.Tests
 
         private static readonly string StringToDecode = "stringToDecode";
 
-        private Mock<IEncryptionProvider> mockEncryptionProvider;
-        private Mock<IBinaryUtil> mockBinaryUtil;
-        private Mock<IDummyUtil> mockDummyUtil;
-        private Mock<IRandomizeUtil> mockRandomUtil;
-        private Mock<ICompressionUtil> mockCompressionUtil;
+        [InjectMock(typeof(IEncryptionProvider))]
+        public Mock<IEncryptionProvider> mockEncryptionProvider;
 
-        [SetUp]
-        public void EncodeSetUp()
-        {
-            mockEncryptionProvider = new Mock<IEncryptionProvider>();
-            mockBinaryUtil = new Mock<IBinaryUtil>();
-            mockDummyUtil = new Mock<IDummyUtil>();
-            mockRandomUtil = new Mock<IRandomizeUtil>();
-            mockCompressionUtil = new Mock<ICompressionUtil>();
+        [InjectMock(typeof(IBinaryUtil))]
+        public Mock<IBinaryUtil> mockBinaryUtil;
 
-            Injector.UseInstance<IEncryptionProvider>(mockEncryptionProvider.Object);
-            Injector.UseInstance<IBinaryUtil>(mockBinaryUtil.Object);
-            Injector.UseInstance<IDummyUtil>(mockDummyUtil.Object);
-            Injector.UseInstance<IRandomizeUtil>(mockRandomUtil.Object);
-            Injector.UseInstance<ICompressionUtil>(mockCompressionUtil.Object);
-        }
+        [InjectMock(typeof(IDummyUtil))]
+        public Mock<IDummyUtil> mockDummyUtil;
+
+        [InjectMock(typeof(IRandomizeUtil))]
+        public Mock<IRandomizeUtil> mockRandomUtil;
+
+        [InjectMock(typeof(ICompressionUtil))]
+        public Mock<ICompressionUtil> mockCompressionUtil;
 
         [Test]
         public void TestEncode()

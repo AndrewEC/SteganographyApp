@@ -87,10 +87,12 @@ namespace SteganographyApp.Converter
                     tracker.UpdateAndDisplayProgress();
                     continue;
                 }
-
-                if (args.DeleteAfterConversion)
+                else
                 {
-                    File.Delete(coverImage);
+                    if (args.DeleteAfterConversion)
+                    {
+                        File.Delete(coverImage);
+                    }
                 }
 
                 tracker.UpdateAndDisplayProgress();
