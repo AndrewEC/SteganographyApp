@@ -1,13 +1,9 @@
 using System;
-using System.IO;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading;
 
 using SteganographyApp.Common;
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common.IO;
 
 namespace SteganographyAppCalculator
 {
@@ -19,14 +15,19 @@ namespace SteganographyAppCalculator
         /// Calculate the total size of the input file after base64 conversion, binary conversion,
         /// and optionally encryption if a password argument was provided.
         /// </summary>
-        /// <param name="args">The InputArguments instance parsed from the user provided command
+        /// <param name="arguments">The InputArguments instance parsed from the user provided command
         /// line arguments.</param>
-        public static void CalculateEncryptedSize(IInputArguments args)
+        public static void CalculateEncryptedSize(IInputArguments arguments)
         {
-            Console.WriteLine("Calculating encypted size of file {0}.", args.FileToEncode);
+            Console.WriteLine("Calculating encypted size of file {0}.", arguments.FileToEncode);
             try
             {
-                double size = new Orchestrator(args).CalculateFileSize();
+
+                int singleChunkSize = CalculateChunkLength(arguments);
+                int numberOfChunks = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
+                // Plus 1 because we need an additional entry in the chunk table to indicate the number of entries in the table
+                int chunkTableSize = (numberOfChunks + 1) * Calculator.ChunkDefinitionBitSizeWithPadding;
+                double size = (double) singleChunkSize * (double) numberOfChunks + (double) chunkTableSize;
 
                 Console.WriteLine("\nEncrypted file size is:");
                 PrintSize(size);
@@ -34,13 +35,28 @@ namespace SteganographyAppCalculator
                 Console.WriteLine("\n# of images required to store this file at common resolutions:");
                 PrintComparison(size);
             }
-            catch (TransformationException e)
+            catch (Exception e)
             {
                 Console.WriteLine("An error occured while encoding file: {0}", e.Message);
-                if (args.PrintStack)
+                if (arguments.PrintStack)
                 {
                     Console.WriteLine(e.StackTrace);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Read in a chunk of the file to encode and pass the read in bytes to the
+        /// encoder util.
+        /// </summary>
+        /// <param name="chunkId">Used to specify where the thread will start and stop reading.
+        /// The thread will use the equation chunkId * arguments.ChunkByteSize
+        /// to determine where to start reading the file to encode from.</param>
+        private static int CalculateChunkLength(IInputArguments arguments)
+        {
+            using (var contentReader = new ContentReader(arguments))
+            {
+                return contentReader.ReadContentChunkFromFile().Length;
             }
         }
 
@@ -69,188 +85,6 @@ namespace SteganographyAppCalculator
             Console.WriteLine("\tAt 1080p: \t{0}", size / CommonResolutionStorageSpace.P1080);
             Console.WriteLine("\tAt 1440p: \t{0}", size / CommonResolutionStorageSpace.P1440);
             Console.WriteLine("\tAt 4K (2160p): \t{0}", size / CommonResolutionStorageSpace.P2160);
-        }
-
-    }
-
-    /// <summary>
-    /// Orchestrates the running of multiple threads for the purpose of calculating the size of
-    /// the given file to encode.
-    /// </summary>
-    class Orchestrator
-    {
-
-        private static readonly object _lock = new object();
-        private static readonly int MaxThreadCount = 4;
-
-        private readonly ProgressTracker progressTracker;
-        private readonly int requiredNumberOfWrites;
-        private readonly IInputArguments arguments;
-
-        private readonly Dictionary<int, double> chunkLengths;
-        private readonly Queue<int> idsToCheckout;
-
-        private readonly CountdownEvent countdownEvent;
-
-        public Orchestrator(IInputArguments arguments)
-        {
-            this.arguments = arguments;
-
-            requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
-            progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
-                    "Calculating file size", "Completed calculating file size");
-
-            countdownEvent = new CountdownEvent(requiredNumberOfWrites);
-            chunkLengths = new Dictionary<int, double>(requiredNumberOfWrites);
-            idsToCheckout = new Queue<int>(requiredNumberOfWrites);
-            for (int i = 0; i < requiredNumberOfWrites; i++)
-            {
-                idsToCheckout.Enqueue(i);
-                chunkLengths[i] = -1;
-            }
-        }
-
-        /// <summary>
-        /// Start the calculation threads and return a summation of all the chunk sizes calculated by
-        /// the threads.
-        /// </summary>
-        public double CalculateFileSize()
-        {
-            var calculationThreads = CreateAndStartThreads();
-            WaitForThreadsToFinish(calculationThreads);
-            return chunkLengths.Values.Sum();
-        }
-
-        private ChunkSizeCalculatorThread[] CreateAndStartThreads()
-        {
-            int threadCount = Math.Min(requiredNumberOfWrites, MaxThreadCount);
-            var calculationThreads = Enumerable.Range(0, threadCount)
-                .Select(i => new ChunkSizeCalculatorThread(arguments, this))
-                .ToArray();
-
-            foreach (var thread in calculationThreads)
-            {
-                thread.Start();
-            }
-
-            return calculationThreads;
-        }
-
-        private void WaitForThreadsToFinish(ChunkSizeCalculatorThread[] calculationThreads)
-        {
-            countdownEvent.Wait();
-
-            foreach (var thread in calculationThreads)
-            {
-                thread.Join();
-            }
-        }
-
-        /// <summary>
-        /// Attempts to pull an ID of the next chunk whose encoded size needs
-        /// to be calculated. If there are no more chunks left needing calculation
-        /// then this will return -1 signaling the calculator thread to stop execution.
-        /// </summary>
-        public int CheckoutChunkId()
-        {
-            lock (_lock)
-            {
-                if (idsToCheckout.Count == 0)
-                {
-                    return -1;
-                }
-                return idsToCheckout.Dequeue();
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public void CheckinChunk(int chunkId, double chunkLength)
-        {
-            lock (_lock)
-            {
-                chunkLengths[chunkId] = chunkLength;
-                progressTracker.UpdateAndDisplayProgress();
-                countdownEvent.Signal();
-            }
-        }
-
-    }
-
-    /// <summary>
-    /// Threadholder that will handle reading in and encoding a portion, chunk, of the
-    /// file to encode.
-    /// </summary>
-    class ChunkSizeCalculatorThread
-    {
-
-        private readonly IInputArguments arguments;
-        private readonly Orchestrator orchestrator;
-        private readonly IDataEncoderUtil encoder;
-        private readonly Thread thread;
-
-        public ChunkSizeCalculatorThread(IInputArguments arguments, Orchestrator orchestrator)
-        {
-            this.arguments = arguments;
-            this.orchestrator = orchestrator;
-            encoder = Injector.Provide<IDataEncoderUtil>();
-            thread = new Thread(new ThreadStart(StartCalculating));
-        }
-
-        public void Start()
-        {
-            thread.Start();
-        }
-
-        private void StartCalculating()
-        {
-            while (true)
-            {
-                int chunkId = orchestrator.CheckoutChunkId();
-                if (chunkId == -1)
-                {
-                    break;
-                }
-
-                int chunkLength = CalculateChunkLength(chunkId);
-                orchestrator.CheckinChunk(chunkId, chunkLength);
-            }
-        }
-
-        /// <summary>
-        /// Read in a chunk of the file to encode and pass the read in bytes to the
-        /// encoder util.
-        /// </summary>
-        /// <param name="chunkId">Used to specify where the thread will start and stop reading.
-        /// The thread will use the equation chunkId * arguments.ChunkByteSize
-        /// to determine where to start reading the file to encode from.</param>
-        private int CalculateChunkLength(int chunkId)
-        {
-            byte[] buffer = new byte[arguments.ChunkByteSize];
-            using (var stream = File.OpenRead(arguments.FileToEncode))
-            {
-                stream.Seek(chunkId * arguments.ChunkByteSize, SeekOrigin.Begin);
-                int read = stream.Read(buffer, 0, buffer.Length);
-                if (read < arguments.ChunkByteSize)
-                {
-                    byte[] actual = new byte[read];
-                    Array.Copy(buffer, actual, read);
-                    buffer = actual;
-                }
-            }
-
-            return encoder.Encode(buffer, arguments.Password, arguments.UseCompression, arguments.DummyCount, "").Length;
-        }
-
-        public void Join()
-        {
-            try
-            {
-                thread.Join();
-            }
-            catch (Exception)
-            {
-            }
         }
 
     }

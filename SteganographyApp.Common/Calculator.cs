@@ -19,6 +19,8 @@ namespace SteganographyApp.Common
         /// </summary>
         public static readonly int BitsPerPixel = 3;
 
+        public static readonly int ChunkDefinitionBitSizeWithPadding = 33;
+
         /// <summary>
         /// Specifies the number of times the file has to be read from, encoded, and written to the storage
         /// image. The number of writes is essentially based on the total size of the image divided by the
