@@ -12,14 +12,12 @@ namespace SteganographyApp.Common.Tests
     public class ParseImagesTests : FixtureWithMockConsoleReaderAndWriter
     {
 
-        private Mock<IFileProvider> mockFileProvider;
+        [Mockup(typeof(IFileProvider))]
+        public Mock<IFileProvider> mockFileProvider;
 
-        [SetUp]
-        public void ParseSetUp()
+        protected override void SetupMocks()
         {
-            mockFileProvider = new Mock<IFileProvider>();
             mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);
-            Injector.UseInstance<IFileProvider>(mockFileProvider.Object);
         }
 
         [Test]

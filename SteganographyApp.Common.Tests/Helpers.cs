@@ -43,7 +43,7 @@ namespace SteganographyApp.Common.Tests
         [SetUp]
         public void InitializeMocks()
         {
-            TestInjectionHelper.InjectMocks(this);
+            MocksInjector.InjectMocks(this);
             SetupMocks();
         }
 
@@ -76,27 +76,39 @@ namespace SteganographyApp.Common.Tests
 
     }
 
+    /// <summary>
+    /// Attribute meant to be used with public Moq.Mock fields that require an
+    /// injected mock value. Any Moq.Mock field in a TestFixture with this attribute
+    /// present will have an auto-instantiated Moq.Mock instance value provided during the
+    /// SetUp phase of the test fixture.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    public class InjectMockAttribute : Attribute
+    public class Mockup : Attribute
     {
 
         public Type MockType { get; private set; }
 
-        public InjectMockAttribute(Type mockType)
+        public Mockup(Type mockType)
         {
             MockType = mockType;
         }
 
     }
 
-    public static class TestInjectionHelper
+    /// <summary>
+    /// Static helper class to reflectively lookup public Moq.Mock fields in a given TestFixture class
+    /// that are annotated with the InjectMock attribute and set their value to a given auto-instantiated instance
+    /// while also updating the Injector instances to use the new mock instance as the value in place of a given
+    /// interface.
+    /// </summary>
+    public static class MocksInjector
     {
 
         public static void InjectMocks(object testFixture)
         {
             foreach (var field in GetFieldsRequiringMocks(testFixture))
             {
-                var mockableAttribute = GetInjectMockAttribute(field);
+                var mockableAttribute = GetMockupAttribute(field);
 
                 object instance = CreateMockInstance(field, mockableAttribute);
                 field.SetValue(testFixture, instance);
@@ -106,7 +118,7 @@ namespace SteganographyApp.Common.Tests
             }
         }
 
-        private static void UseInstance(object instance, FieldInfo fieldInfo, InjectMockAttribute mockableAttribute)
+        private static void UseInstance(object instance, FieldInfo fieldInfo, Mockup mockableAttribute)
         {
             typeof(Injector)
                 .GetMethod("UseInstance")
@@ -114,7 +126,7 @@ namespace SteganographyApp.Common.Tests
                 .Invoke(null, new object[] { instance });
         }
 
-        private static object CreateMockInstance(FieldInfo field, InjectMockAttribute mockableAttribute)
+        private static object CreateMockInstance(FieldInfo field, Mockup mockableAttribute)
         {
             var mockType = typeof(Mock<>).MakeGenericType(new Type[] { mockableAttribute.MockType });
             return Activator.CreateInstance(mockType);
@@ -127,17 +139,17 @@ namespace SteganographyApp.Common.Tests
 
         private static FieldInfo[] GetFieldsRequiringMocks(object testFixture)
         {
-            return testFixture.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).Where(HasInjectMockAttribute).ToArray();
+            return testFixture.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).Where(HasMockupAttribute).ToArray();
         }
 
-        private static bool HasInjectMockAttribute(FieldInfo info)
+        private static bool HasMockupAttribute(FieldInfo info)
         {
-            return GetInjectMockAttribute(info) != null;
+            return GetMockupAttribute(info) != null;
         }
 
-        private static InjectMockAttribute GetInjectMockAttribute(FieldInfo info)
+        private static Mockup GetMockupAttribute(FieldInfo info)
         {
-            return info.GetCustomAttributes(typeof(InjectMockAttribute), false).FirstOrDefault() as InjectMockAttribute;
+            return info.GetCustomAttributes(typeof(Mockup), false).FirstOrDefault() as Mockup;
         }
     }
 

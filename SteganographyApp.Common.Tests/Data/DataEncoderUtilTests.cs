@@ -19,19 +19,19 @@ namespace SteganographyApp.Common.Tests
 
         private static readonly string StringToDecode = "stringToDecode";
 
-        [InjectMock(typeof(IEncryptionProvider))]
+        [Mockup(typeof(IEncryptionProvider))]
         public Mock<IEncryptionProvider> mockEncryptionProvider;
 
-        [InjectMock(typeof(IBinaryUtil))]
+        [Mockup(typeof(IBinaryUtil))]
         public Mock<IBinaryUtil> mockBinaryUtil;
 
-        [InjectMock(typeof(IDummyUtil))]
+        [Mockup(typeof(IDummyUtil))]
         public Mock<IDummyUtil> mockDummyUtil;
 
-        [InjectMock(typeof(IRandomizeUtil))]
+        [Mockup(typeof(IRandomizeUtil))]
         public Mock<IRandomizeUtil> mockRandomUtil;
 
-        [InjectMock(typeof(ICompressionUtil))]
+        [Mockup(typeof(ICompressionUtil))]
         public Mock<ICompressionUtil> mockCompressionUtil;
 
         [Test]
@@ -113,9 +113,9 @@ namespace SteganographyApp.Common.Tests
 
             var util = new DataEncoderUtil();
 
-            byte[] result = util.Decode(StringToDecode, Password, true, DummyCount, RandomSeed);
+            byte[] result = util.Decode(StringToDecode, Password, false, DummyCount, RandomSeed);
 
-            mockCompressionUtil.Verify(util => util.Decompress(It.IsAny<byte[]>()), Times.Once());
+            mockCompressionUtil.Verify(util => util.Decompress(It.IsAny<byte[]>()), Times.Never());
         }
 
     }

@@ -33,13 +33,13 @@ namespace SteganographyApp.Common.Tests
         }
         .ToImmutable();
 
-        [InjectMock(typeof(IFileProvider))]
+        [Mockup(typeof(IFileProvider))]
         public Mock<IFileProvider> mockFileProvider;
 
-        [InjectMock(typeof(IReadWriteStream))]
+        [Mockup(typeof(IReadWriteStream))]
         public Mock<IReadWriteStream> mockReadWriteStream;
 
-        [InjectMock(typeof(IDataEncoderUtil))]
+        [Mockup(typeof(IDataEncoderUtil))]
         public Mock<IDataEncoderUtil> mockEncoderUtil;
 
         protected override void SetupMocks()
