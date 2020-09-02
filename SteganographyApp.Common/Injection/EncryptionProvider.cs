@@ -12,7 +12,7 @@ namespace SteganographyApp.Common.Injection
         string Decrypt(string base64String, string password);
     }
 
-    [InjectableAttribute(typeof(IEncryptionProvider))]
+    [Injectable(typeof(IEncryptionProvider))]
     public class EncryptionProvider : IEncryptionProvider
     {
 

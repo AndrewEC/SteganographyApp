@@ -6,6 +6,9 @@ using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.Data;
 
+using static Moq.Times;
+using static Moq.It;
+
 namespace SteganographyApp.Common.Tests
 {
 
@@ -44,15 +47,15 @@ namespace SteganographyApp.Common.Tests
 
         protected override void SetupMocks()
         {
-            mockFileProvider.Setup(provider => provider.OpenFileForWrite(It.IsAny<string>())).Returns(mockReadWriteStream.Object);
+            mockFileProvider.Setup(provider => provider.OpenFileForWrite(IsAny<string>())).Returns(mockReadWriteStream.Object);
         }
 
         [Test]
         public void TestWriteContentChunkToFile()
         {
             byte[] bytes = new byte[1024];
-            mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(false);
-            mockEncoderUtil.Setup(encoder => encoder.Decode(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>()))
+            mockFileProvider.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(false);
+            mockEncoderUtil.Setup(encoder => encoder.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()))
                 .Returns(bytes);
 
             using (var writer = new ContentWriter(Arguments))
@@ -60,22 +63,22 @@ namespace SteganographyApp.Common.Tests
                 writer.WriteContentChunkToFile(BinaryString);
             }
 
-            mockFileProvider.Verify(provider => provider.IsExistingFile(DecodedOutputFile), Times.Once());
-            mockFileProvider.Verify(provider => provider.Delete(It.IsAny<string>()), Times.Never());
-            mockFileProvider.Verify(provider => provider.OpenFileForWrite(DecodedOutputFile), Times.Once());
+            mockFileProvider.Verify(provider => provider.IsExistingFile(DecodedOutputFile), Once());
+            mockFileProvider.Verify(provider => provider.Delete(IsAny<string>()), Never());
+            mockFileProvider.Verify(provider => provider.OpenFileForWrite(DecodedOutputFile), Once());
 
-            mockEncoderUtil.Verify(encoder => encoder.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed), Times.Once());
+            mockEncoderUtil.Verify(encoder => encoder.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed), Once());
 
-            mockReadWriteStream.Verify(stream => stream.Flush(), Times.AtLeastOnce());
-            mockReadWriteStream.Verify(stream => stream.Dispose(), Times.Once());
-            mockReadWriteStream.Verify(stream => stream.Write(bytes, 0, bytes.Length), Times.Once());
+            mockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
+            mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
+            mockReadWriteStream.Verify(stream => stream.Write(bytes, 0, bytes.Length), Once());
         }
 
         [Test]
         public void TestWriteContentChunkToFileWhenOutputFileExistsTriesToDeleteFileFirst()
         {
-            mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);
-            mockEncoderUtil.Setup(encoder => encoder.Decode(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>()))
+            mockFileProvider.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(true);
+            mockEncoderUtil.Setup(encoder => encoder.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()))
                 .Returns(new byte[1024]);
 
             using (var writer = new ContentWriter(Arguments))
@@ -83,8 +86,8 @@ namespace SteganographyApp.Common.Tests
                 writer.WriteContentChunkToFile(BinaryString);
             }
 
-            mockFileProvider.Verify(provider => provider.Delete(DecodedOutputFile), Times.Once());
-            mockEncoderUtil.Verify(encoder => encoder.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed), Times.Once());            
+            mockFileProvider.Verify(provider => provider.Delete(DecodedOutputFile), Once());
+            mockEncoderUtil.Verify(encoder => encoder.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed), Once());            
         }
 
     }

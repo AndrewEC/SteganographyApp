@@ -5,6 +5,9 @@ using NUnit.Framework;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
 
+using static Moq.Times;
+using static Moq.It;
+
 namespace SteganographyApp.Common.Tests
 {
 
@@ -26,7 +29,7 @@ namespace SteganographyApp.Common.Tests
         public void TestParseDummyCountIsParsedWhenDummiesAreEnabledAndCoverImagesAreProvided()
         {
             var mockFileProvider = new Mock<IFileProvider>();
-            mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);
+            mockFileProvider.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(true);
             Injector.UseInstance(mockFileProvider.Object);
 
             var mockImage = new Mock<IBasicImageInfo>();
@@ -34,7 +37,7 @@ namespace SteganographyApp.Common.Tests
             mockImage.Setup(image => image.Height).Returns(100);
 
             var mockImageProvider = new Mock<IImageProvider>();
-            mockImageProvider.Setup(provider => provider.LoadImage(It.IsAny<string>())).Returns(mockImage.Object);
+            mockImageProvider.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage.Object);
             Injector.UseInstance(mockImageProvider.Object);
 
             string imagePath = "Test001.png";
@@ -54,7 +57,7 @@ namespace SteganographyApp.Common.Tests
 
             Assert.AreNotEqual(firstArguments.DummyCount, secondArguments.DummyCount);
 
-            mockImageProvider.Verify(provider => provider.LoadImage(imagePath), Times.Exactly(4));
+            mockImageProvider.Verify(provider => provider.LoadImage(imagePath), Exactly(4));
         }
 
     }

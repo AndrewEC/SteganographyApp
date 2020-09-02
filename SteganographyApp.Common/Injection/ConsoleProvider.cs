@@ -20,7 +20,7 @@ namespace SteganographyApp.Common.Injection
     /// <para>Simply proxies the Write and WriteLine methods of the
     /// console class.</para>
     /// </summary>
-    [InjectableAttribute(typeof(IConsoleWriter))]
+    [Injectable(typeof(IConsoleWriter))]
     public class ConsoleWriter : IConsoleWriter
     {
 
@@ -50,7 +50,7 @@ namespace SteganographyApp.Common.Injection
     /// The default IInputReader instance that acts as a proxy to the <see cref="Console.ReadKey(bool)">
     /// method.
     /// </summary>
-    [InjectableAttribute(typeof(IConsoleReader))]
+    [Injectable(typeof(IConsoleReader))]
     public class ConsoleKeyReader : IConsoleReader
     {
 

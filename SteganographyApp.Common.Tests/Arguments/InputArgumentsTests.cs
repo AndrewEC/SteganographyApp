@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
 
+using static Moq.It;
+
 namespace SteganographyApp.Common.Tests
 {
 
@@ -19,7 +21,7 @@ namespace SteganographyApp.Common.Tests
         {
             var lines = new List<string>();
             var mockWriter = new Mock<IConsoleWriter>();
-            mockWriter.Setup(writer => writer.WriteLine(It.IsAny<string>())).Callback<string>(line => lines.Add(line));
+            mockWriter.Setup(writer => writer.WriteLine(IsAny<string>())).Callback<string>(line => lines.Add(line));
 
             Injector.UseInstance(mockWriter.Object);
             Injector.UseInstance<IConsoleReader>(new NullReader());

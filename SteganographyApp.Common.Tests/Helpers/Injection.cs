@@ -1,80 +1,14 @@
-using Moq;
-
-using NUnit.Framework;
-
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
+
+using Moq;
 
 using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Tests
 {
-
-    [TestFixture]
-    public class Init
-    {
-
-        [OneTimeSetUp]
-        public void OneTime()
-        {
-            Injector.AllowOnlyTestObjects();
-        }
-
-    }
-
-    [TestFixture]
-    public abstract class FixtureWithMockConsoleReaderAndWriter : FixtureWithTestObjects
-    {
-
-        [SetUp]
-        public void SetUp()
-        {
-            Injector.UseInstance(new Mock<IConsoleReader>().Object);
-            Injector.UseInstance(new Mock<IConsoleWriter>().Object);
-        }
-
-    }
-
-    [TestFixture]
-    public abstract class FixtureWithTestObjects
-    {
-
-        [SetUp]
-        public void InitializeMocks()
-        {
-            MocksInjector.InjectMocks(this);
-            SetupMocks();
-        }
-
-        protected virtual void SetupMocks() {}
-
-        [TearDown]
-        public void TearDown()
-        {
-            Injector.ResetInstances();
-        }
-
-    }
-
-    [TestFixture]
-    public abstract class FixtureWithRealObjects
-    {
-
-        [SetUp]
-        public void SetUp()
-        {
-            Injector.AllowOnlyRealObjects();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Injector.AllowOnlyTestObjects();
-            Injector.ResetInstances();
-        }
-
-    }
 
     /// <summary>
     /// Attribute meant to be used with public Moq.Mock fields that require an
@@ -137,9 +71,9 @@ namespace SteganographyApp.Common.Tests
             return mock.GetType().GetProperty("Object", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).GetValue(mock);
         }
 
-        private static FieldInfo[] GetFieldsRequiringMocks(object testFixture)
+        private static IEnumerable<FieldInfo> GetFieldsRequiringMocks(object testFixture)
         {
-            return testFixture.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).Where(HasMockupAttribute).ToArray();
+            return testFixture.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).Where(HasMockupAttribute);
         }
 
         private static bool HasMockupAttribute(FieldInfo info)

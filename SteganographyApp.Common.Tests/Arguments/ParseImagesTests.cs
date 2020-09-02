@@ -5,6 +5,9 @@ using NUnit.Framework;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Arguments;
 
+using static Moq.Times;
+using static Moq.It;
+
 namespace SteganographyApp.Common.Tests
 {
 
@@ -17,7 +20,7 @@ namespace SteganographyApp.Common.Tests
 
         protected override void SetupMocks()
         {
-            mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);
+            mockFileProvider.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(true);
         }
 
         [Test]
@@ -34,13 +37,13 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(1, images.Length);
             Assert.AreEqual(image, images[0]);
 
-            mockFileProvider.Verify(provider => provider.IsExistingFile(image), Times.Once());
+            mockFileProvider.Verify(provider => provider.IsExistingFile(image), Once());
         }
 
         [Test]
         public void TestParseImagesWithValidRegex()
         {
-            mockFileProvider.Setup(provider => provider.GetFiles(It.IsAny<string>())).Returns(new string[] { "./Test001.png", "./Test002.png" });
+            mockFileProvider.Setup(provider => provider.GetFiles(IsAny<string>())).Returns(new string[] { "./Test001.png", "./Test002.png" });
 
             string expression = "[r]<^[\\w\\W]+\\.(png)$><./TestAssets>";
             string[] inputArgs = new string[] { "--images", expression };
@@ -53,13 +56,13 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual("./Test001.png", images[0]);
             Assert.AreEqual("./Test002.png", images[1]);
 
-            mockFileProvider.Verify(provider => provider.IsExistingFile(It.IsAny<string>()), Times.Exactly(2));
+            mockFileProvider.Verify(provider => provider.IsExistingFile(IsAny<string>()), Exactly(2));
         }
 
         [Test]
         public void TestParseImagesWithInvalidSingleValuesReturnsFalseAndProducesParseException()
         {
-            mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(false);
+            mockFileProvider.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(false);
 
             string[] inputArgs = new string[] { "--images", "missing-image" };    
             var parser = new ArgumentParser();
@@ -67,7 +70,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
 
-            mockFileProvider.Verify(provider => provider.IsExistingFile("missing-image"), Times.Once());
+            mockFileProvider.Verify(provider => provider.IsExistingFile("missing-image"), Once());
         }
 
         private string NullReturningPostValidator(IInputArguments input) => null;

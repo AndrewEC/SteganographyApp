@@ -6,6 +6,9 @@ using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.Data;
 
+using static Moq.Times;
+using static Moq.It;
+
 namespace SteganographyApp.Common.Tests
 {
 
@@ -42,16 +45,16 @@ namespace SteganographyApp.Common.Tests
 
         protected override void SetupMocks()
         {
-            mockFileProvider.Setup(provider => provider.OpenFileForRead(It.IsAny<string>())).Returns(mockReadWriteStream.Object);
+            mockFileProvider.Setup(provider => provider.OpenFileForRead(IsAny<string>())).Returns(mockReadWriteStream.Object);
         }
 
         [Test]
         public void TestReadContentChunkFromFile()
         {
-            mockReadWriteStream.Setup(stream => stream.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(100);
+            mockReadWriteStream.Setup(stream => stream.Read(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Returns(100);
 
             string expected = "encoded_value";
-            mockDataEncoderUtil.Setup(encoder => encoder.Encode(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>()))
+            mockDataEncoderUtil.Setup(encoder => encoder.Encode(IsAny<byte[]>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()))
                 .Returns("encoded_value");
 
             using (var reader = new ContentReader(Arguments))
@@ -60,20 +63,20 @@ namespace SteganographyApp.Common.Tests
                 Assert.AreEqual(expected, actual);
             }
 
-            mockReadWriteStream.Verify(stream => stream.Flush(), Times.AtLeastOnce());
-            mockReadWriteStream.Verify(stream => stream.Dispose(), Times.Once());
-            mockFileProvider.Verify(provider => provider.OpenFileForRead(FileToEncode), Times.Once());
-            mockReadWriteStream.Verify(stream => stream.Read(It.IsAny<byte[]>(), 0, ChunkByteSize), Times.Once());
+            mockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
+            mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
+            mockFileProvider.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
+            mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
             mockDataEncoderUtil
-                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), It.IsAny<string>(),
-                    It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>()),
-                Times.Once());
+                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(),
+                    IsAny<bool>(), IsAny<int>(), IsAny<string>()),
+                Once());
         }
 
         [Test]
         public void TestReadContentChunkFromFile0BitesAreReadreturnsNull()
         {
-            mockReadWriteStream.Setup(stream => stream.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(0);
+            mockReadWriteStream.Setup(stream => stream.Read(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Returns(0);
 
             using (var contentReader = new ContentReader(Arguments))
             {
@@ -81,21 +84,21 @@ namespace SteganographyApp.Common.Tests
                 Assert.IsNull(result);
             }
 
-            mockReadWriteStream.Verify(stream => stream.Flush(), Times.AtLeastOnce());
-            mockReadWriteStream.Verify(stream => stream.Dispose(), Times.Once());
-            mockFileProvider.Verify(provider => provider.OpenFileForRead(FileToEncode), Times.Once());
-            mockReadWriteStream.Verify(stream => stream.Read(It.IsAny<byte[]>(), 0, ChunkByteSize), Times.Once());
+            mockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
+            mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
+            mockFileProvider.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
+            mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
             mockDataEncoderUtil
-                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), It.IsAny<string>(),
-                    It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>()),
-                Times.Never());
+                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(),
+                    IsAny<bool>(), IsAny<int>(), IsAny<string>()),
+                Never());
         }
 
         [Test]
         public void TestReadContentChunkWhenBitsReadIsLessThanChunkSize()
         {
             int alternateByteCount = 10;
-            mockReadWriteStream.Setup(stream => stream.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(alternateByteCount);
+            mockReadWriteStream.Setup(stream => stream.Read(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Returns(alternateByteCount);
 
             using (var contentReader = new ContentReader(Arguments))
             {
@@ -103,9 +106,9 @@ namespace SteganographyApp.Common.Tests
             }
 
             mockDataEncoderUtil
-                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == alternateByteCount), It.IsAny<string>(),
-                    It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>()),
-                Times.Once());
+                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == alternateByteCount), IsAny<string>(),
+                    IsAny<bool>(), IsAny<int>(), IsAny<string>()),
+                Once());
         }
 
     }

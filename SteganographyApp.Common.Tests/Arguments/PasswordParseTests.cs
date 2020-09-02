@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
 
+using static Moq.Times;
+using static Moq.It;
+
 namespace SteganographyApp.Common.Tests
 {
 
@@ -31,7 +34,7 @@ namespace SteganographyApp.Common.Tests
 
             var queue = CreateUserInputQueue();
             var mockReader = new Mock<IConsoleReader>();
-            mockReader.Setup(reader => reader.ReadKey(It.IsAny<bool>())).Returns<bool>((intercept) => queue.Dequeue());
+            mockReader.Setup(reader => reader.ReadKey(IsAny<bool>())).Returns<bool>((intercept) => queue.Dequeue());
 
             Injector.UseInstance(mockReader.Object);
             Injector.UseInstance(new Mock<IConsoleWriter>().Object);
@@ -40,7 +43,7 @@ namespace SteganographyApp.Common.Tests
             var parser = new ArgumentParser();
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments inputArguments, NullReturningPostValidator));
 
-            mockReader.Verify(reader => reader.ReadKey(It.IsAny<bool>()), Times.Exactly(9));
+            mockReader.Verify(reader => reader.ReadKey(IsAny<bool>()), Exactly(9));
             Assert.AreEqual(0, queue.Count);
             Assert.AreEqual("Testin", inputArguments.Password);
         }
