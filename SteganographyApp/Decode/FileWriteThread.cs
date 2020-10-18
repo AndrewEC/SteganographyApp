@@ -18,7 +18,6 @@ namespace SteganographyApp.Decode
         private readonly BlockingCollection<WriteArgs> queue;
         private readonly ErrorContainer decodeError;
         private readonly IInputArguments arguments;
-        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private Thread readThread;
 
         private FileWriteThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer, IInputArguments arguments)
@@ -26,7 +25,6 @@ namespace SteganographyApp.Decode
             this.arguments = arguments;
             this.queue = queue;
             this.decodeError = errorContainer;
-            readThread = new Thread(new ThreadStart(Write));
         }
 
         public static FileWriteThread CreateAndStartThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer,
@@ -39,6 +37,7 @@ namespace SteganographyApp.Decode
 
         public void StartWriting()
         {
+            readThread = new Thread(new ThreadStart(Write));
             readThread.Start();
         }
 
@@ -56,15 +55,7 @@ namespace SteganographyApp.Decode
             {
                 while (true)
                 {
-                    WriteArgs writeArgs;
-                    try
-                    {
-                        writeArgs = queue.Take(cancellationTokenSource.Token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        break;
-                    }
+                    var writeArgs = queue.Take();
                     if (writeArgs.Status == Status.Complete)
                     {
                         break;
@@ -89,7 +80,6 @@ namespace SteganographyApp.Decode
         {
             try
             {
-                cancellationTokenSource.Cancel();
                 readThread.Join();
             }
             catch {}

@@ -32,10 +32,6 @@ namespace SteganographyApp
         {
             lock (_lock)
             {
-                if (this.exception != null)
-                {
-                    return;
-                }
                 this.exception = exception;
             }
         }
