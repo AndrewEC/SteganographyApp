@@ -14,12 +14,6 @@ namespace SteganographyApp.Converter
     class Program
     {
 
-        /// <summary>
-        /// The mime type of png images. All images that have the png mimetype should not
-        /// be put through the conversion process.
-        /// </summary>
-        private static readonly string PngMimeType = "image/png";
-
         static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography Converter\n");
@@ -63,22 +57,22 @@ namespace SteganographyApp.Converter
         /// </summary>
         private static void ConvertImagesToPng(IInputArguments args)
         {
-            string[] lossyImages = args.CoverImages.Where(FilterOutPngImages).ToArray();
-            if (lossyImages.Length == 0)
+            int imageCount = args.CoverImages.Length;
+            if (imageCount == 0)
             {
                 Console.WriteLine("All images found are png images and will not be converted.");
                 return;
             }
 
-            Console.WriteLine("Converting {0} images.", lossyImages.Length);
-            var tracker = ProgressTracker.CreateAndDisplay(lossyImages.Length, "Converting images",
+            Console.WriteLine("Converting {0} images.", imageCount);
+            var tracker = ProgressTracker.CreateAndDisplay(imageCount, "Converting images",
                 "Finished converting all images");
 
             var failures = new List<string>();
 
             var encoder = new PngEncoder();
             encoder.CompressionLevel = args.CompressionLevel;
-            foreach (string coverImage in lossyImages)
+            foreach (string coverImage in args.CoverImages)
             {
                 string result = TrySaveImage(coverImage, encoder);
                 if (!Checks.IsNullOrEmpty(result))
@@ -97,6 +91,8 @@ namespace SteganographyApp.Converter
 
                 tracker.UpdateAndDisplayProgress();
             }
+
+            PrintFailures(failures);
         }
 
         private static string TrySaveImage(string coverImage, PngEncoder encoder)
@@ -127,14 +123,6 @@ namespace SteganographyApp.Converter
             {
                 Console.WriteLine($"\t{failure}");
             }
-        }
-
-        /// <summary>
-        /// Filters out any images that already have the png format.
-        /// </summary>
-        private static bool FilterOutPngImages(string image)
-        {
-            return Image.DetectFormat(image).DefaultMimeType != PngMimeType;
         }
 
         /// <summary>

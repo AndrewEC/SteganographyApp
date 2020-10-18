@@ -51,6 +51,17 @@ namespace SteganographyApp.Common.Tests
             return nums;
         }
 
+        [TestCase(10, 100, 5)]
+        [TestCase(20, 1000, 10)]
+        [TestCase(30, 550, 87)]
+        public void TestGeneratedNumbersAreInRange(int max, int seed, int generations)
+        {
+            var generator = new IndexGenerator(seed, generations);
+            int[] nums = Generate(generator, 100, max);
+
+            Assert.IsTrue(AreInRange(nums, 0, max));
+        }
+
         [Test]
         public void TestDifferentSeedsDontMatch()
         {
@@ -60,8 +71,6 @@ namespace SteganographyApp.Common.Tests
             generator = new IndexGenerator(101, 5);
             int[] nums2 = Generate(generator, 20, 20);
 
-            Assert.IsTrue(AreInRange(nums, 0, 20));
-            Assert.IsTrue(AreInRange(nums2, 0, 20));
             Assert.IsFalse(HaveSameElements(nums, nums2));
         }
 
@@ -74,8 +83,6 @@ namespace SteganographyApp.Common.Tests
             generator = new IndexGenerator(101, 5);
             int[] nums2 = Generate(generator, 20, 20);
 
-            Assert.IsTrue(AreInRange(nums, 0, 20));
-            Assert.IsTrue(AreInRange(nums2, 0, 20));
             Assert.IsFalse(HaveSameElements(nums, nums2));
         }
 
@@ -88,8 +95,6 @@ namespace SteganographyApp.Common.Tests
             generator = new IndexGenerator(100, 5);
             int[] nums2 = Generate(generator, 20, 20);
 
-            Assert.IsTrue(AreInRange(nums, 0, 20));
-            Assert.IsTrue(AreInRange(nums2, 0, 20));
             Assert.IsTrue(HaveSameElements(nums, nums2));
         }
 
