@@ -114,12 +114,12 @@ namespace SteganographyApp.Common.Injection
             }
         }
 
-        public static void AllowOnlyTestObjects()
+        public static void AllowOnlyNonDefaultInstances()
         {
             onlyTestObjectsState = true;
         }
 
-        public static void AllowOnlyRealObjects()
+        public static void AllowAnyInstances()
         {
             onlyTestObjectsState = false;
         }

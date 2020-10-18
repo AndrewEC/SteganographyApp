@@ -3,6 +3,7 @@ using SteganographyApp.Common.IO;
 using SteganographyApp.Common;
 
 using System;
+using System.Threading;
 using System.Collections.Concurrent;
 
 namespace SteganographyApp.Decode
@@ -39,12 +40,12 @@ namespace SteganographyApp.Decode
         /// added to the this collection so the raw binary content from the image can
         /// be decoded and written to the decoded output file location.
         /// </summary>
-        private readonly BlockingCollection<WriteArgs> writeQueue;
+        private readonly BlockingCollection<WriteArgs> writeQueue = new BlockingCollection<WriteArgs>(2);
 
         /// <summary>
         /// Used to allow the <see cref="FileWriteThread" /> to communicate an exception back to the Decoder.
         /// </summary>
-        private readonly ErrorContainer errorContainer;
+        private readonly ErrorContainer errorContainer = new ErrorContainer();
 
         private Decoder(IInputArguments arguments)
         {
@@ -87,17 +88,23 @@ namespace SteganographyApp.Decode
                 {
                     string binary = wrapper.ReadContentChunkFromImage(chunkLength);
                     writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete });
-                    tracker.UpdateAndDisplayProgress();
 
                     if (errorContainer.HasException())
                     {
                         thread.Join();
                         throw errorContainer.TakeException();
                     }
+
+                    tracker.UpdateAndDisplayProgress();
                 }
 
                 writeQueue.Add(new WriteArgs { Status = Status.Complete });
                 thread.Join();
+            }
+
+            if (errorContainer.HasException())
+            {
+                throw errorContainer.TakeException();
             }
 
             Console.WriteLine("Decoding process complete.");

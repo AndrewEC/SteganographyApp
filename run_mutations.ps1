@@ -1,3 +1,4 @@
+Write-Host("`n----------Preparing Report Directories----------`n")
 if(Test-Path ./SteganographyApp.Common.Tests/StrykerOutput){
     Write-Host("Removing old output folder and contents")
     Remove-Item -Recurse -Force ./SteganographyApp.Common.Tests/StrykerOutput | Out-Null
@@ -9,7 +10,7 @@ if(Test-Path ./SteganographyApp.Common.Tests/StrykerOutput){
 
 cd ./SteganographyApp.Common.Tests
 
-Write-Host("Executing mutation tests")
+Write-Host("`n----------Executing Mutation Tests----------`n")
 dotnet stryker --reporters "['html']"
 if($LastExitCode -ne 0){
     Write-Host("'stryker' failed with status: $LastExitCode")

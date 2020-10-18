@@ -14,7 +14,7 @@ namespace SteganographyApp.Common.Tests
         [OneTimeSetUp]
         public void OneTime()
         {
-            Injector.AllowOnlyTestObjects();
+            Injector.AllowOnlyNonDefaultInstances();
         }
 
     }
@@ -60,13 +60,13 @@ namespace SteganographyApp.Common.Tests
         [SetUp]
         public void SetUp()
         {
-            Injector.AllowOnlyRealObjects();
+            Injector.AllowAnyInstances();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Injector.AllowOnlyTestObjects();
+            Injector.AllowOnlyNonDefaultInstances();
             Injector.ResetInstances();
         }
 
