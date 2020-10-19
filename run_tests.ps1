@@ -1,4 +1,4 @@
-Write-Host("Cleaning out existing build artifacts")
+Write-Host("`n---------- Cleaning out existing build artifacts ----------`n")
 if(Test-Path ./SteganographyApp.Common.Tests/bin){
     Write-Host("Cleaning bin")
     Remove-Item -Recurse -Force ./SteganographyApp.Common.Tests/bin | Out-Null
@@ -8,7 +8,7 @@ if(Test-Path ./SteganographyApp.Common.Tests/obj){
     Remove-Item -Recurse -Force ./SteganographyApp.Common.Tests/obj | Out-Null
 }
 
-Write-Host("`n----------Rebuilding Project----------`n")
+Write-Host("`n---------- Rebuilding Project ----------`n")
 dotnet build SteganographyApp.sln
 
 if(Test-Path ./reports){
@@ -27,7 +27,7 @@ if(-Not (Test-Path ./reports)){
     Exit
 }
 
-Write-Host("`n----------Running unit tests----------`n")
+Write-Host("`n---------- Running unit tests ----------`n")
 coverlet ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp3.1/SteganographyApp.Common.Tests.dll --target "dotnet" --targetargs "test SteganographyApp.sln --no-build" --format opencover --exclude "[*]SteganographyApp.Common.Providers.*"
 if($LastExitCode -ne 0){
     Write-Host("'coverlet' command failed with status: $LastExitCode")
@@ -41,5 +41,5 @@ if($LastExitCode -ne 0){
     Exit
 }
 
-Write-Host("`nOpening report")
+Write-Host("`n---------- Opening report ----------`n")
 ./reports/index.htm

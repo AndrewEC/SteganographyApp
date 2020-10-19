@@ -8,9 +8,9 @@ namespace SteganographyApp.Common.Data
 {
 
     /// <summary>
-    /// Keeps track of an arbitrary counter as to help increase the randomness
-    /// of the size and the position of the dummy entries to make the dummies
-    /// more variable in nature and more difficult to discern any possible pattern.
+    /// Keeps track of an arbitrary counter used when initializing a random generator
+    /// instance as to increase the degree of variance among the positions and
+    /// values of the dummy entries to increase the difficulty in discerning a pattern.
     /// </summary>
     public class GlobalCounter
     {
@@ -86,9 +86,7 @@ namespace SteganographyApp.Common.Data
 
             int[] lengths = GenerateLengthsForDummies(numDummies);
 
-            // cubed root
-            string generatedRandomSeed = CreateRandomSeed(randomSeed);
-            var generator = IndexGenerator.FromString(generatedRandomSeed);
+            var generator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
 
             // storing the positions instead of calculating on the fly will make decoding easier
             int[] positions = Enumerable.Range(0, numDummies)
@@ -124,8 +122,10 @@ namespace SteganographyApp.Common.Data
         }
 
         /// <summary>
-        /// Generates an array of the specified lengths containing ints consisting
-        /// of random values between 1 and 10.
+        /// Generates an array of the length of each dummy entry to be inserted. This
+        /// doesn't make use of the value stored in the global counter as the value
+        /// of the counter can not be determined when decoding the
+        /// contents of the file later.
         /// </summary>
         /// <param name="numDummies">The number of random numbers to generate. Will also
         /// determine the length of the array being returned.</param>
@@ -178,9 +178,7 @@ namespace SteganographyApp.Common.Data
             // determine the length of the binary string before the dummies were added
             int binaryLengthWithoutDummies = binary.Length - totalLength;
 
-            // cubed root
-            string generatedRandomSeed = CreateRandomSeed(randomSeed);
-            var generator = IndexGenerator.FromString(generatedRandomSeed);
+            var generator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
 
             int[] positions = Enumerable.Range(0, numDummies)
                 .Select(i => generator.Next(binaryLengthWithoutDummies))
