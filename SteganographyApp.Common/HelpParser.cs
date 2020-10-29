@@ -122,7 +122,7 @@ namespace SteganographyApp.Common
         {
 
             string assemblyPath = GetAssemblyPath();
-            string helpFileLocation = $"{assemblyPath}\\{fileName}";
+            string helpFileLocation = System.IO.Path.Combine(assemblyPath, fileName);
             
             if (!Injector.Provide<IFileProvider>().IsExistingFile(helpFileLocation))
             {
