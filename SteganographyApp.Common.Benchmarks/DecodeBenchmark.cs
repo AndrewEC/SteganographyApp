@@ -12,7 +12,6 @@ namespace SteganographyApp.Common.Benchmarks
     {
 
         private readonly string Password = "Password123!@#";
-        private readonly int DummyCount = 10;
 
         private readonly string RandomSeed = "randomSeed";
 

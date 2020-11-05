@@ -154,9 +154,10 @@ namespace SteganographyApp.Common.IO
                 {
                     while (true)
                     {
-                        byte newRed = (byte)(currentImage[position.X, position.Y].R & ~randomBit());
-                        byte newGreen = (byte)(currentImage[position.X, position.Y].G & ~randomBit());
-                        byte newBlue = (byte)(currentImage[position.X, position.Y].B & ~randomBit());
+                        var currentPixel = currentImage[position.X, position.Y];
+                        byte newRed = ShiftColourChannelByRandom(currentPixel.R, randomBit());
+                        byte newGreen = ShiftColourChannelByRandom(currentPixel.G, randomBit());
+                        byte newBlue = ShiftColourChannelByRandom(currentPixel.B, randomBit());
 
                         currentImage[position.X, position.Y] = new Rgba32(newRed, newGreen, newBlue, currentImage[position.X, position.Y].A);
 
@@ -210,17 +211,17 @@ namespace SteganographyApp.Common.IO
             {
                 Rgba32 pixel = currentImage[position.X, position.Y];
 
-                pixel.R = (binary[i] == '0') ? (byte)(pixel.R & ~1) : (byte)(pixel.R | 1);
+                pixel.R = ShiftColourChannelByBinary(pixel.R, binary[i]);
                 written++;
 
                 if (written < binary.Length)
                 {
-                    pixel.G = (binary[i + 1] == '0') ? (byte)(pixel.G & ~1) : (byte)(pixel.G | 1);
+                    pixel.G = ShiftColourChannelByBinary(pixel.G, binary[i + 1]);
                     written++;
 
                     if (written < binary.Length)
                     {
-                        pixel.B = (binary[i + 2] == '0') ? (byte)(pixel.B & ~1) : (byte)(pixel.B | 1);
+                        pixel.B = ShiftColourChannelByBinary(pixel.B, binary[i + 2]);
                         written++;
                     }
                 }
@@ -239,6 +240,37 @@ namespace SteganographyApp.Common.IO
             }
             OnChunkWritten?.Invoke(this, new ChunkWrittenArgs { ChunkLength = written });
             return written;
+        }
+
+        /// <summary>
+        /// Performs the appropriate bitwise and/or operation to the provided
+        /// byte value of the pixel colour channel to change its least significatnt
+        /// bit to be the same as the value specified by the lastBit argument.
+        /// <param name="colourChannel">The byte value representing either the
+        /// red, green, or blue channel of a pixel.</param>
+        /// <param name="lastBit">Specifies the value that the colourChannel's
+        /// least significant bit should be changed to.</param>
+        /// </summary>
+        private byte ShiftColourChannelByRandom(byte colourChannel, int lastBit)
+        {
+            return (lastBit == 0)
+                ? (byte) (colourChannel & ~1)
+                : (byte) (colourChannel | 1);
+        }
+
+        /// <summary>
+        /// Performs the appropriate bitwise and/or operation to the provided
+        /// byte value of the pixel colour channel to change its least significatnt
+        /// bit to be the same as the value specified by the lastBit argument.
+        /// <param name="colourChannel">The byte value representing either the
+        /// red, green, or blue channel of a pixel.</param>
+        /// <param name="lastBit">Specifies the value that the colourChannel's
+        /// least significant bit should be changed to.</param>
+        /// </summary>
+        private byte ShiftColourChannelByBinary(byte colourChannel, char lastBit)
+        {
+            int intLastBit = (lastBit == '0') ? 0 : 1;
+            return ShiftColourChannelByRandom(colourChannel, intLastBit);
         }
 
         /// <summary>
