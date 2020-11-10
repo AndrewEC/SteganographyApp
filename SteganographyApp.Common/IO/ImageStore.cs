@@ -422,12 +422,13 @@ namespace SteganographyApp.Common.IO
         }
 
         /// <summary>
-        /// Write a binary string of all zeroes of the specified length to help skip the read/write
-        /// position to a new desired position.
+        /// Skip over a number of pixels on the currently loaded image equal to one third
+        /// of the number specified as the bitsToSkip arguments
         /// </summary>
-        /// <param name="pixelIndex">The number of pixels to skip through in the current image.</param>
-        /// <exception cref="ImageProcessingException">Thrown if the value of position is greater than
-        /// the number of available pixels the current image has.</exception>
+        /// <param name="bitsToSkip">The number of bits to skip over for the current over.</param>
+        /// <exception cref="ImageProcessingException">If the number of bits to skip puts the current position past
+        /// the last bit of the currently loaded image then a processing exception will be thrown.</exception>
+        /// <see cref="TryMoveToNextPixel"/>
         private void SeekToPixel(int bitsToSkip)
         {
             position.Reset();
@@ -435,7 +436,11 @@ namespace SteganographyApp.Common.IO
             int pixelIndex = (int) Math.Ceiling((double) bitsToSkip / (double) Calculator.BitsPerPixel);
             for (int i = 0; i < pixelIndex; i++)
             {
-                TryMoveToNextPixel();
+                if (!TryMoveToNextPixel())
+                {
+                    throw new ImageProcessingException("Could not skip by specified amount. The number of bits to "
+                        + "skip is greater than the remaining bits available in the currently loaded image.");
+                }
             }
         }
 

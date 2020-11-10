@@ -115,8 +115,7 @@ namespace SteganographyApp.Common.Arguments
 
         public IInputArguments ToImmutable()
         {
-            return new ImmutableInputArguments(Password, FileToEncode, DecodedOutputFile, CoverImages, EncodeOrDecode, PrintStack,
-                UseCompression, RandomSeed, DummyCount, InsertDummies, DeleteAfterConversion, CompressionLevel, ChunkByteSize);
+            return new ImmutableInputArguments(this);
         }
     }
 
@@ -127,23 +126,21 @@ namespace SteganographyApp.Common.Arguments
     public sealed class ImmutableInputArguments : IInputArguments
     {
 
-        public ImmutableInputArguments(string password, string fileToEncode, string decodedOutputFile, string[] coverImages,
-            ActionEnum encodeOrDecode, bool printStack, bool useCompression, string randomSeed, int dummyCount,
-            bool insertDummies, bool deleteAfterConversion, int compressionLevel, int chunkByteSize)
+        public ImmutableInputArguments(InputArguments source)
         {
-            Password = password;
-            FileToEncode = fileToEncode;
-            DecodedOutputFile = decodedOutputFile;
-            CoverImages = coverImages;
-            EncodeOrDecode = encodeOrDecode;
-            PrintStack = printStack;
-            UseCompression = useCompression;
-            RandomSeed = randomSeed;
-            DummyCount = dummyCount;
-            InsertDummies = insertDummies;
-            DeleteAfterConversion = deleteAfterConversion;
-            CompressionLevel = compressionLevel;
-            ChunkByteSize = chunkByteSize;
+            Password = source.Password;
+            FileToEncode = source.FileToEncode;
+            DecodedOutputFile = source.DecodedOutputFile;
+            CoverImages = source.CoverImages;
+            EncodeOrDecode = source.EncodeOrDecode;
+            PrintStack = source.PrintStack;
+            UseCompression = source.UseCompression;
+            RandomSeed = source.RandomSeed;
+            DummyCount = source.DummyCount;
+            InsertDummies = source.InsertDummies;
+            DeleteAfterConversion = source.DeleteAfterConversion;
+            CompressionLevel = source.CompressionLevel;
+            ChunkByteSize = source.ChunkByteSize;
         }
 
         public string Password { get; }

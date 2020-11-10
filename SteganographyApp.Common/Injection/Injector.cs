@@ -85,12 +85,17 @@ namespace SteganographyApp.Common.Injection
         public static T Provide<T>()
         {
             var type = typeof(T);
-            if (onlyTestObjectsState && InjectionValues[type] == DefaultInjectionValues[type])
+            if (IsProvidingNonMockObjectWhenInTestState(type))
             {
                 string message = string.Format("Injector is in a test state but tried to provide a non-mocked object for type: {0}", type.Name);
                 throw new InvalidOperationException(message);
             }
             return (T) InjectionValues[typeof(T)];
+        }
+
+        private static bool IsProvidingNonMockObjectWhenInTestState(Type type)
+        {
+            return onlyTestObjectsState && InjectionValues[type] == DefaultInjectionValues[type];
         }
 
         /// <summary>

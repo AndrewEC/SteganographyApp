@@ -32,11 +32,11 @@ namespace SteganographyApp.Common.IO
         /// <param name="randomSeed">The seed to ranomize the binary string with.</param>
         public string ConvertChunkTableToBinary(int[] chunkLengths, string randomSeed)
         {
-            var tableHeader = to33BitBinaryString(chunkLengths.Length);
+            var tableHeader = To33BitBinaryString(chunkLengths.Length);
             var binary = new StringBuilder();
             foreach (int chunkLength in chunkLengths)
             {
-                binary.Append(to33BitBinaryString(chunkLength));
+                binary.Append(To33BitBinaryString(chunkLength));
             }
 
             var binaryString = binary.ToString();
@@ -75,7 +75,7 @@ namespace SteganographyApp.Common.IO
             return Convert.ToInt32(binary, 2);
         }
 
-        private string to33BitBinaryString(int value)
+        private string To33BitBinaryString(int value)
         {
             return Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSize, '0') + "0";
         }
