@@ -5,10 +5,6 @@
     <TargetFramework>netcoreapp5.0</TargetFramework>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DefineConstants>DEBUG</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\SteganographyApp.Common\SteganographyApp.Common.csproj" />
   </ItemGroup>
