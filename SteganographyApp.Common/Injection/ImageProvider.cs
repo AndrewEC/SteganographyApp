@@ -92,7 +92,7 @@ namespace SteganographyApp.Common.Injection
 
         public IBasicImageInfo LoadImage(string pathToImage)
         {
-            return new BasicImageInfo(Image.Load(pathToImage));
+            return new BasicImageInfo(Image.Load<Rgba32>(pathToImage));
         }
 
     }

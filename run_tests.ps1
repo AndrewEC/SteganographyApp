@@ -28,7 +28,7 @@ if(-Not (Test-Path ./reports)){
 }
 
 Write-Host("`n---------- Running unit tests ----------`n")
-coverlet ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp3.1/SteganographyApp.Common.Tests.dll --target "dotnet" --targetargs "test SteganographyApp.sln --no-build" --format opencover --exclude "[*]SteganographyApp.Common.Providers.*"
+coverlet ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp5.0/SteganographyApp.Common.Tests.dll --target "dotnet" --targetargs "test SteganographyApp.sln --no-build" --format opencover --exclude "[*]SteganographyApp.Common.Providers.*"
 if($LastExitCode -ne 0){
     Write-Host("'coverlet' command failed with status: $LastExitCode")
     Exit

@@ -1,5 +1,7 @@
 using System;
 
+using SixLabors.ImageSharp.Formats.Png;
+
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Data;
 
@@ -9,6 +11,7 @@ namespace SteganographyApp.Common.Arguments
     static class Parsers
     {
 
+        private static readonly string CompressionLevelTemplate = "Level{0}";
         private static readonly int MaxDummyCount = 1000;
         private static readonly int MinDummyCount = 100;
 
@@ -71,19 +74,12 @@ namespace SteganographyApp.Common.Arguments
         /// to an int or if the value is less than 0 or greater than 9.</exception>
         public static void ParseCompressionLevel(InputArguments arguments, string value)
         {
-            try
+            string enumName = string.Format(CompressionLevelTemplate, value);
+            if (!Enum.TryParse(enumName, true, out PngCompressionLevel level))
             {
-                arguments.CompressionLevel = Convert.ToInt32(value);
+                throw new ArgumentValueException($"Could nto parse compression level. Compression level must be a number between 0 and 9 inclusive.");
             }
-            catch (Exception e)
-            {
-                throw new ArgumentValueException($"Could not parse compression level from value: {value}", e);
-            }
-
-            if (arguments.CompressionLevel < 0 || arguments.CompressionLevel > 9)
-            {
-                throw new ArgumentValueException("The compression level must be a whole number between 0 and 9 inclusive.");
-            }
+            arguments.CompressionLevel = level;
         }
 
         /// <summary>

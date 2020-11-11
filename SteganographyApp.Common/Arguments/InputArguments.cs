@@ -1,5 +1,7 @@
 using System;
 
+using SixLabors.ImageSharp.Formats.Png;
+
 namespace SteganographyApp.Common.Arguments
 {
 
@@ -101,7 +103,7 @@ namespace SteganographyApp.Common.Arguments
         public int DummyCount { get; set; } = 0;
         public bool InsertDummies { get; set; } = false;
         public bool DeleteAfterConversion { get; set; } = false;
-        public int CompressionLevel { get; set; } = 6;
+        public PngCompressionLevel CompressionLevel { get; set; } = PngCompressionLevel.Level5;
 
         /// <summary>
         /// Specifies the chunk size. I.e. the number of bytes to read, encode,
@@ -154,7 +156,7 @@ namespace SteganographyApp.Common.Arguments
         public int DummyCount { get; }
         public bool InsertDummies { get; }
         public bool DeleteAfterConversion { get; }
-        public int CompressionLevel { get; }
+        public PngCompressionLevel CompressionLevel { get; }
         public int ChunkByteSize { get; }
     }
 
@@ -175,7 +177,7 @@ namespace SteganographyApp.Common.Arguments
         int DummyCount { get; }
         bool InsertDummies { get; }
         bool DeleteAfterConversion { get; }
-        int CompressionLevel { get; }
+        PngCompressionLevel CompressionLevel { get; }
         int ChunkByteSize { get; }
     }
 

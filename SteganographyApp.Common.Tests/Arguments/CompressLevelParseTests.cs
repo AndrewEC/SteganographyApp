@@ -2,6 +2,8 @@ using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
 
+using SixLabors.ImageSharp.Formats.Png;
+
 namespace SteganographyApp.Common.Tests
 {
 
@@ -9,16 +11,16 @@ namespace SteganographyApp.Common.Tests
     public class CompressLevelParseTests
     {
 
-        [TestCase(0)]
-        [TestCase(5)]
-        [TestCase(9)]
-        public void TestCompressionLevelWithValidValue(int value)
+        [TestCase(0, PngCompressionLevel.Level0)]
+        [TestCase(5, PngCompressionLevel.Level5)]
+        [TestCase(9, PngCompressionLevel.Level9)]
+        public void TestCompressionLevelWithValidValue(int value, PngCompressionLevel expected)
         {
             string[] inputArgs = new string[] { "--compressionLevel", value.ToString() };
             var parser = new ArgumentParser();
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
-            Assert.AreEqual(value, arguments.CompressionLevel);
+            Assert.AreEqual(expected, arguments.CompressionLevel);
         }
 
         [TestCase(-1)]

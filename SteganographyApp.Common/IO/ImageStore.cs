@@ -176,10 +176,10 @@ namespace SteganographyApp.Common.IO
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 CloseOpenImage();
-                throw e;
+                throw;
             }
         }
 
@@ -345,10 +345,10 @@ namespace SteganographyApp.Common.IO
 
                 return Injector.Provide<IChunkTableHelper>().ConvertBinaryToChunkTable(chunkTableBinary, chunkCount, args.RandomSeed);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 CloseOpenImage();
-                throw e;
+                throw;
             }
         }
 
@@ -369,10 +369,10 @@ namespace SteganographyApp.Common.IO
                 WriteBinaryString(binary.ToString());
                 CloseOpenImage(true);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 CloseOpenImage();
-                throw e;
+                throw;
             }
         }
 

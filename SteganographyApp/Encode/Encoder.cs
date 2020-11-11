@@ -144,7 +144,7 @@ namespace SteganographyApp.Encode
                     {
                         errorContainer.PutException(e);
                         thread.Join();
-                        throw e;
+                        throw;
                     }
                     progressTracker.UpdateAndDisplayProgress();
                 }
