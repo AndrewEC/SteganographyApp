@@ -21,47 +21,50 @@ namespace SteganographyApp.Common
     /// </summary>
     public sealed class HelpInfo
     {
+
+        public static readonly ImmutableArray<string> MainHelpLabels = ImmutableArray.Create(
+            new string[]
+            {
+                "AppDescription", "AppAction", "Input", "Output", "Images", "Password",
+                "PrintStack", "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"
+            }
+        );
+
+        public static readonly ImmutableArray<string> CalculatorHelpLabels = ImmutableArray.Create(
+            new string[]
+            {
+                "CalculatorDescription", "CalculatorAction", "Input", "Images", "Password",
+                "EnableCompression", "ChunkSize", "EnableDummies", "RandomSeed"
+            }
+        );
+
+        public static readonly ImmutableArray<string> ConverterHelpLabels = ImmutableArray.Create(
+            new string[]
+            {
+                "ConverterDescription", "ConvertAction", "Images", "DeleteOriginals",
+                "CompressionLevel"
+            }
+        );
+
+        private static readonly ImmutableDictionary<HelpItemSet, ImmutableArray<string>> HelpLabelMappings = new Dictionary<HelpItemSet, ImmutableArray<string>>
+        {
+            { HelpItemSet.Main, MainHelpLabels },
+            { HelpItemSet.Calculator, CalculatorHelpLabels },
+            { HelpItemSet.Converter, ConverterHelpLabels }
+        }
+        .ToImmutableDictionary();
+
         /// <summary>
         /// A dictionary containing the results of the help file parsing.
         /// This will include a key value representing the name of the help
         /// message or the parameter that it corresponds to and a value 
         /// being the actual help message.
         /// </summary>
-        private ImmutableDictionary<string, string> helpItems;
+        private readonly ImmutableDictionary<string, string> helpItems;
 
         public HelpInfo(ImmutableDictionary<string, string> helpItems)
         {
             this.helpItems = helpItems;
-        }
-
-        /// <summary>
-        /// Conversion point that takes in an <see cref="HelpItemSet"/> and invokes the
-        /// <see cref="GetMessagesFor(string[])"/> method with the appropriate list of
-        /// headings to lookup for the given item set enum value.
-        /// </summary>
-        /// <param name="item">The HelpItemSet enum value indicating which help items should
-        /// be loaded and displayed to the user.</param>
-        /// <returns>The value retrieved from the <see cref="GetMessagesFor(string[])"/>
-        /// invocation</returns>
-        public string[] GetHelpMessagesFor(HelpItemSet item)
-        {
-            string[] labels = new string[0];
-            switch(item)
-            {
-                case HelpItemSet.Main:
-                    labels = new string[]{"AppDescription", "AppAction", "Input", "Output", "Images", "Password",
-                        "PrintStack", "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"};
-                    break;
-                case HelpItemSet.Calculator:
-                    labels = new string[] {"CalculatorDescription", "CalculatorAction", "Input", "Images", "Password",
-                        "EnableCompression", "ChunkSize", "EnableDummies", "RandomSeed"};
-                    break;
-                case HelpItemSet.Converter:
-                    labels = new string[] {"ConverterDescription", "ConvertAction", "Images", "DeleteOriginals",
-                        "CompressionLevel"};
-                    break;
-            }
-            return GetMessagesFor(labels);
         }
 
         /// <summary>
@@ -71,12 +74,13 @@ namespace SteganographyApp.Common
         /// <para>If a particular parameter name was not loaded from the help file then a
         /// standard message will be returned in place of the actual help message.</para>
         /// </summary>
-        /// <param name="helpLabels">The ordered list of parameter names to retrieve the help
-        /// messages for.</param>
+        /// <param name="item">The HelpItemSet enum value indicating which help items should
+        /// be loaded and displayed to the user.</param>
         /// <returns>An array of help messages whose order is based on the order of the names
         /// provided to lookup.</returns>
-        private string[] GetMessagesFor(string[] helpLabels)
+        public ImmutableArray<string> GetHelpMessagesFor(HelpItemSet itemSet)
         {
+            ImmutableArray<string> helpLabels = HelpLabelMappings[itemSet];
             string[] messages = new string[helpLabels.Length];
             for (int i = 0; i < helpLabels.Length; i++)
             {
@@ -87,7 +91,7 @@ namespace SteganographyApp.Common
                 }
                 messages[i] = helpItems[helpLabels[i]];
             }
-            return messages;
+            return ImmutableArray.Create(messages);
         }
     }
 
@@ -117,7 +121,7 @@ namespace SteganographyApp.Common
         /// property to a message identifying why the process failed.</para>
         /// </summary>
         /// <param name="fileName"></param>
-        /// <returns></returns>
+        /// <returns>True if the help file was successfully parsed, otherwise false.</returns>
         public bool TryParseHelpFile(out HelpInfo info, string fileName = "help.prop")
         {
 

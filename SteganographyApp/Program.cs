@@ -48,7 +48,7 @@ namespace SteganographyApp
                         Console.WriteLine(e.StackTrace);
                     }
 
-                    Console.WriteLine($"An error ocurred during execution: {e.Message}");
+                    Console.WriteLine($"An uncaught error ocurred during execution: {e.Message}");
                     break;
             }
         }
@@ -95,7 +95,7 @@ namespace SteganographyApp
 
             foreach (string message in info.GetHelpMessagesFor(HelpItemSet.Main))
             {
-                Console.WriteLine("{0}\n", message);
+                Console.WriteLine($"{message}\n");
             }
         }
     }

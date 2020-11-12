@@ -28,14 +28,23 @@ if(-Not (Test-Path ./reports)){
 }
 
 Write-Host("`n---------- Running unit tests ----------`n")
-coverlet ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp5.0/SteganographyApp.Common.Tests.dll --target "dotnet" --targetargs "test SteganographyApp.sln --no-build" --format opencover --exclude "[*]SteganographyApp.Common.Providers.*"
+dotnet tool run coverlet `
+    ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp5.0/SteganographyApp.Common.Tests.dll `
+    --target "dotnet" `
+    --targetargs "test SteganographyApp.sln --no-build" `
+    --format opencover `
+    --exclude "[*]SteganographyApp.Common.Providers.*" `
+    --threshold 85 `
+    --threshold-type line `
+    --threshold-type branch `
+    --threshold-stat total
 if($LastExitCode -ne 0){
     Write-Host("'coverlet' command failed with status: $LastExitCode")
     Exit
 }
 
 Write-Host("`n---------- Generating coverage report ----------`n")
-reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
+dotnet tool run reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
 if($LastExitCode -ne 0){
     Write-Host("'reportgenerator' command failed with status: $LastExitCode")
     Exit

@@ -11,7 +11,7 @@ if(Test-Path ./SteganographyApp.Common.Tests/StrykerOutput){
 cd ./SteganographyApp.Common.Tests
 
 Write-Host("`n---------- Executing mutation tests ----------`n")
-dotnet stryker --reporters "['html']"
+dotnet tool run dotnet-stryker --config-file-path stryker-config.json
 if($LastExitCode -ne 0){
     Write-Host("'stryker' failed with status: $LastExitCode")
     cd ..

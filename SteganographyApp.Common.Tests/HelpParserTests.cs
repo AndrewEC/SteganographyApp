@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Immutable;
+
+using NUnit.Framework;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -6,21 +8,41 @@ namespace SteganographyApp.Common.Tests
     public class HelpParserTests : FixtureWithRealObjects
     {
 
-        private readonly string POSITIVE_TEST_PATH = "TestAssets/positive-help.prop";
-        private readonly string NEGATIVE_TEST_PATH = "TestAssets/negative-help.prop";
+        private readonly string PositiveTestPath = "TestAssets/positive-help.prop";
+        private readonly string NegativeTestPath = "TestAssets/negative-help.prop";
 
-        [TestCase(HelpItemSet.Main)]
-        [TestCase(HelpItemSet.Calculator)]
-        [TestCase(HelpItemSet.Converter)]
-        public void TestHelpParserHappyPath(HelpItemSet itemSet)
+        [Test]
+        public void TestParseHelpAndGetMainHelpItems()
+        {
+            RunHelpParserTest(HelpItemSet.Main, HelpInfo.MainHelpLabels);
+        }
+
+        [Test]
+        public void TestParseHelpAndGetCalculatorHelpItems()
+        {
+            RunHelpParserTest(HelpItemSet.Calculator, HelpInfo.CalculatorHelpLabels);
+        }
+
+        [Test]
+        public void TestParseHelpAndGetConverterHelpItems()
+        {
+            RunHelpParserTest(HelpItemSet.Converter, HelpInfo.ConverterHelpLabels);
+        }
+
+        private void RunHelpParserTest(HelpItemSet itemSet, ImmutableArray<string> expected)
         {
             var parser = new HelpParser();
-            Assert.IsTrue(parser.TryParseHelpFile(out HelpInfo info, POSITIVE_TEST_PATH));
+            Assert.IsTrue(parser.TryParseHelpFile(out HelpInfo info, PositiveTestPath));
             Assert.IsNull(parser.LastError);
-            foreach(string line in info.GetHelpMessagesFor(itemSet))
+
+            var messages = info.GetHelpMessagesFor(itemSet);
+            Assert.AreEqual(expected.Length, messages.Length);
+
+            foreach (string line in messages)
             {
                 Assert.IsNotNull(line);
-                Assert.AreNotEqual("", line);
+                Assert.AreNotEqual("", line.Trim());
+                Assert.IsFalse(line.Contains("No help information configured for"));
             }
         }
 
@@ -36,7 +58,7 @@ namespace SteganographyApp.Common.Tests
         public void TestHelpParserWithMissingPropertiesProducesErrorInHelpItems()
         {
             var parser = new HelpParser();
-            Assert.IsTrue(parser.TryParseHelpFile(out HelpInfo info, NEGATIVE_TEST_PATH));
+            Assert.IsTrue(parser.TryParseHelpFile(out HelpInfo info, NegativeTestPath));
             foreach(string line in info.GetHelpMessagesFor(HelpItemSet.Calculator))
             {
                 Assert.IsTrue(line.Contains("No help information configured for"));

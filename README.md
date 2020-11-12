@@ -37,10 +37,14 @@ SteganographyApp.Converter
 
 Running Tests
 ---
-Install the required global tools.
-1. `dotnet tool install -g coverlet.console`
-2. `dotnet tool install -g dotnet-reportgenerator-globaltool`
-3. `dotnet tool install -g dotnet-stryker`
+Install the required global tools using the dotnet cli:
+
+> dotnet tool restore
+
+This will install the following test dependencies:
+* `coverlet` - For measuring and checking unit test coverage
+* `dotnet-stryker` - For executing mutation tests
+* `dotnet-reportgenerator-globaltool` - For generating an Html report from the stryker mutation testing results.
 
 After installing the global tools you can run the unit tests and generate the coverage reports by executing the script `run_tests.ps1`.
 
@@ -53,10 +57,10 @@ For some performance benchmark execute `run_benchmarks.ps1`.
 
 This app takes advantage of the following third party nuget packages:
 
-* [Rijindael256](https://github.com/2Toad/Rijndael256)
-* [ImageSharp](https://github.com/JimBobSquarePants/ImageSharp)
-* [System.ValueTuple](https://www.nuget.org/packages/System.ValueTuple/)
-* [Coverlet](https://github.com/tonerdo/coverlet)
-* [StrykerNet](https://github.com/stryker-mutator/stryker-net)
-* [ReportGenerator](https://github.com/danielpalme/ReportGenerator)
-* [NUnit](https://www.nuget.org/packages/NUnit)
+* [Rijindael256](https://github.com/2Toad/Rijndael256) - Easier Aes-256 encryption
+* [ImageSharp](https://github.com/JimBobSquarePants/ImageSharp) - Loading, manipulating, saving, and converting images
+* [System.ValueTuple](https://www.nuget.org/packages/System.ValueTuple/) - Tuples!
+* [Coverlet](https://github.com/tonerdo/coverlet) - Measure, and subsequently generate reports for, unit test coverage
+* [StrykerNet](https://github.com/stryker-mutator/stryker-net) - Mutation testing framework
+* [ReportGenerator](https://github.com/danielpalme/ReportGenerator) - Generates an Html report from the mutation test results
+* [NUnit](https://www.nuget.org/packages/NUnit) - Unit testing framework
