@@ -2,12 +2,12 @@
     "stryker-config":
     {
         "reporters": [
-            "html"
+            "html",
+            "progress"
         ],
         "log-level": "info",
         "log-file": true,
         "timeout-ms": 30000,
-        "project-file": "SteganographyApp.Common.csproj",
         "threshold-high": 90,
         "threshold-low": 85,
         "threshold-break": 80
