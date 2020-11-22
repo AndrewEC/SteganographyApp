@@ -12,12 +12,13 @@ namespace SteganographyApp.Common.Arguments
     public sealed class SensitiveArgumentParser
     {
 
-        private static readonly string HIDDEN_INPUT_INDICATOR = "?";
+        private static readonly string HiddenInputIndicator = "?";
 
-        private readonly string PasswordPrompt = "Password";
-        private readonly string RandomSeedPrompt = "Random Seed";
-        private readonly string PasswordName = "--password";
-        private readonly string RandomSeedName = "--randomSeed";
+        private static readonly string ConfirmTemplate = "Confirm {0}";
+        private static readonly string PasswordPrompt = "Password";
+        private static readonly string RandomSeedPrompt = "Random Seed";
+        private static readonly string PasswordName = "--password";
+        private static readonly string RandomSeedName = "--randomSeed";
 
         private readonly IConsoleWriter writer;
         private readonly IConsoleReader reader;
@@ -101,11 +102,16 @@ namespace SteganographyApp.Common.Arguments
             {
                 throw new ArgumentValueException("The length of the random seed must be between 3 and 235 characters in length.");
             }
+            var confirm = ReadUserInput(value, string.Format(ConfirmTemplate, RandomSeedPrompt));
+            if (seed != confirm)
+            {
+                throw new ArgumentValueException("Random Seeds do not match");
+            }
             arguments.RandomSeed = seed;
         }
 
         /// <summary>
-        /// Parses the password value using the <see cref="ReadString(string, string, ReadWriteUtils)"/> method.
+        /// Parses the password value using the <see cref="ReadUserInput"/> method.
         /// </summary>
         /// <param name="arguments">The InputArguments instance to insert the password into.</param>
         /// <param name="value">The string representation of the password</param>
@@ -113,7 +119,13 @@ namespace SteganographyApp.Common.Arguments
         /// receiving user input.</param>
         public void ParsePassword(InputArguments arguments, string value)
         {
-            arguments.Password = ReadUserInput(value, PasswordPrompt);
+            var password = ReadUserInput(value, PasswordPrompt);
+            var confirm = ReadUserInput(value, string.Format(ConfirmTemplate, RandomSeedPrompt));
+            if (password != confirm)
+            {
+                throw new ArgumentValueException("Passwords do not match.");
+            }
+            arguments.Password = password;
         }
 
         /// <summary>
@@ -130,7 +142,7 @@ namespace SteganographyApp.Common.Arguments
         /// if the original value string value was a question mark.</returns>
         private string ReadUserInput(string value, string messagePrompt)
         {
-            if(value == HIDDEN_INPUT_INDICATOR)
+            if(value == HiddenInputIndicator)
             {
                 writer.Write($"Enter {messagePrompt}: ");
                 var currentUserInput = new StringBuilder();

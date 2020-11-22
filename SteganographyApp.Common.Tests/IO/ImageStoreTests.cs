@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Linq;
+using System.Collections.Immutable;
 
 using Moq;
 using NUnit.Framework;
@@ -25,7 +26,7 @@ namespace SteganographyApp.Common.Tests
         private static readonly int BinaryStringLength = 100_000;
         private static readonly IInputArguments Arguments = new InputArguments()
         {
-            CoverImages = new string[] { "test001.png" }
+            CoverImages = ImmutableArray.Create(new string[] { "test001.png" })
         }
         .ToImmutable();
 

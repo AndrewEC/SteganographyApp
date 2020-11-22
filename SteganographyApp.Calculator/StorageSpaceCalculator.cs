@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 
 using SixLabors.ImageSharp;
 
@@ -41,7 +42,7 @@ namespace SteganographyAppCalculator
         /// Calculate the total number of pixels within all images.
         /// </summary>
         /// <param name="coverImages">The array of string paths to the images to check.</param>
-        private static ulong CalculateNumberOfPixelsForImages(string[] coverImages)
+        private static ulong CalculateNumberOfPixelsForImages(ImmutableArray<string> coverImages)
         {
             var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length,
                     "Calculating image storage space", "Completed calculating image storage space.");

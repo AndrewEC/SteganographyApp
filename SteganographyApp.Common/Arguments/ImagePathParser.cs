@@ -29,12 +29,12 @@ namespace SteganographyApp.Common.Arguments
         /// could not be found at the specified path.</exception>
         public static void ParseImages(InputArguments arguments, string value)
         {
-            string[] images = RetrieveImagePaths(value);
+            ImmutableArray<string> images = RetrieveImagePaths(value);
             ValidateImagePaths(images);
             arguments.CoverImages = images;
         }
 
-        private static string[] RetrieveImagePaths(string value)
+        private static ImmutableArray<string> RetrieveImagePaths(string value)
         {
             value = ShorthandMappings.GetValueOrDefault(value, value);
             string[] imagePaths = null;
@@ -50,10 +50,10 @@ namespace SteganographyApp.Common.Arguments
             {
                 imagePaths = new string[] { value };
             }
-            return imagePaths.Select(imagePath => imagePath.Trim()).ToArray();
+            return ImmutableArray.Create(imagePaths.Select(imagePath => imagePath.Trim()).ToArray());
         }
 
-        private static void ValidateImagePaths(string[] imagePaths)
+        private static void ValidateImagePaths(ImmutableArray<string> imagePaths)
         {
             if (imagePaths.Length == 0)
             {

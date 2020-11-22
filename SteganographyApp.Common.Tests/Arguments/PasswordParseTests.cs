@@ -1,15 +1,14 @@
 using Moq;
+using static Moq.Times;
 
 using NUnit.Framework;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
-
-using static Moq.Times;
-using static Moq.It;
 
 namespace SteganographyApp.Common.Tests
 {
@@ -17,6 +16,29 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class PasswordParseTests : FixtureWithMockConsoleReaderAndWriter
     {
+
+        private static readonly ImmutableList<ValueTuple<char, ConsoleKey>> TestingInputMapping = new List<ValueTuple<char, ConsoleKey>>()
+        {
+            ('T', ConsoleKey.T),
+            ('e', ConsoleKey.E),
+            ('s', ConsoleKey.S),
+            ('t', ConsoleKey.T),
+            ('i', ConsoleKey.I),
+            ('n', ConsoleKey.N),
+            ('g', ConsoleKey.G),
+            ('[', ConsoleKey.Backspace),
+            (']', ConsoleKey.Enter),
+
+            ('T', ConsoleKey.T),
+            ('e', ConsoleKey.E),
+            ('s', ConsoleKey.S),
+            ('t', ConsoleKey.T),
+            ('i', ConsoleKey.I),
+            ('n', ConsoleKey.N),
+            ('g', ConsoleKey.G),
+            ('0', ConsoleKey.Backspace),
+            ('0', ConsoleKey.Enter)
+        }.ToImmutableList();
 
         [Test]
         public void TestParsePasswordWithValidValue()
@@ -32,9 +54,9 @@ namespace SteganographyApp.Common.Tests
         public void TestParsePasswordWithInteractiveInput()
         {
 
-            var queue = CreateUserInputQueue();
+            var queue = MockInput.CreateInputQueue(TestingInputMapping);
             var mockReader = new Mock<IConsoleReader>();
-            mockReader.Setup(reader => reader.ReadKey(IsAny<bool>())).Returns<bool>((intercept) => queue.Dequeue());
+            mockReader.Setup(reader => reader.ReadKey(true)).Returns<bool>((intercept) => queue.Dequeue());
 
             Injector.UseInstance(mockReader.Object);
             Injector.UseInstance(new Mock<IConsoleWriter>().Object);
@@ -43,24 +65,9 @@ namespace SteganographyApp.Common.Tests
             var parser = new ArgumentParser();
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments inputArguments, NullReturningPostValidator));
 
-            mockReader.Verify(reader => reader.ReadKey(IsAny<bool>()), Exactly(9));
+            mockReader.Verify(reader => reader.ReadKey(true), Exactly(TestingInputMapping.Count));
             Assert.AreEqual(0, queue.Count);
             Assert.AreEqual("Testin", inputArguments.Password);
-        }
-
-        private Queue<ConsoleKeyInfo> CreateUserInputQueue()
-        {
-            var queue = new Queue<ConsoleKeyInfo>();
-            queue.Enqueue(new ConsoleKeyInfo('T', ConsoleKey.T, true, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('e', ConsoleKey.E, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('s', ConsoleKey.S, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('t', ConsoleKey.T, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('i', ConsoleKey.I, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('n', ConsoleKey.N, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('g', ConsoleKey.G, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('*', ConsoleKey.Backspace, false, false, false));
-            queue.Enqueue(new ConsoleKeyInfo('*', ConsoleKey.Enter, false, false, false));
-            return queue;
         }
 
         private string NullReturningPostValidator(IInputArguments input) => null;

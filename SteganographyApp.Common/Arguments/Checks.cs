@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 
 namespace SteganographyApp.Common.Arguments
 {
@@ -25,6 +26,15 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="value">The array to perform the null and empty
         /// checks against.</param>
         public static bool IsNullOrEmpty<T>(T[] value)
+        {
+            return value == null || value.Length == 0;
+        }
+
+        /// <summary>
+        /// Checks whether an immutable array is null or contains no elements.
+        /// </summary>
+        /// <param name="value">The immutable array to perform the null and empty checks against.</param>
+        public static bool IsNullOrEmpty<T>(ImmutableArray<T> value)
         {
             return value == null || value.Length == 0;
         }

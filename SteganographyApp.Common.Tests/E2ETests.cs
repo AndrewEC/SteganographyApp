@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 
 using System.IO;
+using System.Collections.Immutable;
 
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.Data;
@@ -25,7 +26,7 @@ namespace SteganographyApp.Common.Tests
             {
                 FileToEncode = "TestAssets/test.zip",
                 DecodedOutputFile = "TestAssets/testing.zip",
-                CoverImages = new string[] { "TestAssets/001.png" },
+                CoverImages = ImmutableArray.Create(new string[] { "TestAssets/001.png" }),
                 Password = "testing",
                 UseCompression = true,
                 DummyCount = 3,

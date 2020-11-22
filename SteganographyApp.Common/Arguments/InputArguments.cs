@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 
 using SixLabors.ImageSharp.Formats.Png;
 
@@ -95,7 +96,7 @@ namespace SteganographyApp.Common.Arguments
         public string Password { get; set; } = "";
         public string FileToEncode { get; set; } = "";
         public string DecodedOutputFile { get; set; } = "";
-        public string[] CoverImages { get; set; }
+        public ImmutableArray<string> CoverImages { get; set; }
         public ActionEnum EncodeOrDecode { get; set; }
         public bool PrintStack { get; set; } = false;
         public bool UseCompression { get; set; } = false;
@@ -148,7 +149,7 @@ namespace SteganographyApp.Common.Arguments
         public string Password { get; }
         public string FileToEncode { get; }
         public string DecodedOutputFile { get; }
-        public string[] CoverImages { get; }
+        public ImmutableArray<string> CoverImages { get; }
         public ActionEnum EncodeOrDecode { get; }
         public bool PrintStack { get; }
         public bool UseCompression { get; }
@@ -169,7 +170,7 @@ namespace SteganographyApp.Common.Arguments
         string Password { get; }
         string FileToEncode { get; }
         string DecodedOutputFile { get; }
-        string[] CoverImages { get; }
+        ImmutableArray<string> CoverImages { get; }
         ActionEnum EncodeOrDecode { get; }
         bool PrintStack { get; }
         bool UseCompression { get; }

@@ -97,6 +97,8 @@ namespace SteganographyApp.Converter
 
                 tracker.UpdateAndDisplayProgress();
             }
+
+            PrintFailures(failures);
         }
 
         private static string TrySaveImage(string coverImage, PngEncoder encoder)

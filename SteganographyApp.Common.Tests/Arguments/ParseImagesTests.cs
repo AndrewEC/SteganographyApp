@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 using Moq;
 
 using NUnit.Framework;
@@ -33,7 +35,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
 
-            string[] images = arguments.CoverImages;
+            ImmutableArray<string> images = arguments.CoverImages;
             Assert.AreEqual(1, images.Length);
             Assert.AreEqual(image, images[0]);
 
@@ -51,7 +53,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
 
-            string[] images = arguments.CoverImages;
+            ImmutableArray<string> images = arguments.CoverImages;
             Assert.AreEqual(2, images.Length);
             Assert.AreEqual("./Test001.png", images[0]);
             Assert.AreEqual("./Test002.png", images[1]);
