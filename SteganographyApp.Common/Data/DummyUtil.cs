@@ -15,7 +15,7 @@ namespace SteganographyApp.Common.Data
     public class GlobalCounter
     {
 
-        public static GlobalCounter Instance = new GlobalCounter();
+        public static readonly GlobalCounter Instance = new GlobalCounter();
 
         private static object _lock = new object();
 
