@@ -1,8 +1,8 @@
-Write-Host("`n---------- Removing publish directories ----------`n")
+Write-Host("`n---------- Removing testbed directories ----------`n")
 
-if(Test-Path ./publish){
-    Write-Host("Removing publish output folder")
-    Remove-Item -Recurse -Force ./publish | Out-Null
+if(Test-Path ./testbed){
+    Write-Host("Removing testbed output folder")
+    Remove-Item -Recurse -Force ./testbed | Out-Null
 }
 
 if(Test-Path ./SteganographyApp/bin/release){
@@ -27,21 +27,23 @@ if($LastExitCode -ne 0){
     Exit
 }
 
+New-Item -Path ./testbed -ItemType Directory | Out-Null
+
 Write-Host("`n---------- Copying publish output ----------`n")
 Write-Host("Copying output from SteganographyApp publish")
-Copy-Item ./SteganographyApp/bin/release/netcoreapp5.0/publish -Recurse -Destination .
-Get-ChildItem -Path ./SteganographyApp/bin/release/netcoreapp5.0/obfuscated | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish
+Get-ChildItem -Path ./SteganographyApp/bin/release/netcoreapp5.0/publish | Copy-Item -Recurse -Destination ./testbed
 
 Write-Host("Copying output from SteganographyApp.Calculator publish")
-Copy-Item ./SteganographyApp.Calculator/bin/release/netcoreapp5.0/publish -Recurse -Destination ./publish
-Get-ChildItem -Path ./SteganographyApp.Calculator/bin/release/netcoreapp5.0/obfuscated | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish/publish
-cd publish
+Copy-Item ./SteganographyApp.Calculator/bin/release/netcoreapp5.0/publish -Recurse -Destination ./testbed
+cd testbed
 Rename-Item -Path publish -NewName Calculator
 cd ..
 
 Write-Host("Copying output from SteganographyApp.Converter publish")
-Copy-Item ./SteganographyApp.Converter/bin/release/netcoreapp5.0/publish -Recurse -Destination ./publish
-Get-ChildItem -Path ./SteganographyApp.Converter/bin/release/netcoreapp5.0/obfuscated | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish/publish
-cd publish
+Copy-Item ./SteganographyApp.Converter/bin/release/netcoreapp5.0/publish -Recurse -Destination ./testbed
+cd testbed
 Rename-Item -Path publish -NewName Converter -Force
 cd ..
+
+Write-Host("`n---------- Copying test assets ----------`n")
+Get-ChildItem -Path ./SteganographyApp.Common.Tests/TestAssets | Where-Object Name -Like "*.png" | Copy-Item -Force -Destination ./testbed

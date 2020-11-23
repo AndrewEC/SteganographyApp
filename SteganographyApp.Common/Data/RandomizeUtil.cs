@@ -17,6 +17,14 @@ namespace SteganographyApp.Common.Data
 
         private static readonly int RandomizeGenerationsModifier = 7;
 
+        private ILogger log;
+
+        [PostConstruct]
+        public void PostConstruct()
+        {
+            log = Injector.LoggerFor<RandomizeUtil>();
+        }
+
         /// <summary>
         /// Randomizes the encrypted binary string from the file to encode.
         /// </summary>
@@ -24,6 +32,7 @@ namespace SteganographyApp.Common.Data
         /// <returns>A randomized binary string.</returns>
         public string RandomizeBinaryString(string binaryString, string randomSeed)
         {
+            log.Debug("Randomizing binary string using seed [{0}]", randomSeed);
             char[] characters = binaryString.ToCharArray();
 
             var generator = IndexGenerator.FromString(randomSeed);
@@ -50,6 +59,7 @@ namespace SteganographyApp.Common.Data
         /// <returns>A non-randomized array of bytes matching the original input file.</returns>
         public string ReorderBinaryString(string binaryString, string randomSeed)
         {
+            log.Debug("Reordering binary string using seed [{0}]", randomSeed);
             char[] characters = binaryString.ToCharArray();
             var generator = IndexGenerator.FromString(randomSeed);
 

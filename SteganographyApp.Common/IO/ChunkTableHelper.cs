@@ -24,6 +24,14 @@ namespace SteganographyApp.Common.IO
 
         private static readonly int ChunkSizeAndPadding = Calculator.ChunkDefinitionBitSize + 1;
 
+        private ILogger log;
+
+        [PostConstruct]
+        public void PostConstruct()
+        {
+            log = Injector.LoggerFor<ChunkTableHelper>();
+        }
+
         /// <summary>
         /// Converts the lengths of all the chunks in the table to a binary string and,
         /// if the randomSeed is not null or blank, ranmizes that binary string.
@@ -32,6 +40,7 @@ namespace SteganographyApp.Common.IO
         /// <param name="randomSeed">The seed to ranomize the binary string with.</param>
         public string ConvertChunkTableToBinary(int[] chunkLengths, string randomSeed)
         {
+            log.Debug("Converting [{0}] table entries to binary using random seed [{1}]", chunkLengths.Length, randomSeed);
             var tableHeader = To33BitBinaryString(chunkLengths.Length);
             var binary = new StringBuilder();
             foreach (int chunkLength in chunkLengths)
@@ -57,7 +66,7 @@ namespace SteganographyApp.Common.IO
         /// <param name="randomSeed">The random seed required to re-order the binary string.</param>
         public int[] ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed)
         {
-
+            log.Debug("Converting binary to chunk table with count of [{0}] and random seed [{1}]", chunkCount, randomSeed);
             var binaryString = binary;
             if (!Checks.IsNullOrEmpty(randomSeed))
             {

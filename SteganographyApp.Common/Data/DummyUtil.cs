@@ -70,6 +70,14 @@ namespace SteganographyApp.Common.Data
         private static readonly int MaxLengthPerDummy = 500;
         private static readonly int MinLengthPerDummy = 100;
 
+        private ILogger log;
+
+        [PostConstruct]
+        public void PostConstruct()
+        {
+            log = Injector.LoggerFor<DummyUtil>();
+        }
+
         /// <summary>
         /// Inserts the specified number of dummy entries into the current
         /// binary string.
@@ -81,7 +89,8 @@ namespace SteganographyApp.Common.Data
         /// <returns>Returns the binary string with the new dummy entries.</returns>
         public string InsertDummies(int numDummies, string binary, string randomSeed)
         {
-
+            log.Debug("Inserting [{0}] dummies using seed [{1}] and global count [{2}]", numDummies, randomSeed, GlobalCounter.Instance.Count);
+            log.Debug("Bit count before inserting dummies: [{0}]", binary.Length);
             int amountToIncrement = SumBinaryString(binary);
 
             int[] lengths = GenerateLengthsForDummies(numDummies);
@@ -100,6 +109,7 @@ namespace SteganographyApp.Common.Data
 
             GlobalCounter.Instance.Increment(amountToIncrement);
 
+            log.Debug("Bit count after inserting dummies: [{0}]", binary.Length);
             return binary;
         }
 
@@ -170,6 +180,8 @@ namespace SteganographyApp.Common.Data
         public string RemoveDummies(int numDummies, string binary, string randomSeed)
         {
 
+            log.Debug("Removing [{0}] dummies using seed [{1}] and global count [{2}]", numDummies, randomSeed, GlobalCounter.Instance.Count);
+            log.Debug("Bit count before removing dummies: [{0}]", binary.Length);
             // calculate the length of the dummies originally added to the string
             int[] lengths = GenerateLengthsForDummies(numDummies);
             Array.Reverse(lengths);
@@ -199,6 +211,7 @@ namespace SteganographyApp.Common.Data
 
             GlobalCounter.Instance.Increment(SumBinaryString(binary));
 
+            log.Debug("Bit count after removing dummies: [{0}]", binary.Length);
             return binary;
         }
     }

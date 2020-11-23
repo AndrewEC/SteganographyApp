@@ -8,3 +8,4 @@ coverage.opencover.xml
 reports/
 publish/
 BenchmarkDotNet.Artifacts/
+testbed/

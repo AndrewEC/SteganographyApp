@@ -6,7 +6,7 @@ namespace SteganographyApp.Common.Tests
 {
 
     [TestFixture]
-    public class RandomizeUtilTests
+    public class RandomizeUtilTests : FixtureWithLogger
     {
 
         private static string OriginalBinaryString = "1101010101000011101011111000000010101010100";
@@ -17,6 +17,7 @@ namespace SteganographyApp.Common.Tests
         public void TestRandomizeAndReorder()
         {
             var util = new RandomizeUtil();
+            util.PostConstruct();
 
             string randomized = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed);
             Assert.AreNotEqual(OriginalBinaryString, randomized);
@@ -29,6 +30,7 @@ namespace SteganographyApp.Common.Tests
         public void TestRandomizeWithIncorrectRandomSeedReturnsBadResult()
         {
             var util = new RandomizeUtil();
+            util.PostConstruct();
 
             string randomized = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed);
             Assert.AreNotEqual(OriginalBinaryString, randomized);

@@ -159,6 +159,7 @@ namespace SteganographyApp.Common.Arguments
         public bool DeleteAfterConversion { get; }
         public PngCompressionLevel CompressionLevel { get; }
         public int ChunkByteSize { get; }
+        public bool EnableLogs { get; }
     }
 
     /// <summary>

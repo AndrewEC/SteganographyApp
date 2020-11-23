@@ -32,7 +32,7 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestProvideDefaultInstanceWhenOnlyMocksAreAllowedThrowsException()
         {
-            Injector.AllowOnlyTestObjects();
+            Injector.AllowOnlyMockObjects();
 
             var actual = Assert.Throws<InvalidOperationException>(() => {
                 Injector.Provide<IConsoleReader>();

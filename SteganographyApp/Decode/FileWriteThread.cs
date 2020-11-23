@@ -1,5 +1,7 @@
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
+using SteganographyApp.Common;
+using SteganographyApp.Common.Injection;
 
 using System;
 using System.Collections.Concurrent;
@@ -18,6 +20,7 @@ namespace SteganographyApp.Decode
         private readonly BlockingCollection<WriteArgs> queue;
         private readonly ErrorContainer decodeError;
         private readonly IInputArguments arguments;
+        private readonly ILogger log;
         private Thread readThread;
 
         private FileWriteThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer, IInputArguments arguments)
@@ -25,6 +28,7 @@ namespace SteganographyApp.Decode
             this.arguments = arguments;
             this.queue = queue;
             this.decodeError = errorContainer;
+            log = Injector.LoggerFor<FileWriteThread>();
         }
 
         public static FileWriteThread CreateAndStartThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer,
@@ -37,6 +41,7 @@ namespace SteganographyApp.Decode
 
         public void StartWriting()
         {
+            log.Trace("Starting file write thread.");
             readThread = new Thread(new ThreadStart(Write));
             readThread.Start();
         }
@@ -58,16 +63,19 @@ namespace SteganographyApp.Decode
                     var writeArgs = queue.Take();
                     if (writeArgs.Status == Status.Complete)
                     {
+                        log.Trace("Write thread completed.");
                         break;
                     }
                     else
                     {
                         try
                         {
+                            log.Debug("Writing next binary chunk of [{0}] bits.", writeArgs.Data.Length);
                             writer.WriteContentChunkToFile(writeArgs.Data);
                         }
                         catch (Exception e)
                         {
+                            log.Error("An error ocurred while writing content chunk to file: [{0}]", e.Message);
                             decodeError.PutException(e);
                             break;
                         }

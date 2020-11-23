@@ -6,7 +6,7 @@ namespace SteganographyApp.Common.Tests
 {
 
     [TestFixture]
-    public class DummyUtilTests
+    public class DummyUtilTests : FixtureWithLogger
     {
 
         private static readonly string OriginalBinaryString = "1101010101000011101011111000000010101010100";
@@ -30,6 +30,7 @@ namespace SteganographyApp.Common.Tests
         public void TestInsertAndRemoveDummies()
         {
             var util = new DummyUtil();
+            util.PostConstruct();
 
             string inserted = util.InsertDummies(NumberOfDummies, OriginalBinaryString, RandomSeed);
             Assert.AreNotEqual(OriginalBinaryString, inserted);
@@ -44,6 +45,7 @@ namespace SteganographyApp.Common.Tests
         public void TestInsertAndRemoveWithIncorrectDummyCountReturnsBadResult()
         {
             var util = new DummyUtil();
+            util.PostConstruct();
 
             string inserted = util.InsertDummies(NumberOfDummies, OriginalBinaryString, RandomSeed);
             Assert.AreNotEqual(OriginalBinaryString, inserted);

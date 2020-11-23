@@ -26,7 +26,8 @@ namespace SteganographyApp.Common
             new string[]
             {
                 "AppDescription", "AppAction", "Input", "Output", "Images", "Password",
-                "PrintStack", "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies"
+                "PrintStack", "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies",
+                "EnableLogs"
             }
         );
 
@@ -34,7 +35,7 @@ namespace SteganographyApp.Common
             new string[]
             {
                 "CalculatorDescription", "CalculatorAction", "Input", "Images", "Password",
-                "EnableCompression", "ChunkSize", "EnableDummies", "RandomSeed"
+                "EnableCompression", "ChunkSize", "EnableDummies", "RandomSeed", "EnableLogs"
             }
         );
 
@@ -42,7 +43,7 @@ namespace SteganographyApp.Common
             new string[]
             {
                 "ConverterDescription", "ConvertAction", "Images", "DeleteOriginals",
-                "CompressionLevel"
+                "CompressionLevel", "EnableLogs"
             }
         );
 

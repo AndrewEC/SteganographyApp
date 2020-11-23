@@ -1,5 +1,7 @@
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
+using SteganographyApp.Common;
+using SteganographyApp.Common.Injection;
 
 using System;
 using System.Threading;
@@ -19,6 +21,7 @@ namespace SteganographyApp.Encode
         private readonly BlockingCollection<ReadArgs> queue;
         private readonly IInputArguments arguments;
         private readonly ErrorContainer errorContainer;
+        private readonly ILogger log;
         private Thread readThread;
 
         private FileReadThread(BlockingCollection<ReadArgs> queue, IInputArguments arguments, ErrorContainer errorContainer)
@@ -26,6 +29,7 @@ namespace SteganographyApp.Encode
             this.queue = queue;
             this.arguments = arguments;
             this.errorContainer = errorContainer;
+            log = Injector.LoggerFor<FileReadThread>();
         }
 
         public static FileReadThread CreateAndStart(BlockingCollection<ReadArgs> queue, IInputArguments arguments, ErrorContainer errorContainer)
@@ -37,6 +41,7 @@ namespace SteganographyApp.Encode
 
         public void StartReading()
         {
+            log.Trace("Stating file read thread.");
             readThread = new Thread(new ThreadStart(Read));
             readThread.Start();
         }

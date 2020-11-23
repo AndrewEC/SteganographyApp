@@ -16,6 +16,20 @@ namespace SteganographyApp.Common.Arguments
         private static readonly int MinDummyCount = 100;
 
         /// <summary>
+        /// Parses a boolean from the parameter value and set sthe EnableLogs property.
+        /// </summary>
+        /// <param name="arguments">The InputArguments instance to modify. In this case this parameter
+        /// is required to be declared but will not be consumed.</param>
+        /// <param name="value">The string representation of the EnableLogs boolean flag.</param>
+        public static void ParseEnableLogs(InputArguments arguments, string value)
+        {
+            if (Boolean.Parse(value))
+            {
+                RootLogger.Instance.Enable();
+            }
+        }
+
+        /// <summary>
         /// Parses a boolean from the value parameter and sets the InsertDummies property.
         /// </summary>
         /// <param name="arguments">The InputArguments instance to modify.</param>

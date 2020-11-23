@@ -1,3 +1,5 @@
+using System;
+
 using Moq;
 
 using NUnit.Framework;
@@ -14,7 +16,7 @@ namespace SteganographyApp.Common.Tests
         [OneTimeSetUp]
         public void OneTime()
         {
-            Injector.AllowOnlyTestObjects();
+            Injector.AllowOnlyMockObjects();
         }
 
     }
@@ -60,16 +62,42 @@ namespace SteganographyApp.Common.Tests
         [SetUp]
         public void SetUp()
         {
-            Injector.AllowOnlyRealObjects();
+            Injector.AllowAnyObjects();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Injector.AllowOnlyTestObjects();
+            Injector.AllowOnlyMockObjects();
             Injector.ResetInstances();
         }
 
+    }
+
+    class NullLogger : ILogger
+    {
+        public void Trace(string message, params object[] arguments) {}
+        public void Debug(string message, params object[] arguments) {}
+        public void Error(string message, params object[] arguments) {}
+        public void Log(LogLevel level, string message, params object[] arguments) {}
+    }
+
+    class NullLoggerFactory : ILoggerFactory
+    {
+        public ILogger LoggerFor(Type type)
+        {
+            return new NullLogger();
+        }
+    }
+
+    [TestFixture]
+    public abstract class FixtureWithLogger
+    {
+        [SetUp]
+        public void InitializeMockLogger()
+        {
+            Injector.UseInstance<ILoggerFactory>(new NullLoggerFactory());
+        }
     }
 
 }

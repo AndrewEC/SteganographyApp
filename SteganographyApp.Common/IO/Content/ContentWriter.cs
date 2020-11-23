@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-using SteganographyApp.Common.Arguments;
+﻿using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
 

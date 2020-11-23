@@ -1,6 +1,7 @@
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common;
+using SteganographyApp.Common.Injection;
 
 using System;
 using System.Collections.Concurrent;
@@ -46,11 +47,14 @@ namespace SteganographyApp.Decode
         /// </summary>
         private readonly ErrorContainer errorContainer;
 
+        private readonly ILogger log;
+
         private Decoder(IInputArguments arguments)
         {
             this.arguments = arguments;
             writeQueue = new BlockingCollection<WriteArgs>(2);
             errorContainer = new ErrorContainer();
+            log = Injector.LoggerFor<Decoder>();
         }
 
         /// <summary>
@@ -72,6 +76,7 @@ namespace SteganographyApp.Decode
         private void DecodeFileFromImage()
         {
             Console.WriteLine("Decoding to File: {0}", arguments.DecodedOutputFile);
+            log.Debug("Decoding to file: [{0}]", arguments.DecodedOutputFile);
 
             var store = new ImageStore(arguments);
 
@@ -83,8 +88,10 @@ namespace SteganographyApp.Decode
                 var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length,
                     "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
 
+                log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
                 foreach (int chunkLength in contentChunkTable)
                 {
+                    log.Debug("Processing chunk of [{0}] bits.", chunkLength);
                     string binary = wrapper.ReadContentChunkFromImage(chunkLength);
                     writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete });
                     tracker.UpdateAndDisplayProgress();
@@ -92,15 +99,28 @@ namespace SteganographyApp.Decode
                     if (errorContainer.HasException())
                     {
                         thread.Join();
-                        throw errorContainer.TakeException();
+                        ThrowException();
                     }
                 }
 
                 writeQueue.Add(new WriteArgs { Status = Status.Complete });
                 thread.Join();
+
+                if (errorContainer.HasException())
+                {
+                    ThrowException();
+                }
             }
 
+            log.Trace("Decoding process completed.");
             Console.WriteLine("Decoding process complete.");
+        }
+
+        private void ThrowException()
+        {
+            Exception error = errorContainer.TakeException();
+            log.Error("Decoder found exception in container: [{0}]", error);
+            throw error;
         }
 
     }

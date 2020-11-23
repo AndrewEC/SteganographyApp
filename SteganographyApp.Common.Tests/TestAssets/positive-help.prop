@@ -50,6 +50,9 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t\tThe number of dummies to insert per read/write will be based on the properties of the first and last image to write to.
 \t\tThis will also increase the overall size of the encoded content as it will be adding in extra values to the content after encoding.
 
+~EnableLogs
+\t--enableLogs | -el :: Flag indicating whether or not to log debug information to the steganography.logs.txt log file.
+
 ~CalculatorDescription
 Arguments must be specified as <argument_name>space<argument_value>.
 \tExample of calculating required space to store an encrypted file:

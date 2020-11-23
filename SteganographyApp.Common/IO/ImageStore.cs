@@ -117,6 +117,8 @@ namespace SteganographyApp.Common.IO
             }
         }
 
+        private readonly ILogger log;
+
         /// <summary>
         /// Creates a new instance of the ImageStore and calculates the RequiredContentChunkTableBitSize
         /// value.
@@ -125,6 +127,7 @@ namespace SteganographyApp.Common.IO
         public ImageStore(IInputArguments args)
         {
             this.args = args;
+            log = Injector.LoggerFor<ImageStore>();
         }
 
         /// <summary>
@@ -206,6 +209,7 @@ namespace SteganographyApp.Common.IO
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
         private int WriteBinaryString(string binary)
         {
+            log.Debug("Writing [{0}] bits to image [{1}]", binary.Length, CurrentImage);
             int written = 0;
             for (int i = 0; i < binary.Length; i += 3)
             {
@@ -285,6 +289,7 @@ namespace SteganographyApp.Common.IO
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
         private string ReadBinaryString(int bitsToRead)
         {
+            log.Debug("Reading [{0}] bits from image [{1}]", bitsToRead, CurrentImage);
             var binary = new StringBuilder();
             int bitsRead = 0;
             while (bitsRead < bitsToRead)
@@ -329,6 +334,7 @@ namespace SteganographyApp.Common.IO
         /// storage space to read the entire content chunk table.</exception>
         public int[] ReadContentChunkTable()
         {
+            log.Trace("Reading content chunk table");
             try
             {
                 // The size of each table entry is 32 bits but is made up of 11 pixels.
@@ -340,6 +346,7 @@ namespace SteganographyApp.Common.IO
                 // The first 32 bits of the table represent the number of chunk lengths
                 // contained within the table.
                 int chunkCount = Convert.ToInt32(ReadBinaryString(Calculator.ChunkDefinitionBitSize), 2);
+                log.Debug("Content chunk table contains [{0}] entries.", chunkCount);
 
                 string chunkTableBinary = ReadBinaryString(chunkCount * chunkSizeAndPadding);
 
@@ -362,6 +369,7 @@ namespace SteganographyApp.Common.IO
         /// storage space to store the entire content chunk table.</exception>
         public void WriteContentChunkTable(int[] chunkTable)
         {
+            log.Debug("Writing chunk table with [{0}] entries.", chunkTable.Length);
             try
             {
                 var binary = Injector.Provide<IChunkTableHelper>().ConvertChunkTableToBinary(chunkTable, args.RandomSeed);
@@ -403,6 +411,7 @@ namespace SteganographyApp.Common.IO
         /// image index exeeds the available number of images an exception will be thrown.</exception>
         private void LoadNextImage(bool saveImageChanges = false)
         {
+            log.Trace("Loading next image.");
             CloseOpenImage(saveImageChanges);
 
             position.Reset();
@@ -412,12 +421,14 @@ namespace SteganographyApp.Common.IO
                 throw new ImageProcessingException("There is not enough available storage space in the provided images to continue.");
             }
 
-            currentImage = Injector.Provide<IImageProvider>().LoadImage(args.CoverImages[currentImageIndex]);
+            string imagePath = CurrentImage;
+            currentImage = Injector.Provide<IImageProvider>().LoadImage(imagePath);
+            log.Debug("Loaded image [{0}]", imagePath);
 
             OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
             {
                 ImageIndex = currentImageIndex,
-                ImageName = args.CoverImages[currentImageIndex]
+                ImageName = imagePath
             });
         }
 
@@ -431,6 +442,7 @@ namespace SteganographyApp.Common.IO
         /// <see cref="TryMoveToNextPixel"/>
         private void SeekToPixel(int bitsToSkip)
         {
+            log.Debug("Seeking past [{0}] bits", bitsToSkip);
             position.Reset();
 
             int pixelIndex = (int) Math.Ceiling((double) bitsToSkip / (double) Calculator.BitsPerPixel);
@@ -476,7 +488,8 @@ namespace SteganographyApp.Common.IO
             {
                 if (saveImageChanges)
                 {
-                    currentImage.Save(args.CoverImages[currentImageIndex]);
+                    log.Trace("Saving changes to image.");
+                    currentImage.Save(CurrentImage);
                 }
                 currentImage.Dispose();
                 currentImage = null;

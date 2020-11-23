@@ -16,6 +16,14 @@ namespace SteganographyApp.Common.Data
     public class CompressionUtil : ICompressionUtil
     {
 
+        private ILogger log;
+
+        [PostConstruct]
+        public void PostConstruct()
+        {
+            log = Injector.LoggerFor<CompressionUtil>();
+        }
+
         /// <summary>
         /// Copies all the data from the source stream into the destination stream
         /// </summary>
@@ -38,6 +46,7 @@ namespace SteganographyApp.Common.Data
         /// <returns>The gzip compressed array of bytes.</returns>
         public byte[] Compress(byte[] fileBytes)
         {
+            log.Debug("Compressing [{0}] bytes", fileBytes.Length);
             using (var msi = new MemoryStream(fileBytes))
             using (var mso = new MemoryStream())
             {
@@ -59,6 +68,7 @@ namespace SteganographyApp.Common.Data
         /// <returns>A byte array after being decompressed using standard gzip compression.</returns>
         public byte[] Decompress(byte[] readBytes)
         {
+            log.Debug("Decompressing [{0}] bytes.", readBytes.Length);
             using (var msi = new MemoryStream(readBytes))
             using (var mso = new MemoryStream())
             {

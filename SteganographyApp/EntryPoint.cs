@@ -3,6 +3,7 @@ using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Encode;
 using SteganographyApp.Decode;
+using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp
 {
@@ -51,6 +52,7 @@ namespace SteganographyApp
         /// </summary>
         private void CleanImages()
         {
+            Injector.LoggerFor<EntryPoint>().Trace("Cleaning image LSBs");
             var tracker = ProgressTracker.CreateAndDisplay(args.CoverImages.Length, "Cleaning image LSB data", "Finished cleaning all images.");
             var store = new ImageStore(args);
             store.OnNextImageLoaded += (object sender, NextImageLoadedEventArgs eventArg) =>

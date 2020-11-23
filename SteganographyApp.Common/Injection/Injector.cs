@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -18,6 +19,9 @@ namespace SteganographyApp.Common.Injection
         }
 
     }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class PostConstruct : Attribute {}
 
 
     /// <summary>
@@ -40,6 +44,7 @@ namespace SteganographyApp.Common.Injection
         {
             DefaultInjectionValues = CreateDefaultInjectableDictionary();
             ResetInstances();
+            InvokePostConstructMethods();
         }
 
         /// <summary>
@@ -63,6 +68,31 @@ namespace SteganographyApp.Common.Injection
             return injectables.ToImmutableDictionary();
         }
 
+        private static void InvokePostConstructMethods()
+        {
+            foreach (object instance in DefaultInjectionValues.Values)
+            {
+                var method = GetPostConstructMethod(instance);
+                if (method == null)
+                {
+                    continue;
+                }
+                method.Invoke(instance, new object[]{});
+            }
+        }
+
+        private static MethodInfo GetPostConstructMethod(object instance)
+        {
+            foreach (var method in instance.GetType().GetMethods())
+            {
+                if (method.GetCustomAttribute(typeof(PostConstruct), false) != null)
+                {
+                    return method;
+                }
+            }
+            return null;
+        }
+
         private static IEnumerable<Type> FindInjectableTypesInAssembly()
         {
             return typeof(Injector).Assembly.GetTypes().Where(IsInjectableType);
@@ -76,6 +106,11 @@ namespace SteganographyApp.Common.Injection
         private static InjectableAttribute GetInjectableAttribute(Type type)
         {
             return type.GetCustomAttributes(typeof(InjectableAttribute), false).FirstOrDefault() as InjectableAttribute;
+        }
+
+        public static ILogger LoggerFor<T>()
+        {
+            return Provide<ILoggerFactory>().LoggerFor(typeof(T));
         }
 
         /// <summary>
@@ -119,12 +154,12 @@ namespace SteganographyApp.Common.Injection
             }
         }
 
-        public static void AllowOnlyTestObjects()
+        public static void AllowOnlyMockObjects()
         {
             onlyTestObjectsState = true;
         }
 
-        public static void AllowOnlyRealObjects()
+        public static void AllowAnyObjects()
         {
             onlyTestObjectsState = false;
         }

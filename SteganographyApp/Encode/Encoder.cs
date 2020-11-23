@@ -1,6 +1,7 @@
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common;
+using SteganographyApp.Common.Injection;
 
 using System;
 using System.Collections.Concurrent;
@@ -71,11 +72,14 @@ namespace SteganographyApp.Encode
         /// </summary>
         private readonly ErrorContainer errorContainer;
 
+        private readonly ILogger log;
+
         private Encoder(IInputArguments arguments)
         {
             this.arguments = arguments;
             readQueue = new BlockingCollection<ReadArgs>(2);
             errorContainer = new ErrorContainer();
+            log = Injector.LoggerFor<Encoder>();
         }
 
         /// <summary>
@@ -110,11 +114,14 @@ namespace SteganographyApp.Encode
 
         private void Encode(ImageStore.ImageStoreWrapper wrapper)
         {
-            
+
+            log.Debug("Encoding file: [{0}]", arguments.FileToEncode);
             int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
+            log.Debug("Content chunk table requires [{0}] bits of space to store.", startingPixel);
             wrapper.SeekToPixel(startingPixel);
 
             int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
+            log.Debug("File requires [{0}] iterations to encode.", requiredNumberOfWrites);
             var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
                 "Encoding file contents", "All input file contents have been encoded.");
 
@@ -142,6 +149,7 @@ namespace SteganographyApp.Encode
                     }
                     catch (Exception e)
                     {
+                        log.Error("An exception ocurred while encoding the file: [{0}]", e.Message);
                         errorContainer.PutException(e);
                         thread.Join();
                         throw;
@@ -156,6 +164,7 @@ namespace SteganographyApp.Encode
             Console.WriteLine("Writing content chunk table.");
             utilities.ImageStore.WriteContentChunkTable(utilities.TableTracker.GetContentTable());
             Console.WriteLine("Encoding process complete.");
+            log.Trace("Encoding process complete.");
             utilities.ImageTracker.PrintImagesUtilized();
         }
 
