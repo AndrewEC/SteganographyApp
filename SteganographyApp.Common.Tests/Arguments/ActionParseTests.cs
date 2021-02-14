@@ -20,7 +20,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--action", actionString };
             var parser = new ArgumentParser();
-            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
+            parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator);
             Assert.IsNull(parser.LastError);
             Assert.AreEqual(action, arguments.EncodeOrDecode);
         }

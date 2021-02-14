@@ -13,12 +13,18 @@ namespace SteganographyApp.Common
         Error
     }
 
+    public delegate object ArgumentProvider();
+
     public interface ILogger
     {
         void Trace(string message, params object[] arguments);
+        void Trace(string message, ArgumentProvider provider);
         void Debug(string message, params object[] arguments);
+        void Debug(string message, ArgumentProvider provider);
         void Error(string message, params object[] arguments);
+        void Error(string message, ArgumentProvider provider);
         void Log(LogLevel level, string message, params object[] arguments);
+        void Log(LogLevel level, string message, ArgumentProvider provider);
     }
 
     sealed class Logger : ILogger
@@ -32,13 +38,15 @@ namespace SteganographyApp.Common
         }
 
         public void Trace(string message, params object[] arguments) => Log(LogLevel.Trace, message, arguments);
+        public void Trace(string message, ArgumentProvider provider) => Log(LogLevel.Trace, message, provider);
         public void Debug(string message, params object[] arguments) => Log(LogLevel.Debug, message, arguments);
+        public void Debug(string message, ArgumentProvider provider) => Log(LogLevel.Debug, message, provider);
         public void Error(string message, params object[] arguments) => Log(LogLevel.Error, message, arguments);
+        public void Error(string message, ArgumentProvider provider) => Log(LogLevel.Error, message, provider);
 
-        public void Log(LogLevel level, string message, params object[] arguments)
-        {
-            RootLogger.Instance.LogToFile(typeName, level, message, arguments);
-        }
+        public void Log(LogLevel level, string message, params object[] arguments) => RootLogger.Instance.LogToFile(typeName, level, message, arguments);
+        public void Log(LogLevel level, string message, ArgumentProvider provider) => RootLogger.Instance.LogToFile(typeName, level, message, provider);
+        
     }
 
     public sealed class RootLogger
@@ -59,14 +67,40 @@ namespace SteganographyApp.Common
         {
             if (writeLogStream != null)
             {
-                writeLogStream.Dispose();
-                writeLogStream = null;
+                try
+                {
+                    writeLogStream.Dispose();
+                    writeLogStream = null;
+                }
+                catch { }
             }
         }
 
         public void Enable()
         {
             canLog = true;
+        }
+
+        public void LogToFile(string typeName, LogLevel level, string message, ArgumentProvider provider)
+        {
+            if (!canLog)
+            {
+                return;
+            }
+            object arguments = InvokeProvider(provider);
+            LogToFile(FormLogMessage(typeName, level, message, arguments));
+        }
+
+        private object InvokeProvider(ArgumentProvider provider)
+        {
+            try
+            {
+                return provider(); 
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
         }
 
         public void LogToFile(string typeName, LogLevel level, string message, params object[] arguments)
@@ -116,7 +150,7 @@ namespace SteganographyApp.Common
             }
             catch (Exception e)
             {
-                Console.WriteLine("Warning: Could not open log file for write. Logging will be disabled. Caused by: {0}", e.Message);
+                Console.WriteLine("Warning: Could not open log file for write. Logging will be disabled. Caused by: [{0}]", e.Message);
                 return false;
             }
         }

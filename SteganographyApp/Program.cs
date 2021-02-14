@@ -42,13 +42,12 @@ namespace SteganographyApp
                     Console.WriteLine("An error ocurred parsing the provided arguments: \n\t{0}", e.Message);
                     break;
                 default:
+                    Console.WriteLine($"An uncaught error ocurred during execution: {e.Message}");
                     if (arguments.PrintStack)
                     {
                         Console.WriteLine("Message Trace: ");
                         Console.WriteLine(e.StackTrace);
                     }
-
-                    Console.WriteLine($"An uncaught error ocurred during execution: {e.Message}");
                     break;
             }
         }

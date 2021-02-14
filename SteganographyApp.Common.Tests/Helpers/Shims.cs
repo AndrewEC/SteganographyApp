@@ -30,6 +30,7 @@ namespace SteganographyApp.Common.Tests
         {
             Injector.UseInstance(new Mock<IConsoleReader>().Object);
             Injector.UseInstance(new Mock<IConsoleWriter>().Object);
+            Injector.UseInstance<ILoggerFactory>(new NullLoggerFactory());
         }
 
     }
@@ -77,9 +78,13 @@ namespace SteganographyApp.Common.Tests
     class NullLogger : ILogger
     {
         public void Trace(string message, params object[] arguments) {}
+        public void Trace(string message, ArgumentProvider provider) {}
         public void Debug(string message, params object[] arguments) {}
+        public void Debug(string message, ArgumentProvider provider) {}
         public void Error(string message, params object[] arguments) {}
+        public void Error(string message, ArgumentProvider provider) {}
         public void Log(LogLevel level, string message, params object[] arguments) {}
+        public void Log(LogLevel level, string message, ArgumentProvider provider) {}
     }
 
     class NullLoggerFactory : ILoggerFactory

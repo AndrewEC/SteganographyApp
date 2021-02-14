@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Text.Json;
+
 using SteganographyApp.Common.Injection;
 
 namespace SteganographyApp.Common.Arguments
@@ -142,6 +144,8 @@ namespace SteganographyApp.Common.Arguments
 
             Parsers.ParseDummyCount(parsedArguments);
 
+            Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{}]", () => JsonSerializer.Serialize(parsedArguments, parsedArguments.GetType()));
+
             return parsedArguments.ToImmutable();
         }
 
@@ -182,7 +186,7 @@ namespace SteganographyApp.Common.Arguments
             }
             catch (Exception e) when (!(e is ArgumentParseException))
             {
-                throw new ValidationException($"An error occurred while validation your input: {e.Message}", e);
+                throw new ValidationException($"An error occurred while validating your input: {e.Message}", e);
             }
         }
 

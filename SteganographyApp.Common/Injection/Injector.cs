@@ -105,7 +105,7 @@ namespace SteganographyApp.Common.Injection
 
         private static InjectableAttribute GetInjectableAttribute(Type type)
         {
-            return type.GetCustomAttributes(typeof(InjectableAttribute), false).FirstOrDefault() as InjectableAttribute;
+            return type.GetCustomAttribute(typeof(InjectableAttribute), false) as InjectableAttribute;
         }
 
         public static ILogger LoggerFor<T>()
@@ -122,10 +122,10 @@ namespace SteganographyApp.Common.Injection
             var type = typeof(T);
             if (IsProvidingNonMockObjectWhenInTestState(type))
             {
-                string message = string.Format("Injector is in a test state but tried to provide a non-mocked object for type: {0}", type.Name);
+                string message = string.Format("Injector is in a test state but tried to provide a non-mocked object for type: [{0}]", type.Name);
                 throw new InvalidOperationException(message);
             }
-            return (T) InjectionValues[typeof(T)];
+            return (T) InjectionValues[type];
         }
 
         private static bool IsProvidingNonMockObjectWhenInTestState(Type type)
