@@ -337,18 +337,13 @@ namespace SteganographyApp.Common.IO
             log.Trace("Reading content chunk table");
             try
             {
-                // The size of each table entry is 32 bits but is made up of 11 pixels.
-                // Each pixel can store 3 bits so we end up with one bit of padding on the
-                // end. So we need to move in increments of 33 bits as we are reading sequential
-                // entries in the chunk table.
-                int chunkSizeAndPadding = Calculator.ChunkDefinitionBitSize + 1;
 
                 // The first 32 bits of the table represent the number of chunk lengths
                 // contained within the table.
                 int chunkCount = Convert.ToInt32(ReadBinaryString(Calculator.ChunkDefinitionBitSize), 2);
                 log.Debug("Content chunk table contains [{0}] entries.", chunkCount);
 
-                string chunkTableBinary = ReadBinaryString(chunkCount * chunkSizeAndPadding);
+                string chunkTableBinary = ReadBinaryString(chunkCount * Calculator.ChunkDefinitionBitSizeWithPadding);
 
                 return Injector.Provide<IChunkTableHelper>().ConvertBinaryToChunkTable(chunkTableBinary, chunkCount, args.RandomSeed);
             }

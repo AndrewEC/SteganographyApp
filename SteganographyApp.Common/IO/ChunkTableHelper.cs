@@ -22,8 +22,6 @@ namespace SteganographyApp.Common.IO
     public class ChunkTableHelper : IChunkTableHelper
     {
 
-        private static readonly int ChunkSizeAndPadding = Calculator.ChunkDefinitionBitSize + 1;
-
         private ILogger log;
 
         [PostConstruct]
@@ -74,7 +72,7 @@ namespace SteganographyApp.Common.IO
             }
 
             return Enumerable.Range(0, chunkCount)
-                .Select(i => binaryString.Substring(i * ChunkSizeAndPadding, Calculator.ChunkDefinitionBitSize))
+                .Select(i => binaryString.Substring(i * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSize))
                 .Select(BinaryStringToInt)
                 .ToArray();
         }
