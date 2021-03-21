@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Numerics;
 
 using SixLabors.ImageSharp;
 
@@ -22,7 +23,7 @@ namespace SteganographyAppCalculator
             Console.WriteLine("Calculating storage space in {0} images.", args.CoverImages.Length);
             try
             {
-                ulong availableSpace = CalculateNumberOfPixelsForImages(args.CoverImages) * (uint) Calculator.BitsPerPixel;
+                var availableSpace = CalculateNumberOfPixelsForImages(args.CoverImages) * Calculator.BitsPerPixel;
 
                 Console.WriteLine("\nImages are able to store:");
                 PrintSize(availableSpace);
@@ -42,18 +43,18 @@ namespace SteganographyAppCalculator
         /// Calculate the total number of pixels within all images.
         /// </summary>
         /// <param name="coverImages">The array of string paths to the images to check.</param>
-        private static ulong CalculateNumberOfPixelsForImages(ImmutableArray<string> coverImages)
+        private static BigInteger CalculateNumberOfPixelsForImages(ImmutableArray<string> coverImages)
         {
             var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length,
                     "Calculating image storage space", "Completed calculating image storage space.");
-            ulong pixelCount = 0;
+            BigInteger count = new BigInteger();
             foreach (string imagePath in coverImages)
             {
                 try
                 {
                     using (var image = Image.Load(imagePath))
                     {
-                        pixelCount += (ulong) (image.Width * image.Height);
+                        count += (image.Width * image.Height);
                     }
                 }
                 catch (Exception e)
@@ -62,7 +63,7 @@ namespace SteganographyAppCalculator
                 }
                 progressTracker.UpdateAndDisplayProgress();
             }
-            return pixelCount;
+            return count;
         }
 
         /// <summary>
@@ -70,12 +71,16 @@ namespace SteganographyAppCalculator
         /// megabytes and gigabytes.
         /// </summary>
         /// <param name="size">The size in bits to print out.</param>
-        private static void PrintSize(double size)
+        private static void PrintSize(BigInteger size)
         {
             Console.WriteLine("\t{0} bits", size);
             Console.WriteLine("\t{0} bytes", size / 8);
             Console.WriteLine("\t{0} KB", size / 8 / 1024);
-            Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
+            if (size / 8 / 1024 / 1024 < 1) {
+                Console.WriteLine("\t< 1 MB");
+            } else{
+                Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
+            }
         }
 
     }
