@@ -35,26 +35,32 @@ namespace SteganographyApp.Common.IO
     /// <summary>
     /// Handles the current pixel position for the currently loaded image in the ImageStore.
     /// </summary>
-    class Position
+    class PixelPosition
     {
         public int X { get; set; }
         public int Y { get; set; }
 
         /// <summary>
-        /// Increments the X position by one.
+        /// Attempts to move to the next available position;
         /// </summary>
-        public void NextColumn()
+        public bool TryMoveToNext(int maxWidth, int maxHeight)
         {
+            if (!CanMoveToNext(maxWidth, maxHeight))
+            {
+                return false;
+            }
+
             X = X + 1;
+            if (X == maxWidth) {
+                X = 0;
+                Y = Y + 1;
+            }
+            return true;
         }
 
-        /// <summary>
-        /// Increments the Y position by one and resets the X position to 0.
-        /// </summary>
-        public void NextRow()
+        private bool CanMoveToNext(int maxWidth, int maxHeight)
         {
-            X = 0;
-            Y = Y + 1;
+            return !(X + 1 == maxWidth && Y + 1 == maxHeight);
         }
 
         /// <summary>

@@ -84,7 +84,7 @@ namespace SteganographyApp.Common.IO
         /// <summary>
         /// Stores the current x and y position for the current read/write operation.
         /// </summary>
-        private readonly Position position = new Position();
+        private readonly PixelPosition pixelPosition = new PixelPosition();
 
         /// <summary>
         /// The index used to determine which image will be read/written to in the
@@ -157,12 +157,12 @@ namespace SteganographyApp.Common.IO
                 {
                     while (true)
                     {
-                        var currentPixel = currentImage[position.X, position.Y];
-                        byte newRed = ShiftColourChannelByRandom(currentPixel.R, randomBit());
-                        byte newGreen = ShiftColourChannelByRandom(currentPixel.G, randomBit());
-                        byte newBlue = ShiftColourChannelByRandom(currentPixel.B, randomBit());
+                        var currentPixel = currentImage[pixelPosition.X, pixelPosition.Y];
+                        byte newRed = ShiftColourChannel(currentPixel.R, randomBit());
+                        byte newGreen = ShiftColourChannel(currentPixel.G, randomBit());
+                        byte newBlue = ShiftColourChannel(currentPixel.B, randomBit());
 
-                        currentImage[position.X, position.Y] = new Rgba32(newRed, newGreen, newBlue, currentImage[position.X, position.Y].A);
+                        currentImage[pixelPosition.X, pixelPosition.Y] = new Rgba32(newRed, newGreen, newBlue, currentImage[pixelPosition.X, pixelPosition.Y].A);
 
                         if (!TryMoveToNextPixel())
                         {
@@ -213,7 +213,7 @@ namespace SteganographyApp.Common.IO
             int written = 0;
             for (int i = 0; i < binary.Length; i += 3)
             {
-                Rgba32 pixel = currentImage[position.X, position.Y];
+                Rgba32 pixel = currentImage[pixelPosition.X, pixelPosition.Y];
 
                 pixel.R = ShiftColourChannelByBinary(pixel.R, binary[i]);
                 written++;
@@ -230,7 +230,7 @@ namespace SteganographyApp.Common.IO
                     }
                 }
 
-                currentImage[position.X, position.Y] = new Rgba32(
+                currentImage[pixelPosition.X, pixelPosition.Y] = new Rgba32(
                         pixel.R,
                         pixel.G,
                         pixel.B,
@@ -255,7 +255,7 @@ namespace SteganographyApp.Common.IO
         /// <param name="lastBit">Specifies the value that the colourChannel's
         /// least significant bit should be changed to.</param>
         /// </summary>
-        private byte ShiftColourChannelByRandom(byte colourChannel, int lastBit)
+        private byte ShiftColourChannel(byte colourChannel, int lastBit)
         {
             return (lastBit == 0)
                 ? (byte) (colourChannel & ~1)
@@ -274,7 +274,7 @@ namespace SteganographyApp.Common.IO
         private byte ShiftColourChannelByBinary(byte colourChannel, char lastBit)
         {
             int intLastBit = (lastBit == '0') ? 0 : 1;
-            return ShiftColourChannelByRandom(colourChannel, intLastBit);
+            return ShiftColourChannel(colourChannel, intLastBit);
         }
 
         /// <summary>
@@ -294,7 +294,7 @@ namespace SteganographyApp.Common.IO
             int bitsRead = 0;
             while (bitsRead < bitsToRead)
             {
-                Rgba32 pixel = currentImage[position.X, position.Y];
+                Rgba32 pixel = currentImage[pixelPosition.X, pixelPosition.Y];
 
                 string redBit = Convert.ToString(pixel.R, 2);
                 binary.Append(redBit.Substring(redBit.Length - 1));
@@ -409,7 +409,7 @@ namespace SteganographyApp.Common.IO
             log.Trace("Loading next image.");
             CloseOpenImage(saveImageChanges);
 
-            position.Reset();
+            pixelPosition.Reset();
             currentImageIndex++;
             if (currentImageIndex == args.CoverImages.Length)
             {
@@ -437,8 +437,8 @@ namespace SteganographyApp.Common.IO
         /// <see cref="TryMoveToNextPixel"/>
         private void SeekToPixel(int bitsToSkip)
         {
-            log.Debug("Seeking past [{0}] bits", bitsToSkip);
-            position.Reset();
+            log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage);
+            pixelPosition.Reset();
 
             int pixelIndex = (int) Math.Ceiling((double) bitsToSkip / (double) Calculator.BitsPerPixel);
             for (int i = 0; i < pixelIndex; i++)
@@ -459,15 +459,10 @@ namespace SteganographyApp.Common.IO
         /// returns true.</returns>
         private bool TryMoveToNextPixel()
         {
-            position.NextColumn();
-            if (position.X == currentImage.Width)
+            if (!pixelPosition.TryMoveToNext(currentImage.Width, currentImage.Height))
             {
-                position.NextRow();
-                if (position.Y == currentImage.Height)
-                {
-                    position.Reset();
-                    return false;
-                }
+                pixelPosition.Reset();
+                return false;
             }
             return true;
         }
@@ -483,7 +478,7 @@ namespace SteganographyApp.Common.IO
             {
                 if (saveImageChanges)
                 {
-                    log.Trace("Saving changes to image.");
+                    log.Trace("Saving changes to image [{0}]", CurrentImage);
                     currentImage.Save(CurrentImage);
                 }
                 currentImage.Dispose();
