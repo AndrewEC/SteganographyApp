@@ -11,7 +11,6 @@ namespace SteganographyApp.Common.Tests
         [TestCase("encode", ActionEnum.Encode)]
         [TestCase("decode", ActionEnum.Decode)]
         [TestCase("clean", ActionEnum.Clean)]
-        [TestCase("convert", ActionEnum.Convert)]
         [TestCase("calculate-storage-space", ActionEnum.CalculateStorageSpace)]
         [TestCase("calculate-encrypted-size", ActionEnum.CalculateEncryptedSize)]
         [TestCase("ces", ActionEnum.CES)]

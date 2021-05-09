@@ -47,3 +47,5 @@ cd ..
 
 Write-Host("`n---------- Copying test assets ----------`n")
 Get-ChildItem -Path ./SteganographyApp.Common.Tests/TestAssets | Where-Object Name -Like "*.png" | Copy-Item -Force -Destination ./testbed
+Get-ChildItem -Path ./SteganographyApp.Common.Tests/TestAssets | Where-Object Name -Like "*.png" | Copy-Item -Force -Destination ./testbed/Calculator
+Get-ChildItem -Path ./SteganographyApp.Common.Tests/TestAssets | Where-Object Name -Like "*.png" | Copy-Item -Force -Destination ./testbed/Converter

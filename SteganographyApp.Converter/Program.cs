@@ -45,10 +45,6 @@ namespace SteganographyApp.Converter
         /// </summary>
         private static string PostValidation(IInputArguments inputs)
         {
-            if (inputs.EncodeOrDecode != ActionEnum.Convert)
-            {
-                return "The converter utility only supports the Convert action.";
-            }
             if (Checks.IsNullOrEmpty(inputs.CoverImages))
             {
                 return "At least one image must be provided to convert.";
@@ -70,7 +66,7 @@ namespace SteganographyApp.Converter
                 return;
             }
 
-            Console.WriteLine("Converting {0} images.", lossyImages.Length);
+            Console.WriteLine("Converting [{0}] images.", lossyImages.Length);
             var tracker = ProgressTracker.CreateAndDisplay(lossyImages.Length, "Converting images",
                 "Finished converting all images");
 

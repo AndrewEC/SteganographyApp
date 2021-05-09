@@ -84,8 +84,7 @@ namespace SteganographyApp.Common.Arguments
         CalculateStorageSpace,
         CalculateEncryptedSize,
         CSS, // shorthand alias for CalculateStorageSpace
-        CES, // shorthand alias for CalculateEncryptedSize
-        Convert
+        CES // shorthand alias for CalculateEncryptedSize
     }
 
     /// <summary>

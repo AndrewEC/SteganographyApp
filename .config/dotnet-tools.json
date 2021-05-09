@@ -3,19 +3,19 @@
   "isRoot": true,
   "tools": {
     "dotnet-stryker": {
-      "version": "0.20.0",
+      "version": "0.22.3",
       "commands": [
         "dotnet-stryker"
       ]
     },
     "dotnet-reportgenerator-globaltool": {
-      "version": "4.8.0",
+      "version": "4.8.8",
       "commands": [
         "reportgenerator"
       ]
     },
     "coverlet.console": {
-      "version": "1.7.2",
+      "version": "3.0.3",
       "commands": [
         "coverlet"
       ]
