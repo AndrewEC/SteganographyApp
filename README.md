@@ -63,4 +63,4 @@ This app takes advantage of the following third party nuget packages:
 * [Coverlet](https://github.com/tonerdo/coverlet) - Measure, and subsequently generate reports for, unit test coverage
 * [StrykerNet](https://github.com/stryker-mutator/stryker-net) - Mutation testing framework
 * [ReportGenerator](https://github.com/danielpalme/ReportGenerator) - Generates an Html report from the mutation test results
-* [NUnit](https://www.nuget.org/packages/NUnit) - Unit testing framework
+* [NUnit](https://github.com/nunit/nunit) - Unit testing framework

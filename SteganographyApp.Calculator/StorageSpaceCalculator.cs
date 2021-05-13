@@ -47,7 +47,7 @@ namespace SteganographyAppCalculator
         {
             var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length,
                     "Calculating image storage space", "Completed calculating image storage space.");
-            BigInteger count = new BigInteger();
+            var count = new BigInteger();
             foreach (string imagePath in coverImages)
             {
                 try

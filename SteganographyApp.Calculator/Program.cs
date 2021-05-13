@@ -1,6 +1,8 @@
 ﻿using SteganographyApp.Common;
 using SteganographyApp.Common.Arguments;
+
 using System;
+using System.Collections.Immutable;
 
 namespace SteganographyAppCalculator
 {
@@ -22,8 +24,8 @@ namespace SteganographyAppCalculator
     class Program
     {
 
-        private static readonly ActionEnum[] CalculateEncryptedSizeActions = new ActionEnum[] { ActionEnum.CalculateEncryptedSize, ActionEnum.CES };
-        private static readonly ActionEnum[] CalculateStorageSpaceActions = new ActionEnum[] { ActionEnum.CalculateStorageSpace, ActionEnum.CSS };
+        private static readonly ImmutableArray<ActionEnum> CalculateEncryptedSizeActions = ImmutableArray.Create(ActionEnum.CalculateEncryptedSize, ActionEnum.CES);
+        private static readonly ImmutableArray<ActionEnum> CalculateStorageSpaceActions = ImmutableArray.Create(ActionEnum.CalculateStorageSpace, ActionEnum.CSS);
 
         static void Main(string[] args)
         {
@@ -41,26 +43,16 @@ namespace SteganographyAppCalculator
                 return;
             }
 
-            if (IsCalculateStorageSpaceAction(arguments.EncodeOrDecode))
+            if (CalculateStorageSpaceActions.Contains(arguments.EncodeOrDecode))
             {
                 StorageSpaceCalculator.CalculateStorageSpace(arguments);
             }
-            else if (IsCalculateEncryptedSpaceAction(arguments.EncodeOrDecode))
+            else if (CalculateEncryptedSizeActions.Contains(arguments.EncodeOrDecode))
             {
                 EncryptedSizeCalculator.CalculateEncryptedSize(arguments);
             }
 
             Console.WriteLine("");
-        }
-
-        private static bool IsCalculateStorageSpaceAction(ActionEnum action)
-        {
-            return Array.IndexOf(CalculateStorageSpaceActions, action) != -1;
-        }
-
-        private static bool IsCalculateEncryptedSpaceAction(ActionEnum action)
-        {
-            return Array.IndexOf(CalculateEncryptedSizeActions, action) != -1;
         }
 
         /// <summary>
@@ -69,11 +61,11 @@ namespace SteganographyAppCalculator
         /// </summary>
         private static string PostValidate(IInputArguments input)
         {
-            if (!IsCalculateEncryptedSpaceAction(input.EncodeOrDecode) && !IsCalculateStorageSpaceAction(input.EncodeOrDecode))
+            if (!CalculateEncryptedSizeActions.Contains(input.EncodeOrDecode) && !CalculateStorageSpaceActions.Contains(input.EncodeOrDecode))
             {
                 return "The action must either be calculate-storage-space/css or calculate-encrypted-size/ces.";
             }
-            else if (IsCalculateEncryptedSpaceAction(input.EncodeOrDecode))
+            else if (CalculateEncryptedSizeActions.Contains(input.EncodeOrDecode))
             {
                 if (Checks.IsNullOrEmpty(input.FileToEncode))
                 {
@@ -85,7 +77,7 @@ namespace SteganographyAppCalculator
                         + "to properly calculate the number of dummy entries to insert.";
                 }
             }
-            else if (IsCalculateStorageSpaceAction(input.EncodeOrDecode) && Checks.IsNullOrEmpty(input.CoverImages))
+            else if (CalculateStorageSpaceActions.Contains(input.EncodeOrDecode) && Checks.IsNullOrEmpty(input.CoverImages))
             {
                 return "At least one image must be specified in order to calculate the available storage space of those images.";
             }

@@ -68,7 +68,7 @@ namespace SteganographyApp.Common.Arguments
             int[] imageIndexes = new int[] { 0, arguments.CoverImages.Length - 1 };
             foreach (int imageIndex in imageIndexes)
             {
-                using (IBasicImageInfo image = imageProvider.LoadImage(arguments.CoverImages[imageIndex]))
+                using (var image = imageProvider.LoadImage(arguments.CoverImages[imageIndex]))
                 {
                     dummyCount += dummyCount * (image.Width * image.Height);
                 }
