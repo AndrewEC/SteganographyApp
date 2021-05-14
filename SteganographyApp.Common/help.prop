@@ -54,7 +54,8 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t\tThis will also increase the overall size of the encoded content as it will be adding in extra values to the content after encoding.
 
 ~EnableLogs
-\t--enableLogs | -el :: Flag indicating whether or not to log debug information to the steganography.logs.txt log file.
+\t--logLevel | -ll :: Sets the desired log level. Default log level is None.
+\t\tValid values are: [Trace, Debug, Error]
 
 ~CalculatorDescription
 Arguments must be specified as <argument_name>space<argument_value>.

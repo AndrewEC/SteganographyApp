@@ -478,7 +478,7 @@ namespace SteganographyApp.Common.IO
             {
                 if (saveImageChanges)
                 {
-                    log.Trace("Saving changes to image [{0}]", CurrentImage);
+                    log.Debug("Saving changes to image [{0}]", CurrentImage);
                     currentImage.Save(CurrentImage);
                 }
                 currentImage.Dispose();

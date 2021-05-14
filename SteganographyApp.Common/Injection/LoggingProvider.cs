@@ -10,7 +10,8 @@ namespace SteganographyApp.Common
     {
         Trace,
         Debug,
-        Error
+        Error,
+        None
     }
 
     public delegate object ArgumentProvider();
@@ -23,8 +24,6 @@ namespace SteganographyApp.Common
         void Debug(string message, ArgumentProvider provider);
         void Error(string message, params object[] arguments);
         void Error(string message, ArgumentProvider provider);
-        void Log(LogLevel level, string message, params object[] arguments);
-        void Log(LogLevel level, string message, ArgumentProvider provider);
     }
 
     sealed class Logger : ILogger
@@ -44,8 +43,8 @@ namespace SteganographyApp.Common
         public void Error(string message, params object[] arguments) => Log(LogLevel.Error, message, arguments);
         public void Error(string message, ArgumentProvider provider) => Log(LogLevel.Error, message, provider);
 
-        public void Log(LogLevel level, string message, params object[] arguments) => RootLogger.Instance.LogToFile(typeName, level, message, arguments);
-        public void Log(LogLevel level, string message, ArgumentProvider provider) => RootLogger.Instance.LogToFile(typeName, level, message, provider);
+        private void Log(LogLevel level, string message, params object[] arguments) => RootLogger.Instance.LogToFile(typeName, level, message, arguments);
+        private void Log(LogLevel level, string message, ArgumentProvider provider) => RootLogger.Instance.LogToFile(typeName, level, message, provider);
         
     }
 
@@ -59,7 +58,7 @@ namespace SteganographyApp.Common
         private static readonly object _lock = new object();
 
         private IReadWriteStream writeLogStream;
-        private bool canLog = false;
+        private static LogLevel logLevel = LogLevel.None;
 
         private RootLogger() { }
 
@@ -76,22 +75,17 @@ namespace SteganographyApp.Common
             }
         }
 
-        public void Enable()
+        private bool CanLog(LogLevel requestedLevel)
         {
-            canLog = true;
+            return (int)requestedLevel >= (int)logLevel;
         }
 
-        public void LogToFile(string typeName, LogLevel level, string message, ArgumentProvider provider)
+        public void Enable(LogLevel level)
         {
-            if (!canLog)
-            {
-                return;
-            }
-            object arguments = InvokeProvider(provider);
-            LogToFile(FormLogMessage(typeName, level, message, arguments));
+            logLevel = TryOpenLogFileForWrite() ? level : LogLevel.None;
         }
 
-        private object InvokeProvider(ArgumentProvider provider)
+        private object TryInvokeArgumentProvider(ArgumentProvider provider)
         {
             try
             {
@@ -105,10 +99,20 @@ namespace SteganographyApp.Common
 
         public void LogToFile(string typeName, LogLevel level, string message, params object[] arguments)
         {
-            if (!canLog)
+            if (!CanLog(level))
             {
                 return;
             }
+            LogToFile(FormLogMessage(typeName, level, message, arguments));
+        }
+
+        public void LogToFile(string typeName, LogLevel level, string message, ArgumentProvider provider)
+        {
+            if (!CanLog(level))
+            {
+                return;
+            }
+            object arguments = TryInvokeArgumentProvider(provider);
             LogToFile(FormLogMessage(typeName, level, message, arguments));
         }
 
@@ -116,14 +120,6 @@ namespace SteganographyApp.Common
         {
             lock (_lock)
             {
-                if (writeLogStream == null)
-                {
-                    canLog = TryOpenLogFileForWrite();
-                    if (!canLog)
-                    {
-                        return;
-                    }
-                }
                 byte[] messageBytes = Encoding.ASCII.GetBytes(message);
                 writeLogStream.Write(messageBytes, 0, messageBytes.Length);
                 writeLogStream.Flush();

@@ -21,12 +21,13 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="arguments">The InputArguments instance to modify. In this case this parameter
         /// is required to be declared but will not be consumed.</param>
         /// <param name="value">The string representation of the EnableLogs boolean flag.</param>
-        public static void ParseEnableLogs(InputArguments arguments, string value)
+        public static void ParseLogLevel(InputArguments arguments, string value)
         {
-            if (Boolean.Parse(value))
-            {
-                RootLogger.Instance.Enable();
+            if (!Enum.TryParse(value, true, out LogLevel level)) {
+                throw new ArgumentValueException($"Could not parse log level. Log level must be one of Trace, Debug, or Error.");
             }
+
+            RootLogger.Instance.Enable(level);
         }
 
         /// <summary>

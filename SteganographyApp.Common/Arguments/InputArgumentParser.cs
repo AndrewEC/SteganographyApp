@@ -50,7 +50,7 @@ namespace SteganographyApp.Common.Arguments
                 new Argument("--enableDummies", "-d", Parsers.ParseInsertDummies, true),
                 new Argument("--deleteOriginals", "-do", Parsers.ParseDeleteOriginals, true),
                 new Argument("--compressionLevel", "-cl", Parsers.ParseCompressionLevel),
-                new Argument("--enableLogs", "-el", Parsers.ParseEnableLogs, true)
+                new Argument("--logLevel", "-ll", Parsers.ParseLogLevel)
             );
         }
 
@@ -144,7 +144,7 @@ namespace SteganographyApp.Common.Arguments
 
             Parsers.ParseDummyCount(parsedArguments);
 
-            Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{}]", () => JsonSerializer.Serialize(parsedArguments, parsedArguments.GetType()));
+            Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{0}]", () => JsonSerializer.Serialize(parsedArguments, parsedArguments.GetType()));
 
             return parsedArguments.ToImmutable();
         }
