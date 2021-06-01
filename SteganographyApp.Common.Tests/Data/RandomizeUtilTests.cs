@@ -14,6 +14,18 @@ namespace SteganographyApp.Common.Tests
         private static string BadRandomSeed = "badRandomSeed";
 
         [Test]
+        public void TestRandomizeTwiceWithSameSeedProducesSameResult()
+        {
+            var util = new RandomizeUtil();
+            util.PostConstruct();
+
+            string randomizedFirst = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed);
+            string randomizedSecond = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed);
+
+            Assert.AreEqual(randomizedFirst, randomizedSecond);
+        }
+
+        [Test]
         public void TestRandomizeAndReorder()
         {
             var util = new RandomizeUtil();
