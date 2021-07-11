@@ -11,6 +11,11 @@ namespace SteganographyApp.Common.Arguments
         private static readonly string ImageRegexExpression = @"^\[r\]\<(.+)\>\<(.+)\>$";
         private static readonly Regex ImageRegex = new Regex(ImageRegexExpression);
 
+        /// <summary>
+        /// Checks if the input value is a valid regex based input.
+        /// </summary>
+        /// <see cref="ImageRegexParser.ImageRegexExpression">The regular expression used to
+        /// check if the input is a valid regex based in put scheme.</see>
         public static bool IsValidRegex(string value) => ImageRegex.Match(value).Success;
 
         /// <summary>

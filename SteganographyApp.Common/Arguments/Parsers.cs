@@ -27,7 +27,7 @@ namespace SteganographyApp.Common.Arguments
                 throw new ArgumentValueException($"Could not parse log level. Log level must be one of Trace, Debug, or Error.");
             }
 
-            RootLogger.Instance.Enable(level);
+            RootLogger.Instance.EnableLoggingAtLevel(level);
         }
 
         /// <summary>

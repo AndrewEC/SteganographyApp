@@ -9,7 +9,7 @@ if(Test-Path ./SteganographyApp.Common.Tests/obj){
 }
 
 Write-Host("`n---------- Rebuilding Project ----------`n")
-dotnet build SteganographyApp.sln
+dotnet build SteganographyApp.sln --no-incremental
 
 if(Test-Path ./reports){
     Write-Host("Removing old report directory and contents")

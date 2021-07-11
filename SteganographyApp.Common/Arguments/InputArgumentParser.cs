@@ -1,17 +1,12 @@
 ﻿namespace SteganographyApp.Common.Arguments
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Text.Json;
 
     using SteganographyApp.Common.Injection;
-
-    public struct ReadWriteUtils
-    {
-        public IConsoleReader Reader { get; set; }
-
-        public IConsoleWriter Writer { get; set; }
-    }
 
     ///<summary>
     /// Singleton utility class to parse the provided array of arguments and return and instance of
@@ -19,9 +14,6 @@
     ///</summary>
     public sealed class ArgumentParser
     {
-        /// <summary>
-        /// The list of user providable arguments.
-        /// </summary>
         private readonly ImmutableList<Argument> arguments;
 
         private readonly SensitiveArgumentParser sensitiveArgumentParser;
@@ -83,6 +75,8 @@
         /// resulting argument/value pairings at the end of parsing all provided arguments are correct.</param>
         /// <returns>True if all the arguments provided were parsed and the validation was successful
         /// else returns false.</returns>
+        /// <exception cref="ArgumentParseException">Thrown if an exception ocurrs while parsing a given argument.
+        /// The cause of the exception will be set to the original exception causing the parsing failure.</exception>
         public bool TryParse(string[] args, out IInputArguments inputs, PostValidation validation)
         {
             try
@@ -98,28 +92,32 @@
             }
         }
 
-        /// <summary>
-        /// Attempts to lookup an Argument instance from the list of arguments.
-        /// <para>The key value to lookup from can either be the regular argument name or
-        /// the arguments short name.</para>
-        /// </summary>
-        /// <param name="key">The name of the argument to find. This can either be the arguments name or the
-        /// arguments short name</param>
-        /// <param name="targetArgument">The Argument instance to be provided if found. If not found this value
-        /// will be null.</param>
-        /// <returns>True if the argument could be found else false.</returns>
         private bool TryGetArgument(string key, out Argument targetArgument)
         {
-            foreach (var argument in arguments)
+            var matchingArgument = arguments.Where(argument => argument.Name == key || argument.ShortName == key).FirstOrDefault();
+            targetArgument = matchingArgument;
+            return matchingArgument != null;
+        }
+
+        private ImmutableList<(Argument, string)> MatchAllArguments(string[] userArguments)
+        {
+            var identifiedArguments = new List<(Argument, string)>();
+            for (int i = 0; i < userArguments.Length; i++)
             {
-                if (argument.Name == key || argument.ShortName == key)
+                if (!TryGetArgument(userArguments[i], out Argument argument))
                 {
-                    targetArgument = argument;
-                    return true;
+                    throw new ArgumentParseException($"An unrecognized argument was provided: {userArguments[i]}");
+                }
+
+                string inputValue = GetRawArgumentValue(argument, userArguments, i);
+                identifiedArguments.Add((argument, inputValue));
+
+                if (!argument.IsFlag)
+                {
+                    i++;
                 }
             }
-            targetArgument = null;
-            return false;
+            return identifiedArguments.ToImmutableList();
         }
 
         private IInputArguments DoTryParse(string[] userArguments, PostValidation postValidationMethod)
@@ -131,27 +129,14 @@
 
             var parsedArguments = new InputArguments();
 
-            for (int i = 0; i < userArguments.Length; i++)
+            foreach (var (argument, inputValue) in MatchAllArguments(userArguments))
             {
-                if (!TryGetArgument(userArguments[i], out Argument argument))
-                {
-                    throw new ArgumentParseException($"An unrecognized argument was provided: {userArguments[i]}");
-                }
-
                 if (sensitiveArgumentParser.IsSensitiveArgument(argument))
                 {
-                    sensitiveArgumentParser.CaptureArgument(argument, userArguments, i);
-                    i++;
+                    sensitiveArgumentParser.CaptureArgument(argument, inputValue);
                     continue;
                 }
-
-                string inputValue = GetRawArgumentValue(argument, userArguments, i);
                 ParseArgument(argument, parsedArguments, inputValue);
-
-                if (!argument.IsFlag)
-                {
-                    i++;
-                }
             }
 
             InvokePostValidation(postValidationMethod, parsedArguments);
@@ -165,10 +150,6 @@
             return parsedArguments.ToImmutable();
         }
 
-        /// <summary>
-        /// Retrieves the raw unparsed value that corresponds to a given argument from the set
-        /// of command line arguments passed to the program.
-        /// </summary>
         private string GetRawArgumentValue(Argument argument, string[] userArguments, int i)
         {
             if (argument.IsFlag)
@@ -185,11 +166,6 @@
             }
         }
 
-        /// <summary>
-        /// Invokes the custom post validation function.
-        /// <para>If the invocation returns a non-null or non-empty string then an ArgumentParseException
-        /// will be thrown.</para>
-        /// </summary>
         private void InvokePostValidation(PostValidation validation, InputArguments parsed)
         {
             try

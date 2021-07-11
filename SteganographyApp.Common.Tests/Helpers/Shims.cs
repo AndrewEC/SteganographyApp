@@ -81,19 +81,19 @@ namespace SteganographyApp.Common.Tests
     {
         public void Trace(string message, params object[] arguments) { }
 
-        public void Trace(string message, ArgumentProvider provider) { }
+        public void Trace(string message, Func<object[]> provider) { }
 
         public void Debug(string message, params object[] arguments) { }
 
-        public void Debug(string message, ArgumentProvider provider) { }
+        public void Debug(string message, Func<object[]> provider) { }
 
         public void Error(string message, params object[] arguments) { }
 
-        public void Error(string message, ArgumentProvider provider) { }
+        public void Error(string message, Func<object[]> provider) { }
 
         public void Log(LogLevel level, string message, params object[] arguments) { }
 
-        public void Log(LogLevel level, string message, ArgumentProvider provider) { }
+        public void Log(LogLevel level, string message, Func<object[]> provider) { }
     }
 
     internal class NullLoggerFactory : ILoggerFactory

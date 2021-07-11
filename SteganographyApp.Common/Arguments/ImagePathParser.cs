@@ -23,8 +23,6 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="arguments">The input arguments instance to make modifications to.</param>
         /// <param name="value">A string representation of a number, or a single, image where encoded
         /// data will be writted to or where decoded data will be read from.</param>
-        /// <exception cref="ArgumentValueException">Thrown if the image
-        /// could not be found at the specified path.</exception>
         public static void ParseImages(InputArguments arguments, string value)
         {
             var images = RetrieveImagePaths(value);

@@ -2,6 +2,8 @@ namespace SteganographyApp.Common.Arguments
 {
     using System;
 
+#pragma warning disable SA1402
+
     /// <summary>
     /// Specifies that an exception occured while trying to read and parse the command line arguments
     /// or that certain required arguments were not present.
@@ -32,4 +34,5 @@ namespace SteganographyApp.Common.Arguments
     {
         public ValidationException(string message, Exception inner) : base(message, inner) { }
     }
+#pragma warning restore SA1402
 }

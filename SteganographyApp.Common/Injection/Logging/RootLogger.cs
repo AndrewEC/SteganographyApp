@@ -33,11 +33,24 @@ namespace SteganographyApp.Common.Logging
             }
         }
 
-        public void Enable(LogLevel level)
+        /// <summary>
+        /// Attempts to open up the log file for write and use the specified log level to determine which incoming
+        /// messages should be logged.
+        /// <para>This method attempts to swallow all exceptions. If an exception ocurrs the log level will be set to None
+        /// and a message will be logged to console.</para>
+        /// </summary>
+        public void EnableLoggingAtLevel(LogLevel level)
         {
             logLevel = TryOpenLogFileForWrite() ? level : LogLevel.None;
         }
 
+        /// <summary>
+        /// Attempts to write the specified message to the log file.
+        /// </summary>
+        /// <param name="typeName">The name of the concrete type that is attempting to log this message.</param>
+        /// <param name="level">The level the message will be logged at.</param>
+        /// <param name="message">The message to log.</param>
+        /// <param name="arguments">The option array of arguments to substitute into the message value before logging.</param>
         public void LogToFile(string typeName, LogLevel level, string message, params object[] arguments)
         {
             if (!CanLog(level))
@@ -47,7 +60,18 @@ namespace SteganographyApp.Common.Logging
             LogToFile(FormLogMessage(typeName, level, message, arguments));
         }
 
-        public void LogToFile(string typeName, LogLevel level, string message, ArgumentProvider provider)
+        /// <summary>
+        /// Attempts to write the specified message to the log file.
+        /// It is recommended to use this when the operations for determining the arguments that need to be logged are
+        /// expensive.
+        /// </summary>
+        /// <param name="typeName">The name of the concrete type that is attempting to log this message.</param>
+        /// <param name="level">The level the message will be logged at.</param>
+        /// <param name="message">The message to log.</param>
+        /// <param name="provider">A producer function that takes in no arguments and will produce an array of arguments
+        /// that will be substituded into the message parameter before logging. This function will only be invoked after
+        /// it has been determined that the message should be logged based on the specified level.</param>
+        public void LogToFile(string typeName, LogLevel level, string message, Func<object[]> provider)
         {
             if (!CanLog(level))
             {

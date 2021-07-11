@@ -65,12 +65,7 @@ namespace SteganographyApp.Common.Injection
         {
             foreach (object instance in instances)
             {
-                var method = GetPostConstructMethod(instance);
-                if (method == null)
-                {
-                    continue;
-                }
-                method.Invoke(instance, new object[] { });
+                GetPostConstructMethod(instance)?.Invoke(instance, new object[] { });
             }
         }
 
@@ -106,12 +101,18 @@ namespace SteganographyApp.Common.Injection
             InvokePostConstructMethods(defaultInjectionValues.Values);
         }
 
+        /// <summary>
+        /// Proxy method that invokes the ILoggerFactory instance to return an ILogger instance
+        /// for the specified type T.
+        /// </summary>
+        /// <typeparam name="T">The type of the class that will make use of the logger instance being provided.</typeparam>
         public static ILogger LoggerFor<T>() => Provide<ILoggerFactory>().LoggerFor(typeof(T));
 
         /// <summary>
         /// Returns an instance from the dictionary of injectable values using the type of generic
         /// parameter T as the lookup key.
         /// </summary>
+        /// <typeparam name="T">The type of the injectable instance to be returned.</typeparam>
         public static T Provide<T>()
         {
             var type = typeof(T);
@@ -125,9 +126,10 @@ namespace SteganographyApp.Common.Injection
 
         /// <summary>
         /// Replaces or adds a provider in the injection providers dictionary using the
-        /// type of generic parameter T as the key and the provided instance as the value
-        /// return from the provider function.
+        /// type of generic parameter T as the key and the provided instance as the value.
         /// </summary>
+        /// <param name="instance">An instance that conforms to T to be provided whenever Provide is called
+        /// with type T as the type param.</param>
         public static void UseInstance<T>(T instance) => injectionValues[typeof(T)] = instance;
 
         /// <summary>
@@ -145,14 +147,18 @@ namespace SteganographyApp.Common.Injection
         /// <summary>
         /// Sets the onlyTestObjectsState flag to true. While true this will cause the Provide method to throw
         /// an exception if the object about to be provided is the same as the default injectable value loaded during
-        /// initialization. This is to help ensure that tests are done with mocks instances of injectables rather
-        /// than their real counterparts.
+        /// initialization. This is to help ensure that, when running unit tests, real implementations are not being
+        /// accidently provided making it easier to track where objects need to be mocked.
         /// </summary>
         public static void AllowOnlyMockObjects()
         {
             onlyTestObjectsState = true;
         }
 
+        /// <summary>
+        /// Sets the onlyTestObjectsState flag to false.
+        /// </summary>
+        /// <seealso cref="Injector.AllowOnlyMockObjects()"/>
         public static void AllowAnyObjects()
         {
             onlyTestObjectsState = false;
@@ -161,18 +167,4 @@ namespace SteganographyApp.Common.Injection
         private static bool IsProvidingNonMockObjectWhenInTestState(Type type) => onlyTestObjectsState
             && injectionValues[type] == defaultInjectionValues[type];
     }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class InjectableAttribute : Attribute
-    {
-        public InjectableAttribute(Type correlatesWith)
-        {
-            CorrelatesWith = correlatesWith;
-        }
-
-        public Type CorrelatesWith { get; private set; }
-    }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class PostConstructAttribute : Attribute { }
 }

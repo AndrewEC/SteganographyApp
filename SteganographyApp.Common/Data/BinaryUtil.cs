@@ -20,6 +20,7 @@ namespace SteganographyApp.Common.Data
         /// </summary>
         /// <param name="binary">The original string representation of a binary figure to
         /// convert to base64.</param>
+        /// <returns>The base64 representation of the input binary string.</returns>
         public string ToBase64String(string binary)
         {
             byte[] bytes = new byte[binary.Length / 8];
@@ -36,6 +37,7 @@ namespace SteganographyApp.Common.Data
         /// </summary>
         /// <param name="base64String">The base64 encoded string to convert to
         /// binary.</param>
+        /// <returns>A binary representation of the input base64 formatted string.</returns>
         public string ToBinaryString(string base64String)
         {
             byte[] converted = Convert.FromBase64String(base64String);

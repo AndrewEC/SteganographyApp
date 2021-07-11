@@ -36,20 +36,15 @@ namespace SteganographyApp.Common.Arguments
         /// Captures either of the password or random seed arguments so it can be
         /// interactively parsed after all other parsing and validation has occurred.
         /// </summary>
-        public void CaptureArgument(Argument argument, string[] userArguments, int argumentIndex)
+        public void CaptureArgument(Argument argument, string inputValue)
         {
-            if (argumentIndex + 1 >= userArguments.Length)
-            {
-                throw new ArgumentParseException($"Missing required value for ending argument: {userArguments[argumentIndex]}");
-            }
-
             if (argument.Name == PasswordName)
             {
-                password = (userArguments[argumentIndex + 1], argument);
+                password = (inputValue, argument);
             }
             else if (argument.Name == RandomSeedName)
             {
-                randomSeed = (userArguments[argumentIndex + 1], argument);
+                randomSeed = (inputValue, argument);
             }
         }
 
@@ -69,8 +64,6 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         /// <param name="arguments">The InputArguments instanced to fill with the parse random seed value.</param>
         /// <param name="value">The string representation of the random seed.</param>
-        /// <param name="readWriteUtils">The utilities containing the read and write for processing and
-        /// receiving user input.</param>
         public void ParseRandomSeed(InputArguments arguments, string value)
         {
             var seed = ReadUserInput(value, RandomSeedPrompt);
@@ -91,8 +84,6 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         /// <param name="arguments">The InputArguments instance to insert the password into.</param>
         /// <param name="value">The string representation of the password</param>
-        /// <param name="readWriteUtils">The utilities containing the read and write for processing and
-        /// receiving user input.</param>
         public void ParsePassword(InputArguments arguments, string value)
         {
             var password = ReadUserInput(value, PasswordPrompt);
@@ -132,8 +123,6 @@ namespace SteganographyApp.Common.Arguments
         /// input until the enter key has been pressed and return the result without presenting
         /// the resulting value on screen.</param>
         /// <param name="messagePrompt">The argument to prompt the user to enter.</param>
-        /// <param name="readWriteUtils">Contains the IReader instance required for receiving user
-        /// input for interactively entering the password or random seed fields.</param>
         /// <returns>Either the original value string value or the value of the user's input
         /// if the original value string value was a question mark.</returns>
         private string ReadUserInput(string value, string messagePrompt)
