@@ -1,18 +1,16 @@
-using NUnit.Framework;
-
-using SteganographyApp.Common.Arguments;
-
 namespace SteganographyApp.Common.Tests
 {
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
 
     [TestFixture]
     public class ChecksTests
     {
-
         [Test]
         public void TestChecksIsNullOrEmptyReturnsTrueOnEmptyAndNullStrings()
         {
-            Assert.IsTrue(Checks.IsNullOrEmpty(""));
+            Assert.IsTrue(Checks.IsNullOrEmpty(string.Empty));
             Assert.IsTrue(Checks.IsNullOrEmpty(null));
         }
 
@@ -66,7 +64,5 @@ namespace SteganographyApp.Common.Tests
             string[] args = new string[0];
             Assert.IsFalse(Checks.WasHelpRequested(args));
         }
-
     }
-
 }

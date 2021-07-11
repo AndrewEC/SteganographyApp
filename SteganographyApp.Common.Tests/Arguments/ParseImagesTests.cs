@@ -1,29 +1,22 @@
-using System.Collections.Immutable;
-
-using Moq;
-
-using NUnit.Framework;
-
-using SteganographyApp.Common.Injection;
-using SteganographyApp.Common.Arguments;
-
-using static Moq.Times;
-using static Moq.It;
-
 namespace SteganographyApp.Common.Tests
 {
+    using System.Collections.Immutable;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+
+    using static Moq.It;
+    using static Moq.Times;
 
     [TestFixture]
     public class ParseImagesTests : FixtureWithMockConsoleReaderAndWriter
     {
-
         [Mockup(typeof(IFileProvider))]
         public Mock<IFileProvider> mockFileProvider;
-
-        protected override void SetupMocks()
-        {
-            mockFileProvider.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(true);
-        }
 
         [Test]
         public void TestParseImagesWithValidSingleValue()
@@ -66,17 +59,20 @@ namespace SteganographyApp.Common.Tests
         {
             mockFileProvider.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(false);
 
-            string[] inputArgs = new string[] { "--images", "missing-image" };    
+            string[] inputArgs = new string[] { "--images", "missing-image" };
             var parser = new ArgumentParser();
             Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
 
             mockFileProvider.Verify(provider => provider.IsExistingFile("missing-image"), Once());
+    }
+
+        protected override void SetupMocks()
+        {
+            mockFileProvider.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(true);
         }
 
         private string NullReturningPostValidator(IInputArguments input) => null;
-
     }
-
 }

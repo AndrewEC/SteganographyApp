@@ -1,40 +1,21 @@
-using NUnit.Framework;
-
-using System.Collections.Generic;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Tests
 {
+    using System.Collections.Generic;
 
-    class MockWriter : IConsoleWriter
-    {
+    using NUnit.Framework;
 
-        public LinkedList<string> WriteValues { get; private set; } = new LinkedList<string>();
-        public LinkedList<string> WriteLineValues { get; private set; } = new LinkedList<string>();
-
-        public void Write(string line)
-        {
-            WriteValues.AddLast(line);
-        }
-
-        public void WriteLine(string line)
-        {
-            WriteLineValues.AddLast(line);
-        }
-
-    }
+    using SteganographyApp.Common.Injection;
 
     [TestFixture]
     public class ProgressTrackerTests : FixtureWithTestObjects
     {
-
-        private readonly int DesiredWriteCount = 10;
-        private readonly int DesiredWriteLineCount = 1;
-        private readonly string Message = "testing";
-        private readonly string CompleteMessage = "testing complete";
+        private static readonly int DesiredWriteCount = 10;
+        private static readonly int DesiredWriteLineCount = 1;
+        private static readonly string Message = "testing";
+        private static readonly string CompleteMessage = "testing complete";
 
         private MockWriter mockWriter;
+
         private ProgressTracker tracker;
 
         [SetUp]
@@ -43,15 +24,6 @@ namespace SteganographyApp.Common.Tests
             mockWriter = new MockWriter();
             Injector.UseInstance<IConsoleWriter>(mockWriter);
             tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage);
-        }
-
-        private void ExecuteUpdates(ProgressTracker tracker)
-        {
-            tracker.Display();
-            for (int i = 0; i < DesiredWriteCount; i++)
-            {
-                tracker.UpdateAndDisplayProgress();
-            }
         }
 
         [Test]
@@ -79,6 +51,30 @@ namespace SteganographyApp.Common.Tests
             }
         }
 
+        private void ExecuteUpdates(ProgressTracker tracker)
+        {
+            tracker.Display();
+            for (int i = 0; i < DesiredWriteCount; i++)
+            {
+                tracker.UpdateAndDisplayProgress();
+            }
+        }
     }
 
+    internal class MockWriter : IConsoleWriter
+    {
+        public LinkedList<string> WriteValues { get; private set; } = new LinkedList<string>();
+
+        public LinkedList<string> WriteLineValues { get; private set; } = new LinkedList<string>();
+
+        public void Write(string line)
+        {
+            WriteValues.AddLast(line);
+        }
+
+        public void WriteLine(string line)
+        {
+            WriteLineValues.AddLast(line);
+        }
+    }
 }

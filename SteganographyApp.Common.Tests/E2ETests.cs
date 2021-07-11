@@ -1,18 +1,17 @@
-﻿using NUnit.Framework;
-
-using System.IO;
-using System.Collections.Immutable;
-
-using SteganographyApp.Common.IO;
-using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Arguments;
-
-namespace SteganographyApp.Common.Tests
+﻿namespace SteganographyApp.Common.Tests
 {
+    using System.Collections.Immutable;
+    using System.IO;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.IO;
+
     [TestFixture]
     public class E2ETests : FixtureWithRealObjects
     {
-
         private InputArguments args;
         private ImageStore imageStore;
         private ImageStore.ImageStoreWrapper wrapper;
@@ -30,7 +29,7 @@ namespace SteganographyApp.Common.Tests
                 Password = "testing",
                 UseCompression = true,
                 DummyCount = 3,
-                RandomSeed = "random-seed"
+                RandomSeed = "random-seed",
             };
             imageStore = new ImageStore(args);
             wrapper = imageStore.CreateIOWrapper();
@@ -43,7 +42,7 @@ namespace SteganographyApp.Common.Tests
 
             imageStore.CleanImageLSBs();
             wrapper.ResetToImage(0);
-            if(File.Exists(args.DecodedOutputFile))
+            if (File.Exists(args.DecodedOutputFile))
             {
                 File.Delete(args.DecodedOutputFile);
             }
@@ -52,13 +51,13 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestFullWriteReadHappyPath()
         {
-            string content = "";
+            string content = string.Empty;
             var table = new int[1];
             using (wrapper)
             {
                 int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
                 wrapper.SeekToPixel(requiredBitsForTable);
-                using(var reader = new ContentReader(args))
+                using (var reader = new ContentReader(args))
                 {
                     content = reader.ReadContentChunkFromFile();
                     int written = wrapper.WriteContentChunkToImage(content);
@@ -73,7 +72,7 @@ namespace SteganographyApp.Common.Tests
 
             wrapper.ResetToImage(0);
             var readTable = imageStore.ReadContentChunkTable();
-            using(var writer = new ContentWriter(args))
+            using (var writer = new ContentWriter(args))
             {
                 string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
                 Assert.AreEqual(content, binary);
@@ -88,9 +87,10 @@ namespace SteganographyApp.Common.Tests
         public void TestPasswordMismatchError()
         {
             // writing file content to image
-            string content = "";
+            string content = string.Empty;
             var table = new int[1];
-            using(wrapper){
+            using (wrapper)
+            {
                 int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
                 wrapper.SeekToPixel(requiredBitsForTable);
                 using (var reader = new ContentReader(args))
@@ -122,10 +122,11 @@ namespace SteganographyApp.Common.Tests
         {
             // writing file content to image
             var table = new int[1];
-            using(wrapper) {
+            using (wrapper)
+            {
                 int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
                 wrapper.SeekToPixel(requiredBitsForTable);
-                string content = "";
+                string content = string.Empty;
                 using (var reader = new ContentReader(args))
                 {
                     content = reader.ReadContentChunkFromFile();
@@ -155,8 +156,9 @@ namespace SteganographyApp.Common.Tests
         {
             // writing file content to image
             var table = new int[1];
-            string content = "";
-            using(wrapper){
+            string content = string.Empty;
+            using (wrapper)
+            {
                 int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
                 wrapper.SeekToPixel(requiredBitsForTable);
                 using (var reader = new ContentReader(args))
@@ -187,14 +189,14 @@ namespace SteganographyApp.Common.Tests
             Assert.AreNotEqual(target, actual);
         }
 
-
         [Test]
         public void TestRandomSeedMissmatchProducesCompressionException()
         {
             // writing file content to image
-            string content = "";
+            string content = string.Empty;
             var table = new int[1];
-            using(wrapper){
+            using (wrapper)
+            {
                 int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
                 wrapper.SeekToPixel(requiredBitsForTable);
                 using (var reader = new ContentReader(args))
@@ -211,7 +213,7 @@ namespace SteganographyApp.Common.Tests
             GlobalCounter.Instance.Reset();
 
             // reading file content from image
-            args.RandomSeed = "";
+            args.RandomSeed = string.Empty;
             wrapper.ResetToImage(0);
             var readTable = imageStore.ReadContentChunkTable();
             using (var writer = new ContentWriter(args))
@@ -219,6 +221,5 @@ namespace SteganographyApp.Common.Tests
                 Assert.Throws<ImageProcessingException>(() => wrapper.ReadContentChunkFromImage(readTable[0]));
             }
         }
-
     }
 }

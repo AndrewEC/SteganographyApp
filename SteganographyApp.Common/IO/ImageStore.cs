@@ -1,14 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-
-using SixLabors.ImageSharp.PixelFormats;
-
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Injection;
-
-namespace SteganographyApp.Common.IO
+﻿namespace SteganographyApp.Common.IO
 {
+    using System;
+    using System.Text;
+
+    using SixLabors.ImageSharp.PixelFormats;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
 
     /// <summary>
     /// Class that handles positioning a make shift write stream in the proper position so
@@ -16,55 +14,41 @@ namespace SteganographyApp.Common.IO
     /// </summary>
     public class ImageStore
     {
+        /// <summary>
+        /// Stores the current x and y position for the current read/write operation.
+        /// </summary>
+        private readonly PixelPosition pixelPosition = new PixelPosition();
 
         /// <summary>
-        /// A wrapper class that exposes the IO related methods of an ImageStore instance while implementing
-        /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
-        /// more error prone IO operations.
+        /// The values parsed from the command line arguments.
         /// </summary>
-        public class ImageStoreWrapper : IDisposable
+        private readonly IInputArguments args;
+
+        private readonly ILogger log;
+
+        /// <summary>
+        /// The index used to determine which image will be read/written to in the
+        /// next read/write operation.
+        /// <para>The image name is retrieved by looking up the args.CoverImage value
+        /// using this field as the index.</para>
+        /// </summary>
+        private int currentImageIndex = -1;
+
+        /// <summary>
+        /// The currently loaded image. The image is loaded whenever the Next
+        /// method is called and the currentImageIndex has been incremented.
+        /// </summary>
+        private IBasicImageInfo currentImage;
+
+        /// <summary>
+        /// Creates a new instance of the ImageStore and calculates the RequiredContentChunkTableBitSize
+        /// value.
+        /// </summary>
+        /// <param name="args">The values parsed from the command line arguments.</param>
+        public ImageStore(IInputArguments args)
         {
-
-            private readonly ImageStore store;
-
-            private bool save = false;
-
-            public ImageStoreWrapper(ImageStore store)
-            {
-                this.store = store;
-                store.LoadNextImage();
-            }
-
-            public void EncodeComplete()
-            {
-                save = true;
-            }
-
-            public int WriteContentChunkToImage(string binary)
-            {
-                return store.WriteBinaryString(binary);
-            }
-
-            public string ReadContentChunkFromImage(int length)
-            {
-                return store.ReadBinaryString(length);
-            }
-
-            public void SeekToPixel(int bitsToSkip)
-            {
-                store.SeekToPixel(bitsToSkip);
-            }
-
-            public void ResetToImage(int index)
-            {
-                store.ResetToImage(index);
-            }
-
-            public void Dispose()
-            {
-                store.CloseOpenImage(save);
-                store.ResetToImage(0);
-            }
+            this.args = args;
+            log = Injector.LoggerFor<ImageStore>();
         }
 
         /// <summary>
@@ -82,30 +66,6 @@ namespace SteganographyApp.Common.IO
         public event EventHandler<NextImageLoadedEventArgs> OnNextImageLoaded;
 
         /// <summary>
-        /// Stores the current x and y position for the current read/write operation.
-        /// </summary>
-        private readonly PixelPosition pixelPosition = new PixelPosition();
-
-        /// <summary>
-        /// The index used to determine which image will be read/written to in the
-        /// next read/write operation.
-        /// <para>The image name is retrieved by looking up the args.CoverImage value
-        /// using this field as the index.</para>
-        /// </summary>
-        private int currentImageIndex = -1;
-
-        /// <summary>
-        /// The currently loaded image. The image is loaded whenever the Next
-        /// method is called and the currentImageIndex has been incremented.
-        /// </summary>
-        private IBasicImageInfo currentImage;
-
-        /// <summary>
-        /// The values parsed from the command line arguments.
-        /// </summary>
-        private readonly IInputArguments args;
-
-        /// <summary>
         /// Readonly property that returns the name of the current image being used in the write
         /// process.
         /// </summary>
@@ -117,19 +77,6 @@ namespace SteganographyApp.Common.IO
             }
         }
 
-        private readonly ILogger log;
-
-        /// <summary>
-        /// Creates a new instance of the ImageStore and calculates the RequiredContentChunkTableBitSize
-        /// value.
-        /// </summary>
-        /// <param name="args">The values parsed from the command line arguments.</param>
-        public ImageStore(IInputArguments args)
-        {
-            this.args = args;
-            log = Injector.LoggerFor<ImageStore>();
-        }
-
         /// <summary>
         /// Utility method to create an <see cref="ImageStoreWrapper"/> instance to be used in conjunction with the
         /// read and write methods.
@@ -138,10 +85,7 @@ namespace SteganographyApp.Common.IO
         /// will be properly disposed.</para>
         /// </summary>
         /// <returns>A new ImageStoreWrapper instance.</returns>
-        public ImageStoreWrapper CreateIOWrapper()
-        {
-            return new ImageStoreWrapper(this);
-        }
+        public ImageStoreWrapper CreateIOWrapper() => new ImageStoreWrapper(this);
 
         /// <summary>
         /// Will look over all images specified in the InputArguments
@@ -187,142 +131,6 @@ namespace SteganographyApp.Common.IO
         }
 
         /// <summary>
-        /// Provides a consumable function that uses the standard Random class to generate
-        /// a random int value of either 0 or 1.
-        /// </summary>
-        private Func<int> RandomBitGenerator()
-        {
-            var random = new Random();
-            return () => (int) Math.Round(random.NextDouble());
-        }
-
-        /// <summary>
-        /// Writes a binary string value to the current image, starting
-        /// at the last write index, by replacing the LSB of each RGB value in each pixel.
-        /// <para>If the current image does not have enough storage space to store the binary
-        /// string in full then the Next method will be invoked and it will continue to write
-        /// on the next available image.</para>
-        /// </summary>
-        /// <param name="binary">The encypted binary string to write to the image.</param>
-        /// <returns>The number of bits written to the image. This is mostly important when
-        /// writing the content chunk table to the start of the leading image.</returns>
-        /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        private int WriteBinaryString(string binary)
-        {
-            log.Debug("Writing [{0}] bits to image [{1}]", binary.Length, CurrentImage);
-            int written = 0;
-            for (int i = 0; i < binary.Length; i += 3)
-            {
-                Rgba32 pixel = currentImage[pixelPosition.X, pixelPosition.Y];
-
-                pixel.R = ShiftColourChannelByBinary(pixel.R, binary[i]);
-                written++;
-
-                if (written < binary.Length)
-                {
-                    pixel.G = ShiftColourChannelByBinary(pixel.G, binary[i + 1]);
-                    written++;
-
-                    if (written < binary.Length)
-                    {
-                        pixel.B = ShiftColourChannelByBinary(pixel.B, binary[i + 2]);
-                        written++;
-                    }
-                }
-
-                currentImage[pixelPosition.X, pixelPosition.Y] = new Rgba32(
-                        pixel.R,
-                        pixel.G,
-                        pixel.B,
-                        pixel.A
-                    );
-
-                if (!TryMoveToNextPixel())
-                {
-                    LoadNextImage(true);
-                }
-            }
-            OnChunkWritten?.Invoke(this, new ChunkWrittenArgs { ChunkLength = written });
-            return written;
-        }
-
-        /// <summary>
-        /// Performs the appropriate bitwise and/or operation to the provided
-        /// byte value of the pixel colour channel to change its least significatnt
-        /// bit to be the same as the value specified by the lastBit argument.
-        /// <param name="colourChannel">The byte value representing either the
-        /// red, green, or blue channel of a pixel.</param>
-        /// <param name="lastBit">Specifies the value that the colourChannel's
-        /// least significant bit should be changed to.</param>
-        /// </summary>
-        private byte ShiftColourChannel(byte colourChannel, int lastBit)
-        {
-            return (lastBit == 0)
-                ? (byte) (colourChannel & ~1)
-                : (byte) (colourChannel | 1);
-        }
-
-        /// <summary>
-        /// Performs the appropriate bitwise and/or operation to the provided
-        /// byte value of the pixel colour channel to change its least significatnt
-        /// bit to be the same as the value specified by the lastBit argument.
-        /// <param name="colourChannel">The byte value representing either the
-        /// red, green, or blue channel of a pixel.</param>
-        /// <param name="lastBit">Specifies the value that the colourChannel's
-        /// least significant bit should be changed to.</param>
-        /// </summary>
-        private byte ShiftColourChannelByBinary(byte colourChannel, char lastBit)
-        {
-            int intLastBit = (lastBit == '0') ? 0 : 1;
-            return ShiftColourChannel(colourChannel, intLastBit);
-        }
-
-        /// <summary>
-        /// Attempts to read the specified number of bits from the current image starting
-        /// at the last read/write position.
-        /// <para>If there is not enough available space in the current image then it will
-        /// invoke the Next method and continue to read from the next available image.</para>
-        /// </summary>
-        /// <param name="bitsToRead">Specifies the number of bits to be read from the current image.</param>
-        /// <returns>A binary string whose length is equal to the length specified in the length
-        /// parameter.</returns>
-        /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        private string ReadBinaryString(int bitsToRead)
-        {
-            log.Debug("Reading [{0}] bits from image [{1}]", bitsToRead, CurrentImage);
-            var binary = new StringBuilder();
-            int bitsRead = 0;
-            while (bitsRead < bitsToRead)
-            {
-                Rgba32 pixel = currentImage[pixelPosition.X, pixelPosition.Y];
-
-                string redBit = Convert.ToString(pixel.R, 2);
-                binary.Append(redBit.Substring(redBit.Length - 1));
-                bitsRead++;
-
-                if (bitsRead < bitsToRead)
-                {
-                    string greenBit = Convert.ToString(pixel.G, 2);
-                    binary.Append(greenBit.Substring(greenBit.Length - 1));
-                    bitsRead++;
-
-                    if (bitsRead < bitsToRead)
-                    {
-                        string blueBit = Convert.ToString(pixel.B, 2);
-                        binary.Append(blueBit.Substring(blueBit.Length - 1));
-                        bitsRead++;
-                    }
-                }
-
-                if (!TryMoveToNextPixel())
-                {
-                    LoadNextImage();
-                }
-            }
-            return binary.ToString();
-        }
-
-        /// <summary>
         /// Reads the content chunk table from the current image and returns each
         /// content entry except for the first meta entry as a list of ints.
         /// <para>Each values in the list specifies the number of bits that make
@@ -337,7 +145,6 @@ namespace SteganographyApp.Common.IO
             log.Trace("Reading content chunk table");
             try
             {
-
                 // The first 32 bits of the table represent the number of chunk lengths
                 // contained within the table.
                 int chunkCount = Convert.ToInt32(ReadBinaryString(Calculator.ChunkDefinitionBitSize), 2);
@@ -396,6 +203,134 @@ namespace SteganographyApp.Common.IO
         }
 
         /// <summary>
+        /// Provides a consumable function that uses the standard Random class to generate
+        /// a random int value of either 0 or 1.
+        /// </summary>
+        private Func<int> RandomBitGenerator()
+        {
+            var random = new Random();
+            return () => (int)Math.Round(random.NextDouble());
+        }
+
+        /// <summary>
+        /// Writes a binary string value to the current image, starting
+        /// at the last write index, by replacing the LSB of each RGB value in each pixel.
+        /// <para>If the current image does not have enough storage space to store the binary
+        /// string in full then the Next method will be invoked and it will continue to write
+        /// on the next available image.</para>
+        /// </summary>
+        /// <param name="binary">The encypted binary string to write to the image.</param>
+        /// <returns>The number of bits written to the image. This is mostly important when
+        /// writing the content chunk table to the start of the leading image.</returns>
+        /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
+        private int WriteBinaryString(string binary)
+        {
+            log.Debug("Writing [{0}] bits to image [{1}]", binary.Length, CurrentImage);
+            int written = 0;
+            for (int i = 0; i < binary.Length; i += 3)
+            {
+                Rgba32 pixel = currentImage[pixelPosition.X, pixelPosition.Y];
+
+                pixel.R = ShiftColourChannelByBinary(pixel.R, binary[i]);
+                written++;
+
+                if (written < binary.Length)
+                {
+                    pixel.G = ShiftColourChannelByBinary(pixel.G, binary[i + 1]);
+                    written++;
+
+                    if (written < binary.Length)
+                    {
+                        pixel.B = ShiftColourChannelByBinary(pixel.B, binary[i + 2]);
+                        written++;
+                    }
+                }
+
+                currentImage[pixelPosition.X, pixelPosition.Y] = new Rgba32(pixel.R, pixel.G, pixel.B, pixel.A);
+
+                if (!TryMoveToNextPixel())
+                {
+                    LoadNextImage(true);
+                }
+            }
+            OnChunkWritten?.Invoke(this, new ChunkWrittenArgs { ChunkLength = written });
+            return written;
+        }
+
+        /// <summary>
+        /// Performs the appropriate bitwise and/or operation to the provided
+        /// byte value of the pixel colour channel to change its least significatnt
+        /// bit to be the same as the value specified by the lastBit argument.
+        /// <param name="colourChannel">The byte value representing either the
+        /// red, green, or blue channel of a pixel.</param>
+        /// <param name="lastBit">Specifies the value that the colourChannel's
+        /// least significant bit should be changed to.</param>
+        /// </summary>
+        private byte ShiftColourChannel(byte colourChannel, int lastBit) => (lastBit == 0)
+            ? (byte)(colourChannel & ~1)
+            : (byte)(colourChannel | 1);
+
+        /// <summary>
+        /// Performs the appropriate bitwise and/or operation to the provided
+        /// byte value of the pixel colour channel to change its least significatnt
+        /// bit to be the same as the value specified by the lastBit argument.
+        /// <param name="colourChannel">The byte value representing either the
+        /// red, green, or blue channel of a pixel.</param>
+        /// <param name="lastBit">Specifies the value that the colourChannel's
+        /// least significant bit should be changed to.</param>
+        /// </summary>
+        private byte ShiftColourChannelByBinary(byte colourChannel, char lastBit)
+        {
+            int intLastBit = (lastBit == '0') ? 0 : 1;
+            return ShiftColourChannel(colourChannel, intLastBit);
+        }
+
+        /// <summary>
+        /// Attempts to read the specified number of bits from the current image starting
+        /// at the last read/write position.
+        /// <para>If there is not enough available space in the current image then it will
+        /// invoke the Next method and continue to read from the next available image.</para>
+        /// </summary>
+        /// <param name="bitsToRead">Specifies the number of bits to be read from the current image.</param>
+        /// <returns>A binary string whose length is equal to the length specified in the length
+        /// parameter.</returns>
+        /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
+        private string ReadBinaryString(int bitsToRead)
+        {
+            log.Debug("Reading [{0}] bits from image [{1}] starting from position [{2}]", bitsToRead, CurrentImage, pixelPosition.ToString());
+            var binary = new StringBuilder();
+            int bitsRead = 0;
+            while (bitsRead < bitsToRead)
+            {
+                Rgba32 pixel = currentImage[pixelPosition.X, pixelPosition.Y];
+
+                string redBit = Convert.ToString(pixel.R, 2);
+                binary.Append(redBit.Substring(redBit.Length - 1));
+                bitsRead++;
+
+                if (bitsRead < bitsToRead)
+                {
+                    string greenBit = Convert.ToString(pixel.G, 2);
+                    binary.Append(greenBit.Substring(greenBit.Length - 1));
+                    bitsRead++;
+
+                    if (bitsRead < bitsToRead)
+                    {
+                        string blueBit = Convert.ToString(pixel.B, 2);
+                        binary.Append(blueBit.Substring(blueBit.Length - 1));
+                        bitsRead++;
+                    }
+                }
+
+                if (!TryMoveToNextPixel())
+                {
+                    LoadNextImage();
+                }
+            }
+            return binary.ToString();
+        }
+
+        /// <summary>
         /// Attempts to save then dispose of the currently opened image, if the currentImage property
         /// is not null, resets the read/write x and y positions to 0, increments the current image index,
         /// loads the new image, and invokes the OnNextImageLoaded event.
@@ -416,14 +351,13 @@ namespace SteganographyApp.Common.IO
                 throw new ImageProcessingException("There is not enough available storage space in the provided images to continue.");
             }
 
-            string imagePath = CurrentImage;
-            currentImage = Injector.Provide<IImageProvider>().LoadImage(imagePath);
-            log.Debug("Loaded image [{0}]", imagePath);
+            currentImage = Injector.Provide<IImageProvider>().LoadImage(CurrentImage);
+            log.Debug("Loaded image [{0}]", CurrentImage);
 
             OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
             {
                 ImageIndex = currentImageIndex,
-                ImageName = imagePath
+                ImageName = CurrentImage,
             });
         }
 
@@ -440,7 +374,7 @@ namespace SteganographyApp.Common.IO
             log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage);
             pixelPosition.Reset();
 
-            int pixelIndex = (int) Math.Ceiling((double) bitsToSkip / (double) Calculator.BitsPerPixel);
+            int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (double)Calculator.BitsPerPixel);
             for (int i = 0; i < pixelIndex; i++)
             {
                 if (!TryMoveToNextPixel())
@@ -485,6 +419,42 @@ namespace SteganographyApp.Common.IO
                 currentImage = null;
             }
         }
-    }
 
+        /// <summary>
+        /// A wrapper class that exposes the IO related methods of an ImageStore instance while implementing
+        /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
+        /// more error prone IO operations.
+        /// </summary>
+        public class ImageStoreWrapper : IDisposable
+        {
+            private readonly ImageStore store;
+
+            private bool save = false;
+
+            public ImageStoreWrapper(ImageStore store)
+            {
+                this.store = store;
+                store.LoadNextImage();
+            }
+
+            public void EncodeComplete()
+            {
+                save = true;
+            }
+
+            public int WriteContentChunkToImage(string binary) => store.WriteBinaryString(binary);
+
+            public string ReadContentChunkFromImage(int length) => store.ReadBinaryString(length);
+
+            public void SeekToPixel(int bitsToSkip) => store.SeekToPixel(bitsToSkip);
+
+            public void ResetToImage(int index) => store.ResetToImage(index);
+
+            public void Dispose()
+            {
+                store.CloseOpenImage(save);
+                store.ResetToImage(0);
+            }
+        }
+    }
 }

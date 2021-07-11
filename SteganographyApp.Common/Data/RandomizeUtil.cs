@@ -1,21 +1,20 @@
-using System;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Data
 {
+    using System;
+
+    using SteganographyApp.Common.Injection;
 
     public interface IRandomizeUtil
     {
         string RandomizeBinaryString(string binaryString, string randomSeed);
+
         string ReorderBinaryString(string binaryString, string randomSeed);
     }
 
     [Injectable(typeof(IRandomizeUtil))]
     public class RandomizeUtil : IRandomizeUtil
     {
-
-        private static readonly int RandomizeGenerationsModifier = 7;
+        private static readonly int RandomizeIterationsModifier = 7;
 
         private ILogger log;
 
@@ -32,24 +31,29 @@ namespace SteganographyApp.Common.Data
         /// <returns>A randomized binary string.</returns>
         public string RandomizeBinaryString(string binaryString, string randomSeed)
         {
-            log.Debug("Randomizing binary string using seed [{0}]", randomSeed);
             char[] characters = binaryString.ToCharArray();
 
             var generator = IndexGenerator.FromString(randomSeed);
 
-            int generations = characters.Length * RandomizeGenerationsModifier;
-            for (int i = 0; i < generations; i++)
+            int iterations = characters.Length * RandomizeIterationsModifier;
+
+            log.Debug("Randomizing binary string using seed [{0}] over [{1}] iterations", randomSeed, iterations);
+
+            for (int i = 0; i < iterations; i++)
             {
                 int first = generator.Next(characters.Length - 1);
                 int second = generator.Next(characters.Length - 1);
-                if(first != second)
+                if (first != second)
                 {
                     char temp = characters[first];
                     characters[first] = characters[second];
                     characters[second] = temp;
                 }
             }
-            return new string(characters);
+
+            string randomized = new string(characters);
+            LogDegreeOfSimilarity(randomized, binaryString);
+            return randomized;
         }
 
         /// <summary>
@@ -59,19 +63,21 @@ namespace SteganographyApp.Common.Data
         /// <returns>A non-randomized array of bytes matching the original input file.</returns>
         public string ReorderBinaryString(string binaryString, string randomSeed)
         {
-            log.Debug("Reordering binary string using seed [{0}]", randomSeed);
             char[] characters = binaryString.ToCharArray();
             var generator = IndexGenerator.FromString(randomSeed);
 
-            int generations = characters.Length * RandomizeGenerationsModifier;
-            var pairs = new ValueTuple<int, int>[generations];
-            for(int i = generations - 1; i >= 0; i--)
+            int iterations = characters.Length * RandomizeIterationsModifier;
+
+            log.Debug("Randomizing binary string using seed [{0}] over [{1}] iterations", randomSeed, iterations);
+
+            var pairs = new ValueTuple<int, int>[iterations];
+            for (int i = iterations - 1; i >= 0; i--)
             {
                 int first = generator.Next(characters.Length - 1);
                 int second = generator.Next(characters.Length - 1);
                 pairs[i] = (first, second);
             }
-            foreach((int first, int second) in pairs)
+            foreach ((int first, int second) in pairs)
             {
                 char temp = characters[first];
                 characters[first] = characters[second];
@@ -80,6 +86,26 @@ namespace SteganographyApp.Common.Data
             return new string(characters);
         }
 
+        private void LogDegreeOfSimilarity(string newString, string originalString)
+        {
+            log.Debug("After randomizing [{0}] input bits, [{1}] have changed leading to a [{2}]% similarity", () =>
+            {
+                int characterCount = newString.Length;
+                int similar = 0;
+                for (int i = 0; i < characterCount; i++)
+                {
+                    if (newString[i] == originalString[i])
+                    {
+                        similar++;
+                    }
+                }
+                return new object[]
+                {
+                    characterCount,
+                    characterCount - similar,
+                    ((double)similar / (double)characterCount) * 100.0,
+                };
+            });
+        }
     }
-
 }

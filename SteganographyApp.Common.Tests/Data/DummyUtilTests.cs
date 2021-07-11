@@ -1,14 +1,12 @@
-using NUnit.Framework;
-
-using SteganographyApp.Common.Data;
-
 namespace SteganographyApp.Common.Tests
 {
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Data;
 
     [TestFixture]
     public class DummyUtilTests : FixtureWithLogger
     {
-
         private static readonly string OriginalBinaryString = "1101010101000011101011111000000010101010100";
         private static readonly int NumberOfDummies = 10;
         private static readonly int IncorrectNumberOfDummies = 3;
@@ -81,7 +79,5 @@ namespace SteganographyApp.Common.Tests
 
             Assert.AreNotEqual(insertedOnce, insertedTwice);
         }
-
     }
-
 }

@@ -1,17 +1,17 @@
-using System;
-using System.Text;
-using System.Linq;
-
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Injection;
-using SteganographyApp.Common.Data;
-
 namespace SteganographyApp.Common.IO
 {
+    using System;
+    using System.Linq;
+    using System.Text;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.Injection;
 
     public interface IChunkTableHelper
     {
         string ConvertChunkTableToBinary(int[] chunkLengths, string randomSeed);
+
         int[] ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed);
     }
 
@@ -21,7 +21,6 @@ namespace SteganographyApp.Common.IO
     [Injectable(typeof(IChunkTableHelper))]
     public class ChunkTableHelper : IChunkTableHelper
     {
-
         private ILogger log;
 
         [PostConstruct]
@@ -47,6 +46,7 @@ namespace SteganographyApp.Common.IO
             }
 
             var binaryString = binary.ToString();
+
             if (!Checks.IsNullOrEmpty(randomSeed))
             {
                 binaryString = Injector.Provide<IRandomizeUtil>().RandomizeBinaryString(binaryString, randomSeed);
@@ -72,21 +72,15 @@ namespace SteganographyApp.Common.IO
             }
 
             return Enumerable.Range(0, chunkCount)
-                .Select(i => binaryString.Substring(i * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSize))
+                .Select(i => NextBinaryChunk(i, binaryString))
                 .Select(BinaryStringToInt)
                 .ToArray();
         }
 
-        private int BinaryStringToInt(string binary)
-        {
-            return Convert.ToInt32(binary, 2);
-        }
+        private string NextBinaryChunk(int index, string binaryString) => binaryString.Substring(index * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSize);
 
-        private string To33BitBinaryString(int value)
-        {
-            return Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSize, '0') + "0";
-        }
+        private int BinaryStringToInt(string binary) => Convert.ToInt32(binary, 2);
 
+        private string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSize, '0') + "0";
     }
-
 }

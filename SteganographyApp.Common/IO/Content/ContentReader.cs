@@ -1,11 +1,10 @@
-﻿using System;
-
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
-
-namespace SteganographyApp.Common.IO
+﻿namespace SteganographyApp.Common.IO
 {
+    using System;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.Injection;
 
     /// <summary>
     /// Stream encapsulation class that reads and encodes data
@@ -13,7 +12,6 @@ namespace SteganographyApp.Common.IO
     /// </summary>
     public sealed class ContentReader : AbstractContentIO
     {
-
         /// <summary>
         /// Creates a new instance of the ContentReader.
         /// </summary>
@@ -29,25 +27,24 @@ namespace SteganographyApp.Common.IO
         /// <returns>A binary string representation of the next availabe ChunkByteSize from the input file.</returns>
         public string ReadContentChunkFromFile()
         {
-            if (stream == null)
+            if (Stream == null)
             {
-                stream = Injector.Provide<IFileProvider>().OpenFileForRead(args.FileToEncode);
+                Stream = Injector.Provide<IFileProvider>().OpenFileForRead(Args.FileToEncode);
             }
-            byte[] buffer = new byte[args.ChunkByteSize];
-            int read = stream.Read(buffer, 0, buffer.Length);
+            byte[] buffer = new byte[Args.ChunkByteSize];
+            int read = Stream.Read(buffer, 0, buffer.Length);
             if (read == 0)
             {
                 return null;
             }
-            else if (read < args.ChunkByteSize)
+            else if (read < Args.ChunkByteSize)
             {
                 byte[] actual = new byte[read];
                 Array.Copy(buffer, actual, read);
                 buffer = actual;
             }
 
-            return Injector.Provide<IDataEncoderUtil>().Encode(buffer, args.Password, args.UseCompression, args.DummyCount, args.RandomSeed);
+            return Injector.Provide<IDataEncoderUtil>().Encode(buffer, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed);
         }
-
     }
 }

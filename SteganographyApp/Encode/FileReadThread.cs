@@ -1,23 +1,21 @@
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.IO;
-using SteganographyApp.Common;
-using SteganographyApp.Common.Injection;
-
-using System;
-using System.Threading;
-using System.Collections.Concurrent;
-
 namespace SteganographyApp.Encode
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Threading;
+
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.IO;
 
     /// <summary>
     /// Handles reading in and encoding data from a source file and adding it
     /// to the queue so it can be consumed by the encoder and written to the
     /// destination images.
     /// </summary>
-    class FileReadThread
+    internal class FileReadThread
     {
-
         private readonly BlockingCollection<ReadArgs> queue;
         private readonly IInputArguments arguments;
         private readonly ErrorContainer errorContainer;
@@ -46,6 +44,17 @@ namespace SteganographyApp.Encode
             readThread.Start();
         }
 
+        public void Join()
+        {
+            try
+            {
+                readThread.Join();
+            }
+            catch
+            {
+            }
+        }
+
         /// <summary>
         /// Starts reading data from the source file, encoding it, then adding it to the
         /// message queue.
@@ -58,8 +67,8 @@ namespace SteganographyApp.Encode
             {
                 try
                 {
-                    string contentChunk = "";
-                    while((contentChunk = reader.ReadContentChunkFromFile()) != null)
+                    string contentChunk = string.Empty;
+                    while ((contentChunk = reader.ReadContentChunkFromFile()) != null)
                     {
                         if (errorContainer.HasException())
                         {
@@ -76,18 +85,5 @@ namespace SteganographyApp.Encode
                 }
             }
         }
-
-        public void Join()
-        {
-            try
-            {
-                readThread.Join();
-            }
-            catch
-            {
-            }
-        }
-
     }
-
 }

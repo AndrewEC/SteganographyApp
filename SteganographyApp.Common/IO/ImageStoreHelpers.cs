@@ -1,7 +1,6 @@
-using System;
-
 namespace SteganographyApp.Common.IO
 {
+    using System;
 
     /// <summary>
     /// A general exception to represent a specific error occured
@@ -10,6 +9,7 @@ namespace SteganographyApp.Common.IO
     public class ImageProcessingException : Exception
     {
         public ImageProcessingException(string message) : base(message) { }
+
         public ImageProcessingException(string message, Exception inner) : base(message, inner) { }
     }
 
@@ -20,6 +20,7 @@ namespace SteganographyApp.Common.IO
     public class NextImageLoadedEventArgs
     {
         public string ImageName { get; set; }
+
         public int ImageIndex { get; set; }
     }
 
@@ -31,46 +32,4 @@ namespace SteganographyApp.Common.IO
     {
         public int ChunkLength { get; set; }
     }
-
-    /// <summary>
-    /// Handles the current pixel position for the currently loaded image in the ImageStore.
-    /// </summary>
-    class PixelPosition
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        /// <summary>
-        /// Attempts to move to the next available position;
-        /// </summary>
-        public bool TryMoveToNext(int maxWidth, int maxHeight)
-        {
-            if (!CanMoveToNext(maxWidth, maxHeight))
-            {
-                return false;
-            }
-
-            X = X + 1;
-            if (X == maxWidth) {
-                X = 0;
-                Y = Y + 1;
-            }
-            return true;
-        }
-
-        private bool CanMoveToNext(int maxWidth, int maxHeight)
-        {
-            return !(X + 1 == maxWidth && Y + 1 == maxHeight);
-        }
-
-        /// <summary>
-        /// Resets the X and Y positions to 0.
-        /// </summary>
-        public void Reset()
-        {
-            X = 0;
-            Y = 0;
-        }
-    }
-
 }

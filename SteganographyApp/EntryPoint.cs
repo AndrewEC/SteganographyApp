@@ -1,16 +1,14 @@
-﻿using SteganographyApp.Common;
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.IO;
-using SteganographyApp.Encode;
-using SteganographyApp.Decode;
-using SteganographyApp.Common.Injection;
-
-namespace SteganographyApp
+﻿namespace SteganographyApp
 {
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.IO;
+    using SteganographyApp.Decode;
+    using SteganographyApp.Encode;
 
     public class EntryPoint
     {
-
         /// <summary>
         /// The model with values parsed from the user's input.
         /// </summary>
@@ -73,7 +71,6 @@ namespace SteganographyApp
             Encoder.CreateAndEncode(args);
         }
 
-
         /// <summary>
         /// Starts the decoding process.
         /// Reads the content chunk table, reads each chunk, decodes it, writes it to
@@ -83,6 +80,5 @@ namespace SteganographyApp
         {
             Decoder.CreateAndDecode(args);
         }
-
     }
 }

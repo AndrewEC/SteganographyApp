@@ -1,26 +1,25 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Collections.Generic;
-
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
-
-using SteganographyApp.Common;
-using SteganographyApp.Common.Arguments;
-
-namespace SteganographyApp.Converter
+﻿namespace SteganographyApp.Converter
 {
-    class Program
-    {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
 
+    using SixLabors.ImageSharp;
+    using SixLabors.ImageSharp.Formats.Png;
+
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
+
+    public class Program
+    {
         /// <summary>
         /// The mime type of png images. All images that have the png mimetype should not
         /// be put through the conversion process.
         /// </summary>
         private static readonly string PngMimeType = "image/png";
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography Converter\n");
             if (Checks.WasHelpRequested(args))
@@ -30,12 +29,12 @@ namespace SteganographyApp.Converter
             }
 
             var parser = new ArgumentParser();
-            if(!parser.TryParse(args, out IInputArguments arguments, PostValidation))
+            if (!parser.TryParse(args, out IInputArguments arguments, PostValidation))
             {
                 parser.PrintCommonErrorMessage();
                 return;
             }
-            
+
             ConvertImagesToPng(arguments);
         }
 
@@ -43,14 +42,9 @@ namespace SteganographyApp.Converter
         /// Performs some validation once all the user inputted values have been parsed and individually
         /// validated.
         /// </summary>
-        private static string PostValidation(IInputArguments inputs)
-        {
-            if (Checks.IsNullOrEmpty(inputs.CoverImages))
-            {
-                return "At least one image must be provided to convert.";
-            }
-            return null;
-        }
+        private static string PostValidation(IInputArguments inputs) => Checks.IsNullOrEmpty(inputs.CoverImages) ?
+            "At least one image must be provided to convert."
+            : null;
 
         /// <summary>
         /// Converts all of the images to a PNG format and will optionally delete
@@ -67,8 +61,7 @@ namespace SteganographyApp.Converter
             }
 
             Console.WriteLine("Converting [{0}] images.", lossyImages.Length);
-            var tracker = ProgressTracker.CreateAndDisplay(lossyImages.Length, "Converting images",
-                "Finished converting all images");
+            var tracker = ProgressTracker.CreateAndDisplay(lossyImages.Length, "Converting images", "Finished converting all images");
 
             var failures = new List<string>();
 
@@ -130,10 +123,7 @@ namespace SteganographyApp.Converter
         /// <summary>
         /// Filters out any images that already have the png format.
         /// </summary>
-        private static bool FilterOutPngImages(string image)
-        {
-            return Image.DetectFormat(image).DefaultMimeType != PngMimeType;
-        }
+        private static bool FilterOutPngImages(string image) => Image.DetectFormat(image).DefaultMimeType != PngMimeType;
 
         /// <summary>
         /// Takes in the path to the specified image, stripts out the existing file extension

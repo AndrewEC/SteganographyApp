@@ -1,19 +1,17 @@
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Arguments
 {
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
+    using System.Linq;
 
-    static class ImagePathParser
+    using SteganographyApp.Common.Injection;
+
+    internal static class ImagePathParser
     {
-
         private static readonly ImmutableDictionary<string, string> ShorthandMappings = new Dictionary<string, string>()
         {
             { "PNG_IMAGES", @"[r]<^[\W\w]+\.png$><.>" },
-            { "JPG_IMAGES", @"[r]<^[\W\w]+\.(jpg|jpeg)$><.>" }
+            { "JPG_IMAGES", @"[r]<^[\W\w]+\.(jpg|jpeg)$><.>" },
         }
         .ToImmutableDictionary();
 
@@ -29,7 +27,7 @@ namespace SteganographyApp.Common.Arguments
         /// could not be found at the specified path.</exception>
         public static void ParseImages(InputArguments arguments, string value)
         {
-            ImmutableArray<string> images = RetrieveImagePaths(value);
+            var images = RetrieveImagePaths(value);
             ValidateImagePaths(images);
             arguments.CoverImages = images;
         }
@@ -69,7 +67,5 @@ namespace SteganographyApp.Common.Arguments
                 }
             }
         }
-
     }
-
 }

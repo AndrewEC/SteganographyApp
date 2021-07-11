@@ -1,9 +1,8 @@
-﻿using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
-
-namespace SteganographyApp.Common.IO
+﻿namespace SteganographyApp.Common.IO
 {
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.Injection;
 
     /// <summary>
     /// Stream encapsulating class that decodes binary data and writes it
@@ -11,11 +10,10 @@ namespace SteganographyApp.Common.IO
     /// </summary>
     public sealed class ContentWriter : AbstractContentIO
     {
-
         /// <summary>
         /// Instantiates a new ContentWrite instance and sets the
         /// args field value.
-        /// </summary>  
+        /// </summary>
         /// <param name="args"></param>
         public ContentWriter(IInputArguments args) : base(args) { }
 
@@ -26,19 +24,19 @@ namespace SteganographyApp.Common.IO
         /// <param name="binary">The encrypted binary string read from the storage images.</param>
         public void WriteContentChunkToFile(string binary)
         {
-            if(stream == null)
+            if (Stream == null)
             {
                 var fileProvider = Injector.Provide<IFileProvider>();
-                if (fileProvider.IsExistingFile(args.DecodedOutputFile))
+                if (fileProvider.IsExistingFile(Args.DecodedOutputFile))
                 {
-                    fileProvider.Delete(args.DecodedOutputFile);
+                    fileProvider.Delete(Args.DecodedOutputFile);
                 }
-                stream = fileProvider.OpenFileForWrite(args.DecodedOutputFile);
+                Stream = fileProvider.OpenFileForWrite(Args.DecodedOutputFile);
             }
 
-            byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, args.Password, args.UseCompression, args.DummyCount, args.RandomSeed);
-            stream.Write(decoded, 0, decoded.Length);
-            stream.Flush();
+            byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed);
+            Stream.Write(decoded, 0, decoded.Length);
+            Stream.Flush();
         }
     }
 }

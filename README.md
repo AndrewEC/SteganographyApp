@@ -24,7 +24,7 @@ SteganographyApp
 * Encrypt the file's contents using AES-256
 * Minify the file's contents using standard GZip compression
 * Further obfuscate the file's contents by adding in dummy data and randomizing the order in which the data is stored
-* Clean function to clear out any saved data on one or more images that currently contain data
+* Clean function to randomize the LSBs of one or more images
 
 SteganographyApp.Calculator
 ---

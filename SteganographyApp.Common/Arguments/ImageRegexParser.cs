@@ -1,22 +1,17 @@
-using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Arguments
 {
+    using System;
+    using System.Linq;
+    using System.Text.RegularExpressions;
 
-    static class ImageRegexParser
+    using SteganographyApp.Common.Injection;
+
+    internal static class ImageRegexParser
     {
-
         private static readonly string ImageRegexExpression = @"^\[r\]\<(.+)\>\<(.+)\>$";
         private static readonly Regex ImageRegex = new Regex(ImageRegexExpression);
 
-        public static bool IsValidRegex(string value)
-        {
-            return ImageRegex.Match(value).Success;
-        }
+        public static bool IsValidRegex(string value) => ImageRegex.Match(value).Success;
 
         /// <summary>
         /// If a regular expression is detected in the --images parameter this method
@@ -36,7 +31,7 @@ namespace SteganographyApp.Common.Arguments
             string[] files = Injector.Provide<IFileProvider>().GetFiles(path);
             string[] images = files.Where(file => regex.Match(file).Success).ToArray();
             Array.Sort(images, string.Compare);
-            
+
             return images;
         }
 
@@ -50,14 +45,11 @@ namespace SteganographyApp.Common.Arguments
         /// does not match the expected format.</exception>
         private static (string, string) ParseRegex(string value)
         {
-
             var match = ImageRegex.Match(value);
             var fileNameRegex = match.Groups[1].Value;
             var directory = match.Groups[2].Value;
 
             return (fileNameRegex, directory);
         }
-
     }
-
 }

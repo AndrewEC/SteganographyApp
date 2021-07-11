@@ -1,22 +1,20 @@
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.IO;
-using SteganographyApp.Common;
-using SteganographyApp.Common.Injection;
-
-using System;
-using System.Collections.Concurrent;
-using System.Threading;
-
 namespace SteganographyApp.Decode
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Threading;
+
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.IO;
 
     /// <summary>
     /// Handles taking in the raw binary data read from an image, decoding it,
     /// and writing it to the target location.
     /// </summary>
-    class FileWriteThread
+    internal class FileWriteThread
     {
-
         private readonly BlockingCollection<WriteArgs> queue;
         private readonly ErrorContainer decodeError;
         private readonly IInputArguments arguments;
@@ -31,8 +29,7 @@ namespace SteganographyApp.Decode
             log = Injector.LoggerFor<FileWriteThread>();
         }
 
-        public static FileWriteThread CreateAndStartThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer,
-            IInputArguments arguments)
+        public static FileWriteThread CreateAndStartThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer, IInputArguments arguments)
         {
             var thread = new FileWriteThread(queue, errorContainer, arguments);
             thread.StartWriting();
@@ -44,6 +41,17 @@ namespace SteganographyApp.Decode
             log.Trace("Starting file write thread.");
             readThread = new Thread(new ThreadStart(Write));
             readThread.Start();
+        }
+
+        public void Join()
+        {
+            try
+            {
+                readThread.Join();
+            }
+            catch
+            {
+            }
         }
 
         /// <summary>
@@ -83,16 +91,5 @@ namespace SteganographyApp.Decode
                 }
             }
         }
-
-        public void Join()
-        {
-            try
-            {
-                readThread.Join();
-            }
-            catch {}
-        }
-
     }
-
 }

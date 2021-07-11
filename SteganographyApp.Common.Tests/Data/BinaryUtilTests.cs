@@ -1,14 +1,12 @@
-using NUnit.Framework;
-
-using SteganographyApp.Common.Data;
-
 namespace SteganographyApp.Common.Tests
 {
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Data;
 
     [TestFixture]
     public class BinaryUtilTests
     {
-
         private static readonly string OriginalBinaryString = "1101010101000011101011111000000010101010";
 
         [Test]
@@ -22,7 +20,5 @@ namespace SteganographyApp.Common.Tests
             string binary = util.ToBinaryString(base64);
             Assert.AreEqual(OriginalBinaryString, binary);
         }
-
     }
-
 }

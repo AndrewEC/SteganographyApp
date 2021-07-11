@@ -41,7 +41,7 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t--chunkSize | -cs :: Specifies the number of bytes to read in each read, encode, and store operation.
 \t\tValue needs to be a positive whole number.
 \t\tLarger numbers can quicken the process of encoding larger files and make the encoded file size smaller.
-\t\tValues that are too large can produce out of memory errors.
+\t\tValues that are too large can produce out of memory errors and may make the progress bar appear stuck at times.
 \t\tDefaults to: 131,072
 
 ~RandomSeed
@@ -71,11 +71,7 @@ Arguments must be specified as <argument_name>space<argument_value>.
 ~ConverterDescription
 Arguments must be specified as <argument_name>space<argument_value>.
 \tExample of converting a set of jpg images to png format
-\t\t dotnet .\\SteganographyAppCalculator --action convert --images image001.jpg,image002.jpg
-
-~ConvertAction
-\t--action | -a :: Specifies the convertion process to execute
-\t\tCurrently only one value is supported 'convert'
+\t\t dotnet .\\SteganographyAppConverter --images image001.jpg,image002.jpg
 
 ~DeleteOriginals
 \t--deleteOriginals | -do :: Flag indicating to delete the original images after convertion.
@@ -84,4 +80,4 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t--compressionLevel | -cl :: Specifies the level of compression to use when converting the images to PNG.
 \t\tValue must be between 0 and 9.
 \t\tThe higher the value, the more the image will be compressed.
-\t\tThe value defaults to 6
+\t\tThe default compression level is 6.

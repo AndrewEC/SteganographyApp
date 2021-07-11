@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Text.Json;
-
-using SteganographyApp.Common.Injection;
-
-namespace SteganographyApp.Common.Arguments
+﻿namespace SteganographyApp.Common.Arguments
 {
+    using System;
+    using System.Collections.Immutable;
+    using System.Text.Json;
+
+    using SteganographyApp.Common.Injection;
 
     public struct ReadWriteUtils
     {
         public IConsoleReader Reader { get; set; }
+
         public IConsoleWriter Writer { get; set; }
     }
 
@@ -19,24 +19,18 @@ namespace SteganographyApp.Common.Arguments
     ///</summary>
     public sealed class ArgumentParser
     {
-
         /// <summary>
         /// The list of user providable arguments.
         /// </summary>
         private readonly ImmutableList<Argument> arguments;
 
-        /// <summary>
-        /// The last exception to ocurr while parsing the argument values.
-        /// </summary>
-        public Exception LastError { get; private set; }
-
         private readonly SensitiveArgumentParser sensitiveArgumentParser;
 
         public ArgumentParser()
         {
-
             sensitiveArgumentParser = new SensitiveArgumentParser();
 
+#pragma warning disable SA1009
             arguments = ImmutableList.Create(
                 new Argument("--action", "-a", Parsers.ParseEncodeOrDecodeAction),
                 new Argument("--input", "-in", Parsers.ParseFileToEncode),
@@ -52,30 +46,28 @@ namespace SteganographyApp.Common.Arguments
                 new Argument("--compressionLevel", "-cl", Parsers.ParseCompressionLevel),
                 new Argument("--logLevel", "-ll", Parsers.ParseLogLevel)
             );
+#pragma warning restore SA1009
         }
 
         /// <summary>
-        /// Attempts to lookup an Argument instance from the list of arguments.
-        /// <para>The key value to lookup from can either be the regular argument name or
-        /// the arguments short name.</para>
+        /// The last exception to ocurr while parsing the argument values.
         /// </summary>
-        /// <param name="key">The name of the argument to find. This can either be the arguments name or the
-        /// arguments short name</param>
-        /// <param name="argument">The Argument instance to be provided if found. If not found this value
-        /// will be null.</param>
-        /// <returns>True if the argument could be found else false.</returns>
-        private bool TryGetArgument(string key, out Argument argument)
+        public Exception LastError { get; private set; }
+
+        /// <summary>
+        /// A utility method to help print a common error message when parsing the user's arguments fails.
+        /// </summary>
+        public void PrintCommonErrorMessage()
         {
-            foreach(Argument arg in arguments)
+            var writer = Injector.Provide<IConsoleWriter>();
+            writer.WriteLine($"An exception occured while parsing provided arguments: {LastError.Message}");
+            var exception = LastError.InnerException;
+            while (exception != null)
             {
-                if(arg.Name == key || arg.ShortName == key)
-                {
-                    argument = arg;
-                    return true;
-                }
+                writer.WriteLine($"Caused by: {exception.Message}");
+                exception = exception.InnerException;
             }
-            argument = null;
-            return false;
+            writer.WriteLine("\nRun the program with --help to get more information.");
         }
 
         /// <summary>
@@ -106,11 +98,35 @@ namespace SteganographyApp.Common.Arguments
             }
         }
 
+        /// <summary>
+        /// Attempts to lookup an Argument instance from the list of arguments.
+        /// <para>The key value to lookup from can either be the regular argument name or
+        /// the arguments short name.</para>
+        /// </summary>
+        /// <param name="key">The name of the argument to find. This can either be the arguments name or the
+        /// arguments short name</param>
+        /// <param name="targetArgument">The Argument instance to be provided if found. If not found this value
+        /// will be null.</param>
+        /// <returns>True if the argument could be found else false.</returns>
+        private bool TryGetArgument(string key, out Argument targetArgument)
+        {
+            foreach (var argument in arguments)
+            {
+                if (argument.Name == key || argument.ShortName == key)
+                {
+                    targetArgument = argument;
+                    return true;
+                }
+            }
+            targetArgument = null;
+            return false;
+        }
+
         private IInputArguments DoTryParse(string[] userArguments, PostValidation postValidationMethod)
         {
-            if(userArguments == null || userArguments.Length == 0)
+            if (userArguments == null || userArguments.Length == 0)
             {
-                throw new ArgumentParseException("No arguments provided to parse.");
+                throw new ArgumentParseException("No arguments provided.");
             }
 
             var parsedArguments = new InputArguments();
@@ -144,7 +160,7 @@ namespace SteganographyApp.Common.Arguments
 
             Parsers.ParseDummyCount(parsedArguments);
 
-            Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{0}]", () => JsonSerializer.Serialize(parsedArguments, parsedArguments.GetType()));
+            Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(parsedArguments, parsedArguments.GetType()) });
 
             return parsedArguments.ToImmutable();
         }
@@ -200,22 +216,6 @@ namespace SteganographyApp.Common.Arguments
             {
                 throw new ArgumentParseException($"Invalid value provided for argument: {argument.Name}", e);
             }
-        }
-
-        /// <summary>
-        /// A utility method to help print a common error message when parsing the user's arguments fails.
-        /// </summary>
-        public void PrintCommonErrorMessage()
-        {
-            var writer = Injector.Provide<IConsoleWriter>();
-            writer.WriteLine($"An exception occured while parsing provided arguments: {LastError.Message}");
-            var exception = LastError.InnerException;
-            while (exception != null)
-            {
-                writer.WriteLine($"Caused by: {exception.Message}");
-                exception = exception.InnerException;
-            }
-            writer.WriteLine("\nRun the program with --help to get more information.");
         }
     }
 }

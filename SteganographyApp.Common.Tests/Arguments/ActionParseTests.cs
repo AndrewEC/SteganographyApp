@@ -1,9 +1,8 @@
-using NUnit.Framework;
-
-using SteganographyApp.Common.Arguments;
-
 namespace SteganographyApp.Common.Tests
 {
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
 
     [TestFixture]
     public class ActionParsingTests
@@ -35,7 +34,5 @@ namespace SteganographyApp.Common.Tests
         }
 
         private string NullReturningPostValidator(IInputArguments input) => null;
-
     }
-
 }

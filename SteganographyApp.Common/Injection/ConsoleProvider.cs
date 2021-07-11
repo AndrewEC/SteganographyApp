@@ -1,7 +1,6 @@
-using System;
-
 namespace SteganographyApp.Common.Injection
 {
+    using System;
 
     /// <summary>
     /// Inteface that exists for testing the <see cref="ProgressTracker"/> class.
@@ -12,28 +11,8 @@ namespace SteganographyApp.Common.Injection
     public interface IConsoleWriter
     {
         void Write(string line);
+
         void WriteLine(string line);
-    }
-
-    /// <summary>
-    /// The default IWriter used by the application in it's normal flow.
-    /// <para>Simply proxies the Write and WriteLine methods of the
-    /// console class.</para>
-    /// </summary>
-    [Injectable(typeof(IConsoleWriter))]
-    public class ConsoleWriter : IConsoleWriter
-    {
-
-        public void Write(string line)
-        {
-            Console.Write(line);
-        }
-
-        public void WriteLine(string line)
-        {
-            Console.WriteLine(line);
-        }
-
     }
 
     /// <summary>
@@ -47,18 +26,25 @@ namespace SteganographyApp.Common.Injection
     }
 
     /// <summary>
+    /// The default IWriter used by the application in it's normal flow.
+    /// <para>Simply proxies the Write and WriteLine methods of the
+    /// console class.</para>
+    /// </summary>
+    [Injectable(typeof(IConsoleWriter))]
+    public class ConsoleWriter : IConsoleWriter
+    {
+        public void Write(string line) => Console.Write(line);
+
+        public void WriteLine(string line) => Console.WriteLine(line);
+    }
+
+    /// <summary>
     /// The default IInputReader instance that acts as a proxy to the <see cref="Console.ReadKey(bool)">
     /// method.
     /// </summary>
     [Injectable(typeof(IConsoleReader))]
     public class ConsoleKeyReader : IConsoleReader
     {
-
-        public ConsoleKeyInfo ReadKey(bool intercept)
-        {
-            return Console.ReadKey(intercept);
-        }
-
+        public ConsoleKeyInfo ReadKey(bool intercept) => Console.ReadKey(intercept);
     }
-
 }

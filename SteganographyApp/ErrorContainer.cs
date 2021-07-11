@@ -1,16 +1,14 @@
-using System;
-
 namespace SteganographyApp
 {
+    using System;
 
     /// <summary>
     /// Thread-safe method to hold onto an error object so it can be shared
     /// between threads.
     /// </summary>
-    class ErrorContainer
+    internal class ErrorContainer
     {
-
-        private readonly object _lock = new object();
+        private static readonly object SyncLock = new object();
 
         private Exception exception;
 
@@ -19,7 +17,7 @@ namespace SteganographyApp
         /// </summary>
         public bool HasException()
         {
-            lock (_lock)
+            lock (SyncLock)
             {
                 return exception != null;
             }
@@ -30,7 +28,7 @@ namespace SteganographyApp
         /// </summary>
         public void PutException(Exception exception)
         {
-            lock (_lock)
+            lock (SyncLock)
             {
                 this.exception = exception;
             }
@@ -42,12 +40,10 @@ namespace SteganographyApp
         /// </summary>
         public Exception TakeException()
         {
-            lock (_lock)
+            lock (SyncLock)
             {
                 return exception;
             }
         }
-
     }
-
 }

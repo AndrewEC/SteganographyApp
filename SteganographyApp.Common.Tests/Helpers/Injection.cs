@@ -1,33 +1,13 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Collections.Generic;
-
-using Moq;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
 
-    /// <summary>
-    /// Attribute meant to be used with public Moq.Mock fields that require an
-    /// injected mock value. Any Moq.Mock field in a TestFixture with this attribute
-    /// present will have an auto-instantiated Moq.Mock instance value provided during the
-    /// SetUp phase of the test fixture.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Field)]
-    public class Mockup : Attribute
-    {
+    using Moq;
 
-        public Type MockType { get; private set; }
-
-        public Mockup(Type mockType)
-        {
-            MockType = mockType;
-        }
-
-    }
+    using SteganographyApp.Common.Injection;
 
     /// <summary>
     /// Static helper class to reflectively lookup public Moq.Mock fields in a given TestFixture class
@@ -37,7 +17,6 @@ namespace SteganographyApp.Common.Tests
     /// </summary>
     public static class MocksInjector
     {
-
         public static void InjectMocks(object testFixture)
         {
             foreach (var field in GetFieldsRequiringMocks(testFixture))
@@ -87,4 +66,20 @@ namespace SteganographyApp.Common.Tests
         }
     }
 
+    /// <summary>
+    /// Attribute meant to be used with public Moq.Mock fields that require an
+    /// injected mock value. Any Moq.Mock field in a TestFixture with this attribute
+    /// present will have an auto-instantiated Moq.Mock instance value provided during the
+    /// SetUp phase of the test fixture.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class Mockup : Attribute
+    {
+        public Mockup(Type mockType)
+        {
+            MockType = mockType;
+        }
+
+        public Type MockType { get; private set; }
+    }
 }

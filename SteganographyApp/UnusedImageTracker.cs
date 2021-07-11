@@ -1,19 +1,18 @@
-using System;
-using System.Collections.Generic;
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.IO;
-
 namespace SteganographyApp
 {
+    using System;
+    using System.Collections.Generic;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.IO;
 
     /// <summary>
     /// Helps track the images being used during the encoding process.
     /// All images are using during the encoding process if the enableDummies
     /// flag has been provided even if they have not been written to.
     /// </summary>
-    sealed class ImageTracker
+    internal sealed class ImageTracker
     {
-
         private readonly HashSet<string> imagesUsed = new HashSet<string>();
         private readonly int availableImages;
 
@@ -32,11 +31,6 @@ namespace SteganographyApp
             var tracker = new ImageTracker(arguments.CoverImages.Length);
             store.OnNextImageLoaded += tracker.RecordLoadedImage;
             return tracker;
-        }
-
-        private void RecordLoadedImage(object sender, NextImageLoadedEventArgs args)
-        {
-            imagesUsed.Add(args.ImageName);
         }
 
         /// <summary>
@@ -63,6 +57,9 @@ namespace SteganographyApp
             }
         }
 
+        private void RecordLoadedImage(object sender, NextImageLoadedEventArgs args)
+        {
+            imagesUsed.Add(args.ImageName);
+        }
     }
-
 }

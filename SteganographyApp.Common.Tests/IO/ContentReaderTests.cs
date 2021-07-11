@@ -1,20 +1,28 @@
-using Moq;
-using NUnit.Framework;
-
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Injection;
-using SteganographyApp.Common.IO;
-using SteganographyApp.Common.Data;
-
-using static Moq.Times;
-using static Moq.It;
-
 namespace SteganographyApp.Common.Tests
 {
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.IO;
+
+    using static Moq.It;
+    using static Moq.Times;
 
     [TestFixture]
     public class ContentReaderTests : FixtureWithTestObjects
     {
+        [Mockup(typeof(IFileProvider))]
+        public Mock<IFileProvider> mockFileProvider;
+
+        [Mockup(typeof(IReadWriteStream))]
+        public Mock<IReadWriteStream> mockReadWriteStream;
+
+        [Mockup(typeof(IDataEncoderUtil))]
+        public Mock<IDataEncoderUtil> mockDataEncoderUtil;
 
         private static readonly int ChunkByteSize = 100;
         private static readonly string FileToEncode = "file_to_encode";
@@ -30,23 +38,9 @@ namespace SteganographyApp.Common.Tests
             Password = Password,
             UseCompression = UseCompression,
             DummyCount = DummyCount,
-            RandomSeed = RandomSeed
+            RandomSeed = RandomSeed,
         }
         .ToImmutable();
-
-        [Mockup(typeof(IFileProvider))]
-        public Mock<IFileProvider> mockFileProvider;
-
-        [Mockup(typeof(IReadWriteStream))]
-        public Mock<IReadWriteStream> mockReadWriteStream;
-
-        [Mockup(typeof(IDataEncoderUtil))]
-        public Mock<IDataEncoderUtil> mockDataEncoderUtil;
-
-        protected override void SetupMocks()
-        {
-            mockFileProvider.Setup(provider => provider.OpenFileForRead(IsAny<string>())).Returns(mockReadWriteStream.Object);
-        }
 
         [Test]
         public void TestReadContentChunkFromFile()
@@ -68,9 +62,7 @@ namespace SteganographyApp.Common.Tests
             mockFileProvider.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
             mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
             mockDataEncoderUtil
-                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(),
-                    IsAny<bool>(), IsAny<int>(), IsAny<string>()),
-                Once());
+                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()), Once());
         }
 
         [Test]
@@ -89,9 +81,7 @@ namespace SteganographyApp.Common.Tests
             mockFileProvider.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
             mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
             mockDataEncoderUtil
-                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(),
-                    IsAny<bool>(), IsAny<int>(), IsAny<string>()),
-                Never());
+                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()), Never());
         }
 
         [Test]
@@ -106,11 +96,12 @@ namespace SteganographyApp.Common.Tests
             }
 
             mockDataEncoderUtil
-                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == alternateByteCount), IsAny<string>(),
-                    IsAny<bool>(), IsAny<int>(), IsAny<string>()),
-                Once());
+                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == alternateByteCount), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()), Once());
         }
 
+        protected override void SetupMocks()
+        {
+            mockFileProvider.Setup(provider => provider.OpenFileForRead(IsAny<string>())).Returns(mockReadWriteStream.Object);
+        }
     }
-
 }

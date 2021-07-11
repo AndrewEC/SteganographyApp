@@ -1,16 +1,14 @@
-using System;
-
-using SixLabors.ImageSharp.Formats.Png;
-
-using SteganographyApp.Common.Injection;
-using SteganographyApp.Common.Data;
-
 namespace SteganographyApp.Common.Arguments
 {
+    using System;
 
-    static class Parsers
+    using SixLabors.ImageSharp.Formats.Png;
+
+    using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.Injection;
+
+    internal static class Parsers
     {
-
         private static readonly string CompressionLevelTemplate = "Level{0}";
         private static readonly int MaxDummyCount = 1000;
         private static readonly int MinDummyCount = 100;
@@ -23,7 +21,8 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="value">The string representation of the EnableLogs boolean flag.</param>
         public static void ParseLogLevel(InputArguments arguments, string value)
         {
-            if (!Enum.TryParse(value, true, out LogLevel level)) {
+            if (!Enum.TryParse(value, true, out LogLevel level))
+            {
                 throw new ArgumentValueException($"Could not parse log level. Log level must be one of Trace, Debug, or Error.");
             }
 
@@ -37,7 +36,7 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="value">The string representation of the InsertDummies boolean flag.</param>
         public static void ParseInsertDummies(InputArguments arguments, string value)
         {
-            arguments.InsertDummies = Boolean.Parse(value);
+            arguments.InsertDummies = bool.Parse(value);
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="value">The string representation of the InsertDummies boolean flag.</param>
         public static void ParseDeleteOriginals(InputArguments arguments, string value)
         {
-            arguments.DeleteAfterConversion = Boolean.Parse(value);
+            arguments.DeleteAfterConversion = bool.Parse(value);
         }
 
         /// <summary>
@@ -64,7 +63,7 @@ namespace SteganographyApp.Common.Arguments
             }
 
             var imageProvider = Injector.Provide<IImageProvider>();
-            
+
             long dummyCount = 1;
             int[] imageIndexes = new int[] { 0, arguments.CoverImages.Length - 1 };
             foreach (int imageIndex in imageIndexes)
@@ -74,8 +73,8 @@ namespace SteganographyApp.Common.Arguments
                     dummyCount += dummyCount * (image.Width * image.Height);
                 }
             }
-            
-            string userRandomSeed = Checks.IsNullOrEmpty(arguments.RandomSeed) ? "" : arguments.RandomSeed;
+
+            string userRandomSeed = Checks.IsNullOrEmpty(arguments.RandomSeed) ? string.Empty : arguments.RandomSeed;
             string seed = userRandomSeed + dummyCount.ToString();
             arguments.DummyCount = IndexGenerator.FromString(seed).Next(MaxDummyCount - MinDummyCount) + MinDummyCount;
         }
@@ -115,7 +114,7 @@ namespace SteganographyApp.Common.Arguments
                 throw new ArgumentValueException($"Could not parse chunk size from value {value}", e);
             }
 
-            if(arguments.ChunkByteSize <= 0)
+            if (arguments.ChunkByteSize <= 0)
             {
                 throw new ArgumentValueException("The chunk size value must be a positive whole number with a value more than 0.");
             }
@@ -128,10 +127,7 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="value">A string representation of a boolean value.</param>
         /// <exception cref="ArgumentValueException">Thrown if a boolean value could not
         /// be parsed from the value parameter.</exception>
-        public static void ParsePrintStack(InputArguments arguments, string value)
-        {
-            arguments.PrintStack = Boolean.Parse(value);
-        }
+        public static void ParsePrintStack(InputArguments arguments, string value) => arguments.PrintStack = bool.Parse(value);
 
         /// <summary>
         /// Checks if the specified file, value, exists and then sets the
@@ -159,7 +155,7 @@ namespace SteganographyApp.Common.Arguments
         /// from the value parameter</exception>
         public static void ParseUseCompression(InputArguments arguments, string value)
         {
-            arguments.UseCompression = Boolean.Parse(value);
+            arguments.UseCompression = bool.Parse(value);
         }
 
         /// <summary>
@@ -171,14 +167,12 @@ namespace SteganographyApp.Common.Arguments
         /// the string value does not map to an enum value.</exception>
         public static void ParseEncodeOrDecodeAction(InputArguments args, string value)
         {
-            value = value.Replace("-", "");
-            if(!Enum.TryParse(value, true, out ActionEnum action))
+            value = value.Replace("-", string.Empty);
+            if (!Enum.TryParse(value, true, out ActionEnum action))
             {
                 throw new ArgumentValueException($"Invalid value for action argument. Expected one of 'encode', 'decode', 'clean', 'calculate-storage-space', 'css', 'calculate-encrypted-size', 'ces' got {value}");
             }
             args.EncodeOrDecode = action;
         }
-
     }
-
 }

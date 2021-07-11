@@ -1,16 +1,15 @@
-using Moq;
-using NUnit.Framework;
-
-using SteganographyApp.Common.Injection;
-using SteganographyApp.Common.Arguments;
-
 namespace SteganographyApp.Common.Tests
 {
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
 
     [TestFixture]
     public class InputParseTests : FixtureWithMockConsoleReaderAndWriter
     {
-
         private Mock<IFileProvider> mockFileProvider;
 
         [SetUp]
@@ -21,7 +20,7 @@ namespace SteganographyApp.Common.Tests
         }
 
         [Test]
-        public void TestFileToEncodeWithValidFile() 
+        public void TestFileToEncodeWithValidFile()
         {
             mockFileProvider.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);
 
@@ -53,7 +52,5 @@ namespace SteganographyApp.Common.Tests
         }
 
         private string NullReturningPostValidator(IInputArguments input) => null;
-
     }
-
 }

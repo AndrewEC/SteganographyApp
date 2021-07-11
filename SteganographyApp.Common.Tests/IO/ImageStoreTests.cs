@@ -1,32 +1,30 @@
-using System;
-using System.Text;
-using System.Linq;
-using System.Collections.Immutable;
-
-using Moq;
-using NUnit.Framework;
-
-using SixLabors.ImageSharp.PixelFormats;
-
-using SteganographyApp.Common.Injection;
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.IO;
-
-
-using static Moq.Times;
-using static Moq.It;
-
 namespace SteganographyApp.Common.Tests
 {
+    using System;
+    using System.Collections.Immutable;
+    using System.Linq;
+    using System.Text;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SixLabors.ImageSharp.PixelFormats;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.IO;
+
+    using static Moq.It;
+    using static Moq.Times;
 
     [TestFixture]
     public class ImageStoreTests : FixtureWithRealObjects
     {
-
         private static readonly int BinaryStringLength = 100_000;
         private static readonly IInputArguments Arguments = new InputArguments()
         {
-            CoverImages = ImmutableArray.Create(new string[] { "test001.png" })
+            CoverImages = ImmutableArray.Create(new string[] { "test001.png" }),
         }
         .ToImmutable();
 
@@ -46,7 +44,7 @@ namespace SteganographyApp.Common.Tests
         {
             var mockImage = GenerateMockImage(100, 100);
             mockImageProvider.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
-            
+
             var imageStore = new ImageStore(Arguments);
             imageStore.OnNextImageLoaded += OnNextImageLoaded;
             imageStore.CleanImageLSBs();
@@ -70,8 +68,7 @@ namespace SteganographyApp.Common.Tests
             using (var wrapper = imageStore.CreateIOWrapper())
             {
                 var exception = Assert.Throws<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
-                Assert.AreEqual("There is not enough available storage space in the provided images to continue.",
-                    exception.Message);
+                Assert.AreEqual("There is not enough available storage space in the provided images to continue.", exception.Message);
             }
 
             Assert.IsTrue(mockImage.DisposeCalled);
@@ -120,7 +117,7 @@ namespace SteganographyApp.Common.Tests
             var builder = new StringBuilder();
             for (int i = 0; i < length; i++)
             {
-                string nextBit = ((int) Math.Round(random.NextDouble())).ToString();
+                string nextBit = ((int)Math.Round(random.NextDouble())).ToString();
                 builder.Append(nextBit);
             }
             return builder.ToString();
@@ -144,18 +141,11 @@ namespace SteganographyApp.Common.Tests
 
             return new MockBasicImageInfo(width, height, pixels);
         }
-
     }
 
-    public class MockBasicImageInfo : IBasicImageInfo
+    internal class MockBasicImageInfo : IBasicImageInfo
     {
-
-        public string SaveCalledWith { get; private set; }
-        public bool DisposeCalled { get; private set; }
-
         private Rgba32[,] pixels;
-        public int Width { get; set; }
-        public int Height { get; set; }
 
         public MockBasicImageInfo(int width, int height, Rgba32[,] pixels)
         {
@@ -163,6 +153,14 @@ namespace SteganographyApp.Common.Tests
             Height = height;
             this.pixels = pixels;
         }
+
+        public int Width { get; set; }
+
+        public int Height { get; set; }
+
+        public string SaveCalledWith { get; private set; }
+
+        public bool DisposeCalled { get; private set; }
 
         public Rgba32 this[int x, int y]
         {
@@ -186,7 +184,5 @@ namespace SteganographyApp.Common.Tests
         {
             DisposeCalled = true;
         }
-
     }
-
 }

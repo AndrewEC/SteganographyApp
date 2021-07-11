@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Reflection;
-
-using SteganographyApp.Common.Injection;
-
-namespace SteganographyApp.Common
+﻿namespace SteganographyApp.Common
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
+    using System.Reflection;
+
+    using SteganographyApp.Common.Injection;
 
     public enum HelpItemSet
     {
         Main,
         Calculator,
-        Converter
+        Converter,
     }
 
     /// <summary>
@@ -21,44 +20,67 @@ namespace SteganographyApp.Common
     /// </summary>
     public sealed class HelpInfo
     {
+#pragma warning disable SA1009
 
         public static readonly ImmutableArray<string> MainHelpLabels = ImmutableArray.Create(
             new string[]
             {
-                "AppDescription", "AppAction", "Input", "Output", "Images", "Password",
-                "PrintStack", "EnableCompression", "ChunkSize", "RandomSeed", "EnableDummies",
-                "EnableLogs"
+                "AppDescription",
+                "AppAction",
+                "Input",
+                "Output",
+                "Images",
+                "Password",
+                "PrintStack",
+                "EnableCompression",
+                "ChunkSize",
+                "RandomSeed",
+                "EnableDummies",
+                "EnableLogs",
             }
         );
 
         public static readonly ImmutableArray<string> CalculatorHelpLabels = ImmutableArray.Create(
             new string[]
             {
-                "CalculatorDescription", "CalculatorAction", "Input", "Images", "Password",
-                "EnableCompression", "ChunkSize", "EnableDummies", "RandomSeed", "EnableLogs"
+                "CalculatorDescription",
+                "CalculatorAction",
+                "Input",
+                "Images",
+                "Password",
+                "EnableCompression",
+                "ChunkSize",
+                "EnableDummies",
+                "RandomSeed",
+                "EnableLogs",
             }
         );
 
         public static readonly ImmutableArray<string> ConverterHelpLabels = ImmutableArray.Create(
             new string[]
             {
-                "ConverterDescription", "ConvertAction", "Images", "DeleteOriginals",
-                "CompressionLevel", "EnableLogs"
+                "ConverterDescription",
+                "Images",
+                "DeleteOriginals",
+                "CompressionLevel",
+                "EnableLogs",
             }
         );
+
+#pragma warning restore SA1009
 
         private static readonly ImmutableDictionary<HelpItemSet, ImmutableArray<string>> HelpLabelMappings = new Dictionary<HelpItemSet, ImmutableArray<string>>
         {
             { HelpItemSet.Main, MainHelpLabels },
             { HelpItemSet.Calculator, CalculatorHelpLabels },
-            { HelpItemSet.Converter, ConverterHelpLabels }
+            { HelpItemSet.Converter, ConverterHelpLabels },
         }
         .ToImmutableDictionary();
 
         /// <summary>
         /// A dictionary containing the results of the help file parsing.
         /// This will include a key value representing the name of the help
-        /// message or the parameter that it corresponds to and a value 
+        /// message or the parameter that it corresponds to and a value
         /// being the actual help message.
         /// </summary>
         private readonly ImmutableDictionary<string, string> helpItems;
@@ -81,8 +103,8 @@ namespace SteganographyApp.Common
         /// provided to lookup.</returns>
         public ImmutableArray<string> GetHelpMessagesFor(HelpItemSet itemSet)
         {
-            ImmutableArray<string> helpLabels = HelpLabelMappings[itemSet];
-            string[] messages = new string[helpLabels.Length];
+            var helpLabels = HelpLabelMappings[itemSet];
+            var messages = new string[helpLabels.Length];
             for (int i = 0; i < helpLabels.Length; i++)
             {
                 if (!helpItems.ContainsKey(helpLabels[i]))
@@ -102,17 +124,27 @@ namespace SteganographyApp.Common
     /// </summary>
     public class HelpParser
     {
-
         /// <summary>
         /// When found at the beginning of a line it indicates a new help item
         /// entry.
         /// </summary>
-        private readonly string HelpItemIndicator = "~";
+        private static readonly string HelpItemIndicator = "~";
 
         /// <summary>
         /// The last error that occured during the execution of TryParse.
         /// </summary>
         public string LastError { get; private set; }
+
+        /// <summary>
+        /// Utility to print out a common error message in the instance where there is an error parsing
+        /// the help properties file.
+        /// </summary>
+        public void PrintCommonErrorMessage()
+        {
+            Console.WriteLine("An error occurred while parsing the help file: {0}", LastError);
+            Console.WriteLine("Check that the help.prop file is in the same directory as the application and try again.");
+            Console.WriteLine();
+        }
 
         /// <summary>
         /// Attempts to parse the help file located at the fileName parameter value.
@@ -125,10 +157,9 @@ namespace SteganographyApp.Common
         /// <returns>True if the help file was successfully parsed, otherwise false.</returns>
         public bool TryParseHelpFile(out HelpInfo info, string fileName = "help.prop")
         {
-
             string assemblyPath = GetAssemblyPath();
             string helpFileLocation = $"{assemblyPath}\\{fileName}";
-            
+
             if (!Injector.Provide<IFileProvider>().IsExistingFile(helpFileLocation))
             {
                 LastError = $"The help file named {helpFileLocation} could not be found.";
@@ -152,9 +183,9 @@ namespace SteganographyApp.Common
 
         private ImmutableDictionary<string, string> ParseHelpItems(string helpFileLocation)
         {
-            Dictionary<string, string> helpItems = new Dictionary<string, string>();
+            var helpItems = new Dictionary<string, string>();
             string[] lines = Injector.Provide<IFileProvider>().ReadAllLines(helpFileLocation);
-            for(int i = 0; i < lines.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 if (lines[i].StartsWith(HelpItemIndicator))
                 {
@@ -164,16 +195,13 @@ namespace SteganographyApp.Common
             return helpItems.ToImmutableDictionary();
         }
 
-        private string LineWithoutHelpItemIndicator(string line)
-        {
-            return line.Substring(1);
-        }
+        private string LineWithoutHelpItemIndicator(string line) => line.Substring(1);
 
         private string GetAssemblyPath()
         {
             string assemblyPath = Assembly.GetExecutingAssembly().Location;
             int index = assemblyPath.LastIndexOf("\\");
-            if(index == -1)
+            if (index == -1)
             {
                 index = assemblyPath.LastIndexOf("/");
             }
@@ -192,8 +220,8 @@ namespace SteganographyApp.Common
         /// <returns>A single string containing all the lines of the help message delimeted by line breaks.</returns>
         private string ReadHelpItem(string[] lines, int startLine)
         {
-            string message = "";
-            for(int i = startLine; i < lines.Length; i++)
+            string message = string.Empty;
+            for (int i = startLine; i < lines.Length; i++)
             {
                 if (lines[i].StartsWith(HelpItemIndicator))
                 {
@@ -203,24 +231,13 @@ namespace SteganographyApp.Common
                 {
                     continue;
                 }
-                if(i != startLine)
+                if (i != startLine)
                 {
                     message += "\n";
                 }
                 message += lines[i].Replace("\\t", "\t");
             }
             return message;
-        }
-
-        /// <summary>
-        /// Utility to print out a common error message in the instance where there is an error parsing
-        /// the help properties file.
-        /// </summary>
-        public void PrintCommonErrorMessage()
-        {
-            Console.WriteLine("An error occurred while parsing the help file: {0}", LastError);
-            Console.WriteLine("Check that the help.prop file is in the same directory as the application and try again.");
-            Console.WriteLine();
         }
     }
 }

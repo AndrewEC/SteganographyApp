@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-
 namespace SteganographyApp.Common.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
 
     public static class MockInput
     {
-
         public static Queue<ConsoleKeyInfo> CreateInputQueue(ImmutableList<ValueTuple<char, ConsoleKey>> inputMapping)
         {
             var queue = new Queue<ConsoleKeyInfo>();
@@ -23,7 +21,5 @@ namespace SteganographyApp.Common.Tests
             }
             return queue;
         }
-
     }
-
 }

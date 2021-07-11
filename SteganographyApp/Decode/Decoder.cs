@@ -1,37 +1,35 @@
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.IO;
-using SteganographyApp.Common;
-using SteganographyApp.Common.Injection;
-
-using System;
-using System.Collections.Concurrent;
-
 namespace SteganographyApp.Decode
 {
+    using System;
+    using System.Collections.Concurrent;
 
-    /// <summary>
-    /// Specifies the values to be added to the queue whenever data is read
-    /// from the file to encode.
-    /// </summary>
-    struct WriteArgs
-    {
-        public Status Status;
-        public string Data;
-    }
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.IO;
 
     /// <summary>
     /// Used to indicate if there is more data to be read from the storage images.
     /// Incomplete means there is more data to be read, complete means there is none.
     /// </summary>
-    enum Status
+    internal enum Status
     {
         Incomplete,
-        Complete
+        Complete,
+    }
+
+    /// <summary>
+    /// Specifies the values to be added to the queue whenever data is read
+    /// from the file to encode.
+    /// </summary>
+    internal struct WriteArgs
+    {
+        public Status Status;
+        public string Data;
     }
 
     public class Decoder
     {
-
         private readonly IInputArguments arguments;
 
         /// <summary>
@@ -61,10 +59,7 @@ namespace SteganographyApp.Decode
         /// Creates a decode instance and invokes the
         /// <see cref="DecodeFileFromImage" method.
         /// </summary>
-        public static void CreateAndDecode(IInputArguments arguments)
-        {
-            new Decoder(arguments).DecodeFileFromImage();
-        }
+        public static void CreateAndDecode(IInputArguments arguments) => new Decoder(arguments).DecodeFileFromImage();
 
         /// <summary>
         /// Inititates the process of reading a file from an image, decoding it, and writing it
@@ -85,8 +80,7 @@ namespace SteganographyApp.Decode
                 var thread = FileWriteThread.CreateAndStartThread(writeQueue, errorContainer, arguments);
 
                 var contentChunkTable = store.ReadContentChunkTable();
-                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length,
-                    "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
+                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
 
                 log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
                 foreach (int chunkLength in contentChunkTable)
@@ -122,7 +116,5 @@ namespace SteganographyApp.Decode
             log.Error("Decoder found exception in container: [{0}]", error);
             throw error;
         }
-
     }
-
 }

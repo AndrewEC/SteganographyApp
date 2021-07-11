@@ -1,20 +1,28 @@
-using Moq;
-using NUnit.Framework;
-
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Injection;
-using SteganographyApp.Common.IO;
-using SteganographyApp.Common.Data;
-
-using static Moq.Times;
-using static Moq.It;
-
 namespace SteganographyApp.Common.Tests
 {
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.IO;
+
+    using static Moq.It;
+    using static Moq.Times;
 
     [TestFixture]
     public class ContentWriterTests : FixtureWithTestObjects
     {
+        [Mockup(typeof(IFileProvider))]
+        public Mock<IFileProvider> mockFileProvider;
+
+        [Mockup(typeof(IReadWriteStream))]
+        public Mock<IReadWriteStream> mockReadWriteStream;
+
+        [Mockup(typeof(IDataEncoderUtil))]
+        public Mock<IDataEncoderUtil> mockEncoderUtil;
 
         private static readonly string BinaryString = "00010010100100111110101001001001";
 
@@ -32,23 +40,9 @@ namespace SteganographyApp.Common.Tests
             Password = Password,
             UseCompression = UseCompression,
             DummyCount = DummyCount,
-            RandomSeed = RandomSeed
+            RandomSeed = RandomSeed,
         }
         .ToImmutable();
-
-        [Mockup(typeof(IFileProvider))]
-        public Mock<IFileProvider> mockFileProvider;
-
-        [Mockup(typeof(IReadWriteStream))]
-        public Mock<IReadWriteStream> mockReadWriteStream;
-
-        [Mockup(typeof(IDataEncoderUtil))]
-        public Mock<IDataEncoderUtil> mockEncoderUtil;
-
-        protected override void SetupMocks()
-        {
-            mockFileProvider.Setup(provider => provider.OpenFileForWrite(IsAny<string>())).Returns(mockReadWriteStream.Object);
-        }
 
         [Test]
         public void TestWriteContentChunkToFile()
@@ -87,9 +81,12 @@ namespace SteganographyApp.Common.Tests
             }
 
             mockFileProvider.Verify(provider => provider.Delete(DecodedOutputFile), Once());
-            mockEncoderUtil.Verify(encoder => encoder.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed), Once());            
+            mockEncoderUtil.Verify(encoder => encoder.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed), Once());
         }
 
+        protected override void SetupMocks()
+        {
+            mockFileProvider.Setup(provider => provider.OpenFileForWrite(IsAny<string>())).Returns(mockReadWriteStream.Object);
+        }
     }
-
 }

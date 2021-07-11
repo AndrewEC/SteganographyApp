@@ -1,12 +1,13 @@
-﻿using SteganographyApp.Common;
-using SteganographyApp.Common.Arguments;
-using System;
-
-namespace SteganographyApp
+﻿namespace SteganographyApp
 {
-    class Program
+    using System;
+
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
+
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography App\n");
             if (Checks.WasHelpRequested(args))
@@ -16,7 +17,7 @@ namespace SteganographyApp
             }
 
             var parser = new ArgumentParser();
-            if(!parser.TryParse(args, out IInputArguments arguments, PostValidate))
+            if (!parser.TryParse(args, out IInputArguments arguments, PostValidate))
             {
                 parser.PrintCommonErrorMessage();
                 return;
@@ -31,12 +32,13 @@ namespace SteganographyApp
                 HandleException(e, arguments);
             }
 
-            Console.WriteLine("");
+            Console.WriteLine(string.Empty);
         }
 
         private static void HandleException(Exception e, IInputArguments arguments)
         {
-            switch (e){
+            switch (e)
+            {
                 case ArgumentParseException e1:
                 case ArgumentValueException e2:
                     Console.WriteLine("An error ocurred parsing the provided arguments: \n\t{0}", e.Message);
@@ -58,8 +60,7 @@ namespace SteganographyApp
         /// </summary>
         private static string PostValidate(IInputArguments input)
         {
-            if (!Checks.IsOneOf(input.EncodeOrDecode, ActionEnum.Clean, ActionEnum.Encode,
-                ActionEnum.Decode))
+            if (!Checks.IsOneOf(input.EncodeOrDecode, ActionEnum.Clean, ActionEnum.Encode, ActionEnum.Decode))
             {
                 return "The action specified must be one of: 'clean', 'encode', or 'decode'.";
             }
@@ -81,7 +82,7 @@ namespace SteganographyApp
         /// <summary>
         /// Attempts to print out the help information retrieved from the help.prop file.
         /// </summary>
-        static void PrintHelp()
+        private static void PrintHelp()
         {
             var parser = new HelpParser();
             if (!parser.TryParseHelpFile(out HelpInfo info))

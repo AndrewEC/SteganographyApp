@@ -1,14 +1,12 @@
-using NUnit.Framework;
-
-using SteganographyApp.Common.Arguments;
-
 namespace SteganographyApp.Common.Tests
 {
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
 
     [TestFixture]
     public class EnableCompressParseTests : FixtureWithMockConsoleReaderAndWriter
     {
-
         [Test]
         public void TestEnableCompressionWithValidValue()
         {
@@ -18,7 +16,5 @@ namespace SteganographyApp.Common.Tests
             Assert.IsNull(parser.LastError);
             Assert.IsTrue(arguments.UseCompression);
         }
-
     }
-
 }

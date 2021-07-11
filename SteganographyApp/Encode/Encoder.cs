@@ -1,60 +1,38 @@
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.IO;
-using SteganographyApp.Common;
-using SteganographyApp.Common.Injection;
-
-using System;
-using System.Collections.Concurrent;
-
 namespace SteganographyApp.Encode
 {
+    using System;
+    using System.Collections.Concurrent;
+
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.IO;
 
     /// <summary>
     /// Used to indicate if there is more data that can be potentially read
     /// from the file to encode. Incomplete indicates there might be more data
     /// to read, complete means there is for sure none left.
     /// </summary>
-    enum Status
+    internal enum Status
     {
         Incomplete,
         Complete,
-        Failure
+        Failure,
     }
 
     /// <summary>
     /// Specifies the values to be added to our read queue by the file read
     /// thread.
     /// </summary>
-    struct ReadArgs
+    internal struct ReadArgs
     {
         public Status Status;
         public string Data;
         public Exception Exception;
     }
 
-    /// <summary>
-    /// Helps initialize the utilitiy classes required to fulfill the encoding
-    /// process.
-    /// </summary>
-    class EncodingUtilities
-    {
-
-        public ImageStore ImageStore { get; }
-        public TableChunkTracker TableTracker { get; }
-        public ImageTracker ImageTracker { get; }
-
-        public EncodingUtilities(IInputArguments args)
-        {
-            ImageStore = new ImageStore(args);
-            TableTracker = new TableChunkTracker(ImageStore);
-            ImageTracker = ImageTracker.CreateTrackerFrom(args, ImageStore);
-        }
-
-    }
-
     public class Encoder
     {
-
         private readonly IInputArguments arguments;
 
         /// <summary>
@@ -86,10 +64,7 @@ namespace SteganographyApp.Encode
         /// Creates an Encoder instances and invokes the private
         /// <see cref="EncodeFileToImage"/> method.
         /// </summary>
-        public static void CreateAndEncode(IInputArguments arguments)
-        {
-            new Encoder(arguments).EncodeFileToImage();
-        }
+        public static void CreateAndEncode(IInputArguments arguments) => new Encoder(arguments).EncodeFileToImage();
 
         /// <summary>
         /// Initiates the process of encoding a file and storing it within an image.
@@ -114,7 +89,6 @@ namespace SteganographyApp.Encode
 
         private void Encode(ImageStore.ImageStoreWrapper wrapper)
         {
-
             log.Debug("Encoding file: [{0}]", arguments.FileToEncode);
             int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
             log.Debug("Content chunk table requires [{0}] bits of space to store.", startingPixel);
@@ -122,12 +96,11 @@ namespace SteganographyApp.Encode
 
             int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
             log.Debug("File requires [{0}] iterations to encode.", requiredNumberOfWrites);
-            var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites,
-                "Encoding file contents", "All input file contents have been encoded.");
+            var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites, "Encoding file contents", "All input file contents have been encoded.");
 
             var thread = FileReadThread.CreateAndStart(readQueue, arguments, errorContainer);
 
-            while(true)
+            while (true)
             {
                 var readArgs = readQueue.Take();
                 if (readArgs.Status == Status.Complete)
@@ -167,7 +140,25 @@ namespace SteganographyApp.Encode
             log.Trace("Encoding process complete.");
             utilities.ImageTracker.PrintImagesUtilized();
         }
-
     }
 
+    /// <summary>
+    /// Helps initialize the utilitiy classes required to fulfill the encoding
+    /// process.
+    /// </summary>
+    internal class EncodingUtilities
+    {
+        public EncodingUtilities(IInputArguments args)
+        {
+            ImageStore = new ImageStore(args);
+            TableTracker = new TableChunkTracker(ImageStore);
+            ImageTracker = ImageTracker.CreateTrackerFrom(args, ImageStore);
+        }
+
+        public ImageStore ImageStore { get; }
+
+        public TableChunkTracker TableTracker { get; }
+
+        public ImageTracker ImageTracker { get; }
+    }
 }

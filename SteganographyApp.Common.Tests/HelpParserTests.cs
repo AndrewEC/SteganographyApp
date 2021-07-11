@@ -1,15 +1,14 @@
-﻿using System.Collections.Immutable;
-
-using NUnit.Framework;
-
-namespace SteganographyApp.Common.Tests
+﻿namespace SteganographyApp.Common.Tests
 {
+    using System.Collections.Immutable;
+
+    using NUnit.Framework;
+
     [TestFixture]
     public class HelpParserTests : FixtureWithRealObjects
     {
-
-        private readonly string PositiveTestPath = "TestAssets/positive-help.prop";
-        private readonly string NegativeTestPath = "TestAssets/negative-help.prop";
+        private static readonly string PositiveTestPath = "TestAssets/positive-help.prop";
+        private static readonly string NegativeTestPath = "TestAssets/negative-help.prop";
 
         [Test]
         public void TestParseHelpAndGetMainHelpItems()
@@ -29,23 +28,6 @@ namespace SteganographyApp.Common.Tests
             RunHelpParserTest(HelpItemSet.Converter, HelpInfo.ConverterHelpLabels);
         }
 
-        private void RunHelpParserTest(HelpItemSet itemSet, ImmutableArray<string> expected)
-        {
-            var parser = new HelpParser();
-            Assert.IsTrue(parser.TryParseHelpFile(out HelpInfo info, PositiveTestPath));
-            Assert.IsNull(parser.LastError);
-
-            var messages = info.GetHelpMessagesFor(itemSet);
-            Assert.AreEqual(expected.Length, messages.Length);
-
-            foreach (string line in messages)
-            {
-                Assert.IsNotNull(line);
-                Assert.AreNotEqual("", line.Trim());
-                Assert.IsFalse(line.Contains("No help information configured for"));
-            }
-        }
-
         [Test]
         public void TestMissingFileReturnsFalse()
         {
@@ -59,11 +41,27 @@ namespace SteganographyApp.Common.Tests
         {
             var parser = new HelpParser();
             Assert.IsTrue(parser.TryParseHelpFile(out HelpInfo info, NegativeTestPath));
-            foreach(string line in info.GetHelpMessagesFor(HelpItemSet.Calculator))
+            foreach (string line in info.GetHelpMessagesFor(HelpItemSet.Calculator))
             {
                 Assert.IsTrue(line.Contains("No help information configured for"));
             }
         }
 
+        private void RunHelpParserTest(HelpItemSet itemSet, ImmutableArray<string> expected)
+        {
+            var parser = new HelpParser();
+            Assert.IsTrue(parser.TryParseHelpFile(out HelpInfo info, PositiveTestPath));
+            Assert.IsNull(parser.LastError);
+
+            var messages = info.GetHelpMessagesFor(itemSet);
+            Assert.AreEqual(expected.Length, messages.Length);
+
+            foreach (string line in messages)
+            {
+                Assert.IsNotNull(line);
+                Assert.AreNotEqual(string.Empty, line.Trim());
+                Assert.IsFalse(line.Contains("No help information configured for"));
+            }
+        }
     }
 }

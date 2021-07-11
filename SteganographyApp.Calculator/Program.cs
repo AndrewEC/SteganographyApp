@@ -1,11 +1,10 @@
-﻿using SteganographyApp.Common;
-using SteganographyApp.Common.Arguments;
-
-using System;
-using System.Collections.Immutable;
-
-namespace SteganographyAppCalculator
+﻿namespace SteganographyAppCalculator
 {
+    using System;
+    using System.Collections.Immutable;
+
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
 
     /// <summary>
     /// Static reference class containing the number of available storage bits
@@ -21,13 +20,12 @@ namespace SteganographyAppCalculator
         public static readonly int P2160 = 25_012_800;
     }
 
-    class Program
+    public class Program
     {
-
         private static readonly ImmutableArray<ActionEnum> CalculateEncryptedSizeActions = ImmutableArray.Create(ActionEnum.CalculateEncryptedSize, ActionEnum.CES);
         private static readonly ImmutableArray<ActionEnum> CalculateStorageSpaceActions = ImmutableArray.Create(ActionEnum.CalculateStorageSpace, ActionEnum.CSS);
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("\nSteganography Calculator\n");
             if (Checks.WasHelpRequested(args))
@@ -37,7 +35,7 @@ namespace SteganographyAppCalculator
             }
 
             var parser = new ArgumentParser();
-            if(!parser.TryParse(args, out IInputArguments arguments, PostValidate))
+            if (!parser.TryParse(args, out IInputArguments arguments, PostValidate))
             {
                 parser.PrintCommonErrorMessage();
                 return;
@@ -52,7 +50,7 @@ namespace SteganographyAppCalculator
                 EncryptedSizeCalculator.CalculateEncryptedSize(arguments);
             }
 
-            Console.WriteLine("");
+            Console.WriteLine(string.Empty);
         }
 
         /// <summary>
@@ -104,6 +102,5 @@ namespace SteganographyAppCalculator
                 Console.WriteLine("{0}\n", message);
             }
         }
-
     }
 }

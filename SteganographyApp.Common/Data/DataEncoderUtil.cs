@@ -1,9 +1,16 @@
-﻿using System;
-
-using SteganographyApp.Common.Injection;
-
-namespace SteganographyApp.Common.Data
+﻿namespace SteganographyApp.Common.Data
 {
+    using System;
+
+    using SteganographyApp.Common.Injection;
+
+    public interface IDataEncoderUtil
+    {
+        string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed);
+
+        byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed);
+    }
+
     /// <summary>
     /// A case class inheriting from Exception that specifies an error occured
     /// when an IFileCoder instance attempted to transform input data.
@@ -11,13 +18,8 @@ namespace SteganographyApp.Common.Data
     public class TransformationException : Exception
     {
         public TransformationException(string message) : base(message) { }
-        public TransformationException(string message, Exception inner) : base(message, inner) { }
-    }
 
-    public interface IDataEncoderUtil
-    {
-        string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed);
-        byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed);
+        public TransformationException(string message, Exception inner) : base(message, inner) { }
     }
 
     /// <summary>
@@ -26,8 +28,7 @@ namespace SteganographyApp.Common.Data
     /// </summary>
     [Injectable(typeof(IDataEncoderUtil))]
     public class DataEncoderUtil : IDataEncoderUtil
-    {   
-
+    {
         /// <summary>
         /// Takes in a raw byte array, compresses, encodes base64, encrypts, and then
         /// returns as a binary string.
@@ -51,7 +52,7 @@ namespace SteganographyApp.Common.Data
 
             string base64 = Convert.ToBase64String(bytes);
 
-            if (password != "")
+            if (password != string.Empty)
             {
                 try
                 {
@@ -70,7 +71,7 @@ namespace SteganographyApp.Common.Data
                 binary = Injector.Provide<IDummyUtil>().InsertDummies(dummyCount, binary, randomSeed);
             }
 
-            if (randomSeed != "")
+            if (randomSeed != string.Empty)
             {
                 binary = Injector.Provide<IRandomizeUtil>().RandomizeBinaryString(binary, randomSeed);
             }
@@ -93,19 +94,18 @@ namespace SteganographyApp.Common.Data
         /// occured while decrypting the base64 string or when decompressing the byte stream.</exception>
         public byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed)
         {
-            
-            if (randomSeed != "")
+            if (randomSeed != string.Empty)
             {
-                binary = Injector.Provide<IRandomizeUtil>().ReorderBinaryString(binary, randomSeed);   
+                binary = Injector.Provide<IRandomizeUtil>().ReorderBinaryString(binary, randomSeed);
             }
 
-            if(dummyCount > 0)
+            if (dummyCount > 0)
             {
                 binary = Injector.Provide<IDummyUtil>().RemoveDummies(dummyCount, binary, randomSeed);
             }
 
             var decoded64String = Injector.Provide<IBinaryUtil>().ToBase64String(binary);
-            if (password != "")
+            if (password != string.Empty)
             {
                 try
                 {
@@ -130,9 +130,8 @@ namespace SteganographyApp.Common.Data
                     throw new TransformationException("An exception occurred while decompressing content.", e);
                 }
             }
-            
+
             return decoded;
         }
-
     }
 }

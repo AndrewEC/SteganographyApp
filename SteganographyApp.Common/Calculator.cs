@@ -1,13 +1,11 @@
-using System;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common
 {
+    using System;
+
+    using SteganographyApp.Common.Injection;
 
     public class Calculator
     {
-
         /// <summary>
         /// Specifies the number of bits that will be reserved for each entry in the content
         /// chunk table.
@@ -31,7 +29,7 @@ namespace SteganographyApp.Common
         public static int CalculateRequiredNumberOfWrites(string fileToEncode, int chunkByteSize)
         {
             long fileSizeBytes = Injector.Provide<IFileProvider>().GetFileSizeBytes(fileToEncode);
-            return (int)(Math.Ceiling((double)fileSizeBytes / chunkByteSize));
+            return (int)Math.Ceiling((double)fileSizeBytes / chunkByteSize);
         }
 
         /// <summary>
@@ -44,9 +42,7 @@ namespace SteganographyApp.Common
         public static int CalculateRequiredBitsForContentTable(string fileToEncode, int chunkByteSize)
         {
             int requiredNumberOfWrites = CalculateRequiredNumberOfWrites(fileToEncode, chunkByteSize);
-            return requiredNumberOfWrites * ChunkDefinitionBitSize + ChunkDefinitionBitSize + requiredNumberOfWrites;
+            return (requiredNumberOfWrites * ChunkDefinitionBitSize) + ChunkDefinitionBitSize + requiredNumberOfWrites;
         }
-
     }
-
 }

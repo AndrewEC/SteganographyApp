@@ -1,41 +1,38 @@
-﻿using System;
-using System.IO;
-
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Injection;
-
-namespace SteganographyApp.Common.IO
+﻿namespace SteganographyApp.Common.IO
 {
+    using System;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+
     public abstract class AbstractContentIO : IDisposable
     {
+        public AbstractContentIO(IInputArguments args)
+        {
+            this.Args = args;
+        }
+
+        /// <summary>
+        /// The values parsed from the command line arguments.
+        /// </summary>
+        protected IInputArguments Args { get; }
 
         /// <summary>
         /// The stream used by the underlying implementation to read
         /// or write data to a specified file.
         /// </summary>
-        protected IReadWriteStream stream;
-
-        /// <summary>
-        /// The values parsed from the command line arguments.
-        /// </summary>
-        protected readonly IInputArguments args;
-
-        public AbstractContentIO(IInputArguments args)
-        {
-            this.args = args;
-        }
+        protected IReadWriteStream Stream { get; set; }
 
         /// <summary>
         /// Flushes the stream if it has been instantiated.
         /// </summary>
         public void Dispose()
         {
-            if(stream != null)
+            if (Stream != null)
             {
-                stream.Flush();
-                stream.Dispose();
+                Stream.Flush();
+                Stream.Dispose();
             }
         }
-
     }
 }

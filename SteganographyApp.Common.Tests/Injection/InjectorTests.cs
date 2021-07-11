@@ -1,16 +1,16 @@
-using System;
-using Moq;
-using NUnit.Framework;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Tests
 {
+    using System;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Injection;
 
     [TestFixture]
-    class InjectorTests : FixtureWithRealObjects
+    public class InjectorTests : FixtureWithRealObjects
     {
-
         [Test]
         public void TestProvideDefaultInjectableInstance()
         {
@@ -34,7 +34,8 @@ namespace SteganographyApp.Common.Tests
         {
             Injector.AllowOnlyMockObjects();
 
-            var actual = Assert.Throws<InvalidOperationException>(() => {
+            var actual = Assert.Throws<InvalidOperationException>(() =>
+            {
                 Injector.Provide<IConsoleReader>();
             });
 
@@ -46,13 +47,11 @@ namespace SteganographyApp.Common.Tests
         {
             var mockReader = new Mock<IConsoleReader>();
             Injector.UseInstance<IConsoleReader>(mockReader.Object);
-            
+
             Injector.ResetInstances();
             var reader = Injector.Provide<IConsoleReader>();
 
             Assert.AreNotEqual(mockReader.Object, reader);
         }
-
     }
-
 }

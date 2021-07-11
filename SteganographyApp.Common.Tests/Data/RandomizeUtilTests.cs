@@ -1,17 +1,15 @@
-using NUnit.Framework;
-
-using SteganographyApp.Common.Data;
-
 namespace SteganographyApp.Common.Tests
 {
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Data;
 
     [TestFixture]
     public class RandomizeUtilTests : FixtureWithLogger
     {
-
-        private static string OriginalBinaryString = "1101010101000011101011111000000010101010100";
-        private static string RandomSeed = "randomSeed";
-        private static string BadRandomSeed = "badRandomSeed";
+        private static readonly string OriginalBinaryString = "1101010101000011101011111000000010101010100";
+        private static readonly string RandomSeed = "randomSeed";
+        private static readonly string BadRandomSeed = "badRandomSeed";
 
         [Test]
         public void TestRandomizeTwiceWithSameSeedProducesSameResult()
@@ -48,9 +46,7 @@ namespace SteganographyApp.Common.Tests
             Assert.AreNotEqual(OriginalBinaryString, randomized);
 
             string unrandomized = util.ReorderBinaryString(randomized, BadRandomSeed);
-            Assert.AreNotEqual(OriginalBinaryString, unrandomized);            
+            Assert.AreNotEqual(OriginalBinaryString, unrandomized);
         }
-
     }
-
 }

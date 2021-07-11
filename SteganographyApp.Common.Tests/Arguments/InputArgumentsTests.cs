@@ -1,21 +1,20 @@
-﻿using Moq;
-using NUnit.Framework;
-
-using System;
-using System.Collections.Generic;
-
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Injection;
-
-using static Moq.It;
-
-namespace SteganographyApp.Common.Tests
+﻿namespace SteganographyApp.Common.Tests
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+
+    using static Moq.It;
 
     [TestFixture]
     public class InputArgumentsTests : FixtureWithMockConsoleReaderAndWriter
     {
-
         [Test]
         public void TestPrintCommonMessageOutputsCorrectMessagesToWriter()
         {
@@ -28,7 +27,7 @@ namespace SteganographyApp.Common.Tests
 
             var inputs = new string[] { "--chunkSize", "abc" };
             var parser = new ArgumentParser();
-            
+
             Assert.IsFalse(parser.TryParse(inputs, out IInputArguments inputArguments, (IInputArguments arguments) => null));
             parser.PrintCommonErrorMessage();
 
@@ -43,7 +42,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsFalse(parser.TryParse(null, out IInputArguments arguments, null));
             Assert.IsNotNull(parser.LastError);
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
-            Assert.AreEqual("No arguments provided to parse.", parser.LastError.Message);
+            Assert.AreEqual("No arguments provided.", parser.LastError.Message);
         }
 
         [Test]
@@ -70,7 +69,7 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestParseWithPostValidationMessageProducesException()
         {
-            string[] inputs = new string[] {  "--action", "encode" };
+            string[] inputs = new string[] { "--action", "encode" };
             var parser = new ArgumentParser();
             Assert.IsFalse(parser.TryParse(inputs, out IInputArguments arguments, PostValidationWithMessage));
             Assert.IsNotNull(parser.LastError);
@@ -103,6 +102,5 @@ namespace SteganographyApp.Common.Tests
                 return new ConsoleKeyInfo('*', ConsoleKey.Backspace, false, false, false);
             }
         }
-
     }
 }

@@ -1,21 +1,20 @@
-using System;
-using System.Text;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Data
 {
+    using System;
+    using System.Text;
+
+    using SteganographyApp.Common.Injection;
 
     public interface IBinaryUtil
     {
         string ToBase64String(string binary);
+
         string ToBinaryString(string base64String);
     }
 
     [Injectable(typeof(IBinaryUtil))]
     public class BinaryUtil : IBinaryUtil
     {
-
         /// <summary>
         /// Converts a binary string to a base64 encoded string.
         /// </summary>
@@ -49,5 +48,4 @@ namespace SteganographyApp.Common.Data
             return builder.ToString();
         }
     }
-
 }

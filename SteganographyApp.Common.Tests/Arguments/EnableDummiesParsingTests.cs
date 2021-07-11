@@ -1,20 +1,18 @@
-using Moq;
-
-using NUnit.Framework;
-
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Injection;
-
-using static Moq.Times;
-using static Moq.It;
-
 namespace SteganographyApp.Common.Tests
 {
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+
+    using static Moq.It;
+    using static Moq.Times;
 
     [TestFixture]
     public class EnableDummiesParsingTests : FixtureWithMockConsoleReaderAndWriter
     {
-
         [Test]
         public void TestParseInsertDummiesWithValidValue()
         {
@@ -51,7 +49,7 @@ namespace SteganographyApp.Common.Tests
             Assert.IsTrue(firstArguments.InsertDummies);
             Assert.AreNotEqual(0, firstArguments.DummyCount);
 
-            Assert.IsTrue(second.TryParse(secondaryArgs, out IInputArguments secondArguments, (IInputArguments Arguments) => null));
+            Assert.IsTrue(second.TryParse(secondaryArgs, out IInputArguments secondArguments, (IInputArguments arguments) => null));
             Assert.IsTrue(secondArguments.InsertDummies);
             Assert.AreNotEqual(0, secondArguments.DummyCount);
 
@@ -59,7 +57,5 @@ namespace SteganographyApp.Common.Tests
 
             mockImageProvider.Verify(provider => provider.LoadImage(imagePath), Exactly(4));
         }
-
     }
-
 }

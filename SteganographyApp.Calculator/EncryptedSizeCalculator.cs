@@ -1,16 +1,13 @@
-using System;
-
-using SteganographyApp.Common;
-using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.IO;
-
 namespace SteganographyAppCalculator
 {
+    using System;
+
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.IO;
 
     public static class EncryptedSizeCalculator
     {
-
         /// <summary>
         /// Calculate the total size of the input file after base64 conversion, binary conversion,
         /// and optionally encryption if a password argument was provided.
@@ -22,12 +19,12 @@ namespace SteganographyAppCalculator
             Console.WriteLine("Calculating encypted size of file {0}.", arguments.FileToEncode);
             try
             {
-
                 int singleChunkSize = CalculateChunkLength(arguments);
                 int numberOfChunks = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
+
                 // Plus 1 because we need an additional entry in the chunk table to indicate the number of entries in the table
                 int chunkTableSize = (numberOfChunks + 1) * Calculator.ChunkDefinitionBitSizeWithPadding;
-                double size = (double) singleChunkSize * (double) numberOfChunks + (double) chunkTableSize;
+                double size = ((double)singleChunkSize * (double)numberOfChunks) + (double)chunkTableSize;
 
                 Console.WriteLine("\nEncrypted file size is:");
                 PrintSize(size);
@@ -86,7 +83,5 @@ namespace SteganographyAppCalculator
             Console.WriteLine("\tAt 1440p: \t{0}", size / CommonResolutionStorageSpace.P1440);
             Console.WriteLine("\tAt 4K (2160p): \t{0}", size / CommonResolutionStorageSpace.P2160);
         }
-
     }
-
 }

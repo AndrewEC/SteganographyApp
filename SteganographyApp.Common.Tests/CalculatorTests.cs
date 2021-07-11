@@ -1,25 +1,18 @@
-using Moq;
-using NUnit.Framework;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Tests
 {
+    using Moq;
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Injection;
 
     [TestFixture]
     public class CalculatorTests : FixtureWithTestObjects
     {
-
-        private static readonly string TestFile = "Test001.png";
-        private static readonly int ChunkSize = 131_072;
-
         [Mockup(typeof(IFileProvider))]
         public Mock<IFileProvider> mockFileProvider;
 
-        protected override void SetupMocks()
-        {
-            mockFileProvider.Setup(provider => provider.GetFileSizeBytes(It.IsAny<string>())).Returns(ChunkSize * 5);
-        }
+        private static readonly string TestFile = "Test001.png";
+        private static readonly int ChunkSize = 131_072;
 
         [Test]
         public void TestRequiredChunkSizeMatchesExpected()
@@ -39,6 +32,9 @@ namespace SteganographyApp.Common.Tests
             mockFileProvider.Verify(provider => provider.GetFileSizeBytes(TestFile), Times.Once());
         }
 
+        protected override void SetupMocks()
+        {
+            mockFileProvider.Setup(provider => provider.GetFileSizeBytes(It.IsAny<string>())).Returns(ChunkSize * 5);
+        }
     }
-
 }

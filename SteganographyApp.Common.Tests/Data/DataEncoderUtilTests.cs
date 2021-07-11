@@ -1,27 +1,18 @@
-﻿using Moq;
-
-using NUnit.Framework;
-
-using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
-
-using static Moq.Times;
-using static Moq.It;
-
-namespace SteganographyApp.Common.Tests
+﻿namespace SteganographyApp.Common.Tests
 {
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.Injection;
+
+    using static Moq.It;
+    using static Moq.Times;
+
     [TestFixture]
     public class DataEncoderUtilTests : FixtureWithTestObjects
     {
-
-        private static readonly byte[] InputBytes = new byte[1];
-        private static readonly string Password = "password";
-        private static readonly bool UseCompression = false;
-        private static readonly int DummyCount = 10;
-        private static readonly string RandomSeed = "randomSeed";
-
-        private static readonly string StringToDecode = "stringToDecode";
-
         [Mockup(typeof(IEncryptionProvider))]
         public Mock<IEncryptionProvider> mockEncryptionProvider;
 
@@ -36,6 +27,14 @@ namespace SteganographyApp.Common.Tests
 
         [Mockup(typeof(ICompressionUtil))]
         public Mock<ICompressionUtil> mockCompressionUtil;
+
+        private static readonly byte[] InputBytes = new byte[1];
+        private static readonly string Password = "password";
+        private static readonly bool UseCompression = false;
+        private static readonly int DummyCount = 10;
+        private static readonly string RandomSeed = "randomSeed";
+
+        private static readonly string StringToDecode = "stringToDecode";
 
         [Test]
         public void TestEncode()
@@ -120,6 +119,5 @@ namespace SteganographyApp.Common.Tests
 
             mockCompressionUtil.Verify(util => util.Decompress(IsAny<byte[]>()), Never());
         }
-
     }
 }

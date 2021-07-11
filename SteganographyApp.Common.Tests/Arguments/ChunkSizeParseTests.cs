@@ -1,14 +1,12 @@
-using NUnit.Framework;
-
-using SteganographyApp.Common.Arguments;
-
 namespace SteganographyApp.Common.Tests
 {
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
 
     [TestFixture]
     public class ChunkSizeParseTests
     {
-
         [TestCase(1)]
         [TestCase(10_000)]
         [TestCase(1_000_000)]
@@ -36,7 +34,5 @@ namespace SteganographyApp.Common.Tests
         }
 
         private string NullReturningPostValidator(IInputArguments input) => null;
-
     }
-
 }

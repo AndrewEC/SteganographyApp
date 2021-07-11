@@ -1,7 +1,8 @@
-﻿using System;
-
-namespace SteganographyApp.Common.Data
+﻿namespace SteganographyApp.Common.Data
 {
+    using System;
+
+#pragma warning disable SA1121
 
     /// <summary>
     /// A reliable number generator that will repeatably generate random sets
@@ -9,6 +10,18 @@ namespace SteganographyApp.Common.Data
     /// </summary>
     public sealed class IndexGenerator
     {
+        // Coefficients
+        private readonly Int32 a1 = 0;
+        private readonly Int32 a2 = 63308;
+        private readonly Int32 a3 = -183326;
+
+        private readonly Int32 b1 = 86098;
+        private readonly Int32 b2 = 0;
+        private readonly Int32 b3 = -539608;
+
+        // Bases
+        private readonly Int32 m1 = 2147483647;
+        private readonly Int32 m2 = 2145483479;
 
         /// <summary>
         /// The history of x values up to a maximum of 3 values.
@@ -24,19 +37,6 @@ namespace SteganographyApp.Common.Data
         /// the first entry in the history of y values.
         /// </summary>
         private Int32[] y;
-
-        //Coefficients
-        private readonly Int32 a1 = 0;
-        private readonly Int32 a2 = 63308;
-        private readonly Int32 a3 = -183326;
-
-        private readonly Int32 b1 = 86098;
-        private readonly Int32 b2 = 0;
-        private readonly Int32 b3 = -539608;
-
-        //Bases
-        private readonly Int32 m1 = 2147483647;
-        private readonly Int32 m2 = 2145483479;
 
         /// <summary>
         /// Takes in a seed number and initializes the history of x and y values using the specified seed
@@ -65,28 +65,6 @@ namespace SteganographyApp.Common.Data
         }
 
         /// <summary>
-        /// Generates a new random number between 0 and max inclusive.
-        /// </summary>
-        /// <param name="max">The largest values this method can return.</param>
-        /// <returns>A 32 bit integer between 0 and the maximum value inclusive.</returns>
-        public Int32 Next(Int32 max)
-        {
-            if (max % 2 == 0)
-            {
-                max -= 1;
-            }
-
-            Int32 xn = (a1 * x[2] + a2 * x[1] + a3 * x[0]) % m1;
-            Int32 yn = (b1 * y[2] + b2 * y[1] + b3 * y[0]) % m2;
-
-            Swap(x, xn);
-            Swap(y, yn);
-
-            Int32 zn = (xn - yn) % max;
-            return Math.Abs(zn - 1);
-        }
-
-        /// <summary>
         /// Generates a new random seed from a string.
         /// </summary>
         /// <param name="seed">The seed or hash as a string.</param>
@@ -103,6 +81,28 @@ namespace SteganographyApp.Common.Data
         }
 
         /// <summary>
+        /// Generates a new random number between 0 and max inclusive.
+        /// </summary>
+        /// <param name="max">The largest values this method can return.</param>
+        /// <returns>A 32 bit integer between 0 and the maximum value inclusive.</returns>
+        public Int32 Next(Int32 max)
+        {
+            if (max % 2 == 0)
+            {
+                max -= 1;
+            }
+
+            Int32 xn = ((a1 * x[2]) + (a2 * x[1]) + (a3 * x[0])) % m1;
+            Int32 yn = ((b1 * y[2]) + (b2 * y[1]) + (b3 * y[0])) % m2;
+
+            Swap(x, xn);
+            Swap(y, yn);
+
+            Int32 zn = (xn - yn) % max;
+            return Math.Abs(zn - 1);
+        }
+
+        /// <summary>
         /// Adds the new value to the beginning of the array and moves all elements to the next element,
         /// losing the last value in the array.
         /// </summary>
@@ -115,4 +115,5 @@ namespace SteganographyApp.Common.Data
             arr[0] = value;
         }
     }
+#pragma warning restore SA1121
 }

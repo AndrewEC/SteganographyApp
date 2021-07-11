@@ -1,42 +1,26 @@
-using System.IO;
-using System.IO.Compression;
-
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Data
 {
+    using System.IO;
+    using System.IO.Compression;
+
+    using SteganographyApp.Common.Injection;
 
     public interface ICompressionUtil
     {
         byte[] Compress(byte[] fileBytes);
+
         byte[] Decompress(byte[] readBytes);
     }
 
     [Injectable(typeof(ICompressionUtil))]
     public class CompressionUtil : ICompressionUtil
     {
-
         private ILogger log;
 
         [PostConstruct]
         public void PostConstruct()
         {
             log = Injector.LoggerFor<CompressionUtil>();
-        }
-
-        /// <summary>
-        /// Copies all the data from the source stream into the destination stream
-        /// </summary>
-        /// <param name="src">The source stream where the data is coming from.</param>
-        /// <param name="dest">The destination stream the data is being written to.</param>
-        private void CopyTo(Stream src, Stream dest)
-        {
-            byte[] bytes = new byte[2048];
-            int read = 0;
-            while ((read = src.Read(bytes, 0, bytes.Length)) != 0)
-            {
-                dest.Write(bytes, 0, read);
-            }
         }
 
         /// <summary>
@@ -81,6 +65,19 @@ namespace SteganographyApp.Common.Data
             }
         }
 
+        /// <summary>
+        /// Copies all the data from the source stream into the destination stream
+        /// </summary>
+        /// <param name="src">The source stream where the data is coming from.</param>
+        /// <param name="dest">The destination stream the data is being written to.</param>
+        private void CopyTo(Stream src, Stream dest)
+        {
+            byte[] bytes = new byte[2048];
+            int read = 0;
+            while ((read = src.Read(bytes, 0, bytes.Length)) != 0)
+            {
+                dest.Write(bytes, 0, read);
+            }
+        }
     }
-
 }

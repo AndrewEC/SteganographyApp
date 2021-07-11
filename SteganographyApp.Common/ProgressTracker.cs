@@ -1,7 +1,6 @@
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common
 {
+    using SteganographyApp.Common.Injection;
 
     /// <summary>
     /// Utility class to help write messages to the console along with a
@@ -10,7 +9,6 @@ namespace SteganographyApp.Common
     /// </summary>
     public sealed class ProgressTracker
     {
-
         private readonly double maxProgress;
         private readonly string progressMessage;
         private readonly string completeMessage;
@@ -35,10 +33,7 @@ namespace SteganographyApp.Common
         /// <summary>
         /// Displays the progress message with a progress of 0.
         /// </summary>
-        public void Display()
-        {
-            outputWriter.Write($"{progressMessage} :: 0%\r");
-        }
+        public void Display() => outputWriter.Write($"{progressMessage} :: 0%\r");
 
         /// <summary>
         /// Increments the current progress by one and reprints the progress message.
@@ -50,7 +45,7 @@ namespace SteganographyApp.Common
         {
             currentProgress = currentProgress + 1;
             double percent = currentProgress / maxProgress * 100.0;
-            if(percent >= 100.0)
+            if (percent >= 100.0)
             {
                 percent = 100.0;
                 outputWriter.WriteLine(completeMessage);
@@ -60,7 +55,5 @@ namespace SteganographyApp.Common
                 outputWriter.Write($"{progressMessage} :: {(int)percent}%\r");
             }
         }
-
     }
-
 }

@@ -1,23 +1,22 @@
-using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-
-using Moq;
-using static Moq.Times;
-
-using NUnit.Framework;
-
-using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Injection;
-
 namespace SteganographyApp.Common.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
+    using System.Text;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Injection;
+
+    using static Moq.Times;
 
     [TestFixture]
     public class RandomSeedParseTests : FixtureWithMockConsoleReaderAndWriter
     {
-
         private static readonly ImmutableList<ValueTuple<char, ConsoleKey>> TestingInputMapping = new List<ValueTuple<char, ConsoleKey>>()
         {
             ('T', ConsoleKey.T),
@@ -38,7 +37,7 @@ namespace SteganographyApp.Common.Tests
             ('n', ConsoleKey.N),
             ('g', ConsoleKey.G),
             ('0', ConsoleKey.Backspace),
-            ('0', ConsoleKey.Enter)
+            ('0', ConsoleKey.Enter),
         }.ToImmutableList();
 
         [TestCase(3)]
@@ -96,7 +95,5 @@ namespace SteganographyApp.Common.Tests
         }
 
         private string NullReturningPostValidator(IInputArguments input) => null;
-
     }
-
 }

@@ -1,16 +1,14 @@
-using NUnit.Framework;
-
-using SteganographyApp.Common.Arguments;
-
-using SixLabors.ImageSharp.Formats.Png;
-
 namespace SteganographyApp.Common.Tests
 {
+    using NUnit.Framework;
+
+    using SixLabors.ImageSharp.Formats.Png;
+
+    using SteganographyApp.Common.Arguments;
 
     [TestFixture]
     public class CompressLevelParseTests
     {
-
         [TestCase(0, PngCompressionLevel.Level0)]
         [TestCase(5, PngCompressionLevel.Level5)]
         [TestCase(9, PngCompressionLevel.Level9)]
@@ -35,7 +33,5 @@ namespace SteganographyApp.Common.Tests
         }
 
         private string NullReturningPostValidator(IInputArguments input) => null;
-
     }
-
 }

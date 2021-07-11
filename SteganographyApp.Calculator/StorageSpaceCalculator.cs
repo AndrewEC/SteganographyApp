@@ -1,18 +1,16 @@
-using System;
-using System.Collections.Immutable;
-using System.Numerics;
-
-using SixLabors.ImageSharp;
-
-using SteganographyApp.Common;
-using SteganographyApp.Common.Arguments;
-
 namespace SteganographyAppCalculator
 {
+    using System;
+    using System.Collections.Immutable;
+    using System.Numerics;
+
+    using SixLabors.ImageSharp;
+
+    using SteganographyApp.Common;
+    using SteganographyApp.Common.Arguments;
 
     public static class StorageSpaceCalculator
     {
-
          /// <summary>
         /// Calculates the total available storage space of all the specified images.
         /// </summary>
@@ -45,16 +43,15 @@ namespace SteganographyAppCalculator
         /// <param name="coverImages">The array of string paths to the images to check.</param>
         private static BigInteger CalculateNumberOfPixelsForImages(ImmutableArray<string> coverImages)
         {
-            var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length,
-                    "Calculating image storage space", "Completed calculating image storage space.");
-            var count = new BigInteger();
+            var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length, "Calculating image storage space", "Completed calculating image storage space.");
+            var count = new BigInteger(0);
             foreach (string imagePath in coverImages)
             {
                 try
                 {
                     using (var image = Image.Load(imagePath))
                     {
-                        count += (image.Width * image.Height);
+                        count += image.Width * image.Height;
                     }
                 }
                 catch (Exception e)
@@ -76,13 +73,14 @@ namespace SteganographyAppCalculator
             Console.WriteLine("\t{0} bits", size);
             Console.WriteLine("\t{0} bytes", size / 8);
             Console.WriteLine("\t{0} KB", size / 8 / 1024);
-            if (size / 8 / 1024 / 1024 < 1) {
+            if ((size / 8) / 1024 / 1024 < 1)
+            {
                 Console.WriteLine("\t< 1 MB");
-            } else{
+            }
+            else
+            {
                 Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
             }
         }
-
     }
-
 }
