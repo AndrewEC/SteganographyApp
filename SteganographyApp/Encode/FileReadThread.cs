@@ -4,10 +4,10 @@ namespace SteganographyApp.Encode
     using System.Collections.Concurrent;
     using System.Threading;
 
-    using SteganographyApp.Common;
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.IO;
+    using SteganographyApp.Common.Logging;
 
     /// <summary>
     /// Handles reading in and encoding data from a source file and adding it

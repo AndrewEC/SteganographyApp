@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common
+namespace SteganographyApp.Common.Logging
 {
     using System;
     using System.Text;

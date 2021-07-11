@@ -4,6 +4,7 @@ namespace SteganographyApp.Common.Data
     using System.IO.Compression;
 
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     public interface ICompressionUtil
     {

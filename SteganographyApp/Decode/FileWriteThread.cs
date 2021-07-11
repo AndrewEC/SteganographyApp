@@ -4,10 +4,10 @@ namespace SteganographyApp.Decode
     using System.Collections.Concurrent;
     using System.Threading;
 
-    using SteganographyApp.Common;
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.IO;
+    using SteganographyApp.Common.Logging;
 
     /// <summary>
     /// Handles taking in the raw binary data read from an image, decoding it,

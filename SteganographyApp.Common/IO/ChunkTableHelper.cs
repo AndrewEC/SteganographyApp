@@ -7,6 +7,7 @@ namespace SteganographyApp.Common.IO
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Data;
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     public interface IChunkTableHelper
     {

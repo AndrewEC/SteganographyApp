@@ -6,6 +6,7 @@ namespace SteganographyApp.Common.Arguments
 
     using SteganographyApp.Common.Data;
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     internal static class Parsers
     {

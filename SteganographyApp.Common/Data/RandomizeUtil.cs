@@ -3,6 +3,7 @@ namespace SteganographyApp.Common.Data
     using System;
 
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     public interface IRandomizeUtil
     {

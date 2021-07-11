@@ -7,6 +7,7 @@ namespace SteganographyApp.Common.Tests
     using NUnit.Framework;
 
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     [TestFixture]
     public class Init

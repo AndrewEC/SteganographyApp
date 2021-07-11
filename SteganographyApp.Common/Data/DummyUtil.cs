@@ -5,6 +5,7 @@ namespace SteganographyApp.Common.Data
     using System.Text;
 
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     public interface IDummyUtil
     {

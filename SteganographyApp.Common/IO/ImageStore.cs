@@ -7,6 +7,7 @@
 
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     /// <summary>
     /// Class that handles positioning a make shift write stream in the proper position so

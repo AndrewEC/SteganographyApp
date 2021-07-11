@@ -7,6 +7,7 @@ namespace SteganographyApp.Decode
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.IO;
+    using SteganographyApp.Common.Logging;
 
     /// <summary>
     /// Used to indicate if there is more data to be read from the storage images.

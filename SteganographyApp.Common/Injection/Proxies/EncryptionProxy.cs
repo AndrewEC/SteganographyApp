@@ -2,6 +2,8 @@ namespace SteganographyApp.Common.Injection
 {
     using Rijndael256;
 
+    using SteganographyApp.Common.Logging;
+
     /// <summary>
     /// A proxy interface for interacting with the Rijndael encryption library.
     /// </summary>

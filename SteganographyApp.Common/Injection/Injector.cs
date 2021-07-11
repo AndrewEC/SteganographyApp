@@ -6,6 +6,8 @@ namespace SteganographyApp.Common.Injection
     using System.Linq;
     using System.Reflection;
 
+    using SteganographyApp.Common.Logging;
+
     /// <summary>
     /// For looking up and initializing the things within the current assembly that can be injected.
     /// </summary>
