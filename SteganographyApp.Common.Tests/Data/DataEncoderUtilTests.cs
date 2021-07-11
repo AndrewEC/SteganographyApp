@@ -13,8 +13,8 @@
     [TestFixture]
     public class DataEncoderUtilTests : FixtureWithTestObjects
     {
-        [Mockup(typeof(IEncryptionProvider))]
-        public Mock<IEncryptionProvider> mockEncryptionProvider;
+        [Mockup(typeof(IEncryptionProxy))]
+        public Mock<IEncryptionProxy> mockEncryptionProxy;
 
         [Mockup(typeof(IBinaryUtil))]
         public Mock<IBinaryUtil> mockBinaryUtil;
@@ -40,7 +40,7 @@
         public void TestEncode()
         {
             string encryptedString = "encrypted_string";
-            mockEncryptionProvider.Setup(provider => provider.Encrypt(IsAny<string>(), IsAny<string>())).Returns(encryptedString);
+            mockEncryptionProxy.Setup(provider => provider.Encrypt(IsAny<string>(), IsAny<string>())).Returns(encryptedString);
 
             string binaryString = "binary_string";
             mockBinaryUtil.Setup(provider => provider.ToBinaryString(IsAny<string>())).Returns(binaryString);
@@ -57,7 +57,7 @@
 
             Assert.AreEqual(randomizedString, result);
 
-            mockEncryptionProvider.Verify(provider => provider.Encrypt(IsAny<string>(), Password), Once());
+            mockEncryptionProxy.Verify(provider => provider.Encrypt(IsAny<string>(), Password), Once());
             mockBinaryUtil.Verify(util => util.ToBinaryString(encryptedString), Once());
             mockDummyUtil.Verify(util => util.InsertDummies(DummyCount, binaryString, RandomSeed), Once());
             mockRandomUtil.Verify(util => util.RandomizeBinaryString(dummyString, RandomSeed), Once());
@@ -67,7 +67,7 @@
         [Test]
         public void TestEncodeWithCompressionEnabled()
         {
-            mockEncryptionProvider.Setup(provider => provider.Encrypt(IsAny<string>(), IsAny<string>())).Returns("encrypted_string");
+            mockEncryptionProxy.Setup(provider => provider.Encrypt(IsAny<string>(), IsAny<string>())).Returns("encrypted_string");
             mockBinaryUtil.Setup(util => util.ToBinaryString(IsAny<string>())).Returns("binary_string");
             mockDummyUtil.Setup(util => util.InsertDummies(IsAny<int>(), IsAny<string>(), IsAny<string>())).Returns("dummy_string");
             mockRandomUtil.Setup(util => util.RandomizeBinaryString(IsAny<string>(), IsAny<string>())).Returns("randomized_string");
@@ -92,7 +92,7 @@
             mockBinaryUtil.Setup(util => util.ToBase64String(IsAny<string>())).Returns(base64String);
 
             string encryptedString = "ZW5jcnlwdGVkX3N0cmluZw==";
-            mockEncryptionProvider.Setup(provider => provider.Decrypt(IsAny<string>(), IsAny<string>())).Returns(encryptedString);
+            mockEncryptionProxy.Setup(provider => provider.Decrypt(IsAny<string>(), IsAny<string>())).Returns(encryptedString);
 
             var util = new DataEncoderUtil();
 
@@ -101,7 +101,7 @@
             mockRandomUtil.Verify(provider => provider.ReorderBinaryString(StringToDecode, RandomSeed), Once());
             mockDummyUtil.Verify(provider => provider.RemoveDummies(DummyCount, randomizedString, RandomSeed), Once());
             mockBinaryUtil.Verify(provider => provider.ToBase64String(dummyString), Once());
-            mockEncryptionProvider.Verify(provider => provider.Decrypt(base64String, Password), Once());
+            mockEncryptionProxy.Verify(provider => provider.Decrypt(base64String, Password), Once());
             mockCompressionUtil.Verify(util => util.Decompress(IsAny<byte[]>()), Never());
         }
 
@@ -111,7 +111,7 @@
             mockRandomUtil.Setup(util => util.ReorderBinaryString(IsAny<string>(), IsAny<string>())).Returns("randomized_string");
             mockDummyUtil.Setup(util => util.RemoveDummies(IsAny<int>(), IsAny<string>(), IsAny<string>())).Returns("dummy_string");
             mockBinaryUtil.Setup(util => util.ToBase64String(IsAny<string>())).Returns("base64String");
-            mockEncryptionProvider.Setup(provider => provider.Decrypt(IsAny<string>(), IsAny<string>())).Returns("ZW5jcnlwdGVkX3N0cmluZw==");
+            mockEncryptionProxy.Setup(provider => provider.Decrypt(IsAny<string>(), IsAny<string>())).Returns("ZW5jcnlwdGVkX3N0cmluZw==");
 
             var util = new DataEncoderUtil();
 

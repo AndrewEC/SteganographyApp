@@ -28,7 +28,7 @@ namespace SteganographyApp.Common.Arguments
             (string regexExpression, string path) = ParseRegex(value);
             var regex = new Regex(regexExpression);
 
-            string[] files = Injector.Provide<IFileProvider>().GetFiles(path);
+            string[] files = Injector.Provide<IFileIOProxy>().GetFiles(path);
             string[] images = files.Where(file => regex.Match(file).Success).ToArray();
             Array.Sort(images, string.Compare);
 

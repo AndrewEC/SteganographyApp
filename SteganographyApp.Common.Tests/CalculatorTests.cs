@@ -8,8 +8,8 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class CalculatorTests : FixtureWithTestObjects
     {
-        [Mockup(typeof(IFileProvider))]
-        public Mock<IFileProvider> mockFileProvider;
+        [Mockup(typeof(IFileIOProxy))]
+        public Mock<IFileIOProxy> mockFileIOProxy;
 
         private static readonly string TestFile = "Test001.png";
         private static readonly int ChunkSize = 131_072;
@@ -20,7 +20,7 @@ namespace SteganographyApp.Common.Tests
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(TestFile, ChunkSize);
 
             Assert.AreEqual(197, requiredBitsForTable);
-            mockFileProvider.Verify(provider => provider.GetFileSizeBytes(TestFile), Times.Once());
+            mockFileIOProxy.Verify(provider => provider.GetFileSizeBytes(TestFile), Times.Once());
         }
 
         [Test]
@@ -29,12 +29,12 @@ namespace SteganographyApp.Common.Tests
             int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(TestFile, ChunkSize);
 
             Assert.AreEqual(5, requiredNumberOfWrites);
-            mockFileProvider.Verify(provider => provider.GetFileSizeBytes(TestFile), Times.Once());
+            mockFileIOProxy.Verify(provider => provider.GetFileSizeBytes(TestFile), Times.Once());
         }
 
         protected override void SetupMocks()
         {
-            mockFileProvider.Setup(provider => provider.GetFileSizeBytes(It.IsAny<string>())).Returns(ChunkSize * 5);
+            mockFileIOProxy.Setup(provider => provider.GetFileSizeBytes(It.IsAny<string>())).Returns(ChunkSize * 5);
         }
     }
 }

@@ -12,7 +12,7 @@
     /// Class that handles positioning a make shift write stream in the proper position so
     /// data can be reliably read and written to the storage images.
     /// </summary>
-    public class ImageStore
+    public sealed partial class ImageStore
     {
         /// <summary>
         /// Stores the current x and y position for the current read/write operation.
@@ -351,7 +351,7 @@
                 throw new ImageProcessingException("There is not enough available storage space in the provided images to continue.");
             }
 
-            currentImage = Injector.Provide<IImageProvider>().LoadImage(CurrentImage);
+            currentImage = Injector.Provide<IImageProxy>().LoadImage(CurrentImage);
             log.Debug("Loaded image [{0}]", CurrentImage);
 
             OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
@@ -417,43 +417,6 @@
                 }
                 currentImage.Dispose();
                 currentImage = null;
-            }
-        }
-
-        /// <summary>
-        /// A wrapper class that exposes the IO related methods of an ImageStore instance while implementing
-        /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
-        /// more error prone IO operations.
-        /// </summary>
-        public class ImageStoreWrapper : IDisposable
-        {
-            private readonly ImageStore store;
-
-            private bool save = false;
-
-            public ImageStoreWrapper(ImageStore store)
-            {
-                this.store = store;
-                store.LoadNextImage();
-            }
-
-            public void EncodeComplete()
-            {
-                save = true;
-            }
-
-            public int WriteContentChunkToImage(string binary) => store.WriteBinaryString(binary);
-
-            public string ReadContentChunkFromImage(int length) => store.ReadBinaryString(length);
-
-            public void SeekToPixel(int bitsToSkip) => store.SeekToPixel(bitsToSkip);
-
-            public void ResetToImage(int index) => store.ResetToImage(index);
-
-            public void Dispose()
-            {
-                store.CloseOpenImage(save);
-                store.ResetToImage(0);
             }
         }
     }

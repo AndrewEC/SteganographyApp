@@ -160,7 +160,7 @@
             string assemblyPath = GetAssemblyPath();
             string helpFileLocation = $"{assemblyPath}\\{fileName}";
 
-            if (!Injector.Provide<IFileProvider>().IsExistingFile(helpFileLocation))
+            if (!Injector.Provide<IFileIOProxy>().IsExistingFile(helpFileLocation))
             {
                 LastError = $"The help file named {helpFileLocation} could not be found.";
                 info = new HelpInfo(null);
@@ -184,7 +184,7 @@
         private ImmutableDictionary<string, string> ParseHelpItems(string helpFileLocation)
         {
             var helpItems = new Dictionary<string, string>();
-            string[] lines = Injector.Provide<IFileProvider>().ReadAllLines(helpFileLocation);
+            string[] lines = Injector.Provide<IFileIOProxy>().ReadAllLines(helpFileLocation);
             for (int i = 0; i < lines.Length; i++)
             {
                 if (lines[i].StartsWith(HelpItemIndicator))

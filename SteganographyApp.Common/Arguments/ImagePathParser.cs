@@ -58,10 +58,10 @@ namespace SteganographyApp.Common.Arguments
                 throw new ArgumentValueException($"No images were found using the provided regular expression.");
             }
 
-            var fileProvider = Injector.Provide<IFileProvider>();
+            var fileProxy = Injector.Provide<IFileIOProxy>();
             foreach (string path in imagePaths)
             {
-                if (!fileProvider.IsExistingFile(path))
+                if (!fileProxy.IsExistingFile(path))
                 {
                     throw new ArgumentValueException($"The file specified could not be found or is not a file: {path}");
                 }

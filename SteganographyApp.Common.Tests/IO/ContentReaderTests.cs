@@ -15,8 +15,8 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class ContentReaderTests : FixtureWithTestObjects
     {
-        [Mockup(typeof(IFileProvider))]
-        public Mock<IFileProvider> mockFileProvider;
+        [Mockup(typeof(IFileIOProxy))]
+        public Mock<IFileIOProxy> mockFileIOProxy;
 
         [Mockup(typeof(IReadWriteStream))]
         public Mock<IReadWriteStream> mockReadWriteStream;
@@ -59,7 +59,7 @@ namespace SteganographyApp.Common.Tests
 
             mockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
             mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
-            mockFileProvider.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
+            mockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
             mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
             mockDataEncoderUtil
                 .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()), Once());
@@ -78,7 +78,7 @@ namespace SteganographyApp.Common.Tests
 
             mockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
             mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
-            mockFileProvider.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
+            mockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
             mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
             mockDataEncoderUtil
                 .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()), Never());
@@ -101,7 +101,7 @@ namespace SteganographyApp.Common.Tests
 
         protected override void SetupMocks()
         {
-            mockFileProvider.Setup(provider => provider.OpenFileForRead(IsAny<string>())).Returns(mockReadWriteStream.Object);
+            mockFileIOProxy.Setup(provider => provider.OpenFileForRead(IsAny<string>())).Returns(mockReadWriteStream.Object);
         }
     }
 }

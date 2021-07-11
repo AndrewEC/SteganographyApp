@@ -9,13 +9,13 @@ namespace SteganographyApp.Common.Injection
     /// test with a loaded image without the need for an actual image file
     /// to be present.
     /// </summary>
-    public interface IImageProvider
+    public interface IImageProxy
     {
         IBasicImageInfo LoadImage(string pathToImage);
     }
 
-    [Injectable(typeof(IImageProvider))]
-    public class ImageProvider : IImageProvider
+    [Injectable(typeof(IImageProxy))]
+    public class ImageProxy : IImageProxy
     {
         public IBasicImageInfo LoadImage(string pathToImage) => new BasicImageInfo(Image.Load<Rgba32>(pathToImage));
     }

@@ -26,12 +26,12 @@
         {
             if (Stream == null)
             {
-                var fileProvider = Injector.Provide<IFileProvider>();
-                if (fileProvider.IsExistingFile(Args.DecodedOutputFile))
+                var fileIOProxy = Injector.Provide<IFileIOProxy>();
+                if (fileIOProxy.IsExistingFile(Args.DecodedOutputFile))
                 {
-                    fileProvider.Delete(Args.DecodedOutputFile);
+                    fileIOProxy.Delete(Args.DecodedOutputFile);
                 }
-                Stream = fileProvider.OpenFileForWrite(Args.DecodedOutputFile);
+                Stream = fileIOProxy.OpenFileForWrite(Args.DecodedOutputFile);
             }
 
             byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed);

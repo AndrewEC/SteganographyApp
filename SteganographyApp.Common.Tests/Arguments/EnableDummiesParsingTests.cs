@@ -26,15 +26,15 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestParseDummyCountIsParsedWhenDummiesAreEnabledAndCoverImagesAreProvided()
         {
-            var mockFileProvider = new Mock<IFileProvider>();
-            mockFileProvider.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(true);
-            Injector.UseInstance(mockFileProvider.Object);
+            var mockFileIOProxy = new Mock<IFileIOProxy>();
+            mockFileIOProxy.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(true);
+            Injector.UseInstance(mockFileIOProxy.Object);
 
             var mockImage = new Mock<IBasicImageInfo>();
             mockImage.Setup(image => image.Width).Returns(100);
             mockImage.Setup(image => image.Height).Returns(100);
 
-            var mockImageProvider = new Mock<IImageProvider>();
+            var mockImageProvider = new Mock<IImageProxy>();
             mockImageProvider.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage.Object);
             Injector.UseInstance(mockImageProvider.Object);
 

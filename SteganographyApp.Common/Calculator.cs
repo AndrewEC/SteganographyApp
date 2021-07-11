@@ -17,6 +17,12 @@ namespace SteganographyApp.Common
         /// </summary>
         public static readonly int BitsPerPixel = 3;
 
+        /// <summary>
+        /// Specifies the number of bits that will be reserved for each entry in the content
+        /// chunk table + 1. The plus one is because each pixel in the image stores 3 bits
+        /// and since 11 pixels are used to store a content chunk table entry then it can store 33
+        /// bits in total. Although only 32 of them are needed for the actual entry.
+        /// </summary>
         public static readonly int ChunkDefinitionBitSizeWithPadding = 33;
 
         /// <summary>
@@ -28,7 +34,7 @@ namespace SteganographyApp.Common
         /// <param name="chunkByteSize">The number of bytes to read in at a time.</param>
         public static int CalculateRequiredNumberOfWrites(string fileToEncode, int chunkByteSize)
         {
-            long fileSizeBytes = Injector.Provide<IFileProvider>().GetFileSizeBytes(fileToEncode);
+            long fileSizeBytes = Injector.Provide<IFileIOProxy>().GetFileSizeBytes(fileToEncode);
             return (int)Math.Ceiling((double)fileSizeBytes / chunkByteSize);
         }
 

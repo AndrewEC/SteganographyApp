@@ -29,7 +29,7 @@
         {
             if (Stream == null)
             {
-                Stream = Injector.Provide<IFileProvider>().OpenFileForRead(Args.FileToEncode);
+                Stream = Injector.Provide<IFileIOProxy>().OpenFileForRead(Args.FileToEncode);
             }
             byte[] buffer = new byte[Args.ChunkByteSize];
             int read = Stream.Read(buffer, 0, buffer.Length);

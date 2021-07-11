@@ -62,13 +62,13 @@ namespace SteganographyApp.Common.Arguments
                 return;
             }
 
-            var imageProvider = Injector.Provide<IImageProvider>();
+            var imageProxy = Injector.Provide<IImageProxy>();
 
             long dummyCount = 1;
             int[] imageIndexes = new int[] { 0, arguments.CoverImages.Length - 1 };
             foreach (int imageIndex in imageIndexes)
             {
-                using (var image = imageProvider.LoadImage(arguments.CoverImages[imageIndex]))
+                using (var image = imageProxy.LoadImage(arguments.CoverImages[imageIndex]))
                 {
                     dummyCount += dummyCount * (image.Width * image.Height);
                 }
@@ -139,7 +139,7 @@ namespace SteganographyApp.Common.Arguments
         /// could not be found.</exception>
         public static void ParseFileToEncode(InputArguments arguments, string value)
         {
-            if (!Injector.Provide<IFileProvider>().IsExistingFile(value))
+            if (!Injector.Provide<IFileIOProxy>().IsExistingFile(value))
             {
                 throw new ArgumentValueException($"Input file could not be found or is not a file: {value}");
             }

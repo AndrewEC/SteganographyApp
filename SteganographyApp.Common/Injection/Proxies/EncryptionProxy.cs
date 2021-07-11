@@ -3,24 +3,24 @@ namespace SteganographyApp.Common.Injection
     using Rijndael256;
 
     /// <summary>
-    /// Provides a wrapper interface for interacting with the Rijndael encryption library.
+    /// A proxy interface for interacting with the Rijndael encryption library.
     /// </summary>
-    public interface IEncryptionProvider
+    public interface IEncryptionProxy
     {
         string Encrypt(string base64String, string password);
 
         string Decrypt(string base64String, string password);
     }
 
-    [Injectable(typeof(IEncryptionProvider))]
-    public class EncryptionProvider : IEncryptionProvider
+    [Injectable(typeof(IEncryptionProxy))]
+    public class EncryptionProxy : IEncryptionProxy
     {
         private ILogger log;
 
         [PostConstruct]
         public void PostConstruct()
         {
-            log = Injector.LoggerFor<EncryptionProvider>();
+            log = Injector.LoggerFor<EncryptionProxy>();
         }
 
         public string Encrypt(string base64String, string password)

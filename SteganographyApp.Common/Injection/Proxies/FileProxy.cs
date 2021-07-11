@@ -3,10 +3,9 @@ namespace SteganographyApp.Common.Injection
     using System.IO;
 
     /// <summary>
-    /// Provides an interface wrapper for some of the basic file IO operations
-    /// so they can be stubbed out in unit tests.
+    /// A proxy interface to interacting with some of the common file IO related functions.
     /// </summary>
-    public interface IFileProvider
+    public interface IFileIOProxy
     {
         long GetFileSizeBytes(string pathToFile);
 
@@ -23,8 +22,8 @@ namespace SteganographyApp.Common.Injection
         string[] ReadAllLines(string pathToFile);
     }
 
-    [Injectable(typeof(IFileProvider))]
-    public class FileProvider : IFileProvider
+    [Injectable(typeof(IFileIOProxy))]
+    public class FileIOProxy : IFileIOProxy
     {
         public long GetFileSizeBytes(string pathToFile)
         {

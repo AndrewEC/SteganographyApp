@@ -56,7 +56,7 @@
             {
                 try
                 {
-                    base64 = Injector.Provide<IEncryptionProvider>().Encrypt(base64, password);
+                    base64 = Injector.Provide<IEncryptionProxy>().Encrypt(base64, password);
                 }
                 catch (Exception e)
                 {
@@ -109,7 +109,7 @@
             {
                 try
                 {
-                    decoded64String = Injector.Provide<IEncryptionProvider>().Decrypt(decoded64String, password);
+                    decoded64String = Injector.Provide<IEncryptionProxy>().Decrypt(decoded64String, password);
                 }
                 catch (Exception e)
                 {

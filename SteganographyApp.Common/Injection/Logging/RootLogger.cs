@@ -87,12 +87,12 @@ namespace SteganographyApp.Common
         {
             try
             {
-                var provider = Injector.Provide<IFileProvider>();
-                if (provider.IsExistingFile(LogFileName))
+                var fileIOProxy = Injector.Provide<IFileIOProxy>();
+                if (fileIOProxy.IsExistingFile(LogFileName))
                 {
-                    provider.Delete(LogFileName);
+                    fileIOProxy.Delete(LogFileName);
                 }
-                writeLogStream = provider.OpenFileForWrite(LogFileName);
+                writeLogStream = fileIOProxy.OpenFileForWrite(LogFileName);
                 return true;
             }
             catch (Exception e)

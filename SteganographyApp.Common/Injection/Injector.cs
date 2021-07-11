@@ -6,6 +6,9 @@ namespace SteganographyApp.Common.Injection
     using System.Linq;
     using System.Reflection;
 
+    /// <summary>
+    /// For looking up and initializing the things within the current assembly that can be injected.
+    /// </summary>
     public static partial class Injector
     {
         /// <summary>
@@ -45,6 +48,10 @@ namespace SteganographyApp.Common.Injection
         }
     }
 
+    /// <summary>
+    /// For invoking any post construct methods registered on the things within the assembly that are injectable
+    /// and have already been instantiated.
+    /// </summary>
     public static partial class Injector
     {
         /// <summary>
