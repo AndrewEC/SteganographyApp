@@ -1,0 +1,384 @@
+<docs>
+    <members name="Exceptions">
+        <GeneralMessage>
+            <summary>Initializes the exception with a message.</summary>
+            <param name="message">The message detailing the error that has ocurred.</param>
+        </GeneralMessage>
+        <GeneralMessageInner>
+            <summary>Initializes the exception with a message and a cause.</summary>
+            <param name="message">The message detailing the error that has ocurred.</param>
+            <param name="inner">The actual exception that triggered this exception.</param>
+        </GeneralMessageInner>
+    </members>
+    <members name="InputArguments">
+        <Password>
+            <summary>
+                The password used to encrypt or decrypt the contents of a file.
+                Only used when encoding or decoding a file.
+            </summary>
+        </Password>
+        <FileToEncode>
+            <summary>
+                The relative or absolute path to the file to encode. Only used when encoding a file.
+            </summary>
+        </FileToEncode>
+        <DecodedOutputFile>
+            <summary>
+                The path the decoded file contents will be written to. Only used when decoding a file.
+            </summary>
+        </DecodedOutputFile>
+        <CoverImages>
+            <summary>
+                The paths to the images to read from or write to. This may be used when encoding a file,
+                decoding a file, cleaning the images, or calculating the storage space of a series of images.
+            </summary>
+        </CoverImages>
+        <EncodeOrDecode>
+            <summary>
+                The action to take.
+            </summary>
+        </EncodeOrDecode>
+        <PrintStack>
+            <summary>
+                Indicates whether or not stack trace should be printed whenever an exception ocurrs during an
+                encoding or decoding process.
+            </summary>
+        </PrintStack>
+        <UseCompression>
+            <summary>
+                Indicates whether or not the contents being encoded, decoded, or calculate, should be compressed
+                using a standard GZip compression algorithm.
+            </summary>
+        </UseCompression>
+        <RandomSeed>
+            <summary>
+                A starting seed for the random number generator used when encoding, decoding, and calculating encrypted
+                size of a file.
+            </summary>
+        </RandomSeed>
+        <DummyCount>
+            <summary>
+                Indicates the number of dummies to insert or remove from the contents of a file when encoding, decoding,
+                and calculating the encrypted size of a file.
+            </summary>
+        </DummyCount>
+        <InsertDummies>
+            <summary>
+                Specifies whether or not any dummies should be inserted or removed from the contents of a file when
+                encoding, decoding, or calculating the encrypted size of a file.
+            </summary>
+        </InsertDummies>
+        <DeleteAfterConversion>
+            <summary>
+                Specifies whether or not the original image should be deleted after being converted to a PNG image.
+                Only used by the Converter.
+            </summary>
+        </DeleteAfterConversion>
+        <CompressionLevel>
+            <summary>
+                The compression level to use when converting lossy images to a PNG format. Only used by the Converter.
+                <para>Default value is 5.</para>
+            </summary>
+        </CompressionLevel>
+        <ChunkByteSize>
+            <summary>
+                Gets the chunk size. I.e. the number of bytes to read, encode, and write at any given time.
+                <para>Higher values will improve the time to encode a larger file and reduce
+                ther overall encoded file size though values too high run the risk of having memory related errors.</para>
+                <para>Default value of 131,072.</para>
+            </summary>
+        </ChunkByteSize>
+    </members>
+    <members name="BinaryUtil">
+        <ToBase64String>
+            <summary>
+                Converts a binary string to a base64 encoded string.
+            </summary>
+            <param name="binary">The original string representation of a binary figure to convert to base64.</param>
+            <returns>The base64 representation of the input binary string.</returns>
+        </ToBase64String>
+        <ToBinaryString>
+            <summary>
+                Converts a base64 encoded string to a string of binary.
+            </summary>
+            <param name="base64String">The base64 encoded string to convert to binary.</param>
+            <returns>A binary representation of the input base64 formatted string.</returns>
+        </ToBinaryString>
+    </members>
+    <members name="CompressionUtil">
+        <Compress>
+            <summary>
+                Compresses the raw file bytes using standard gzip compression.
+            </summary>
+            <param name="fileBytes">The array of bytes read from the input file.</param>
+            <returns>The gzip compressed array of bytes.</returns>
+        </Compress>
+        <Decompress>
+            <summary>
+                Decompresses the bytes read and decoded from the cover image(s) using standard
+                gzip compression.
+            </summary>
+            <param name="readBytes">The array of bytes read and decoded from the cover images.</param>
+            <returns>A byte array after being decompressed using standard gzip compression.</returns>
+        </Decompress>
+    </members>
+    <members name="DataEncoderUtil">
+        <Encode>
+            <summary>
+                Takes in a raw byte array, compresses, encodes base64, encrypts, and then
+                returns as a binary string.
+            </summary>
+            <param name="bytes">The array of bytes to be encoded as a binary string.</param>
+            <param name="password">The password used to encrypt the contents of the file.</param>
+            <param name="useCompression">Tells the encoder whether or not to compress the input byte array.
+                If an empty string is provided then no encryption will be performed.</param>
+            <param name="dummyCount">The number of dummies to insert into the binary string being encoded. No dummies will be
+            inserted if the dummy count is 0.</param>
+            <param name="randomSeed">The random seed used to randomize the binary string being encoded. If the random seed is blank
+            or null then no randmization will be done.</param>
+            <returns>An binary string made up of the base64 bytes read from the file and possibly passed through an AES cipher.</returns>
+            <exception cref="TransformationException">
+                Thrown if there was an issue trying to pass the base64 encoded string through the AES cipher.
+            </exception>
+        </Encode>
+        <Decode>
+            <summary>
+                Takes an encrypted binary string and returns a byte array that is the original bytes
+                that made up the original input file.
+            </summary>
+            <param name="binary">The encrypted binary string.</param>
+            <param name="password">The password used to decrypt the base64 string. If no password is provided then no decryption will be done to the string.</param>
+            <param name="useCompression">Tells the encoder whether or not to uncompress the encoded binary string.</param>
+            <param name="dummyCount">The number of dummies to remove from the binary string being decoded. If the dummy count is zero then no dummies will
+            be removed.</param>
+            <param name="randomSeed">The random seed to use in de-randomizing the binary string being decoded. If the random seed is null or blank then
+            no randomization will be done.</param>
+            <returns>A byte array containing the original decoded bytes of the file inputted during encoding.</returns>
+            <exception cref="TransformationException">
+                Thrown if an error occured while decrypting the base64 string or when decompressing the byte stream.
+            </exception>
+        </Decode>
+    </members>
+    <members name="DummyUtil">
+        <InsertDummies>
+            <summary>Inserts the specified number of dummy entries into the current binary string.</summary>
+            <param name="numDummies">The number of dummy entries to insert into the binary string.</param>
+            <param name="binary">The original binary string to be modified with the dummy entries.</param>
+            <param name="randomSeed">A random seed used to seed the random number generator used when generating the dummy entries.</param>
+            <returns>Returns the binary string with the new dummy entries.</returns>
+        </InsertDummies>
+        <RemoveDummies>
+            <summary>
+                Attempts to remove dummy entries from the string equal to the number of entries specified in the numDummies parameter.
+            </summary>
+            <param name="numDummies">The number of dummy entries to remove from the binary string.</param>
+            <param name="binary">The binary string to remove the dummy entries from.</param>
+            <param name="randomSeed">A random seed used to seed the random number generator used when generating the dummy entries.</param>
+            <returns>If numDummies == 0 then it will return the original binary string otherwise will return the binary string with the dummy entries removed.</returns>
+            <exception cref="TransformationException">Thrown if an our of range exception is caught while trying to remove the dummy entries from the chunk.</exception>
+        </RemoveDummies>
+    </members>
+    <members name="RandomizeUtil">
+        <RandomizeBinaryString>
+            <summary>
+                Randomizes the encrypted binary string from the file to encode.
+            </summary>
+            <param name="binaryString">The binary string to randomize.</param>
+            <param name="randomSeed">The user provided random seed that will be used to initialize the random number generator.</param>
+            <returns>A randomized binary string.</returns>
+        </RandomizeBinaryString>
+        <ReorderBinaryString>
+            <summary>
+                Reverses the effect of the RandomizeBytes method when writing to file.
+            </summary>
+            <param name="binaryString">The binary string in which the previous randomization process needs to be reversed.</param>
+            <param name="randomSeed">The user provided randoom seed that will be used to initialize the random number generator.</param>
+            <returns>A non-randomized array of bytes matching the original input file.</returns>
+        </ReorderBinaryString>
+    </members>
+    <members name="Logger">
+        <Trace>
+            <summary>
+                Logs a message to the log file with the level of Trace.
+            </summary>
+            <param name="message">The template string to log to file.</param>
+            <param name="arguments">The arguments to be spliced into the template message string.</param>
+        </Trace>
+        <TraceProvider>
+            <summary>
+                Logs a message to the log file with the level of Trace.
+            </summary>
+            <param name="message">The template string to log to file.</param>
+            <param name="provider">
+                The producer function to provide the arguments to be spliced into the template message string.
+                This will only be invoked if it is determine that the message, at the current log level, should
+                be logged at all.
+            </param>
+        </TraceProvider>
+        <Debug>
+            <summary>
+                Logs a message to the log file with the level of Debug.
+            </summary>
+            <param name="message">The template string to log to file.</param>
+            <param name="arguments">The arguments to be spliced into the template message string.</param>
+        </Debug>
+        <DebugProvider>
+            <summary>
+                Logs a message to the log file with the level of Debug.
+            </summary>
+            <param name="message">The template string to log to file.</param>
+            <param name="provider">
+                The producer function to provide the arguments to be spliced into the template message string.
+                This will only be invoked if it is determine that the message, at the current log level, should
+                be logged at all.
+            </param>
+        </DebugProvider>
+        <Error>
+            <summary>Logs a message to the log file with the level of Error.</summary>
+            <param name="message">The template string to log to file.</param>
+            <param name="arguments">The arguments to be spliced into the template message string.</param>
+        </Error>
+        <ErrorProvider>
+            <summary>
+                Logs a message to the log file with the level of Error.
+            </summary>
+            <param name="message">The template string to log to file.</param>
+            <param name="provider">
+                The producer function to provide the arguments to be spliced into the template message string.
+                This will only be invoked if it is determine that the message, at the current log level, should
+                be logged at all.
+            </param>
+        </ErrorProvider>
+    </members>
+    <members name="BasicImageInfo">
+        <Width>
+            <summary>The width of the currently loaded image.</summary>
+        </Width>
+        <Height>
+            <summary>The height of the currently loaded image.</summary>
+        </Height>
+        <Accessor>
+            <summary>Accessor to lookup the colour of a pixel at the specified position.</summary>
+            <param name="x">The x position of the pixel.</param>
+            <param name="y">The y position of the pixel.</param>
+        </Accessor>
+        <Save>
+            <summary>Save the currently loaded image to the specified location.</summary>
+            <param name="pathToImage">The absolute or relative file path where the image should be written to.</param>
+        </Save>
+    </members>
+    <members name="ConsoleProxy">
+        <Write>
+            <summary>Writes the specified string to output using Console.Write.</summary>
+            <param name="line">The string to write to the console without an added new line ending.</param>
+        </Write>
+        <WriteLine>
+            <summary>Writes the specified string to output using Console.WriteLine.</summary>
+            <param name="line">The string to write to the console with an attached new line break.</param>
+        </WriteLine>
+        <ReadKey>
+            <summary>Reads a key press from the console using Console.ReadKey.</summary>
+            <param name="intercept">Intecept.</param>
+            <returns>The info of the key that was pressed.</returns>
+        </ReadKey>
+    </members>
+    <members name="EncryptionProxy">
+        <Encrypt>
+            <summary>Encrypts the provided base64 encoded string using the input password.</summary>
+            <param name="base64String">The base64 encoded string to encrypt.</param>
+            <param name="password">The password to use in the AES cypher.</param>
+            <returns>An encrypted base64 encoded string.</returns>
+        </Encrypt>
+        <Decrypt>
+            <summary>Decrypts the provided base64 encoded string using the input password.</summary>
+            <param name="base64String">The base64 encoded string to decrypt.</param>
+            <param name="password">The password to use in the AES cypher.</param>
+            <returns>A decrypted base64 encoded string.</returns>
+        </Decrypt>
+    </members>
+    <members name="ImageProxy">
+        <LoadImage>
+            <summary>Invokes the Image.Load from the image sharp API to load an image from the provided path.</summary>
+            <param name="pathToImage">The absolute or relative path to the image to load.</param>
+            <returns>A new IBasicImageInfo instance loaded from the specified path.</returns>
+        </LoadImage>
+    </members>
+    <members name="FileIOProxy">
+        <GetFileSizeBytes>
+            <summary>Attempts to get the size of the file, specified by input path, in bytes.</summary>
+            <param name="pathToFile">The absolute or relative path to the file.</param>
+            <returns>The size of the file in bytes.</returns>
+        </GetFileSizeBytes>
+        <IsExistingFile>
+            <summary>Checks if the file at the specified path exists and is a file and not a directory.</summary>
+            <param name="pathToFile">The absolute or relative path to the file.</param>
+            <returns>True if the file exists, otherwise false.</returns>
+        </IsExistingFile>
+        <GetFiles>
+            <summary>Gets a list of files in the specified directory using Directory.GetFiles.</summary>
+            <param name="pathToDirectory">The path to the directory to get the list of files from.</param>
+            <returns>The list of files in the specified directory.</returns>
+        </GetFiles>
+        <OpenFileForRead>
+            <summary>Opens an IO stream to read from a specified file.</summary>
+            <param name="pathToFile">The path to the file to open the read stream to.</param>
+            <returns>A stream made to read from the specified file.</returns>
+        </OpenFileForRead>
+        <OpenFileForWrite>
+            <summary>Opens an IO stream to the target destination for write.</summary>
+            <param name="pathToFile">The path to the file to write to.</param>
+            <returns>A stream made to write to the specified destination.</returns>
+        </OpenFileForWrite>
+        <Delete>
+            <summary>Deletes the specified file.</summary>
+            <param name="pathToFile">The relative or absolute path to the file to delete.</param>
+        </Delete>
+        <ReadAllLines>
+            <summary>Reads all the lines from the specified file.</summary>
+            <param name="pathToFile">The relative or absolute path to the file to read all lines from.</param>
+            <returns>An array of strings whose length is equal to the total number of lines in the file.</returns>
+        </ReadAllLines>
+    </members>
+    <members name="ReadWriteStream">
+        <Read>
+            <summary>
+                Reads a number of bytes from the current file stream.
+            </summary>
+            <param name="array">The array of bytes for values to be read into.</param>
+            <param name="offset">The byte offset to start reading from.</param>
+            <param name="count">The number of bytes to read from the file.</param>
+            <returns>The number of bytes read from the file stream.</returns>
+        </Read>
+        <Write>
+            <summary>Writes a number of bytes to the current file stream.</summary>
+            <param name="array">The array of bytes to write to the stream.</param>
+            <param name="offset">The byte offset to start writing from.</param>
+            <param name="count">The number of bytes to write to the file.</param>
+        </Write>
+        <Flush>
+            <summary>Calls flush on the current file stream.</summary>
+        </Flush>
+    </members>
+    <members name="ChunkTableHelper">
+        <ConvertChunkTableToBinary>
+            <summary>
+                Converts the lengths of all the chunks in the table to a binary string and,
+                if the randomSeed is not null or blank, ranmizes that binary string.
+            </summary>
+            <param name="chunkLengths">The array of chunk lengths to write.</param>
+            <param name="randomSeed">The seed to ranomize the binary string with.</param>
+            <returns>A single binary string representing the chunk table.</returns>
+        </ConvertChunkTableToBinary>
+        <ConvertBinaryToChunkTable>
+            <summary>
+                Converts the raw binary string containing the content chunk table and converts it to an array
+                of integers representing the lengths of each entry in the chunk table. This will not return the
+                first entry in the chunk table that represents the number of entries in the table.
+            </summary>
+            <param name="binary">The binary string containing the content chunk table to un-randomize.</param>
+            <param name="chunkCount">The number of expected chunks in the content chunk table.</param>
+            <param name="randomSeed">The random seed required to re-order the binary string.</param>
+            <returns>A list of integers representing the number of bits in each chunk table.</returns>
+        </ConvertBinaryToChunkTable>
+    </members>
+</docs>

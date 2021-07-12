@@ -8,16 +8,19 @@
 
     using SteganographyApp.Common.Injection;
 
-    ///<summary>
+    /// <summary>
     /// Singleton utility class to parse the provided array of arguments and return and instance of
-    /// InputArguments with the required values
-    ///</summary>
+    /// InputArguments with the required values.
+    /// </summary>
     public sealed class ArgumentParser
     {
         private readonly ImmutableList<Argument> arguments;
 
         private readonly SensitiveArgumentParser sensitiveArgumentParser;
 
+        /// <summary>
+        /// Initialize the argument parser and the list of available arguments.
+        /// </summary>
         public ArgumentParser()
         {
             sensitiveArgumentParser = new SensitiveArgumentParser();
@@ -42,7 +45,7 @@
         }
 
         /// <summary>
-        /// The last exception to ocurr while parsing the argument values.
+        /// Gets last exception to ocurr while parsing the argument values.
         /// </summary>
         public Exception LastError { get; private set; }
 

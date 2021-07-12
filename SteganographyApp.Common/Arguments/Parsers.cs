@@ -8,6 +8,9 @@ namespace SteganographyApp.Common.Arguments
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Logging;
 
+    /// <summary>
+    /// A static class containing a series of parsers for parsing out the user's provided arguments.
+    /// </summary>
     internal static class Parsers
     {
         private static readonly string CompressionLevelTemplate = "Level{0}";
@@ -56,6 +59,7 @@ namespace SteganographyApp.Common.Arguments
         /// <para>Note: the first and last image can be the same image if only one cover image
         /// was provided.</para>
         /// </summary>
+        /// <param name="arguments">The InputArguments instance to modify.</param>
         public static void ParseDummyCount(InputArguments arguments)
         {
             if (!arguments.InsertDummies || arguments.CoverImages == null)
@@ -98,7 +102,7 @@ namespace SteganographyApp.Common.Arguments
         }
 
         /// <summary>
-        /// Parses an int32 from the value string and sets the ChunkByteSize property
+        /// Parses an int32 from the value string and sets the ChunkByteSize property.
         /// </summary>
         /// <param name="arguments">The InputArguments instance to modify.</param>
         /// <param name="value">The string representation of an int value.</param>
@@ -122,9 +126,9 @@ namespace SteganographyApp.Common.Arguments
         }
 
         /// <summary>
-        /// Parses a boolean from the value and sets the PrintStack property
+        /// Parses a boolean from the value and sets the PrintStack property.
         /// </summary>
-        /// <param name="arguments">The InputArguments instance to modify</param>
+        /// <param name="arguments">The InputArguments instance to modify.</param>
         /// <param name="value">A string representation of a boolean value.</param>
         /// <exception cref="ArgumentValueException">Thrown if a boolean value could not
         /// be parsed from the value parameter.</exception>
@@ -150,10 +154,10 @@ namespace SteganographyApp.Common.Arguments
         /// <summary>
         /// Parses a boolean from the value string and sets the UseCompression property.
         /// </summary>
-        /// <param name="arguments">The InputArguments instance to modify</param>
+        /// <param name="arguments">The InputArguments instance to modify.</param>
         /// <param name="value">A string representation of a boolean value.</param>
         /// <exception cref="ArgumentValueException">Thrown if a boolean value could not be parsed
-        /// from the value parameter</exception>
+        /// from the value parameter.</exception>
         public static void ParseUseCompression(InputArguments arguments, string value)
         {
             arguments.UseCompression = bool.Parse(value);

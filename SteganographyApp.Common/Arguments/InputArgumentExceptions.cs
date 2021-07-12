@@ -10,8 +10,10 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     public class ArgumentParseException : Exception
     {
+        /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessage/*' />
         public ArgumentParseException(string message) : base(message) { }
 
+        /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessageInner/*' />
         public ArgumentParseException(string message, Exception inner) : base(message, inner) { }
     }
 
@@ -21,8 +23,10 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     public class ArgumentValueException : Exception
     {
+        /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessage/*' />
         public ArgumentValueException(string message) : base(message) { }
 
+        /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessageInner/*' />
         public ArgumentValueException(string message, Exception inner) : base(message, inner) { }
     }
 
@@ -32,6 +36,7 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     public class ValidationException : Exception
     {
+        /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessageInner/*' />
         public ValidationException(string message, Exception inner) : base(message, inner) { }
     }
 #pragma warning restore SA1402

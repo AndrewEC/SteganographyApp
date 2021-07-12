@@ -6,29 +6,36 @@ namespace SteganographyApp.Common.Data
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Logging;
 
+    /// <summary>
+    /// Contract for interacting with the CompressionUtil instance.
+    /// </summary>
     public interface ICompressionUtil
     {
+        /// <include file='../docs.xml' path='docs/members[@name="CompressionUtil"]/Compress/*' />
         byte[] Compress(byte[] fileBytes);
 
+        /// <include file='../docs.xml' path='docs/members[@name="CompressionUtil"]/Decompress/*' />
         byte[] Decompress(byte[] readBytes);
     }
 
+    /// <summary>
+    /// Utility class for compressing and decrompressing content using GZip compression.
+    /// </summary>
     [Injectable(typeof(ICompressionUtil))]
     public class CompressionUtil : ICompressionUtil
     {
         private ILogger log;
 
+        /// <summary>
+        /// Post construct method for initializing the logger.
+        /// </summary>
         [PostConstruct]
         public void PostConstruct()
         {
             log = Injector.LoggerFor<CompressionUtil>();
         }
 
-        /// <summary>
-        /// Compresses the raw file bytes using standard gzip compression.
-        /// </summary>
-        /// <param name="fileBytes">The array of bytes read from the input file.</param>
-        /// <returns>The gzip compressed array of bytes.</returns>
+        /// <include file='../docs.xml' path='docs/members[@name="CompressionUtil"]/Compress/*' />
         public byte[] Compress(byte[] fileBytes)
         {
             log.Debug("Compressing [{0}] bytes", fileBytes.Length);
@@ -44,13 +51,7 @@ namespace SteganographyApp.Common.Data
             }
         }
 
-        /// <summary>
-        /// Decompresses the bytes read and decoded from the cover image(s) using standard
-        /// gzip compression.
-        /// </summary>
-        /// <param name="readBytes">The array of bytes read and decoded from the
-        /// cover images.</param>
-        /// <returns>A byte array after being decompressed using standard gzip compression.</returns>
+        /// <include file='../docs.xml' path='docs/members[@name="CompressionUtil"]/Decompress/*' />
         public byte[] Decompress(byte[] readBytes)
         {
             log.Debug("Decompressing [{0}] bytes.", readBytes.Length);
@@ -66,11 +67,6 @@ namespace SteganographyApp.Common.Data
             }
         }
 
-        /// <summary>
-        /// Copies all the data from the source stream into the destination stream
-        /// </summary>
-        /// <param name="src">The source stream where the data is coming from.</param>
-        /// <param name="dest">The destination stream the data is being written to.</param>
         private void CopyTo(Stream src, Stream dest)
         {
             byte[] bytes = new byte[2048];

@@ -11,12 +11,18 @@ namespace SteganographyApp.Common.Injection
     /// </summary>
     public interface IImageProxy
     {
+        /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/LoadImage/*' />
         IBasicImageInfo LoadImage(string pathToImage);
     }
 
+    /// <summary>
+    /// The concrete implementation to allow proxying calls to the static Image.Load provided
+    /// in the image sharp API.
+    /// </summary>
     [Injectable(typeof(IImageProxy))]
     public class ImageProxy : IImageProxy
     {
+        /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/LoadImage/*' />
         public IBasicImageInfo LoadImage(string pathToImage) => new BasicImageInfo(Image.Load<Rgba32>(pathToImage));
     }
 }

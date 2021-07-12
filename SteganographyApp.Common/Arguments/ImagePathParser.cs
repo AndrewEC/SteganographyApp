@@ -6,6 +6,10 @@ namespace SteganographyApp.Common.Arguments
 
     using SteganographyApp.Common.Injection;
 
+    /// <summary>
+    /// Static utility class to help parse out a list of paths to the images provided in the
+    /// users arguments.
+    /// </summary>
     internal static class ImagePathParser
     {
         private static readonly ImmutableDictionary<string, string> ShorthandMappings = new Dictionary<string, string>()

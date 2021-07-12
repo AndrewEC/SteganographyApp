@@ -67,8 +67,7 @@
         public event EventHandler<NextImageLoadedEventArgs> OnNextImageLoaded;
 
         /// <summary>
-        /// Readonly property that returns the name of the current image being used in the write
-        /// process.
+        /// Gets the current image being used in the write process.
         /// </summary>
         private string CurrentImage
         {
@@ -191,7 +190,7 @@
         /// Moves the current index back to the index before the specified image
         /// then calls the Next method to advance to the specified image.
         /// </summary>
-        /// <param name="imageName">The image name to start reading and writing from.</param>
+        /// <param name="coverImageIndex">The index of the image to start reading and writing from.</param>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
         public void ResetToImage(int coverImageIndex)
         {
@@ -262,11 +261,12 @@
         /// Performs the appropriate bitwise and/or operation to the provided
         /// byte value of the pixel colour channel to change its least significatnt
         /// bit to be the same as the value specified by the lastBit argument.
+        /// </summary>
         /// <param name="colourChannel">The byte value representing either the
         /// red, green, or blue channel of a pixel.</param>
         /// <param name="lastBit">Specifies the value that the colourChannel's
         /// least significant bit should be changed to.</param>
-        /// </summary>
+        /// <returns>The original colour channel byte that has been shifted based on the last bit value.</returns>
         private byte ShiftColourChannel(byte colourChannel, int lastBit) => (lastBit == 0)
             ? (byte)(colourChannel & ~1)
             : (byte)(colourChannel | 1);
@@ -275,11 +275,11 @@
         /// Performs the appropriate bitwise and/or operation to the provided
         /// byte value of the pixel colour channel to change its least significatnt
         /// bit to be the same as the value specified by the lastBit argument.
+        /// </summary>
         /// <param name="colourChannel">The byte value representing either the
         /// red, green, or blue channel of a pixel.</param>
         /// <param name="lastBit">Specifies the value that the colourChannel's
         /// least significant bit should be changed to.</param>
-        /// </summary>
         private byte ShiftColourChannelByBinary(byte colourChannel, char lastBit)
         {
             int intLastBit = (lastBit == '0') ? 0 : 1;
@@ -364,7 +364,7 @@
 
         /// <summary>
         /// Skip over a number of pixels on the currently loaded image equal to one third
-        /// of the number specified as the bitsToSkip arguments
+        /// of the number specified as the bitsToSkip arguments.
         /// </summary>
         /// <param name="bitsToSkip">The number of bits to skip over for the current over.</param>
         /// <exception cref="ImageProcessingException">If the number of bits to skip puts the current position past

@@ -10,28 +10,41 @@ namespace SteganographyApp.Common.Injection
     /// </summary>
     public interface IBasicImageInfo : IDisposable
     {
+        /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Width/*' />
         int Width { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Height/*' />
         int Height { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Accessor/*' />
         Rgba32 this[int x, int y]
         {
             get;
             set;
         }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
         void Save(string pathToImage);
     }
 
+    /// <summary>
+    /// The concrete implementation of IBasicImageInfo. Used to manipulate images loaded
+    /// via the image sharp library.
+    /// </summary>
     public class BasicImageInfo : IBasicImageInfo
     {
         private readonly Image<Rgba32> image;
 
+        /// <summary>
+        /// Initialize the BasicImageInfo instance using the image data loaded by the image sharp API.
+        /// </summary>
+        /// <param name="image">The image data.</param>
         public BasicImageInfo(Image<Rgba32> image)
         {
             this.image = image;
         }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Width/*' />
         public int Width
         {
             get
@@ -40,6 +53,7 @@ namespace SteganographyApp.Common.Injection
             }
         }
 
+         /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Height/*' />
         public int Height
         {
             get
@@ -48,6 +62,7 @@ namespace SteganographyApp.Common.Injection
             }
         }
 
+         /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Accessor/*' />
         public Rgba32 this[int x, int y]
         {
             get
@@ -61,11 +76,15 @@ namespace SteganographyApp.Common.Injection
             }
         }
 
+        /// <summary>
+        /// Proxies the call to the Dispose method of the image managed by this class.
+        /// </summary>
         public void Dispose()
         {
             image.Dispose();
         }
 
+         /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
         public void Save(string pathToImage) => image.Save(pathToImage);
     }
 }

@@ -7,19 +7,25 @@ namespace SteganographyApp.Common.Data
     /// </summary>
     public class GlobalCounter
     {
+        /// <summary>
+        /// The singleton instance of the GlobalCounter.
+        /// </summary>
         public static readonly GlobalCounter Instance = new GlobalCounter();
 
-        private static object syncLock = new object();
+        private static readonly object SyncLock = new object();
 
         private long count = 0;
 
         private GlobalCounter() { }
 
+        /// <summary>
+        /// Gets the current accumulated count.
+        /// </summary>
         public long Count
         {
             get
             {
-                lock (syncLock)
+                lock (SyncLock)
                 {
                     return count;
                 }
@@ -31,17 +37,24 @@ namespace SteganographyApp.Common.Data
             }
         }
 
+        /// <summary>
+        /// Attempts to increment the Count value by the specified amount.
+        /// </summary>
+        /// <param name="amount">The amount to increment Count by.</param>
         public void Increment(long amount)
         {
-            lock (syncLock)
+            lock (SyncLock)
             {
                 Count = Count + amount;
             }
         }
 
+        /// <summary>
+        /// Resets the count value to 0.
+        /// </summary>
         public void Reset()
         {
-            lock (syncLock)
+            lock (SyncLock)
             {
                 Count = 0;
             }

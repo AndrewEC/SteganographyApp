@@ -9,10 +9,15 @@ namespace SteganographyApp.Common.IO
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Logging;
 
+    /// <summary>
+    /// The interface for interacting with the ChunkTableHelper.
+    /// </summary>
     public interface IChunkTableHelper
     {
+        /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertChunkTableToBinary/*' />
         string ConvertChunkTableToBinary(int[] chunkLengths, string randomSeed);
 
+        /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertBinaryToChunkTable/*' />
         int[] ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed);
     }
 
@@ -24,18 +29,16 @@ namespace SteganographyApp.Common.IO
     {
         private ILogger log;
 
+        /// <summary>
+        /// Post construct method to initialize the logger.
+        /// </summary>
         [PostConstruct]
         public void PostConstruct()
         {
             log = Injector.LoggerFor<ChunkTableHelper>();
         }
 
-        /// <summary>
-        /// Converts the lengths of all the chunks in the table to a binary string and,
-        /// if the randomSeed is not null or blank, ranmizes that binary string.
-        /// </summary>
-        /// <param name="chunkLengths">The array of chunk lengths to write.</param>
-        /// <param name="randomSeed">The seed to ranomize the binary string with.</param>
+        /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertChunkTableToBinary/*' />
         public string ConvertChunkTableToBinary(int[] chunkLengths, string randomSeed)
         {
             log.Debug("Converting [{0}] table entries to binary using random seed [{1}]", chunkLengths.Length, randomSeed);
@@ -56,13 +59,7 @@ namespace SteganographyApp.Common.IO
             return tableHeader + binaryString;
         }
 
-        /// <summary>
-        /// Converts the raw binary string containing the content chunk table and converts it to an array
-        /// of integers representing the lenghts of each entry in the chunk table.
-        /// </summary>
-        /// <param name="binary">The binary string containing the content chunk table to un-randomize</param>
-        /// <param name="chunkCount">The number of expected chunks in the content chunk table.</param>
-        /// <param name="randomSeed">The random seed required to re-order the binary string.</param>
+        /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertBinaryToChunkTable/*' />
         public int[] ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed)
         {
             log.Debug("Converting binary to chunk table with count of [{0}] and random seed [{1}]", chunkCount, randomSeed);

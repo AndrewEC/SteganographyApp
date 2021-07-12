@@ -5,13 +5,22 @@ namespace SteganographyApp.Common.Data
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Logging;
 
+    /// <summary>
+    /// The contract for interacting with the RandomizeUtil instance.
+    /// </summary>
     public interface IRandomizeUtil
     {
+        /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/RandomizeBinaryString/*' />
         string RandomizeBinaryString(string binaryString, string randomSeed);
 
+        /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/ReorderBinaryString/*' />
         string ReorderBinaryString(string binaryString, string randomSeed);
     }
 
+    /// <summary>
+    /// The injectable utility class to randomize and re-order a binary string during the encode
+    /// and decode process.
+    /// </summary>
     [Injectable(typeof(IRandomizeUtil))]
     public class RandomizeUtil : IRandomizeUtil
     {
@@ -19,17 +28,16 @@ namespace SteganographyApp.Common.Data
 
         private ILogger log;
 
+        /// <summary>
+        /// The post construct method for initializing the logger.
+        /// </summary>
         [PostConstruct]
         public void PostConstruct()
         {
             log = Injector.LoggerFor<RandomizeUtil>();
         }
 
-        /// <summary>
-        /// Randomizes the encrypted binary string from the file to encode.
-        /// </summary>
-        /// <param name="binaryString">The binary string to randomize</param>
-        /// <returns>A randomized binary string.</returns>
+        /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/RandomizeBinaryString/*' />
         public string RandomizeBinaryString(string binaryString, string randomSeed)
         {
             char[] characters = binaryString.ToCharArray();
@@ -57,11 +65,7 @@ namespace SteganographyApp.Common.Data
             return randomized;
         }
 
-        /// <summary>
-        /// Reverses the effect of the RandomizeBytes method when writing to file
-        /// </summary>
-        /// <param name="bytes">The randomized bytes read from the input images</param>
-        /// <returns>A non-randomized array of bytes matching the original input file.</returns>
+        /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/ReorderBinaryString/*' />
         public string ReorderBinaryString(string binaryString, string randomSeed)
         {
             char[] characters = binaryString.ToCharArray();

@@ -80,4 +80,4 @@ Arguments must be specified as <argument_name>space<argument_value>.
 \t--compressionLevel | -cl :: Specifies the level of compression to use when converting the images to PNG.
 \t\tValue must be between 0 and 9.
 \t\tThe higher the value, the more the image will be compressed.
-\t\tThe default compression level is 6.
+\t\tThe default compression level is 5.

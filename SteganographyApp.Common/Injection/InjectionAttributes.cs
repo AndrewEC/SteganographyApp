@@ -10,11 +10,20 @@ namespace SteganographyApp.Common.Injection
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class InjectableAttribute : Attribute
     {
+        /// <summary>
+        /// Initialize an injectable attribute with the correlated type.
+        /// </summary>
+        /// <param name="correlatesWith">The interface type that will act as the key that will be used
+        /// to lookup an instance of this attributed class when injecting a value.</param>
         public InjectableAttribute(Type correlatesWith)
         {
             CorrelatesWith = correlatesWith;
         }
 
+        /// <summary>
+        /// Gets the interface type that will act as the lookup key when trying to lookup and inject
+        /// the instance of the class with this attribute.
+        /// </summary>
         public Type CorrelatesWith { get; private set; }
     }
 

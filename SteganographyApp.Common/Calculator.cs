@@ -4,7 +4,11 @@ namespace SteganographyApp.Common
 
     using SteganographyApp.Common.Injection;
 
-    public class Calculator
+    /// <summary>
+    /// Utility class for performing some basic calculations to help in reading and writing
+    /// the content chunk table.
+    /// </summary>
+    public static class Calculator
     {
         /// <summary>
         /// Specifies the number of bits that will be reserved for each entry in the content
@@ -32,6 +36,8 @@ namespace SteganographyApp.Common
         /// </summary>
         /// <param name="fileToEncode">The path to the file that is going to be encoded.</param>
         /// <param name="chunkByteSize">The number of bytes to read in at a time.</param>
+        /// <returns>A count of the number of times the file must be read from, encoded, and written for
+        /// the encoding process to complete.</returns>
         public static int CalculateRequiredNumberOfWrites(string fileToEncode, int chunkByteSize)
         {
             long fileSizeBytes = Injector.Provide<IFileIOProxy>().GetFileSizeBytes(fileToEncode);
@@ -45,6 +51,10 @@ namespace SteganographyApp.Common
         /// outlining the number of bits that were written at the time of the write so we know how to decode
         /// and rebuild the input file when we are decoding.
         /// </summary>
+        /// <param name="fileToEncode">The path to the file that is going to be encoded.</param>
+        /// <param name="chunkByteSize">The number of bytes to read in at a time.</param>
+        /// <returns>A count of the total number of bits that will be required to store the content chunk table
+        /// so the contents of the file can be decoded from the cover images later.</returns>
         public static int CalculateRequiredBitsForContentTable(string fileToEncode, int chunkByteSize)
         {
             int requiredNumberOfWrites = CalculateRequiredNumberOfWrites(fileToEncode, chunkByteSize);

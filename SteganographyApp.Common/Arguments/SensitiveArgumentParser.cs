@@ -24,18 +24,29 @@ namespace SteganographyApp.Common.Arguments
         private ValueTuple<string, Argument> password;
         private ValueTuple<string, Argument> randomSeed;
 
+        /// <summary>
+        /// Initialize the writer and reader instances using the static Injector service.
+        /// </summary>
         public SensitiveArgumentParser()
         {
             writer = Injector.Provide<IConsoleWriter>();
             reader = Injector.Provide<IConsoleReader>();
         }
 
+        /// <summary>
+        /// Identifies if the argument in question may contain sensitive data. Currently the password and random seed
+        /// arguments are the only two that are marked as sensitive.
+        /// </summary>
+        /// <param name="argument">The argument being checked.</param>
+        /// <returns>True if the argument name matches the password argument name or the random seed argument name.</returns>
         public bool IsSensitiveArgument(Argument argument) => argument.Name == PasswordName || argument.Name == RandomSeedName;
 
         /// <summary>
         /// Captures either of the password or random seed arguments so it can be
         /// interactively parsed after all other parsing and validation has occurred.
         /// </summary>
+        /// <param name="argument">The argument being captured.</param>
+        /// <param name="inputValue">The user provided value associated with the argument being capture.</param>
         public void CaptureArgument(Argument argument, string inputValue)
         {
             if (argument.Name == PasswordName)
@@ -52,6 +63,8 @@ namespace SteganographyApp.Common.Arguments
         /// Attempts to parse the password and randomSeed arguments and raises any exceptions that may occur
         /// if either argument cannot be properly parsed.
         /// </summary>
+        /// <param name="inputArguments">The input arguments that will be mutated and provided with the values of the
+        /// random seed and password values if they are to be parsed.</param>
         public void ParseSecureArguments(InputArguments inputArguments)
         {
             TryParseSecureItem(inputArguments, password, PasswordName);
@@ -83,7 +96,7 @@ namespace SteganographyApp.Common.Arguments
         /// Parses the password value using the <see cref="ReadUserInput"/> method.
         /// </summary>
         /// <param name="arguments">The InputArguments instance to insert the password into.</param>
-        /// <param name="value">The string representation of the password</param>
+        /// <param name="value">The string representation of the password.</param>
         public void ParsePassword(InputArguments arguments, string value)
         {
             var password = ReadUserInput(value, PasswordPrompt);
@@ -95,9 +108,6 @@ namespace SteganographyApp.Common.Arguments
             arguments.Password = password;
         }
 
-        /// <summary>
-        /// Utility method containing the common logic for parsing the random seed and the password parameters.
-        /// </summary>
         private void TryParseSecureItem(InputArguments inputArguments, ValueTuple<string, Argument> argument, string argumentName)
         {
             if (argument.Item1 == null || argument.Item2 == null)

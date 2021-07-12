@@ -2,7 +2,7 @@ namespace SteganographyApp.Common.Arguments
 {
     /// <summary>
     /// Takes in a value retrieved from an associated key, parses it, and sets the
-    /// relevant property value in the InputArguments instance
+    /// relevant property value in the InputArguments instance.
     /// </summary>
     /// <param name="args">The InputArguments param to modify.</param>
     /// <param name="value">The value of the key/value pair from the array of arguments.</param>

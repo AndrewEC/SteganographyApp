@@ -7,13 +7,21 @@ namespace SteganographyApp.Common.Data
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Logging;
 
+    /// <summary>
+    /// The contract for interacting with the DummyUtil instance.
+    /// </summary>
     public interface IDummyUtil
     {
+        /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
         string InsertDummies(int numDummies, string binary, string randomSeed);
 
+        /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
         string RemoveDummies(int numDummies, string binary, string randomSeed);
     }
 
+    /// <summary>
+    /// Utility class for inserting and removing dummy entries in a binary string.
+    /// </summary>
     [Injectable(typeof(IDummyUtil))]
     public class DummyUtil : IDummyUtil
     {
@@ -22,39 +30,35 @@ namespace SteganographyApp.Common.Data
 
         private ILogger log;
 
+        /// <summary>
+        /// Post construct method for initializing the logger.
+        /// </summary>
         [PostConstruct]
         public void PostConstruct()
         {
             log = Injector.LoggerFor<DummyUtil>();
         }
 
-        /// <summary>
-        /// Inserts the specified number of dummy entries into the current
-        /// binary string.
-        /// </summary>
-        /// <param name="numDummies">The number of dummy entries to insert into the
-        /// binary string.</param>
-        /// <param name="binary">The original binary string to be modified with the
-        /// dummy entries.</param>
-        /// <returns>Returns the binary string with the new dummy entries.</returns>
+        /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
         public string InsertDummies(int numDummies, string binary, string randomSeed)
         {
             log.Debug("Inserting [{0}] dummies using seed [{1}] and global count [{2}]", numDummies, randomSeed, GlobalCounter.Instance.Count);
             log.Debug("Bit count before inserting dummies: [{0}]", binary.Length);
             int amountToIncrement = SumBinaryString(binary);
 
-            int[] lengths = GenerateLengthsForDummies(numDummies);
+            int[] lengths = GenerateLengthsOfDummies(numDummies);
 
             var generator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
 
-            // storing the positions instead of calculating on the fly will make decoding easier
+            // we need to pre-calculate the positions that these dummy entries will be inserted at in order
+            // to make decoding possible.
             int[] positions = Enumerable.Range(0, numDummies)
                 .Select(i => generator.Next(binary.Length))
                 .ToArray();
 
             for (int i = 0; i < positions.Length; i++)
             {
-                binary = binary.Insert(positions[i], GenerateDummy(generator, lengths[i]));
+                binary = binary.Insert(positions[i], GenerateDummyEntry(generator, lengths[i]));
             }
 
             GlobalCounter.Instance.Increment(amountToIncrement);
@@ -63,28 +67,19 @@ namespace SteganographyApp.Common.Data
             return binary;
         }
 
-        /// <summary>
-        /// Attempts to remove dummy entries from the string equal to the number
-        /// of entries specified in the numDummies parameter.
-        /// </summary>
-        /// <param name="numDummies">The number of dummy entries to remove from
-        /// the binary string.</param>
-        /// <param name="binary">The binary string to remove the dummy entries from.</param>
-        /// <returns>If numDummies == 0 then it will return the original binary string
-        /// otherwise will return the binary string with the dummy entries removed.</returns>
-        /// <exception cref="TransformationException">Thrown if an our of range exception is caught
-        /// while trying to remove the dummy entries from the chunk.</exception>
+        /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
         public string RemoveDummies(int numDummies, string binary, string randomSeed)
         {
             log.Debug("Removing [{0}] dummies using seed [{1}] and global count [{2}]", numDummies, randomSeed, GlobalCounter.Instance.Count);
             log.Debug("Bit count before removing dummies: [{0}]", binary.Length);
 
             // calculate the length of the dummies originally added to the string
-            int[] lengths = GenerateLengthsForDummies(numDummies);
+            int[] lengths = GenerateLengthsOfDummies(numDummies);
             Array.Reverse(lengths);
             int totalLength = lengths.Sum();
 
-            // determine the length of the binary string before the dummies were added
+            // Calculate the length of the binary string before the dummies were added so we can
+            // determine the original position where the dummy entries were inserted.
             int binaryLengthWithoutDummies = binary.Length - totalLength;
 
             var generator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
@@ -114,15 +109,7 @@ namespace SteganographyApp.Common.Data
 
         private int SumBinaryString(string binary)
         {
-            int count = 0;
-            foreach (char c in binary.ToCharArray())
-            {
-                if (c == '1')
-                {
-                    count++;
-                }
-            }
-            return count;
+            return binary.ToCharArray().Where(c => c == '1').Count();
         }
 
         private string CreateRandomSeed(string randomSeed)
@@ -130,16 +117,7 @@ namespace SteganographyApp.Common.Data
             return $"{randomSeed}{GlobalCounter.Instance.Count}";
         }
 
-        /// <summary>
-        /// Generates an array of the length of each dummy entry to be inserted. This
-        /// doesn't make use of the value stored in the global counter as the value
-        /// of the counter can not be determined when decoding the
-        /// contents of the file later.
-        /// </summary>
-        /// <param name="numDummies">The number of random numbers to generate. Will also
-        /// determine the length of the array being returned.</param>
-        /// <returns>A new array of random numbers of the specified length.</returns>
-        private int[] GenerateLengthsForDummies(int numDummies)
+        private int[] GenerateLengthsOfDummies(int numDummies)
         {
             var lengthGenerator = new IndexGenerator(numDummies, numDummies);
             return Enumerable.Range(0, numDummies)
@@ -147,14 +125,7 @@ namespace SteganographyApp.Common.Data
                 .ToArray();
         }
 
-        /// <summary>
-        /// Generates a random binary string of the length specified by the length parameter
-        /// using the provided IndexGenerator instance.
-        /// </summary>
-        /// <param name="generator">The index generator instance to determine whether
-        /// each character in the dummy string should be a 1 or a 0.</param>
-        /// <returns>Returns a random binary string of a length equal to
-        private string GenerateDummy(IndexGenerator generator, int length)
+        private string GenerateDummyEntry(IndexGenerator generator, int length)
         {
             var dummy = new StringBuilder(length, length);
             for (int i = 0; i < length; i++)

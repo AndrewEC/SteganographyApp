@@ -4,10 +4,15 @@
 
     using SteganographyApp.Common.Injection;
 
+    /// <summary>
+    /// The contract for interacting with the DataEncoderUtil instance.
+    /// </summary>
     public interface IDataEncoderUtil
     {
+        /// <include file='../docs.xml' path='docs/members[@name="DataEncoderUtil"]/Encode/*' />
         string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed);
 
+        /// <include file='../docs.xml' path='docs/members[@name="DataEncoderUtil"]/Decode/*' />
         byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed);
     }
 
@@ -17,8 +22,10 @@
     /// </summary>
     public class TransformationException : Exception
     {
+        /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessage/*' />
         public TransformationException(string message) : base(message) { }
 
+        /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessageInner/*' />
         public TransformationException(string message, Exception inner) : base(message, inner) { }
     }
 
@@ -29,20 +36,7 @@
     [Injectable(typeof(IDataEncoderUtil))]
     public class DataEncoderUtil : IDataEncoderUtil
     {
-        /// <summary>
-        /// Takes in a raw byte array, compresses, encodes base64, encrypts, and then
-        /// returns as a binary string.
-        /// </summary>
-        /// <param name="bytes">The array of bytes to be encoded as a binary string.</param>
-        /// <param name="password">The password used to encrypt the contents of the file.
-        /// <param name="useCompression">Tells the encoder whether or not to compress the input
-        /// byte array.</param>
-        /// If an empty string is provided then no encryption will be performed.</param>
-        /// <returns>An binary string made up of the base64 bytes read from the file and
-        /// possibly passed through an AES cipher.</returns>
-        /// <exception cref="TransformationException">Thrown
-        /// if there was an issue trying to pass the base64 encoded string through the AES
-        /// cipher.</exception>
+        /// <include file='../docs.xml' path='docs/members[@name="DataEncoderUtil"]/Encode/*' />
         public string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed)
         {
             if (useCompression)
@@ -79,19 +73,7 @@
             return binary;
         }
 
-        /// <summary>
-        /// Takes an encrypted binary string and returns a byte array that is the original bytes
-        /// that made up the original input file.
-        /// </summary>
-        /// <param name="binary">The encrypted binary string.</param>
-        /// <param name="password">The password used to decrypt the base64 string. If no password is provided
-        /// then no decryption will be done to the string.</param>
-        /// <param name="useCompression">Tells the encoder whether or not to uncompress the encoded
-        /// binary string.</param>
-        /// <returns>A byte array containing the original decoded bytes of the file inputted during
-        /// encoding.</returns>
-        /// <exception cref="TransformationException">Thrown if an error
-        /// occured while decrypting the base64 string or when decompressing the byte stream.</exception>
+        /// <include file='../docs.xml' path='docs/members[@name="DataEncoderUtil"]/Decode/*' />
         public byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed)
         {
             if (randomSeed != string.Empty)

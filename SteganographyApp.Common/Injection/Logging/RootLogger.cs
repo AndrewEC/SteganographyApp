@@ -5,8 +5,14 @@ namespace SteganographyApp.Common.Logging
 
     using SteganographyApp.Common.Injection;
 
+    /// <summary>
+    /// The singleon logger that all ILogger instances will invoke.
+    /// </summary>
     public sealed class RootLogger
     {
+        /// <summary>
+        /// The static readonly singleton instance of the RootLogger.
+        /// </summary>
         public static readonly RootLogger Instance = new RootLogger();
 
         private static readonly string LogFileName = "steganography.logs.txt";
@@ -18,6 +24,9 @@ namespace SteganographyApp.Common.Logging
 
         private RootLogger() { }
 
+        /// <summary>
+        /// Cleanup code to try and close an open stream to the log file upon application exit.
+        /// </summary>
         ~RootLogger()
         {
             if (writeLogStream != null)
@@ -39,6 +48,8 @@ namespace SteganographyApp.Common.Logging
         /// <para>This method attempts to swallow all exceptions. If an exception ocurrs the log level will be set to None
         /// and a message will be logged to console.</para>
         /// </summary>
+        /// <param name="level">The level at which messages must be at or be more important than in order
+        /// to be written to the log file.</param>
         public void EnableLoggingAtLevel(LogLevel level)
         {
             logLevel = TryOpenLogFileForWrite() ? level : LogLevel.None;

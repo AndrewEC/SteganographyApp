@@ -10,18 +10,20 @@ namespace SteganographyApp.Common.Injection
     /// </summary>
     public interface IConsoleWriter
     {
+        /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/Write/*' />
         void Write(string line);
 
+        /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/WriteLine/*' />
         void WriteLine(string line);
     }
 
     /// <summary>
-    /// Interface that exists for testing the <see cref="ArgumentParser.ReadString"/> method from
-    /// the ArgumentParser class.
+    /// Interface that exists for testing the sensitive argument parser.
     /// <para>This will allow the test to stub out the user input operations for some tests.</para>
     /// </summary>
     public interface IConsoleReader
     {
+        /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/ReadKey/*' />
         ConsoleKeyInfo ReadKey(bool intercept);
     }
 
@@ -33,18 +35,21 @@ namespace SteganographyApp.Common.Injection
     [Injectable(typeof(IConsoleWriter))]
     public class ConsoleWriter : IConsoleWriter
     {
+        /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/Write/*' />
         public void Write(string line) => Console.Write(line);
 
+        /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/WriteLine/*' />
         public void WriteLine(string line) => Console.WriteLine(line);
     }
 
     /// <summary>
-    /// The default IInputReader instance that acts as a proxy to the <see cref="Console.ReadKey(bool)">
+    /// The default IInputReader instance that acts as a proxy to the <see cref="Console.ReadKey(bool)"/>
     /// method.
     /// </summary>
     [Injectable(typeof(IConsoleReader))]
     public class ConsoleKeyReader : IConsoleReader
     {
+        /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/ReadKey/*' />
         public ConsoleKeyInfo ReadKey(bool intercept) => Console.ReadKey(intercept);
     }
 }

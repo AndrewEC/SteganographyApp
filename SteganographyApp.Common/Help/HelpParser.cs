@@ -20,7 +20,7 @@ namespace SteganographyApp.Common
         private static readonly string HelpItemIndicator = "~";
 
         /// <summary>
-        /// The last error that occured during the execution of TryParse.
+        /// Gets a value representing the last exception message to be caught.
         /// </summary>
         public string LastError { get; private set; }
 
@@ -37,17 +37,19 @@ namespace SteganographyApp.Common
 
         /// <summary>
         /// Attempts to parse the help file located at the fileName parameter value.
-        /// <para> If successful it will have populated the <see cref="Results"/> dictionary with all the
+        /// <para> If successful it will have populated the <paramref name="info"/> dictionary with all the
         /// help messages and the parameters that they are associated with.</para>
         /// <para>If not successful it will exit early and set the value of the <see cref="LastError"/>
         /// property to a message identifying why the process failed.</para>
         /// </summary>
-        /// <param name="fileName"></param>
+        /// <param name="info">The HelpInfo instance that will be set by the end of execution. If an exception
+        /// ocurrs during execution then this will be set to null.</param>
+        /// <param name="filename">The path to the help file to read from.</param>
         /// <returns>True if the help file was successfully parsed, otherwise false.</returns>
-        public bool TryParseHelpFile(out HelpInfo info, string fileName = "help.prop")
+        public bool TryParseHelpFile(out HelpInfo info, string filename = "help.prop")
         {
             string assemblyPath = GetAssemblyPath();
-            string helpFileLocation = $"{assemblyPath}\\{fileName}";
+            string helpFileLocation = $"{assemblyPath}\\{filename}";
 
             if (!Injector.Provide<IFileIOProxy>().IsExistingFile(helpFileLocation))
             {

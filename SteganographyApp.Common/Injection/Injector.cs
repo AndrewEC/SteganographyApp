@@ -20,6 +20,8 @@ namespace SteganographyApp.Common.Injection
         /// dictionary of DefaultInjectionProviders using the class type as the key and the instance
         /// as the value.</para>
         /// </summary>
+        /// <returns>Returns an immutable dictionary with all the type and an instance
+        /// of each type within this assembly that has the injectable attribute.</returns>
         public static ImmutableDictionary<Type, object> LookupDefaultInjectableDictionary()
         {
             var injectables = new Dictionary<Type, object>();
@@ -61,6 +63,8 @@ namespace SteganographyApp.Common.Injection
         /// has the PostConstruct attribute and invoke it. This expects the post construct method to be
         /// parameterless.
         /// </summary>
+        /// <param name="instances">The collection of instanced injectable objects to invoke the post
+        /// constructors of if they exist.</param>
         public static void InvokePostConstructMethods(IEnumerable<object> instances)
         {
             foreach (object instance in instances)
@@ -106,6 +110,7 @@ namespace SteganographyApp.Common.Injection
         /// for the specified type T.
         /// </summary>
         /// <typeparam name="T">The type of the class that will make use of the logger instance being provided.</typeparam>
+        /// <returns>A new ILogger instance configured for the specified type T.</returns>
         public static ILogger LoggerFor<T>() => Provide<ILoggerFactory>().LoggerFor(typeof(T));
 
         /// <summary>
@@ -113,6 +118,7 @@ namespace SteganographyApp.Common.Injection
         /// parameter T as the lookup key.
         /// </summary>
         /// <typeparam name="T">The type of the injectable instance to be returned.</typeparam>
+        /// <returns>Returns an instance from the current collection of injectable instances that conforms to type T.</returns>
         public static T Provide<T>()
         {
             var type = typeof(T);
@@ -128,6 +134,8 @@ namespace SteganographyApp.Common.Injection
         /// Replaces or adds a provider in the injection providers dictionary using the
         /// type of generic parameter T as the key and the provided instance as the value.
         /// </summary>
+        /// <typeparam name="T">The key whose corresponding value in the injectables dictionary will be replaced
+        /// with the <paramref name="instance"/> value.</typeparam>
         /// <param name="instance">An instance that conforms to T to be provided whenever Provide is called
         /// with type T as the type param.</param>
         public static void UseInstance<T>(T instance) => injectionValues[typeof(T)] = instance;

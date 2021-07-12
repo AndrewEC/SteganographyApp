@@ -14,7 +14,7 @@
         /// Instantiates a new ContentWrite instance and sets the
         /// args field value.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">The user provided input arguments.</param>
         public ContentWriter(IInputArguments args) : base(args) { }
 
         /// <summary>

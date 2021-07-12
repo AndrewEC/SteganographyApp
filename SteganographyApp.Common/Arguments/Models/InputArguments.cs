@@ -10,35 +10,56 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     public interface IInputArguments
     {
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
         string Password { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
         string FileToEncode { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
         string DecodedOutputFile { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
         ImmutableArray<string> CoverImages { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/EncodeOrDecode/*' />
         ActionEnum EncodeOrDecode { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/PrintStack/*' />
         bool PrintStack { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
         bool UseCompression { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
         string RandomSeed { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
         int DummyCount { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/InsertDummies/*' />
         bool InsertDummies { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
         bool DeleteAfterConversion { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CompressionLevel/*' />
         PngCompressionLevel CompressionLevel { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
         int ChunkByteSize { get; }
     }
 
+    /// <summary>
+    /// A contract for converting a concrete mutatble instance to an immutable representation of the same instance.
+    /// </summary>
+    /// <typeparam name="T">The immutable type that will be returned by the ToImmutable invocation.</typeparam>
     public interface IImmutableFactory<T>
     {
+        /// <summary>
+        /// Convert the underlying concrete instance to an immutable representation.
+        /// </summary>
+        /// <returns>A preferrably immutable instance that conforms to type T.</returns>
         T ToImmutable();
     }
 
@@ -50,40 +71,50 @@ namespace SteganographyApp.Common.Arguments
     /// <see cref="ImmutableInputArguments"></see>
     public sealed class InputArguments : IInputArguments, IImmutableFactory<IInputArguments>
     {
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
         public string Password { get; set; } = string.Empty;
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
         public string FileToEncode { get; set; } = string.Empty;
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
         public string DecodedOutputFile { get; set; } = string.Empty;
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
         public ImmutableArray<string> CoverImages { get; set; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/EncodeOrDecode/*' />
         public ActionEnum EncodeOrDecode { get; set; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/PrintStack/*' />
         public bool PrintStack { get; set; } = false;
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
         public bool UseCompression { get; set; } = false;
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
         public string RandomSeed { get; set; } = string.Empty;
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
         public int DummyCount { get; set; } = 0;
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/InsertDummies/*' />
         public bool InsertDummies { get; set; } = false;
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
         public bool DeleteAfterConversion { get; set; } = false;
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CompressionLevel/*' />
         public PngCompressionLevel CompressionLevel { get; set; } = PngCompressionLevel.Level5;
 
-        /// <summary>
-        /// Specifies the chunk size. I.e. the number of bytes to read, encode,
-        /// and write at any given time.
-        /// <para>Higher values will improve the time to encode a larger file and reduce
-        /// ther overall encoded file size though values too high run the risk of
-        /// having memory related errors.</para>
-        /// <para>Default value of 131,072</para>
-        /// </summary>
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
         public int ChunkByteSize { get; set; } = 131_072;
 
+        /// <summary>
+        /// Converts the current InputArguments instance into an ImmutableInputArguments instance with
+        /// readonly properties.
+        /// </summary>
+        /// <returns>An ImmutableInputArguments instance created using this InputArguments instance as input.</returns>
         public IInputArguments ToImmutable()
         {
             return new ImmutableInputArguments(this);
@@ -91,10 +122,16 @@ namespace SteganographyApp.Common.Arguments
     }
 
     /// <summary>
-    /// Immutable class containg the parsed argument values.
+    /// Immutable class containg the parsed argument values. All of the properties within this class
+    /// are immutable and readonly.
     /// </summary>
     public sealed class ImmutableInputArguments : IInputArguments
     {
+        /// <summary>
+        /// Initializes an ImmutableInputArguments instance using the values pulled from the given
+        /// InputArguments instance.
+        /// </summary>
+        /// <param name="source">The InputArguments instance from which all properties will be set from.</param>
         public ImmutableInputArguments(InputArguments source)
         {
             Password = source.Password;
@@ -112,32 +149,43 @@ namespace SteganographyApp.Common.Arguments
             ChunkByteSize = source.ChunkByteSize;
         }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
         public string Password { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
         public string FileToEncode { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
         public string DecodedOutputFile { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
         public ImmutableArray<string> CoverImages { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/EncodeOrDecode/*' />
         public ActionEnum EncodeOrDecode { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/PrintStack/*' />
         public bool PrintStack { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
         public bool UseCompression { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
         public string RandomSeed { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
         public int DummyCount { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/InsertDummies/*' />
         public bool InsertDummies { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
         public bool DeleteAfterConversion { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CompressionLevel/*' />
         public PngCompressionLevel CompressionLevel { get; }
 
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
         public int ChunkByteSize { get; }
-
-        public bool EnableLogs { get; }
     }
 }

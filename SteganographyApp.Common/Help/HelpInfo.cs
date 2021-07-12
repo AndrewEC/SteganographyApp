@@ -3,10 +3,24 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
 
+    /// <summary>
+    /// The current program being run for which we need to present the help items for.
+    /// </summary>
     public enum HelpItemSet
     {
+        /// <summary>
+        /// The main application that focuses on the main feature of encoding and decoding.
+        /// </summary>
         Main,
+
+        /// <summary>
+        /// The calculator application that focuses on calculating storage space and encoded file sizes.
+        /// </summary>
         Calculator,
+
+        /// <summary>
+        /// The converter application that focuses on converting lossy images to a PNG format.
+        /// </summary>
         Converter,
     }
 
@@ -18,6 +32,9 @@
     {
 #pragma warning disable SA1009
 
+        /// <summary>
+        /// The help labels of the arguments for the main application.
+        /// </summary>
         public static readonly ImmutableArray<string> MainHelpLabels = ImmutableArray.Create(
             new string[]
             {
@@ -36,6 +53,9 @@
             }
         );
 
+        /// <summary>
+        /// The help labels of the arguments for the calculator application.
+        /// </summary>
         public static readonly ImmutableArray<string> CalculatorHelpLabels = ImmutableArray.Create(
             new string[]
             {
@@ -52,6 +72,9 @@
             }
         );
 
+        /// <summary>
+        /// The help labels of the arguments for the converter application.
+        /// </summary>
         public static readonly ImmutableArray<string> ConverterHelpLabels = ImmutableArray.Create(
             new string[]
             {
@@ -81,6 +104,11 @@
         /// </summary>
         private readonly ImmutableDictionary<string, string> helpItems;
 
+        /// <summary>
+        /// Initializes the HelpInfo instance with a list of all the help items that could be
+        /// read from the help.prop file.
+        /// </summary>
+        /// <param name="helpItems">The dicionary of all help items that were found in the help info file.</param>
         public HelpInfo(ImmutableDictionary<string, string> helpItems)
         {
             this.helpItems = helpItems;
@@ -93,7 +121,7 @@
         /// <para>If a particular parameter name was not loaded from the help file then a
         /// standard message will be returned in place of the actual help message.</para>
         /// </summary>
-        /// <param name="item">The HelpItemSet enum value indicating which help items should
+        /// <param name="itemSet">The HelpItemSet enum value indicating which help items should
         /// be returned.</param>
         /// <returns>An array of help messages whose order is based on the order of the names
         /// provided to lookup.</returns>

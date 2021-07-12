@@ -15,6 +15,12 @@ namespace SteganographyApp.Common
         private readonly IConsoleWriter outputWriter;
         private double currentProgress;
 
+        /// <summary>
+        /// Initializes a new ProgressTracker instance.
+        /// </summary>
+        /// <param name="maxProgress">The maximum progress.</param>
+        /// <param name="progressMessage">The message to print while progress has not yet reached 100.</param>
+        /// <param name="completeMessage">The message to print after the progress has reached 100.</param>
         public ProgressTracker(double maxProgress, string progressMessage, string completeMessage)
         {
             this.maxProgress = maxProgress;
@@ -23,6 +29,13 @@ namespace SteganographyApp.Common
             outputWriter = Injector.Provide<IConsoleWriter>();
         }
 
+        /// <summary>
+        /// Initializes a ProgressTracker instance and prints the first progress message with a percentage of 0.
+        /// </summary>
+        /// <param name="maxProgress">The maximum progress.</param>
+        /// <param name="progressMessage">The message to print while progress has not yet reached 100.</param>
+        /// <param name="completeMessage">The message to print after the progress has reached 100.</param>
+        /// <returns>Returns a new ProgressTracker instance instantiated with the provided values.</returns>
         public static ProgressTracker CreateAndDisplay(double maxProgress, string progressMessage, string completeMessage)
         {
             var tracker = new ProgressTracker(maxProgress, progressMessage, completeMessage);

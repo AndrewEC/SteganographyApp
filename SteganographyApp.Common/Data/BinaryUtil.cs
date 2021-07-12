@@ -5,22 +5,25 @@ namespace SteganographyApp.Common.Data
 
     using SteganographyApp.Common.Injection;
 
+    /// <summary>
+    /// Contract for interacting with the concrete BinaryUtil implementation.
+    /// </summary>
     public interface IBinaryUtil
     {
+        /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBase64String/*' />
         string ToBase64String(string binary);
 
+        /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBinaryString/*' />
         string ToBinaryString(string base64String);
     }
 
+    /// <summary>
+    /// Injectable Utility class for encoding a binary string to base64 and from base64 to binary.
+    /// </summary>
     [Injectable(typeof(IBinaryUtil))]
     public class BinaryUtil : IBinaryUtil
     {
-        /// <summary>
-        /// Converts a binary string to a base64 encoded string.
-        /// </summary>
-        /// <param name="binary">The original string representation of a binary figure to
-        /// convert to base64.</param>
-        /// <returns>The base64 representation of the input binary string.</returns>
+        /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBase64String/*' />
         public string ToBase64String(string binary)
         {
             byte[] bytes = new byte[binary.Length / 8];
@@ -32,12 +35,7 @@ namespace SteganographyApp.Common.Data
             return Convert.ToBase64String(bytes);
         }
 
-        /// <summary>
-        /// Converts a base64 encoded string to a string of binary.
-        /// </summary>
-        /// <param name="base64String">The base64 encoded string to convert to
-        /// binary.</param>
-        /// <returns>A binary representation of the input base64 formatted string.</returns>
+        /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBinaryString/*' />
         public string ToBinaryString(string base64String)
         {
             byte[] converted = Convert.FromBase64String(base64String);
