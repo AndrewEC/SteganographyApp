@@ -14,7 +14,7 @@
     {
         private InputArguments args;
         private ImageStore imageStore;
-        private ImageStore.ImageStoreWrapper wrapper;
+        private ImageStoreIO wrapper;
 
         [SetUp]
         public void E2ESetUp()

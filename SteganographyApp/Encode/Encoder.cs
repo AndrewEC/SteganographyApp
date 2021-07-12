@@ -88,7 +88,7 @@ namespace SteganographyApp.Encode
             Cleanup(utilities);
         }
 
-        private void Encode(ImageStore.ImageStoreWrapper wrapper)
+        private void Encode(ImageStoreIO wrapper)
         {
             log.Debug("Encoding file: [{0}]", arguments.FileToEncode);
             int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);

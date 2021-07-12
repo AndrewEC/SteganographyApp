@@ -78,14 +78,14 @@
         }
 
         /// <summary>
-        /// Utility method to create an <see cref="ImageStoreWrapper"/> instance to be used in conjunction with the
+        /// Utility method to create an <see cref="ImageStoreIO"/> instance to be used in conjunction with the
         /// read and write methods.
         /// <para>The ImageStoreWrapper instance provides proxies to the ImageStore IO methods as well as
         /// implementing the IDisposable interface to ensure that any currently open and loaded image
         /// will be properly disposed.</para>
         /// </summary>
-        /// <returns>A new ImageStoreWrapper instance.</returns>
-        public ImageStoreWrapper CreateIOWrapper() => new ImageStoreWrapper(this);
+        /// <returns>A new wrapper for safely using the image store IO methods.</returns>
+        public ImageStoreIO CreateIOWrapper() => new ImageStoreIO(this);
 
         /// <summary>
         /// Will look over all images specified in the InputArguments
@@ -203,13 +203,22 @@
         }
 
         /// <summary>
-        /// Provides a consumable function that uses the standard Random class to generate
-        /// a random int value of either 0 or 1.
+        /// Method to help close off any open images.
         /// </summary>
-        private Func<int> RandomBitGenerator()
+        /// <param name="saveImageChanges">If true this method will attempt to save any changes
+        /// made to the current image.</param>
+        internal void CloseOpenImage(bool saveImageChanges = false)
         {
-            var random = new Random();
-            return () => (int)Math.Round(random.NextDouble());
+            if (currentImage != null)
+            {
+                if (saveImageChanges)
+                {
+                    log.Debug("Saving changes to image [{0}]", CurrentImage);
+                    currentImage.Save(CurrentImage);
+                }
+                currentImage.Dispose();
+                currentImage = null;
+            }
         }
 
         /// <summary>
@@ -223,7 +232,7 @@
         /// <returns>The number of bits written to the image. This is mostly important when
         /// writing the content chunk table to the start of the leading image.</returns>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        private int WriteBinaryString(string binary)
+        internal int WriteBinaryString(string binary)
         {
             log.Debug("Writing [{0}] bits to image [{1}]", binary.Length, CurrentImage);
             int written = 0;
@@ -258,35 +267,6 @@
         }
 
         /// <summary>
-        /// Performs the appropriate bitwise and/or operation to the provided
-        /// byte value of the pixel colour channel to change its least significatnt
-        /// bit to be the same as the value specified by the lastBit argument.
-        /// </summary>
-        /// <param name="colourChannel">The byte value representing either the
-        /// red, green, or blue channel of a pixel.</param>
-        /// <param name="lastBit">Specifies the value that the colourChannel's
-        /// least significant bit should be changed to.</param>
-        /// <returns>The original colour channel byte that has been shifted based on the last bit value.</returns>
-        private byte ShiftColourChannel(byte colourChannel, int lastBit) => (lastBit == 0)
-            ? (byte)(colourChannel & ~1)
-            : (byte)(colourChannel | 1);
-
-        /// <summary>
-        /// Performs the appropriate bitwise and/or operation to the provided
-        /// byte value of the pixel colour channel to change its least significatnt
-        /// bit to be the same as the value specified by the lastBit argument.
-        /// </summary>
-        /// <param name="colourChannel">The byte value representing either the
-        /// red, green, or blue channel of a pixel.</param>
-        /// <param name="lastBit">Specifies the value that the colourChannel's
-        /// least significant bit should be changed to.</param>
-        private byte ShiftColourChannelByBinary(byte colourChannel, char lastBit)
-        {
-            int intLastBit = (lastBit == '0') ? 0 : 1;
-            return ShiftColourChannel(colourChannel, intLastBit);
-        }
-
-        /// <summary>
         /// Attempts to read the specified number of bits from the current image starting
         /// at the last read/write position.
         /// <para>If there is not enough available space in the current image then it will
@@ -296,7 +276,7 @@
         /// <returns>A binary string whose length is equal to the length specified in the length
         /// parameter.</returns>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        private string ReadBinaryString(int bitsToRead)
+        internal string ReadBinaryString(int bitsToRead)
         {
             log.Debug("Reading [{0}] bits from image [{1}] starting from position [{2}]", bitsToRead, CurrentImage, pixelPosition.ToString());
             var binary = new StringBuilder();
@@ -340,7 +320,7 @@
         /// image before attempting to increment to the next available image.</param>
         /// <exception cref="ImageProcessingException">If the increment of the current
         /// image index exeeds the available number of images an exception will be thrown.</exception>
-        private void LoadNextImage(bool saveImageChanges = false)
+        internal void LoadNextImage(bool saveImageChanges = false)
         {
             log.Trace("Loading next image.");
             CloseOpenImage(saveImageChanges);
@@ -370,7 +350,7 @@
         /// <exception cref="ImageProcessingException">If the number of bits to skip puts the current position past
         /// the last bit of the currently loaded image then a processing exception will be thrown.</exception>
         /// <see cref="TryMoveToNextPixel"/>
-        private void SeekToPixel(int bitsToSkip)
+        internal void SeekToPixel(int bitsToSkip)
         {
             log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage);
             pixelPosition.Reset();
@@ -387,6 +367,45 @@
         }
 
         /// <summary>
+        /// Performs the appropriate bitwise and/or operation to the provided
+        /// byte value of the pixel colour channel to change its least significatnt
+        /// bit to be the same as the value specified by the lastBit argument.
+        /// </summary>
+        /// <param name="colourChannel">The byte value representing either the
+        /// red, green, or blue channel of a pixel.</param>
+        /// <param name="lastBit">Specifies the value that the colourChannel's
+        /// least significant bit should be changed to.</param>
+        /// <returns>The original colour channel byte that has been shifted based on the last bit value.</returns>
+        private byte ShiftColourChannel(byte colourChannel, int lastBit) => (lastBit == 0)
+            ? (byte)(colourChannel & ~1)
+            : (byte)(colourChannel | 1);
+
+        /// <summary>
+        /// Performs the appropriate bitwise and/or operation to the provided
+        /// byte value of the pixel colour channel to change its least significatnt
+        /// bit to be the same as the value specified by the lastBit argument.
+        /// </summary>
+        /// <param name="colourChannel">The byte value representing either the
+        /// red, green, or blue channel of a pixel.</param>
+        /// <param name="lastBit">Specifies the value that the colourChannel's
+        /// least significant bit should be changed to.</param>
+        private byte ShiftColourChannelByBinary(byte colourChannel, char lastBit)
+        {
+            int intLastBit = (lastBit == '0') ? 0 : 1;
+            return ShiftColourChannel(colourChannel, intLastBit);
+        }
+
+        /// <summary>
+        /// Provides a consumable function that uses the standard Random class to generate
+        /// a random int value of either 0 or 1.
+        /// </summary>
+        private Func<int> RandomBitGenerator()
+        {
+            var random = new Random();
+            return () => (int)Math.Round(random.NextDouble());
+        }
+
+        /// <summary>
         /// Tries to move the read/write x/y position to the next available pixel.
         /// Will return false if there are no more available pixels in the current image.
         /// </summary>
@@ -400,25 +419,6 @@
                 return false;
             }
             return true;
-        }
-
-        /// <summary>
-        /// Method to help close off any open images.
-        /// </summary>
-        /// <param name="saveImageChanges">If true this method will attempt to save any changes
-        /// made to the current image.</param>
-        private void CloseOpenImage(bool saveImageChanges = false)
-        {
-            if (currentImage != null)
-            {
-                if (saveImageChanges)
-                {
-                    log.Debug("Saving changes to image [{0}]", CurrentImage);
-                    currentImage.Save(CurrentImage);
-                }
-                currentImage.Dispose();
-                currentImage = null;
-            }
         }
     }
 }
