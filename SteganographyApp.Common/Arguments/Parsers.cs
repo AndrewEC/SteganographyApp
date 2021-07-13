@@ -79,7 +79,7 @@ namespace SteganographyApp.Common.Arguments
                 }
             }
 
-            string userRandomSeed = Checks.IsNullOrEmpty(arguments.RandomSeed) ? string.Empty : arguments.RandomSeed;
+            string userRandomSeed = string.IsNullOrEmpty(arguments.RandomSeed) ? string.Empty : arguments.RandomSeed;
             string seed = userRandomSeed + dummyCount.ToString();
             arguments.DummyCount = IndexGenerator.FromString(seed).Next(MaxDummyCount - MinDummyCount) + MinDummyCount;
         }

@@ -52,7 +52,7 @@
         public void TestFullWriteReadHappyPath()
         {
             string content = string.Empty;
-            var table = new int[1];
+            var contentChunkSize = -1;
             using (wrapper)
             {
                 int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
@@ -61,12 +61,12 @@
                 {
                     content = reader.ReadContentChunkFromFile();
                     int written = wrapper.WriteContentChunkToImage(content);
-                    table[0] = written;
+                    contentChunkSize = written;
                     Assert.AreEqual(content.Length, written);
                 }
                 wrapper.EncodeComplete();
             }
-            imageStore.WriteContentChunkTable(table);
+            imageStore.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
 
             GlobalCounter.Instance.Reset();
 
@@ -88,7 +88,7 @@
         {
             // writing file content to image
             string content = string.Empty;
-            var table = new int[1];
+            var contentChunkSize = -1;
             using (wrapper)
             {
                 int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
@@ -97,12 +97,12 @@
                 {
                     content = reader.ReadContentChunkFromFile();
                     int written = wrapper.WriteContentChunkToImage(content);
-                    table[0] = written;
+                    contentChunkSize = written;
                     Assert.AreEqual(content.Length, written);
                 }
                 wrapper.EncodeComplete();
             }
-            imageStore.WriteContentChunkTable(table);
+            imageStore.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
 
             GlobalCounter.Instance.Reset();
 
@@ -121,7 +121,7 @@
         public void TestDummyCountMissmatchProducesException()
         {
             // writing file content to image
-            var table = new int[1];
+            var contentChunkSize = -1;
             using (wrapper)
             {
                 int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
@@ -131,12 +131,12 @@
                 {
                     content = reader.ReadContentChunkFromFile();
                     int written = wrapper.WriteContentChunkToImage(content);
-                    table[0] = written;
+                    contentChunkSize = written;
                     Assert.AreEqual(content.Length, written);
                 }
                 wrapper.EncodeComplete();
             }
-            imageStore.WriteContentChunkTable(table);
+            imageStore.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
 
             GlobalCounter.Instance.Reset();
 
@@ -155,7 +155,7 @@
         public void TestCompressMismatchProducesBadFile()
         {
             // writing file content to image
-            var table = new int[1];
+            var contentChunkSize = -1;
             string content = string.Empty;
             using (wrapper)
             {
@@ -165,12 +165,12 @@
                 {
                     content = reader.ReadContentChunkFromFile();
                     int written = wrapper.WriteContentChunkToImage(content);
-                    table[0] = written;
+                    contentChunkSize = written;
                     Assert.AreEqual(content.Length, written);
                 }
                 wrapper.EncodeComplete();
             }
-            imageStore.WriteContentChunkTable(table);
+            imageStore.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
 
             GlobalCounter.Instance.Reset();
 
@@ -194,7 +194,7 @@
         {
             // writing file content to image
             string content = string.Empty;
-            var table = new int[1];
+            var contentChunkSize = -1;
             using (wrapper)
             {
                 int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
@@ -203,12 +203,12 @@
                 {
                     content = reader.ReadContentChunkFromFile();
                     int written = wrapper.WriteContentChunkToImage(content);
-                    table[0] = written;
+                    contentChunkSize = written;
                     Assert.AreEqual(content.Length, written);
                 }
                 wrapper.EncodeComplete();
             }
-            imageStore.WriteContentChunkTable(table);
+            imageStore.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
 
             GlobalCounter.Instance.Reset();
 

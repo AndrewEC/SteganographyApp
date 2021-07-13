@@ -70,7 +70,7 @@
             foreach (string coverImage in lossyImages)
             {
                 string result = TrySaveImage(coverImage, encoder);
-                if (!Checks.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty(result))
                 {
                     failures.Add($"{coverImage}: {result}");
                     tracker.UpdateAndDisplayProgress();

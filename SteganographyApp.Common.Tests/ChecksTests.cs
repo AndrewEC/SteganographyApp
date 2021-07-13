@@ -8,31 +8,6 @@ namespace SteganographyApp.Common.Tests
     public class ChecksTests
     {
         [Test]
-        public void TestChecksIsNullOrEmptyReturnsTrueOnEmptyAndNullStrings()
-        {
-            Assert.IsTrue(Checks.IsNullOrEmpty(string.Empty));
-            Assert.IsTrue(Checks.IsNullOrEmpty(null));
-        }
-
-        [Test]
-        public void TestCheckIsNullOrEmptyReturnsTrueOnNonNullString()
-        {
-            Assert.IsFalse(Checks.IsNullOrEmpty("testing"));
-        }
-
-        [Test]
-        public void TestChecksIsNullOrEmptyReturnsTrueOnEmptyArray()
-        {
-            Assert.IsTrue(Checks.IsNullOrEmpty(new string[0]));
-        }
-
-        [Test]
-        public void TestCheckIsNullOrEmptyReturnsFalseOnNonEmptyArray()
-        {
-            Assert.IsFalse(Checks.IsNullOrEmpty(new string[] { "test" }));
-        }
-
-        [Test]
         public void TestCheckIsOneOfReturnsTrueWhenArrayContainsAction()
         {
             Assert.IsTrue(Checks.IsOneOf(ActionEnum.Encode, ActionEnum.Clean, ActionEnum.Decode, ActionEnum.Encode));

@@ -56,11 +56,9 @@
             x = new Int32[] { seed, seed, seed };
             y = new Int32[] { seed, seed, seed };
 
-            int count = 0;
-            while (count < generations)
+            for (int i = 0; i < generations; i++)
             {
                 Next(Int32.MaxValue);
-                count++;
             }
         }
 

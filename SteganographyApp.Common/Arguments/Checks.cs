@@ -12,23 +12,6 @@ namespace SteganographyApp.Common.Arguments
         private static readonly string HelpArgumentShortened = "-h";
 
         /// <summary>
-        /// Checks whether a string is null or contains no characters.
-        /// </summary>
-        /// <param name="value">The string value to perform the null and
-        /// empty checks on.</param>
-        /// <returns>True if the string is null or empty, otherwise false.</returns>
-        public static bool IsNullOrEmpty(string value) => value == null || value.Length == 0;
-
-        /// <summary>
-        /// Checks whether an array is null or contains no elements.
-        /// </summary>
-        /// <param name="value">The array to perform the null and empty
-        /// checks against.</param>
-        /// <typeparam name="T">The type of the input value array.</typeparam>
-        /// <returns>True if the array is null or has no elements in it, otherwise false.</returns>
-        public static bool IsNullOrEmpty<T>(T[] value) => value == null || value.Length == 0;
-
-        /// <summary>
         /// Checks whether an immutable array is null or contains no elements.
         /// </summary>
         /// <param name="value">The immutable array to perform the null and empty checks against.</param>

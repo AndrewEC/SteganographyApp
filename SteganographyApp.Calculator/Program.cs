@@ -65,7 +65,7 @@
             }
             else if (CalculateEncryptedSizeActions.Contains(input.EncodeOrDecode))
             {
-                if (Checks.IsNullOrEmpty(input.FileToEncode))
+                if (string.IsNullOrEmpty(input.FileToEncode))
                 {
                     return "A file must be specified in order to calculate the encrypted file size.";
                 }

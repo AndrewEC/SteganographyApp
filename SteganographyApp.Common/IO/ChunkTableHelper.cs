@@ -1,10 +1,10 @@
 namespace SteganographyApp.Common.IO
 {
     using System;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Text;
 
-    using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Data;
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Logging;
@@ -15,10 +15,10 @@ namespace SteganographyApp.Common.IO
     public interface IChunkTableHelper
     {
         /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertChunkTableToBinary/*' />
-        string ConvertChunkTableToBinary(int[] chunkLengths, string randomSeed);
+        string ConvertChunkTableToBinary(ImmutableArray<int> chunkLengths, string randomSeed);
 
         /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertBinaryToChunkTable/*' />
-        int[] ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed);
+        ImmutableArray<int> ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed);
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ namespace SteganographyApp.Common.IO
         }
 
         /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertChunkTableToBinary/*' />
-        public string ConvertChunkTableToBinary(int[] chunkLengths, string randomSeed)
+        public string ConvertChunkTableToBinary(ImmutableArray<int> chunkLengths, string randomSeed)
         {
             log.Debug("Converting [{0}] table entries to binary using random seed [{1}]", chunkLengths.Length, randomSeed);
             var tableHeader = To33BitBinaryString(chunkLengths.Length);
@@ -51,7 +51,7 @@ namespace SteganographyApp.Common.IO
 
             var binaryString = binary.ToString();
 
-            if (!Checks.IsNullOrEmpty(randomSeed))
+            if (!string.IsNullOrEmpty(randomSeed))
             {
                 binaryString = Injector.Provide<IRandomizeUtil>().RandomizeBinaryString(binaryString, randomSeed);
             }
@@ -60,11 +60,11 @@ namespace SteganographyApp.Common.IO
         }
 
         /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertBinaryToChunkTable/*' />
-        public int[] ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed)
+        public ImmutableArray<int> ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed)
         {
             log.Debug("Converting binary to chunk table with count of [{0}] and random seed [{1}]", chunkCount, randomSeed);
             var binaryString = binary;
-            if (!Checks.IsNullOrEmpty(randomSeed))
+            if (!string.IsNullOrEmpty(randomSeed))
             {
                 binaryString = Injector.Provide<IRandomizeUtil>().ReorderBinaryString(binaryString, randomSeed);
             }
@@ -72,7 +72,7 @@ namespace SteganographyApp.Common.IO
             return Enumerable.Range(0, chunkCount)
                 .Select(i => NextBinaryChunk(i, binaryString))
                 .Select(BinaryStringToInt)
-                .ToArray();
+                .ToImmutableArray();
         }
 
         private string NextBinaryChunk(int index, string binaryString) => binaryString.Substring(index * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSize);

@@ -1,7 +1,7 @@
 namespace SteganographyApp
 {
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Collections.Immutable;
 
     using SteganographyApp.Common.IO;
 
@@ -30,7 +30,7 @@ namespace SteganographyApp
         /// LinkedList meaning the order of this array matches the order in which each
         /// content chunk was written to the storage image.
         /// </summary>
-        public int[] GetContentTable() => contentChunks.ToArray();
+        public ImmutableArray<int> GetContentTable() => contentChunks.ToImmutableArray();
 
         private void ChunkWritten(object sender, ChunkWrittenArgs args)
         {

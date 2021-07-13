@@ -64,11 +64,11 @@
             {
                 return "The action specified must be one of: 'clean', 'encode', or 'decode'.";
             }
-            if (input.EncodeOrDecode == ActionEnum.Encode && Checks.IsNullOrEmpty(input.FileToEncode))
+            if (input.EncodeOrDecode == ActionEnum.Encode && string.IsNullOrEmpty(input.FileToEncode))
             {
                 return "Specified encode action but no file to encode was provided in arguments.";
             }
-            else if (input.EncodeOrDecode == ActionEnum.Decode && Checks.IsNullOrEmpty(input.DecodedOutputFile))
+            else if (input.EncodeOrDecode == ActionEnum.Decode && string.IsNullOrEmpty(input.DecodedOutputFile))
             {
                 return "Specified decode action but no file to decode was provided in arguments.";
             }

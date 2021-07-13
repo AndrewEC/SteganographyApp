@@ -81,12 +81,12 @@ namespace SteganographyApp.Common.Tests
             var mockImage = GenerateMockImage(1000, 1000);
             mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
 
-            int[] chunkTableWrite = new int[] { 100, 200, 300 };
+            var chunkTableWrite = ImmutableArray.Create(new int[] { 100, 200, 300 });
             var imageStore = new ImageStore(Arguments);
             imageStore.ResetToImage(0);
             imageStore.WriteContentChunkTable(chunkTableWrite);
             imageStore.ResetToImage(0);
-            int[] chunkTableRead = imageStore.ReadContentChunkTable();
+            var chunkTableRead = imageStore.ReadContentChunkTable();
 
             Assert.AreEqual(chunkTableWrite.Length, chunkTableRead.Length);
             for (int i = 0; i < chunkTableWrite.Length; i++)
@@ -102,7 +102,7 @@ namespace SteganographyApp.Common.Tests
             mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
 
             var imageStore = new ImageStore(Arguments);
-            int[] chunkTable = Enumerable.Range(0, 100).ToArray();
+            var chunkTable = Enumerable.Range(0, 100).ToImmutableArray();
 
             imageStore.ResetToImage(0);
             Assert.Throws<ImageProcessingException>(() => imageStore.WriteContentChunkTable(chunkTable));

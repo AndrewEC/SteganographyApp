@@ -1,6 +1,7 @@
 ﻿namespace SteganographyApp.Common.IO
 {
     using System;
+    using System.Collections.Immutable;
     using System.Text;
 
     using SixLabors.ImageSharp.PixelFormats;
@@ -140,7 +141,7 @@
         /// of data stored in the current set of images.</returns>
         /// <exception cref="ImageProcessingException">Thrown if images do not have enough
         /// storage space to read the entire content chunk table.</exception>
-        public int[] ReadContentChunkTable()
+        public ImmutableArray<int> ReadContentChunkTable()
         {
             log.Trace("Reading content chunk table");
             try
@@ -169,7 +170,7 @@
         /// originally written to the target images during the encoding process.</param>
         /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
         /// storage space to store the entire content chunk table.</exception>
-        public void WriteContentChunkTable(int[] chunkTable)
+        public void WriteContentChunkTable(ImmutableArray<int> chunkTable)
         {
             log.Debug("Writing chunk table with [{0}] entries.", chunkTable.Length);
             try

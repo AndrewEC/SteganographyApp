@@ -174,7 +174,7 @@
             try
             {
                 string validationResult = validation(parsed);
-                if (!Checks.IsNullOrEmpty(validationResult))
+                if (!string.IsNullOrEmpty(validationResult))
                 {
                     throw new ArgumentParseException($"Invalid arguments provided. {validationResult}");
                 }
