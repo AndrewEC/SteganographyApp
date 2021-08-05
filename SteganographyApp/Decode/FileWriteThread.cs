@@ -47,7 +47,7 @@ namespace SteganographyApp.Decode
         {
             try
             {
-                readThread.Join();
+                readThread.Join(1000);
             }
             catch
             {

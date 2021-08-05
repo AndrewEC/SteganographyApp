@@ -80,6 +80,7 @@ namespace SteganographyApp.Decode
             {
                 var thread = FileWriteThread.CreateAndStartThread(writeQueue, errorContainer, arguments);
 
+                Console.WriteLine("Reading content chunk table.");
                 var contentChunkTable = store.ReadContentChunkTable();
                 var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
 
