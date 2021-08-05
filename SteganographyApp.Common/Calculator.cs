@@ -45,11 +45,10 @@ namespace SteganographyApp.Common
         }
 
         /// <summary>
-        /// The table size is essentially the number of read/encode/write iterations times the number
-        /// of RGB bytes required to store the content chunk table.
-        /// Each time we read and encode the a portion of the input file we will write an entry to the content chunk table
-        /// outlining the number of bits that were written at the time of the write so we know how to decode
-        /// and rebuild the input file when we are decoding.
+        /// The content chunk table is a table containing the sizes of the encoded output after each
+        /// read/write/encode iteration. So the number of bits required for the content chunk table will
+        /// be the number of chunk table entries required plus one (plus one is to account for the table header
+        /// that indicates how many entries there are in the chunk table) times the size of each table entry (33 bits).
         /// </summary>
         /// <param name="fileToEncode">The path to the file that is going to be encoded.</param>
         /// <param name="chunkByteSize">The number of bytes to read in at a time.</param>
@@ -58,7 +57,7 @@ namespace SteganographyApp.Common
         public static int CalculateRequiredBitsForContentTable(string fileToEncode, int chunkByteSize)
         {
             int requiredNumberOfWrites = CalculateRequiredNumberOfWrites(fileToEncode, chunkByteSize);
-            return (requiredNumberOfWrites * ChunkDefinitionBitSize) + ChunkDefinitionBitSize + requiredNumberOfWrites;
+            return (requiredNumberOfWrites + 1) * ChunkDefinitionBitSizeWithPadding;
         }
     }
 }

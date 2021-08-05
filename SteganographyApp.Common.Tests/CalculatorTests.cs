@@ -19,7 +19,7 @@ namespace SteganographyApp.Common.Tests
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(TestFile, ChunkSize);
 
-            Assert.AreEqual(197, requiredBitsForTable);
+            Assert.AreEqual(198, requiredBitsForTable);
             mockFileIOProxy.Verify(provider => provider.GetFileSizeBytes(TestFile), Times.Once());
         }
 
