@@ -148,7 +148,7 @@
 
             Parsers.ParseDummyCount(parsedArguments);
 
-            Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(parsedArguments, parsedArguments.GetType()) });
+            Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(parsedArguments) });
 
             return parsedArguments.ToImmutable();
         }

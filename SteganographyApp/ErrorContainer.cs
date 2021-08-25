@@ -1,6 +1,7 @@
 namespace SteganographyApp
 {
     using System;
+    using System.Threading;
 
     /// <summary>
     /// Thread-safe method to hold onto an error object so it can be shared
@@ -10,7 +11,27 @@ namespace SteganographyApp
     {
         private static readonly object SyncLock = new object();
 
+        private readonly CancellationTokenSource source = new CancellationTokenSource();
         private Exception exception;
+
+        ~ErrorContainer()
+        {
+            try
+            {
+                source.Dispose();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public CancellationToken CancellationToken
+        {
+            get
+            {
+                return source.Token;
+            }
+        }
 
         /// <summary>
         /// Checks to see if the exception object is not null.
@@ -30,7 +51,12 @@ namespace SteganographyApp
         {
             lock (SyncLock)
             {
+                if (this.exception != null)
+                {
+                    return;
+                }
                 this.exception = exception;
+                source.Cancel();
             }
         }
 

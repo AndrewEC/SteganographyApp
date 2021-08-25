@@ -24,7 +24,7 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(IRandomizeUtil))]
     public class RandomizeUtil : IRandomizeUtil
     {
-        private static readonly int RandomizeIterationsModifier = 7;
+        private static readonly int RandomizeIterationsModifier = 3;
 
         private ILogger log;
 

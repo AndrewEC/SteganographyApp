@@ -46,13 +46,7 @@ namespace SteganographyApp.Encode
 
         public void Join()
         {
-            try
-            {
-                readThread.Join(1000);
-            }
-            catch
-            {
-            }
+            Suppressed.TryRun(() => readThread.Join(1000));
         }
 
         /// <summary>
@@ -63,9 +57,9 @@ namespace SteganographyApp.Encode
         /// </summary>
         private void Read()
         {
-            using (var reader = new ContentReader(arguments))
+            try
             {
-                try
+                using (var reader = new ContentReader(arguments))
                 {
                     string contentChunk = string.Empty;
                     while ((contentChunk = reader.ReadContentChunkFromFile()) != null)
@@ -78,11 +72,11 @@ namespace SteganographyApp.Encode
                     }
                     queue.Add(new ReadArgs { Status = Status.Complete });
                 }
-                catch (Exception e)
-                {
-                    queue.Add(new ReadArgs { Status = Status.Failure, Exception = e });
-                    return;
-                }
+            }
+            catch (Exception e)
+            {
+                queue.Add(new ReadArgs { Status = Status.Failure, Exception = e });
+                return;
             }
         }
     }

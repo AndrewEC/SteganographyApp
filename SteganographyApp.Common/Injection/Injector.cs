@@ -73,12 +73,7 @@ namespace SteganographyApp.Common.Injection
             }
         }
 
-        private static MethodInfo GetPostConstructMethod(object instance)
-        {
-            return instance.GetType().GetMethods()
-                .Where(HasPostConstructAttribute)
-                .FirstOrDefault();
-        }
+        private static MethodInfo GetPostConstructMethod(object instance) => instance.GetType().GetMethods().Where(HasPostConstructAttribute).FirstOrDefault();
 
         private static bool HasPostConstructAttribute(MethodInfo info) => info.GetCustomAttribute(typeof(PostConstructAttribute), false) != null;
     }
@@ -122,7 +117,7 @@ namespace SteganographyApp.Common.Injection
         public static T Provide<T>()
         {
             var type = typeof(T);
-            if (IsProvidingNonMockObjectWhenInTestState(type))
+            if (IsProvidingRealObjectWhenInTestState(type))
             {
                 string message = string.Format("Injector is in a test state but tried to provide a non-mocked object for type: [{0}]", type.Name);
                 throw new InvalidOperationException(message);
@@ -172,7 +167,7 @@ namespace SteganographyApp.Common.Injection
             onlyTestObjectsState = false;
         }
 
-        private static bool IsProvidingNonMockObjectWhenInTestState(Type type) => onlyTestObjectsState
+        private static bool IsProvidingRealObjectWhenInTestState(Type type) => onlyTestObjectsState
             && injectionValues[type] == defaultInjectionValues[type];
     }
 }

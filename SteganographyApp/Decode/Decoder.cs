@@ -41,9 +41,6 @@ namespace SteganographyApp.Decode
         /// </summary>
         private readonly BlockingCollection<WriteArgs> writeQueue;
 
-        /// <summary>
-        /// Used to allow the <see cref="FileWriteThread" /> to communicate an exception back to the Decoder.
-        /// </summary>
         private readonly ErrorContainer errorContainer;
 
         private readonly ILogger log;
@@ -58,17 +55,10 @@ namespace SteganographyApp.Decode
 
         /// <summary>
         /// Creates a decode instance and invokes the
-        /// <see cref="DecodeFileFromImage" method.
+        /// <see cref="DecodeFileFromImage" /> method.
         /// </summary>
         public static void CreateAndDecode(IInputArguments arguments) => new Decoder(arguments).DecodeFileFromImage();
 
-        /// <summary>
-        /// Inititates the process of reading a file from an image, decoding it, and writing it
-        /// to the target output file.
-        /// The read/decode/write loop consists of the Decoder class reading the encoded binary
-        /// content from the images and adding it to the writeQueue. The file write thread then
-        /// picks up the raw content from the queue, decodes it, and writes it to the target output file.
-        /// </summary>
         private void DecodeFileFromImage()
         {
             Console.WriteLine("Decoding to File: {0}", arguments.DecodedOutputFile);
@@ -79,32 +69,19 @@ namespace SteganographyApp.Decode
             using (var wrapper = store.CreateIOWrapper())
             {
                 var thread = FileWriteThread.CreateAndStartThread(writeQueue, errorContainer, arguments);
-
-                Console.WriteLine("Reading content chunk table.");
-                var contentChunkTable = store.ReadContentChunkTable();
-                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
-
-                log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
-                foreach (int chunkLength in contentChunkTable)
+                try
                 {
-                    log.Debug("Processing chunk of [{0}] bits.", chunkLength);
-                    string binary = wrapper.ReadContentChunkFromImage(chunkLength);
-                    writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete });
-                    tracker.UpdateAndDisplayProgress();
-
-                    if (errorContainer.HasException())
-                    {
-                        thread.Join();
-                        ThrowException();
-                    }
+                    DoDecode(store, wrapper);
                 }
-
-                writeQueue.Add(new WriteArgs { Status = Status.Complete });
-                thread.Join();
-
-                if (errorContainer.HasException())
+                catch (Exception e)
                 {
-                    ThrowException();
+                    errorContainer.PutException(e);
+                    log.Error("Decoder found exception in container: [{0}]", e.Message);
+                    throw;
+                }
+                finally
+                {
+                    Suppressed.TryRun(() => thread.Join());
                 }
             }
 
@@ -112,11 +89,32 @@ namespace SteganographyApp.Decode
             Console.WriteLine("Decoding process complete.");
         }
 
-        private void ThrowException()
+        private void DoDecode(ImageStore store, ImageStoreIO wrapper)
         {
-            Exception error = errorContainer.TakeException();
-            log.Error("Decoder found exception in container: [{0}]", error);
-            throw error;
+            Console.WriteLine("Reading content chunk table.");
+            var contentChunkTable = store.ReadContentChunkTable();
+            var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
+
+            log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
+            foreach (int chunkLength in contentChunkTable)
+            {
+                log.Debug("Processing chunk of [{0}] bits.", chunkLength);
+                string binary = wrapper.ReadContentChunkFromImage(chunkLength);
+                writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete });
+                tracker.UpdateAndDisplayProgress();
+
+                if (errorContainer.HasException())
+                {
+                    throw errorContainer.TakeException();
+                }
+            }
+
+            writeQueue.Add(new WriteArgs { Status = Status.Complete });
+
+            if (errorContainer.HasException())
+            {
+                throw errorContainer.TakeException();
+            }
         }
     }
 }

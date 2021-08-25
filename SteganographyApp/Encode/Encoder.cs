@@ -103,7 +103,7 @@ namespace SteganographyApp.Encode
 
             while (true)
             {
-                var readArgs = readQueue.Take();
+                var readArgs = readQueue.Take(errorContainer.CancellationToken);
                 if (readArgs.Status == Status.Complete)
                 {
                     thread.Join();
