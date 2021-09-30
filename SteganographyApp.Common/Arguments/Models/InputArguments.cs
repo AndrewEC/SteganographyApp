@@ -119,7 +119,6 @@ namespace SteganographyApp.Common.Arguments
         {
             return new ImmutableInputArguments(this);
         }
-
     }
 
     /// <summary>

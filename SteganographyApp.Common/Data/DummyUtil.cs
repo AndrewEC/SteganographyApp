@@ -46,7 +46,7 @@ namespace SteganographyApp.Common.Data
             log.Debug("Bit count before inserting dummies: [{0}]", binary.Length);
             int amountToIncrement = SumBinaryString(binary);
 
-            int[] lengths = GenerateLengthsOfDummies(numDummies);
+            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies);
 
             var generator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
 
@@ -58,7 +58,10 @@ namespace SteganographyApp.Common.Data
 
             for (int i = 0; i < positions.Length; i++)
             {
-                binary = binary.Insert(positions[i], GenerateDummyEntry(generator, lengths[i]));
+                var nextDummy = GenerateDummyEntry(generator, lengths[i]);
+                var nextDummyPosition = positions[i];
+                log.Trace("Inserting dummy at position [{0}] with value [{1}]", nextDummyPosition, nextDummy);
+                binary = binary.Insert(positions[i], nextDummy);
             }
 
             GlobalCounter.Instance.Increment(amountToIncrement);
@@ -74,7 +77,7 @@ namespace SteganographyApp.Common.Data
             log.Debug("Bit count before removing dummies: [{0}]", binary.Length);
 
             // calculate the length of the dummies originally added to the string
-            int[] lengths = GenerateLengthsOfDummies(numDummies);
+            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies);
             Array.Reverse(lengths);
             int totalLength = lengths.Sum();
 
@@ -117,9 +120,9 @@ namespace SteganographyApp.Common.Data
             return $"{randomSeed}{GlobalCounter.Instance.Count}";
         }
 
-        private int[] GenerateLengthsOfDummies(int numDummies)
+        private int[] GenerateLengthsOfDummies(string randomSeed, int numDummies)
         {
-            var lengthGenerator = new IndexGenerator(numDummies, numDummies);
+            var lengthGenerator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
             return Enumerable.Range(0, numDummies)
                 .Select(i => lengthGenerator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
                 .ToArray();
