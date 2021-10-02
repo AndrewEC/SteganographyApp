@@ -22,7 +22,7 @@ namespace SteganographyApp.Common.Data
     /// Utility class for compressing and decrompressing content using GZip compression.
     /// </summary>
     [Injectable(typeof(ICompressionUtil))]
-    public class CompressionUtil : ICompressionUtil
+    public sealed class CompressionUtil : ICompressionUtil
     {
         private ILogger log;
 

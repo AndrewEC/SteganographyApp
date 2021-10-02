@@ -178,6 +178,20 @@
             <exception cref="TransformationException">Thrown if an our of range exception is caught while trying to remove the dummy entries from the chunk.</exception>
         </RemoveDummies>
     </members>
+    <members name="EncryptionUtil">
+        <Encrypt>
+            <summary>Encrypts the provided base64 encoded string using the input password.</summary>
+            <param name="value">The base64 encoded string to encrypt.</param>
+            <param name="password">The password to use in the AES cypher.</param>
+            <returns>An encrypted base64 encoded string.</returns>
+        </Encrypt>
+        <Decrypt>
+            <summary>Decrypts the provided base64 encoded string using the input password.</summary>
+            <param name="value">The base64 encoded string to decrypt.</param>
+            <param name="password">The password to use in the AES cypher.</param>
+            <returns>A decrypted base64 encoded string.</returns>
+        </Decrypt>
+    </members>
     <members name="RandomizeUtil">
         <RandomizeBinaryString>
             <summary>
@@ -281,20 +295,6 @@
             <param name="intercept">Intecept.</param>
             <returns>The info of the key that was pressed.</returns>
         </ReadKey>
-    </members>
-    <members name="EncryptionProxy">
-        <Encrypt>
-            <summary>Encrypts the provided base64 encoded string using the input password.</summary>
-            <param name="base64String">The base64 encoded string to encrypt.</param>
-            <param name="password">The password to use in the AES cypher.</param>
-            <returns>An encrypted base64 encoded string.</returns>
-        </Encrypt>
-        <Decrypt>
-            <summary>Decrypts the provided base64 encoded string using the input password.</summary>
-            <param name="base64String">The base64 encoded string to decrypt.</param>
-            <param name="password">The password to use in the AES cypher.</param>
-            <returns>A decrypted base64 encoded string.</returns>
-        </Decrypt>
     </members>
     <members name="ImageProxy">
         <LoadImage>

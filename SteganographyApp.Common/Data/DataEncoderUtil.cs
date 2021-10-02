@@ -34,7 +34,7 @@
     /// original file bytes.
     /// </summary>
     [Injectable(typeof(IDataEncoderUtil))]
-    public class DataEncoderUtil : IDataEncoderUtil
+    public sealed class DataEncoderUtil : IDataEncoderUtil
     {
         /// <include file='../docs.xml' path='docs/members[@name="DataEncoderUtil"]/Encode/*' />
         public string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed)
@@ -50,7 +50,7 @@
             {
                 try
                 {
-                    base64 = Injector.Provide<IEncryptionProxy>().Encrypt(base64, password);
+                    base64 = Injector.Provide<IEncryptionUtil>().Encrypt(base64, password);
                 }
                 catch (Exception e)
                 {
@@ -91,7 +91,7 @@
             {
                 try
                 {
-                    decoded64String = Injector.Provide<IEncryptionProxy>().Decrypt(decoded64String, password);
+                    decoded64String = Injector.Provide<IEncryptionUtil>().Decrypt(decoded64String, password);
                 }
                 catch (Exception e)
                 {

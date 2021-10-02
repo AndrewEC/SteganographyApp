@@ -5,7 +5,7 @@ namespace SteganographyApp.Common.Data
     /// instance as to increase the degree of variance among the positions and
     /// values of the dummy entries to increase the difficulty in discerning a pattern.
     /// </summary>
-    public class GlobalCounter
+    public sealed class GlobalCounter
     {
         /// <summary>
         /// The singleton instance of the GlobalCounter.

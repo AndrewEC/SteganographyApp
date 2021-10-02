@@ -13,8 +13,8 @@
     [TestFixture]
     public class DataEncoderUtilTests : FixtureWithTestObjects
     {
-        [Mockup(typeof(IEncryptionProxy))]
-        public Mock<IEncryptionProxy> mockEncryptionProxy;
+        [Mockup(typeof(IEncryptionUtil))]
+        public Mock<IEncryptionUtil> mockEncryptionProxy;
 
         [Mockup(typeof(IBinaryUtil))]
         public Mock<IBinaryUtil> mockBinaryUtil;

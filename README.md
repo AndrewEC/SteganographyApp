@@ -57,7 +57,6 @@ For some performance benchmark execute `run_benchmarks.ps1`.
 
 This app takes advantage of the following third party nuget packages:
 
-* [Rijindael256](https://github.com/2Toad/Rijndael256) - Easier Aes-256 encryption
 * [ImageSharp](https://github.com/JimBobSquarePants/ImageSharp) - Loading, manipulating, saving, and converting images
 * [System.ValueTuple](https://www.nuget.org/packages/System.ValueTuple/) - Tuples!
 * [Coverlet](https://github.com/tonerdo/coverlet) - Measure, and subsequently generate reports for, unit test coverage

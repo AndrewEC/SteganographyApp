@@ -23,7 +23,7 @@ namespace SteganographyApp.Common.Data
     /// Utility class for inserting and removing dummy entries in a binary string.
     /// </summary>
     [Injectable(typeof(IDummyUtil))]
-    public class DummyUtil : IDummyUtil
+    public sealed class DummyUtil : IDummyUtil
     {
         private static readonly int MaxLengthPerDummy = 500;
         private static readonly int MinLengthPerDummy = 100;

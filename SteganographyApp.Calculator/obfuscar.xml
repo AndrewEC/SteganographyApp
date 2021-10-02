@@ -10,7 +10,6 @@
     <Module file="$(InPath)\SteganographyApp.Common.dll">
         <SkipType name="SteganographyApp.Common.Arguments.ActionEnum" skipFields="true" skipMethods="true" skipProperties="true" />
         <SkipType name="SteganographyApp.Common.Logging.LogLevel" skipFields="true" skipMethods="true" skipProperties="true" />
-        <SkipType name="SteganographyApp.Common.Arguments.InputArguments" skipFields="true" skipMethods="true" skipProperties="true" />
         <SkipType name="SteganographyApp.Common.Arguments.IImmutableFactory`1" skipFields="true" skipMethods="true" skipProperties="true" />
     </Module>
 </Obfuscator>

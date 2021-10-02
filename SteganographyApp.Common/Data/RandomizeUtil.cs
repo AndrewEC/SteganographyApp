@@ -22,7 +22,7 @@ namespace SteganographyApp.Common.Data
     /// and decode process.
     /// </summary>
     [Injectable(typeof(IRandomizeUtil))]
-    public class RandomizeUtil : IRandomizeUtil
+    public sealed class RandomizeUtil : IRandomizeUtil
     {
         private static readonly int RandomizeIterationsModifier = 3;
 

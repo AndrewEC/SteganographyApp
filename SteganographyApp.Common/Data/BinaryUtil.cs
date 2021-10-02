@@ -21,7 +21,7 @@ namespace SteganographyApp.Common.Data
     /// Injectable Utility class for encoding a binary string to base64 and from base64 to binary.
     /// </summary>
     [Injectable(typeof(IBinaryUtil))]
-    public class BinaryUtil : IBinaryUtil
+    public sealed class BinaryUtil : IBinaryUtil
     {
         /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBase64String/*' />
         public string ToBase64String(string binary)
