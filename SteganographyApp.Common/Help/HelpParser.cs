@@ -17,7 +17,7 @@ namespace SteganographyApp.Common
         /// When found at the beginning of a line it indicates a new help item
         /// entry.
         /// </summary>
-        private static readonly string HelpItemIndicator = "~";
+        private const string HelpItemIndicator = "~";
 
         /// <summary>
         /// Gets a value representing the last exception message to be caught.

@@ -9,10 +9,10 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class ProgressTrackerTests : FixtureWithTestObjects
     {
-        private static readonly int DesiredWriteCount = 10;
-        private static readonly int DesiredWriteLineCount = 1;
-        private static readonly string Message = "testing";
-        private static readonly string CompleteMessage = "testing complete";
+        private const int DesiredWriteCount = 10;
+        private const int DesiredWriteLineCount = 1;
+        private const string Message = "testing";
+        private const string CompleteMessage = "testing complete";
 
         private MockWriter mockWriter;
 

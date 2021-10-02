@@ -24,12 +24,12 @@ namespace SteganographyApp.Common.Tests
         [Mockup(typeof(IDataEncoderUtil))]
         public Mock<IDataEncoderUtil> mockDataEncoderUtil;
 
-        private static readonly int ChunkByteSize = 100;
-        private static readonly string FileToEncode = "file_to_encode";
-        private static readonly string Password = "password";
-        private static readonly bool UseCompression = true;
-        private static readonly int DummyCount = 10;
-        private static readonly string RandomSeed = "randomSeed";
+        private const int ChunkByteSize = 100;
+        private const string FileToEncode = "file_to_encode";
+        private const string Password = "password";
+        private const bool UseCompression = true;
+        private const int DummyCount = 10;
+        private const string RandomSeed = "randomSeed";
 
         private static readonly IInputArguments Arguments = new InputArguments
         {

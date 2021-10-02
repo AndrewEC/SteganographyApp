@@ -7,7 +7,7 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class BinaryUtilTests
     {
-        private static readonly string OriginalBinaryString = "1101010101000011101011111000000010101010";
+        private const string OriginalBinaryString = "1101010101000011101011111000000010101010";
 
         [Test]
         public void TestToBase64AndBackToBinary()

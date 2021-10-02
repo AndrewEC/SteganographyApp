@@ -7,11 +7,11 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class DummyUtilTests : FixtureWithLogger
     {
-        private static readonly string OriginalBinaryString = "1101010101000011101011111000000010101010100";
-        private static readonly int NumberOfDummies = 10;
-        private static readonly int IncorrectNumberOfDummies = 3;
-        private static readonly string RandomSeed = "random_seed";
-        private static readonly string IncorrectRandomSeed = "seed_random";
+        private const string OriginalBinaryString = "1101010101000011101011111000000010101010100";
+        private const int NumberOfDummies = 10;
+        private const int IncorrectNumberOfDummies = 3;
+        private const string RandomSeed = "random_seed";
+        private const string IncorrectRandomSeed = "seed_random";
 
         [SetUp]
         public void Initialize()

@@ -28,13 +28,12 @@
         [Mockup(typeof(ICompressionUtil))]
         public Mock<ICompressionUtil> mockCompressionUtil;
 
+        private const string Password = "password";
+        private const bool UseCompression = false;
+        private const int DummyCount = 10;
+        private const string RandomSeed = "randomSeed";
+        private const string StringToDecode = "stringToDecode";
         private static readonly byte[] InputBytes = new byte[1];
-        private static readonly string Password = "password";
-        private static readonly bool UseCompression = false;
-        private static readonly int DummyCount = 10;
-        private static readonly string RandomSeed = "randomSeed";
-
-        private static readonly string StringToDecode = "stringToDecode";
 
         [Test]
         public void TestEncode()

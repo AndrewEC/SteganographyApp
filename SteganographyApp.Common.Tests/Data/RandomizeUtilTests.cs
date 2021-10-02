@@ -7,9 +7,9 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class RandomizeUtilTests : FixtureWithLogger
     {
-        private static readonly string OriginalBinaryString = "1101010101000011101011111000000010101010100";
-        private static readonly string RandomSeed = "randomSeed";
-        private static readonly string BadRandomSeed = "badRandomSeed";
+        private const string OriginalBinaryString = "1101010101000011101011111000000010101010100";
+        private const string RandomSeed = "randomSeed";
+        private const string BadRandomSeed = "badRandomSeed";
 
         [Test]
         public void TestRandomizeTwiceWithSameSeedProducesSameResult()

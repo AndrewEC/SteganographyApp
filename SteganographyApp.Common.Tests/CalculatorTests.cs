@@ -11,8 +11,8 @@ namespace SteganographyApp.Common.Tests
         [Mockup(typeof(IFileIOProxy))]
         public Mock<IFileIOProxy> mockFileIOProxy;
 
-        private static readonly string TestFile = "Test001.png";
-        private static readonly int ChunkSize = 131_072;
+        private const string TestFile = "Test001.png";
+        private const int ChunkSize = 131_072;
 
         [Test]
         public void TestRequiredChunkSizeMatchesExpected()

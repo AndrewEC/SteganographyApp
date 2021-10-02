@@ -1,10 +1,10 @@
 namespace SteganographyApp.Common.Data
 {
-    using SteganographyApp.Common.Injection;
     using System;
     using System.IO;
     using System.Security.Cryptography;
     using System.Text;
+    using SteganographyApp.Common.Injection;
 
     /// <summary>
     /// Contract for interacting with the EncryptionUtil instance.
@@ -24,8 +24,8 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(IEncryptionUtil))]
     public sealed class EncryptionUtil : IEncryptionUtil
     {
-        private static readonly int Iterations = 10000;
-        private static readonly int KeySize = 256;
+        private const int Iterations = 10000;
+        private const int KeySize = 256;
         private const int IvSize = 16;
 
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />

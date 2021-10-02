@@ -12,7 +12,7 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     internal static class ImageRegexParser
     {
-        private static readonly string ImageRegexExpression = @"^\[r\]\<(.+)\>\<(.+)\>$";
+        private const string ImageRegexExpression = @"^\[r\]\<(.+)\>\<(.+)\>$";
         private static readonly Regex ImageRegex = new Regex(ImageRegexExpression);
 
         /// <summary>

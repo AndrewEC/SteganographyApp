@@ -8,8 +8,8 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     public static class Checks
     {
-        private static readonly string HelpArgument = "--help";
-        private static readonly string HelpArgumentShortened = "-h";
+        private const string HelpArgument = "--help";
+        private const string HelpArgumentShortened = "-h";
 
         /// <summary>
         /// Checks whether an immutable array is null or contains no elements.

@@ -25,8 +25,8 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(IDummyUtil))]
     public sealed class DummyUtil : IDummyUtil
     {
-        private static readonly int MaxLengthPerDummy = 500;
-        private static readonly int MinLengthPerDummy = 100;
+        private const int MaxLengthPerDummy = 500;
+        private const int MinLengthPerDummy = 100;
 
         private ILogger log;
 

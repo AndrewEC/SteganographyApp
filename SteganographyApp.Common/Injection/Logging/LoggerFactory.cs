@@ -24,7 +24,7 @@ namespace SteganographyApp.Common.Logging
     [Injectable(typeof(ILoggerFactory))]
     public class LoggerFactory : ILoggerFactory
     {
-        private static readonly string TypeNameTemplate = "{0}.{1}";
+        private const string TypeNameTemplate = "{0}.{1}";
 
         /// <summary>
         /// Creates an ILogger instance for the specified type. The type should specify the class that will

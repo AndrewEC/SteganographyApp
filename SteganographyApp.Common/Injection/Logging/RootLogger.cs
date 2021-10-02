@@ -15,8 +15,8 @@ namespace SteganographyApp.Common.Logging
         /// </summary>
         public static readonly RootLogger Instance = new RootLogger();
 
-        private static readonly string LogFileName = "steganography.logs.txt";
-        private static readonly string LogMessageTemplate = "[{0}] [{1}] => {2}\n";
+        private const string LogFileName = "steganography.logs.txt";
+        private const string LogMessageTemplate = "[{0}] [{1}] => {2}\n";
         private static readonly object SyncLock = new object();
 
         private static LogLevel logLevel = LogLevel.None;

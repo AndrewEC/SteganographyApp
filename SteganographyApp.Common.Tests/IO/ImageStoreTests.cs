@@ -21,7 +21,7 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class ImageStoreTests : FixtureWithRealObjects
     {
-        private static readonly int BinaryStringLength = 100_000;
+        private const int BinaryStringLength = 100_000;
         private static readonly IInputArguments Arguments = new InputArguments()
         {
             CoverImages = ImmutableArray.Create(new string[] { "test001.png" }),

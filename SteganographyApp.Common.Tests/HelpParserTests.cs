@@ -7,8 +7,8 @@
     [TestFixture]
     public class HelpParserTests : FixtureWithRealObjects
     {
-        private static readonly string PositiveTestPath = "TestAssets/positive-help.prop";
-        private static readonly string NegativeTestPath = "TestAssets/negative-help.prop";
+        private const string PositiveTestPath = "TestAssets/positive-help.prop";
+        private const string NegativeTestPath = "TestAssets/negative-help.prop";
 
         [Test]
         public void TestParseHelpAndGetMainHelpItems()

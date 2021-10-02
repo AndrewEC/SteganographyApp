@@ -17,7 +17,7 @@
         /// The mime type of png images. All images that have the png mimetype should not
         /// be put through the conversion process.
         /// </summary>
-        private static readonly string PngMimeType = "image/png";
+        private const string PngMimeType = "image/png";
 
         public static void Main(string[] args)
         {

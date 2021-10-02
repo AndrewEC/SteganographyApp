@@ -10,13 +10,13 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     public sealed class SensitiveArgumentParser
     {
-        private static readonly string HiddenInputIndicator = "?";
+        private const string HiddenInputIndicator = "?";
 
-        private static readonly string ConfirmTemplate = "Confirm {0}";
-        private static readonly string PasswordPrompt = "Password";
-        private static readonly string RandomSeedPrompt = "Random Seed";
-        private static readonly string PasswordName = "--password";
-        private static readonly string RandomSeedName = "--randomSeed";
+        private const string ConfirmTemplate = "Confirm {0}";
+        private const string PasswordPrompt = "Password";
+        private const string RandomSeedPrompt = "Random Seed";
+        private const string PasswordName = "--password";
+        private const string RandomSeedName = "--randomSeed";
 
         private readonly IConsoleWriter writer;
         private readonly IConsoleReader reader;

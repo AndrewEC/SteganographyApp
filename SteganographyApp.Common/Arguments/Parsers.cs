@@ -13,9 +13,9 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     internal static class Parsers
     {
-        private static readonly string CompressionLevelTemplate = "Level{0}";
-        private static readonly int MaxDummyCount = 1000;
-        private static readonly int MinDummyCount = 100;
+        private const string CompressionLevelTemplate = "Level{0}";
+        private const int MaxDummyCount = 1000;
+        private const int MinDummyCount = 100;
 
         /// <summary>
         /// Parses a boolean from the parameter value and set sthe EnableLogs property.

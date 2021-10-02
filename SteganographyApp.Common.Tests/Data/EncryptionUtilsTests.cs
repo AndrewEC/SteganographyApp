@@ -7,8 +7,8 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class EncryptionUtilTests
     {
-        private static readonly string InputString = "Testing123!@#";
-        private static readonly string Password = "Pass1";
+        private const string InputString = "Testing123!@#";
+        private const string Password = "Pass1";
 
         [Test]
         public void TestEncryptAndDecrypt()
