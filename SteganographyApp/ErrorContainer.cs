@@ -16,13 +16,7 @@ namespace SteganographyApp
 
         ~ErrorContainer()
         {
-            try
-            {
-                source.Dispose();
-            }
-            catch (Exception)
-            {
-            }
+            Suppressed.TryRun(source.Dispose);
         }
 
         public CancellationToken CancellationToken

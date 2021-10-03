@@ -81,7 +81,7 @@ namespace SteganographyApp.Decode
                 }
                 finally
                 {
-                    Suppressed.TryRun(() => thread.Join());
+                    thread.Join();
                 }
             }
 

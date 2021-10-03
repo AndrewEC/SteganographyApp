@@ -1,9 +1,6 @@
 ﻿namespace SteganographyApp.Common.Arguments
 {
     using System;
-    using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.Linq;
     using System.Text.Json;
 
     using SteganographyApp.Common.Injection;
@@ -14,35 +11,7 @@
     /// </summary>
     public sealed class ArgumentParser
     {
-        private readonly ImmutableList<Argument> arguments;
-
-        private readonly SensitiveArgumentParser sensitiveArgumentParser;
-
-        /// <summary>
-        /// Initialize the argument parser and the list of available arguments.
-        /// </summary>
-        public ArgumentParser()
-        {
-            sensitiveArgumentParser = new SensitiveArgumentParser();
-
-#pragma warning disable SA1009
-            arguments = ImmutableList.Create(
-                new Argument("--action", "-a", Parsers.ParseEncodeOrDecodeAction),
-                new Argument("--input", "-in", Parsers.ParseFileToEncode),
-                new Argument("--enableCompression", "-c", Parsers.ParseUseCompression, true),
-                new Argument("--printStack", "-stack", Parsers.ParsePrintStack, true),
-                new Argument("--images", "-im", ImagePathParser.ParseImages),
-                new Argument("--password", "-p", sensitiveArgumentParser.ParsePassword),
-                new Argument("--output", "-o", (arguments, value) => { arguments.DecodedOutputFile = value; }),
-                new Argument("--chunkSize", "-cs", Parsers.ParseChunkSize),
-                new Argument("--randomSeed", "-rs", sensitiveArgumentParser.ParseRandomSeed),
-                new Argument("--enableDummies", "-d", Parsers.ParseInsertDummies, true),
-                new Argument("--deleteOriginals", "-do", Parsers.ParseDeleteOriginals, true),
-                new Argument("--compressionLevel", "-cl", Parsers.ParseCompressionLevel),
-                new Argument("--logLevel", "-ll", Parsers.ParseLogLevel)
-            );
-#pragma warning restore SA1009
-        }
+        private readonly ArgumentContainer argumentContainer = new ArgumentContainer();
 
         /// <summary>
         /// Gets last exception to ocurr while parsing the argument values.
@@ -95,34 +64,6 @@
             }
         }
 
-        private bool TryGetArgument(string key, out Argument targetArgument)
-        {
-            var matchingArgument = arguments.Where(argument => argument.Name == key || argument.ShortName == key).FirstOrDefault();
-            targetArgument = matchingArgument;
-            return matchingArgument != null;
-        }
-
-        private ImmutableList<(Argument, string)> MatchAllArguments(string[] userArguments)
-        {
-            var identifiedArguments = new List<(Argument, string)>();
-            for (int i = 0; i < userArguments.Length; i++)
-            {
-                if (!TryGetArgument(userArguments[i], out Argument argument))
-                {
-                    throw new ArgumentParseException($"An unrecognized argument was provided: {userArguments[i]}");
-                }
-
-                string inputValue = GetRawArgumentValue(argument, userArguments, i);
-                identifiedArguments.Add((argument, inputValue));
-
-                if (!argument.IsFlag)
-                {
-                    i++;
-                }
-            }
-            return identifiedArguments.ToImmutableList();
-        }
-
         private IInputArguments DoTryParse(string[] userArguments, PostValidation postValidationMethod)
         {
             if (userArguments == null || userArguments.Length == 0)
@@ -132,11 +73,11 @@
 
             var parsedArguments = new InputArguments();
 
-            foreach (var (argument, inputValue) in MatchAllArguments(userArguments))
+            foreach (var (argument, inputValue) in argumentContainer.MatchAllArguments(userArguments))
             {
-                if (sensitiveArgumentParser.IsSensitiveArgument(argument))
+                if (argumentContainer.SensitiveArgumentParser.IsSensitiveArgument(argument))
                 {
-                    sensitiveArgumentParser.CaptureArgument(argument, inputValue);
+                    argumentContainer.SensitiveArgumentParser.CaptureArgument(argument, inputValue);
                     continue;
                 }
                 ParseArgument(argument, parsedArguments, inputValue);
@@ -144,29 +85,13 @@
 
             InvokePostValidation(postValidationMethod, parsedArguments);
 
-            sensitiveArgumentParser.ParseSecureArguments(parsedArguments);
+            argumentContainer.SensitiveArgumentParser.ParseSecureArguments(parsedArguments);
 
             Parsers.ParseDummyCount(parsedArguments);
 
             Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(parsedArguments) });
 
             return parsedArguments.ToImmutable();
-        }
-
-        private string GetRawArgumentValue(Argument argument, string[] userArguments, int i)
-        {
-            if (argument.IsFlag)
-            {
-                return "true";
-            }
-            else
-            {
-                if (i + 1 >= userArguments.Length)
-                {
-                    throw new ArgumentParseException($"Missing required value for ending argument: {userArguments[i]}");
-                }
-                return userArguments[i + 1];
-            }
         }
 
         private void InvokePostValidation(PostValidation validation, InputArguments parsed)
