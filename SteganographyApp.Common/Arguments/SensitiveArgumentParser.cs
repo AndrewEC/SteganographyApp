@@ -8,76 +8,37 @@ namespace SteganographyApp.Common.Arguments
     /// <summary>
     /// Parser class to help house and parse sensitive/interactive arguments.
     /// </summary>
-    public sealed class SensitiveArgumentParser
+    public static class SensitiveArgumentParser
     {
         private const string HiddenInputIndicator = "?";
-
         private const string ConfirmTemplate = "Confirm {0}";
         private const string PasswordPrompt = "Password";
         private const string RandomSeedPrompt = "Random Seed";
-        private const string PasswordName = "--password";
-        private const string RandomSeedName = "--randomSeed";
-
-        private readonly IConsoleWriter writer;
-        private readonly IConsoleReader reader;
-
-        private ValueTuple<string, Argument> password;
-        private ValueTuple<string, Argument> randomSeed;
 
         /// <summary>
-        /// Initialize the writer and reader instances using the static Injector service.
+        /// Attempts to parse the password property. This will either accept the input value or, if the value is
+        /// a ? then it will prompt the user to enter the password in an interactive mode.
         /// </summary>
-        public SensitiveArgumentParser()
+        /// <param name="inputArguments">The input arguments in which the Password property will be set by this method.</param>
+        /// <param name="value">The raw value entered by the user as a command line argument.</param>
+        public static void ParsePassword(InputArguments inputArguments, string value)
         {
-            writer = Injector.Provide<IConsoleWriter>();
-            reader = Injector.Provide<IConsoleReader>();
-        }
-
-        /// <summary>
-        /// Identifies if the argument in question may contain sensitive data. Currently the password and random seed
-        /// arguments are the only two that are marked as sensitive.
-        /// </summary>
-        /// <param name="argument">The argument being checked.</param>
-        /// <returns>True if the argument name matches the password argument name or the random seed argument name.</returns>
-        public bool IsSensitiveArgument(Argument argument) => argument.Name == PasswordName || argument.Name == RandomSeedName;
-
-        /// <summary>
-        /// Captures either of the password or random seed arguments so it can be
-        /// interactively parsed after all other parsing and validation has occurred.
-        /// </summary>
-        /// <param name="argument">The argument being captured.</param>
-        /// <param name="inputValue">The user provided value associated with the argument being capture.</param>
-        public void CaptureArgument(Argument argument, string inputValue)
-        {
-            if (argument.Name == PasswordName)
+            var password = ReadUserInput(value, PasswordPrompt);
+            var confirm = ReadUserInput(value, string.Format(ConfirmTemplate, RandomSeedPrompt));
+            if (password != confirm)
             {
-                password = (inputValue, argument);
+                throw new ArgumentValueException("Passwords do not match.");
             }
-            else if (argument.Name == RandomSeedName)
-            {
-                randomSeed = (inputValue, argument);
-            }
+            inputArguments.Password = password;
         }
 
         /// <summary>
-        /// Attempts to parse the password and randomSeed arguments and raises any exceptions that may occur
-        /// if either argument cannot be properly parsed.
+        /// Attempts to parse the random seed property. This will either accept the input value or, if the value
+        /// is an ? then it will prompt the user to enter the password in an interactive mode.
         /// </summary>
-        /// <param name="inputArguments">The input arguments that will be mutated and provided with the values of the
-        /// random seed and password values if they are to be parsed.</param>
-        public void ParseSecureArguments(InputArguments inputArguments)
-        {
-            TryParseSecureItem(inputArguments, password, PasswordName);
-            TryParseSecureItem(inputArguments, randomSeed, RandomSeedName);
-        }
-
-        /// <summary>
-        /// Takes in the random seed value by invoking the <see cref="ReadUserInput"/> method and validating the
-        /// input is of a valid length.
-        /// </summary>
-        /// <param name="arguments">The InputArguments instanced to fill with the parse random seed value.</param>
-        /// <param name="value">The string representation of the random seed.</param>
-        public void ParseRandomSeed(InputArguments arguments, string value)
+        /// <param name="inputArguments">The input arguments in which teh RandomSeed property will be set by this method.</param>
+        /// <param name="value">The raw value entered by the user as a command line argument.</param>
+        public static void ParseRandomSeed(InputArguments inputArguments, string value)
         {
             var seed = ReadUserInput(value, RandomSeedPrompt);
             if (seed.Length > 235 || seed.Length < 3)
@@ -87,42 +48,9 @@ namespace SteganographyApp.Common.Arguments
             var confirm = ReadUserInput(value, string.Format(ConfirmTemplate, RandomSeedPrompt));
             if (seed != confirm)
             {
-                throw new ArgumentValueException("Random Seeds do not match");
+                throw new ArgumentValueException("Random Seeds do not match.");
             }
-            arguments.RandomSeed = seed;
-        }
-
-        /// <summary>
-        /// Parses the password value using the <see cref="ReadUserInput"/> method.
-        /// </summary>
-        /// <param name="arguments">The InputArguments instance to insert the password into.</param>
-        /// <param name="value">The string representation of the password.</param>
-        public void ParsePassword(InputArguments arguments, string value)
-        {
-            var password = ReadUserInput(value, PasswordPrompt);
-            var confirm = ReadUserInput(value, string.Format(ConfirmTemplate, RandomSeedPrompt));
-            if (password != confirm)
-            {
-                throw new ArgumentValueException("Passwords do not match.");
-            }
-            arguments.Password = password;
-        }
-
-        private void TryParseSecureItem(InputArguments inputArguments, ValueTuple<string, Argument> argument, string argumentName)
-        {
-            if (argument.Item1 == null || argument.Item2 == null)
-            {
-                return;
-            }
-
-            try
-            {
-                argument.Item2.Parser(inputArguments, argument.Item1);
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentParseException($"Invalid value provided for argument: {argumentName}", e);
-            }
+            inputArguments.RandomSeed = seed;
         }
 
         /// <summary>
@@ -135,8 +63,10 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="messagePrompt">The argument to prompt the user to enter.</param>
         /// <returns>Either the original value string value or the value of the user's input
         /// if the original value string value was a question mark.</returns>
-        private string ReadUserInput(string value, string messagePrompt)
+        private static string ReadUserInput(string value, string messagePrompt)
         {
+            var writer = Injector.Provide<IConsoleWriter>();
+            var reader = Injector.Provide<IConsoleReader>();
             if (value == HiddenInputIndicator)
             {
                 writer.Write($"Enter {messagePrompt}: ");

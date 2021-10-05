@@ -1,6 +1,8 @@
 ﻿namespace SteganographyApp.Common.Arguments
 {
     using System;
+    using System.Collections.Immutable;
+    using System.Linq;
     using System.Text.Json;
 
     using SteganographyApp.Common.Injection;
@@ -11,8 +13,6 @@
     /// </summary>
     public sealed class ArgumentParser
     {
-        private readonly ArgumentContainer argumentContainer = new ArgumentContainer();
-
         /// <summary>
         /// Gets last exception to ocurr while parsing the argument values.
         /// </summary>
@@ -72,26 +72,24 @@
             }
 
             var parsedArguments = new InputArguments();
+            var container = new ArgumentContainer(userArguments);
 
-            foreach (var (argument, inputValue) in argumentContainer.MatchAllArguments(userArguments))
-            {
-                if (argumentContainer.SensitiveArgumentParser.IsSensitiveArgument(argument))
-                {
-                    argumentContainer.SensitiveArgumentParser.CaptureArgument(argument, inputValue);
-                    continue;
-                }
-                ParseArgument(argument, parsedArguments, inputValue);
-            }
+            ParseSelected(container.GetAllNonSensitiveArguments(), parsedArguments);
 
             InvokePostValidation(postValidationMethod, parsedArguments);
 
-            argumentContainer.SensitiveArgumentParser.ParseSecureArguments(parsedArguments);
+            ParseSelected(container.GetAllSensitiveArguments(), parsedArguments);
 
             Parsers.ParseDummyCount(parsedArguments);
 
             Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(parsedArguments) });
 
             return parsedArguments.ToImmutable();
+        }
+
+        private void ParseSelected(ImmutableDictionary<Argument, string> selected, InputArguments parsedArguments)
+        {
+            selected.ToList().ForEach(item => ParseArgument(item.Key, parsedArguments, item.Value));
         }
 
         private void InvokePostValidation(PostValidation validation, InputArguments parsed)
