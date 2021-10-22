@@ -59,5 +59,17 @@ namespace SteganographyApp.Common
             int requiredNumberOfWrites = CalculateRequiredNumberOfWrites(fileToEncode, chunkByteSize);
             return (requiredNumberOfWrites + 1) * ChunkDefinitionBitSizeWithPadding;
         }
+
+        /// <summary>
+        /// Returns a count of the total number of bits that will be required to store a content chunk table
+        /// given the number of chunks that will need to be written to said table.
+        /// </summary>
+        /// <param name="numberOfChunks">The number of chunks that will need to be written to the content chunk table
+        /// less the chunk table header.</param>
+        /// <returns>A count of the total number of bits that will be required to store the content chunk table.</returns>
+        public static int CalculateRequiredBitsForContentTable(int numberOfChunks)
+        {
+            return (numberOfChunks + 1) * ChunkDefinitionBitSizeWithPadding;
+        }
     }
 }

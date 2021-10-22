@@ -74,11 +74,11 @@
             var parsedArguments = new InputArguments();
             var container = new ArgumentContainer(userArguments);
 
-            ParseSelected(container.GetAllNonSensitiveArguments(), parsedArguments);
+            ParseArguments(container.GetAllNonSensitiveArguments(), parsedArguments);
 
             InvokePostValidation(postValidationMethod, parsedArguments);
 
-            ParseSelected(container.GetAllSensitiveArguments(), parsedArguments);
+            ParseArguments(container.GetAllSensitiveArguments(), parsedArguments);
 
             Parsers.ParseDummyCount(parsedArguments);
 
@@ -87,9 +87,9 @@
             return parsedArguments.ToImmutable();
         }
 
-        private void ParseSelected(ImmutableDictionary<Argument, string> selected, InputArguments parsedArguments)
+        private void ParseArguments(ImmutableDictionary<Argument, string> selected, InputArguments parsedArguments)
         {
-            selected.ToList().ForEach(item => ParseArgument(item.Key, parsedArguments, item.Value));
+            selected.ToList().ForEach(argumentAndValue => ParseArgument(argumentAndValue.Key, parsedArguments, argumentAndValue.Value));
         }
 
         private void InvokePostValidation(PostValidation validation, InputArguments parsed)

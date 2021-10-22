@@ -3,6 +3,7 @@ namespace SteganographyApp.Common
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.IO;
     using System.Reflection;
 
     using SteganographyApp.Common.Injection;
@@ -48,8 +49,8 @@ namespace SteganographyApp.Common
         /// <returns>True if the help file was successfully parsed, otherwise false.</returns>
         public bool TryParseHelpFile(out HelpInfo info, string filename = "help.prop")
         {
-            string assemblyPath = GetAssemblyPath();
-            string helpFileLocation = $"{assemblyPath}\\{filename}";
+            string assemblyFolder = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+            string helpFileLocation = Path.Combine(assemblyFolder, filename);
 
             if (!Injector.Provide<IFileIOProxy>().IsExistingFile(helpFileLocation))
             {
@@ -66,7 +67,7 @@ namespace SteganographyApp.Common
             {
                 LastError = e.Message;
                 info = new HelpInfo(null);
-                return false;
+                throw;
             }
 
             return true;
@@ -87,17 +88,6 @@ namespace SteganographyApp.Common
         }
 
         private string LineWithoutHelpItemIndicator(string line) => line.Substring(1);
-
-        private string GetAssemblyPath()
-        {
-            string assemblyPath = Assembly.GetExecutingAssembly().Location;
-            int index = assemblyPath.LastIndexOf("\\");
-            if (index == -1)
-            {
-                index = assemblyPath.LastIndexOf("/");
-            }
-            return assemblyPath.Substring(0, index);
-        }
 
         /// <summary>
         /// Attempts to read all the lines of text that make up the help message that is associated

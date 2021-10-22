@@ -39,13 +39,15 @@ namespace SteganographyApp.Common.Data
         public string ToBinaryString(string base64String)
         {
             byte[] converted = Convert.FromBase64String(base64String);
-            int capacity = converted.Length * 8;
-            var builder = new StringBuilder(capacity);
+            int numberOfBits = converted.Length * 8;
+            var builder = new StringBuilder(numberOfBits);
             foreach (byte bit in converted)
             {
-                builder.Append(Convert.ToString(bit, 2).PadLeft(8, '0'));
+                builder.Append(To8BitBinaryString(bit));
             }
             return builder.ToString();
         }
+
+        private string To8BitBinaryString(byte input) => Convert.ToString(input, 2).PadLeft(8, '0');
     }
 }

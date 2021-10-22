@@ -133,7 +133,7 @@
             {
                 if (!helpItems.ContainsKey(helpLabels[i]))
                 {
-                    messages[i] = $"No help information configured for {helpLabels[i]}.\n";
+                    messages[i] = $"No help information available for {helpLabels[i]}.\n";
                     continue;
                 }
                 messages[i] = helpItems[helpLabels[i]];

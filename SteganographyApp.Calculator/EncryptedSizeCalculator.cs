@@ -23,7 +23,7 @@ namespace SteganographyAppCalculator
                 int numberOfChunks = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
 
                 // Plus 1 because we need an additional entry in the chunk table to indicate the number of entries in the table
-                int chunkTableSize = (numberOfChunks + 1) * Calculator.ChunkDefinitionBitSizeWithPadding;
+                int chunkTableSize = Calculator.CalculateRequiredBitsForContentTable(numberOfChunks);
                 double size = ((double)singleChunkSize * (double)numberOfChunks) + (double)chunkTableSize;
 
                 Console.WriteLine("\nEncrypted file size is:");

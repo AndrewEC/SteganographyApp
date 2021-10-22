@@ -94,14 +94,11 @@ namespace SteganographyApp.Common.Arguments
             {
                 return "true";
             }
-            else
+            else if (i + 1 >= userArguments.Length)
             {
-                if (i + 1 >= userArguments.Length)
-                {
-                    throw new ArgumentParseException($"Missing required value for ending argument: {userArguments[i]}");
-                }
-                return userArguments[i + 1];
+                throw new ArgumentParseException($"Missing required value for ending argument: {userArguments[i]}");
             }
+            return userArguments[i + 1];
         }
     }
 }

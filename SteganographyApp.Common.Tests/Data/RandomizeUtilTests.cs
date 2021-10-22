@@ -11,12 +11,18 @@ namespace SteganographyApp.Common.Tests
         private const string RandomSeed = "randomSeed";
         private const string BadRandomSeed = "badRandomSeed";
 
+        private RandomizeUtil util;
+
+        [SetUp]
+        public void Setup()
+        {
+            util = new RandomizeUtil();
+            util.PostConstruct();
+        }
+
         [Test]
         public void TestRandomizeTwiceWithSameSeedProducesSameResult()
         {
-            var util = new RandomizeUtil();
-            util.PostConstruct();
-
             string randomizedFirst = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed);
             string randomizedSecond = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed);
 
@@ -26,9 +32,6 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestRandomizeAndReorder()
         {
-            var util = new RandomizeUtil();
-            util.PostConstruct();
-
             string randomized = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed);
             Assert.AreNotEqual(OriginalBinaryString, randomized);
 
@@ -39,9 +42,6 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestRandomizeWithIncorrectRandomSeedReturnsBadResult()
         {
-            var util = new RandomizeUtil();
-            util.PostConstruct();
-
             string randomized = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed);
             Assert.AreNotEqual(OriginalBinaryString, randomized);
 

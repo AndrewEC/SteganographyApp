@@ -43,7 +43,7 @@
             Assert.IsTrue(parser.TryParseHelpFile(out HelpInfo info, NegativeTestPath));
             foreach (string line in info.GetHelpMessagesFor(HelpItemSet.Calculator))
             {
-                Assert.IsTrue(line.Contains("No help information configured for"));
+                Assert.IsTrue(line.Contains("No help information available for"));
             }
         }
 
