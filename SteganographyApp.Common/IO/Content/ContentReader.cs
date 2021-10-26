@@ -16,7 +16,10 @@
         /// Creates a new instance of the ContentReader.
         /// </summary>
         /// <param name="args">The values parsed from the command line values.</param>
-        public ContentReader(IInputArguments args) : base(args) { }
+        public ContentReader(IInputArguments args) : base(args)
+        {
+            Stream = Injector.Provide<IFileIOProxy>().OpenFileForRead(Args.FileToEncode);
+        }
 
         /// <summary>
         /// Reads in the next unread chunk of data from the input file, encodes it,
@@ -27,10 +30,6 @@
         /// <returns>A binary string representation of the next availabe ChunkByteSize from the input file.</returns>
         public string ReadContentChunkFromFile()
         {
-            if (Stream == null)
-            {
-                Stream = Injector.Provide<IFileIOProxy>().OpenFileForRead(Args.FileToEncode);
-            }
             byte[] buffer = new byte[Args.ChunkByteSize];
             int read = Stream.Read(buffer, 0, buffer.Length);
             if (read == 0)

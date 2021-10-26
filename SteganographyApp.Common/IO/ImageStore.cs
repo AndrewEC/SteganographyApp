@@ -14,7 +14,7 @@
     /// Class that handles positioning a make shift write stream in the proper position so
     /// data can be reliably read and written to the storage images.
     /// </summary>
-    public sealed partial class ImageStore
+    public sealed class ImageStore
     {
         /// <summary>
         /// Stores the current x and y position for the current read/write operation.
@@ -107,9 +107,9 @@
                         byte newGreen = ShiftColourChannel(currentPixel.G, randomBit());
                         byte newBlue = ShiftColourChannel(currentPixel.B, randomBit());
 
-                        currentImage[pixelPosition.X, pixelPosition.Y] = new Rgba32(newRed, newGreen, newBlue, currentImage[pixelPosition.X, pixelPosition.Y].A);
+                        currentImage[pixelPosition.X, pixelPosition.Y] = new Rgba32(newRed, newGreen, newBlue, currentPixel.A);
 
-                        if (!TryMoveToNextPixel())
+                        if (!pixelPosition.TryMoveToNext())
                         {
                             break;
                         }
@@ -258,7 +258,7 @@
 
                 currentImage[pixelPosition.X, pixelPosition.Y] = new Rgba32(pixel.R, pixel.G, pixel.B, pixel.A);
 
-                if (!TryMoveToNextPixel())
+                if (!pixelPosition.TryMoveToNext())
                 {
                     LoadNextImage(true);
                 }
@@ -286,25 +286,22 @@
             {
                 Rgba32 pixel = currentImage[pixelPosition.X, pixelPosition.Y];
 
-                string redBit = Convert.ToString(pixel.R, 2);
-                binary.Append(redBit.Substring(redBit.Length - 1));
+                binary.Append(ReadLeastSignificantBit(pixel.R));
                 bitsRead++;
 
                 if (bitsRead < bitsToRead)
                 {
-                    string greenBit = Convert.ToString(pixel.G, 2);
-                    binary.Append(greenBit.Substring(greenBit.Length - 1));
+                    binary.Append(ReadLeastSignificantBit(pixel.G));
                     bitsRead++;
 
                     if (bitsRead < bitsToRead)
                     {
-                        string blueBit = Convert.ToString(pixel.B, 2);
-                        binary.Append(blueBit.Substring(blueBit.Length - 1));
+                        binary.Append(ReadLeastSignificantBit(pixel.B));
                         bitsRead++;
                     }
                 }
 
-                if (!TryMoveToNextPixel())
+                if (!pixelPosition.TryMoveToNext())
                 {
                     LoadNextImage();
                 }
@@ -326,7 +323,6 @@
             log.Trace("Loading next image.");
             CloseOpenImage(saveImageChanges);
 
-            pixelPosition.Reset();
             currentImageIndex++;
             if (currentImageIndex == args.CoverImages.Length)
             {
@@ -334,6 +330,7 @@
             }
 
             currentImage = Injector.Provide<IImageProxy>().LoadImage(CurrentImage);
+            pixelPosition.TrackImage(currentImage);
             log.Debug("Loaded image [{0}]", CurrentImage);
 
             OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
@@ -350,7 +347,6 @@
         /// <param name="bitsToSkip">The number of bits to skip over for the current over.</param>
         /// <exception cref="ImageProcessingException">If the number of bits to skip puts the current position past
         /// the last bit of the currently loaded image then a processing exception will be thrown.</exception>
-        /// <see cref="TryMoveToNextPixel"/>
         internal void SeekToPixel(int bitsToSkip)
         {
             log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage);
@@ -359,7 +355,7 @@
             int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (double)Calculator.BitsPerPixel);
             for (int i = 0; i < pixelIndex; i++)
             {
-                if (!TryMoveToNextPixel())
+                if (!pixelPosition.TryMoveToNext())
                 {
                     throw new ImageProcessingException("Could not skip by specified amount. The number of bits to "
                         + "skip is greater than the remaining bits available in the currently loaded image.");
@@ -388,12 +384,19 @@
         /// </summary>
         /// <param name="colourChannel">The byte value representing either the
         /// red, green, or blue channel of a pixel.</param>
-        /// <param name="lastBit">Specifies the value that the colourChannel's
+        /// <param name="shiftByBit">Specifies the value that the colourChannel's
         /// least significant bit should be changed to.</param>
-        private byte ShiftColourChannelByBinary(byte colourChannel, char lastBit)
+        private byte ShiftColourChannelByBinary(byte colourChannel, char shiftByBit) => ShiftColourChannel(colourChannel, (shiftByBit == '0') ? 0 : 1);
+
+        /// <summary>
+        /// Converts the provided input byte into binary and returns the last binary digit.
+        /// </summary>
+        /// <param name="colourChannel">The 0-255 representation of either the red, green, blue colour of any given pixel.</param>
+        /// <returns>The least (last) significant bit of the input value.</returns>
+        private string ReadLeastSignificantBit(byte colourChannel)
         {
-            int intLastBit = (lastBit == '0') ? 0 : 1;
-            return ShiftColourChannel(colourChannel, intLastBit);
+            var binary = Convert.ToString(colourChannel, 2);
+            return binary.Substring(binary.Length - 1);
         }
 
         /// <summary>
@@ -404,22 +407,6 @@
         {
             var random = new Random();
             return () => (int)Math.Round(random.NextDouble());
-        }
-
-        /// <summary>
-        /// Tries to move the read/write x/y position to the next available pixel.
-        /// Will return false if there are no more available pixels in the current image.
-        /// </summary>
-        /// <returns>False if there are no more pixels left to read/write to otherwise
-        /// returns true.</returns>
-        private bool TryMoveToNextPixel()
-        {
-            if (!pixelPosition.TryMoveToNext(currentImage.Width, currentImage.Height))
-            {
-                pixelPosition.Reset();
-                return false;
-            }
-            return true;
         }
     }
 }

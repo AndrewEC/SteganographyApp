@@ -110,15 +110,9 @@ namespace SteganographyApp.Common.Data
             return binary;
         }
 
-        private int SumBinaryString(string binary)
-        {
-            return binary.ToCharArray().Where(c => c == '1').Count();
-        }
+        private int SumBinaryString(string binary) => binary.ToCharArray().Where(c => c == '1').Count();
 
-        private string CreateRandomSeed(string randomSeed)
-        {
-            return $"{randomSeed}{GlobalCounter.Instance.Count}";
-        }
+        private string CreateRandomSeed(string randomSeed) => $"{randomSeed}{GlobalCounter.Instance.Count}";
 
         private int[] GenerateLengthsOfDummies(string randomSeed, int numDummies)
         {

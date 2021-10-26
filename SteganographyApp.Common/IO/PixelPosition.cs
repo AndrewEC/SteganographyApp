@@ -1,5 +1,7 @@
 namespace SteganographyApp.Common.IO
 {
+    using SteganographyApp.Common.Injection;
+
     /// <summary>
     /// Handles the current pixel position for the currently loaded image in the ImageStore.
     /// </summary>
@@ -16,20 +18,35 @@ namespace SteganographyApp.Common.IO
         public int Y { get; set; }
 
         /// <summary>
+        /// Gets or sets the image currently being tracked and updated. This width and height of this
+        /// image is used to determine if there is a pixel to move to when CanMoveToNext is invoked.
+        /// </summary>
+        private IBasicImageInfo TrackedImage { get; set; }
+
+        /// <summary>
+        /// Sets the image whose pixel position is currently being tracked and starts
+        /// tracking from the first pixel position (0, 0).
+        /// </summary>
+        /// <param name="imageInfo">The image to track.</param>
+        public void TrackImage(IBasicImageInfo imageInfo)
+        {
+            TrackedImage = imageInfo;
+            Reset();
+        }
+
+        /// <summary>
         /// Attempts to move to the next available position.
         /// </summary>
-        /// <param name="maxWidth">The width of the current image being traversed.</param>
-        /// <param name="maxHeight">The height of the current image being traversed.</param>
         /// <returns>False if there is no further pixel to move to, otherwise true.</returns>
-        public bool TryMoveToNext(int maxWidth, int maxHeight)
+        public bool TryMoveToNext()
         {
-            if (!CanMoveToNext(maxWidth, maxHeight))
+            if (!CanMoveToNext())
             {
                 return false;
             }
 
             X = X + 1;
-            if (X == maxWidth)
+            if (X == TrackedImage.Width)
             {
                 X = 0;
                 Y = Y + 1;
@@ -53,6 +70,6 @@ namespace SteganographyApp.Common.IO
         /// <returns>The position of the pixel in the format (X: {0}, Y: {1}).</returns>
         public override string ToString() => string.Format("(X: {0}, Y: {1})", X, Y);
 
-        private bool CanMoveToNext(int maxWidth, int maxHeight) => !(X + 1 == maxWidth && Y + 1 == maxHeight);
+        private bool CanMoveToNext() => !(X + 1 == TrackedImage.Width && Y + 1 == TrackedImage.Height);
     }
 }

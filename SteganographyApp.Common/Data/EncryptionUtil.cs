@@ -86,15 +86,9 @@ namespace SteganographyApp.Common.Data
             return Pbkdf2(passwordBytes, salt, Iterations, KeySize / 8);
         }
 
-        private static byte[] Pbkdf2(byte[] data, byte[] salt, int iterations, int size)
-        {
-            return new Rfc2898DeriveBytes(data, salt, iterations).GetBytes(size);
-        }
+        private static byte[] Pbkdf2(byte[] data, byte[] salt, int iterations, int size) => new Rfc2898DeriveBytes(data, salt, iterations).GetBytes(size);
 
-        private static byte[] Sha512(string data)
-        {
-            return SHA512.Create().ComputeHash(Encoding.UTF8.GetBytes(data));
-        }
+        private static byte[] Sha512(string data) => SHA512.Create().ComputeHash(Encoding.UTF8.GetBytes(data));
 
         private static byte[] GenerateRandomBytes(int size)
         {
