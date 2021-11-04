@@ -100,7 +100,7 @@ namespace SteganographyApp.Decode
             {
                 log.Debug("Processing chunk of [{0}] bits.", chunkLength);
                 string binary = wrapper.ReadContentChunkFromImage(chunkLength);
-                writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete });
+                writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete }, errorContainer.CancellationToken);
                 tracker.UpdateAndDisplayProgress();
 
                 if (errorContainer.HasException())
@@ -109,7 +109,7 @@ namespace SteganographyApp.Decode
                 }
             }
 
-            writeQueue.Add(new WriteArgs { Status = Status.Complete });
+            writeQueue.Add(new WriteArgs { Status = Status.Complete }, errorContainer.CancellationToken);
 
             if (errorContainer.HasException())
             {

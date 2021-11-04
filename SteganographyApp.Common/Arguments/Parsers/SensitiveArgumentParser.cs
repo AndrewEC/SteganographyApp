@@ -65,31 +65,31 @@ namespace SteganographyApp.Common.Arguments
         /// if the original value string value was a question mark.</returns>
         private static string ReadUserInput(string value, string messagePrompt)
         {
+            if (value != HiddenInputIndicator)
+            {
+                return value;
+            }
             var writer = Injector.Provide<IConsoleWriter>();
             var reader = Injector.Provide<IConsoleReader>();
-            if (value == HiddenInputIndicator)
+            writer.Write($"Enter {messagePrompt}: ");
+            var currentUserInput = new StringBuilder();
+            while (true)
             {
-                writer.Write($"Enter {messagePrompt}: ");
-                var currentUserInput = new StringBuilder();
-                while (true)
+                var key = reader.ReadKey(true);
+                if (key.Key == ConsoleKey.Enter)
                 {
-                    var key = reader.ReadKey(true);
-                    if (key.Key == ConsoleKey.Enter)
-                    {
-                        writer.WriteLine(string.Empty);
-                        return currentUserInput.ToString();
-                    }
-                    else if (key.Key == ConsoleKey.Backspace && currentUserInput.Length > 0)
-                    {
-                        currentUserInput.Remove(currentUserInput.Length - 1, 1);
-                    }
-                    else
-                    {
-                        currentUserInput.Append(key.KeyChar);
-                    }
+                    writer.WriteLine(string.Empty);
+                    return currentUserInput.ToString();
+                }
+                else if (key.Key == ConsoleKey.Backspace && currentUserInput.Length > 0)
+                {
+                    currentUserInput.Remove(currentUserInput.Length - 1, 1);
+                }
+                else
+                {
+                    currentUserInput.Append(key.KeyChar);
                 }
             }
-            return value;
         }
     }
 }

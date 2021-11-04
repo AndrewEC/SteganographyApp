@@ -68,9 +68,9 @@ namespace SteganographyApp.Encode
                         {
                             return;
                         }
-                        queue.Add(new ReadArgs { Status = Status.Incomplete, Data = contentChunk });
+                        queue.Add(new ReadArgs { Status = Status.Incomplete, Data = contentChunk }, errorContainer.CancellationToken);
                     }
-                    queue.Add(new ReadArgs { Status = Status.Complete });
+                    queue.Add(new ReadArgs { Status = Status.Complete }, errorContainer.CancellationToken);
                 }
             }
             catch (Exception e)
