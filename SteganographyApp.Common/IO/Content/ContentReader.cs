@@ -16,10 +16,7 @@
         /// Creates a new instance of the ContentReader.
         /// </summary>
         /// <param name="args">The values parsed from the command line values.</param>
-        public ContentReader(IInputArguments args) : base(args)
-        {
-            Stream = Injector.Provide<IFileIOProxy>().OpenFileForRead(Args.FileToEncode);
-        }
+        public ContentReader(IInputArguments args) : base(args) { }
 
         /// <summary>
         /// Reads in the next unread chunk of data from the input file, encodes it,
@@ -44,6 +41,15 @@
             }
 
             return Injector.Provide<IDataEncoderUtil>().Encode(buffer, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed);
+        }
+
+        /// <summary>
+        /// Creates a new stream configured to read in the file that is to be encoded.
+        /// </summary>
+        /// <returns>A stream instance configured for reading from the FileToEncode.</returns>
+        protected override IReadWriteStream InitializeStream()
+        {
+            return Injector.Provide<IFileIOProxy>().OpenFileForRead(Args.FileToEncode);
         }
     }
 }

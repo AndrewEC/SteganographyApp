@@ -15,15 +15,7 @@
         /// args field value.
         /// </summary>
         /// <param name="args">The user provided input arguments.</param>
-        public ContentWriter(IInputArguments args) : base(args)
-        {
-            var fileIOProxy = Injector.Provide<IFileIOProxy>();
-            if (fileIOProxy.IsExistingFile(Args.DecodedOutputFile))
-            {
-                fileIOProxy.Delete(Args.DecodedOutputFile);
-            }
-            Stream = fileIOProxy.OpenFileForWrite(Args.DecodedOutputFile);
-        }
+        public ContentWriter(IInputArguments args) : base(args) { }
 
         /// <summary>
         /// Takes in an encrypted binary string, decyrypts it using the DataEncoderUtil
@@ -35,6 +27,21 @@
             byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed);
             Stream.Write(decoded, 0, decoded.Length);
             Stream.Flush();
+        }
+
+        /// <summary>
+        /// Creates a new stream configured to write to the target file location as speicified in the
+        /// DecodedOutputFile argument.
+        /// </summary>
+        /// <returns>A read write stream configured to write to the DecodedOutputFile.</returns>
+        protected override IReadWriteStream InitializeStream()
+        {
+            var fileIOProxy = Injector.Provide<IFileIOProxy>();
+            if (fileIOProxy.IsExistingFile(Args.DecodedOutputFile))
+            {
+                fileIOProxy.Delete(Args.DecodedOutputFile);
+            }
+            return fileIOProxy.OpenFileForWrite(Args.DecodedOutputFile);
         }
     }
 }

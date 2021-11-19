@@ -18,6 +18,7 @@
         public AbstractContentIO(IInputArguments args)
         {
             this.Args = args;
+            Stream = InitializeStream();
         }
 
         /// <summary>
@@ -26,10 +27,10 @@
         protected IInputArguments Args { get; }
 
         /// <summary>
-        /// Gets or sets the stream used by the underlying implementation to read
+        /// Gets the stream used by the underlying implementation to read
         /// or write data to a specified file.
         /// </summary>
-        protected IReadWriteStream Stream { get; set; }
+        protected IReadWriteStream Stream { get; private set; }
 
         /// <summary>
         /// Flushes the stream if it has been instantiated.
@@ -42,5 +43,11 @@
                 Stream.Dispose();
             }
         }
+
+        /// <summary>
+        /// Gets the stream instance initialized for reading or writing.
+        /// </summary>
+        /// <returns>A read write stream instance.</returns>
+        protected abstract IReadWriteStream InitializeStream();
     }
 }
