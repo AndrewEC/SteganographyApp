@@ -75,7 +75,7 @@ namespace SteganographyApp.Encode
             }
             catch (Exception e)
             {
-                queue.Add(new ReadArgs { Status = Status.Failure, Exception = e });
+                queue.Add(new ReadArgs { Status = Status.Failure, Exception = e }, errorContainer.CancellationToken);
                 return;
             }
         }

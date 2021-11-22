@@ -82,13 +82,28 @@ namespace SteganographyApp.Encode
 
             using (var wrapper = utilities.ImageStore.CreateIOWrapper())
             {
-                Encode(wrapper);
+                var thread = FileReadThread.CreateAndStart(readQueue, arguments, errorContainer);
+                try
+                {
+                    Encode(wrapper, thread);
+                }
+                catch (Exception e)
+                {
+                    log.Error("An exception ocurred while encoding the file: [{0}]", e.Message);
+                    errorContainer.PutException(e);
+                    thread.Join();
+                    throw;
+                }
+                finally
+                {
+                    thread.Join();
+                }
             }
 
             Cleanup(utilities);
         }
 
-        private void Encode(ImageStoreIO wrapper)
+        private void Encode(ImageStoreIO wrapper, FileReadThread thread)
         {
             log.Debug("Encoding file: [{0}]", arguments.FileToEncode);
             int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
@@ -98,8 +113,6 @@ namespace SteganographyApp.Encode
             int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
             log.Debug("File requires [{0}] iterations to encode.", requiredNumberOfWrites);
             var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites, "Encoding file contents", "All input file contents have been encoded.");
-
-            var thread = FileReadThread.CreateAndStart(readQueue, arguments, errorContainer);
 
             while (true)
             {
@@ -117,17 +130,7 @@ namespace SteganographyApp.Encode
                 }
                 else if (readArgs.Status == Status.Incomplete)
                 {
-                    try
-                    {
-                        wrapper.WriteContentChunkToImage(readArgs.Data);
-                    }
-                    catch (Exception e)
-                    {
-                        log.Error("An exception ocurred while encoding the file: [{0}]", e.Message);
-                        errorContainer.PutException(e);
-                        thread.Join();
-                        throw;
-                    }
+                    wrapper.WriteContentChunkToImage(readArgs.Data);
                     progressTracker.UpdateAndDisplayProgress();
                 }
             }

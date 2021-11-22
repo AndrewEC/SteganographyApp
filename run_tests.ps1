@@ -1,3 +1,8 @@
+Param(
+    [Switch]$openReport,
+    [Switch]$reportOnFailure
+)
+
 Write-Host("`n---------- Cleaning out existing build artifacts ----------`n")
 if(Test-Path ./SteganographyApp.Common.Tests/bin){
     Write-Host("Cleaning bin")
@@ -40,7 +45,9 @@ dotnet tool run coverlet `
     --threshold-stat total
 if($LastExitCode -ne 0){
     Write-Host("'coverlet' command failed with status: $LastExitCode")
-    Exit
+    if (-Not($reportOnFailure)) {
+        Exit
+    }
 }
 
 Write-Host("`n---------- Generating coverage report ----------`n")
@@ -50,5 +57,7 @@ if($LastExitCode -ne 0){
     Exit
 }
 
-Write-Host("`n---------- Opening report ----------`n")
-./reports/index.htm
+if ($openReport) {
+    Write-Host("`n---------- Opening report ----------`n")
+    ./reports/index.htm
+}
