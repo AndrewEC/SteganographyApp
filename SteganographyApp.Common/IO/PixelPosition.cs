@@ -8,14 +8,14 @@ namespace SteganographyApp.Common.IO
     internal class PixelPosition
     {
         /// <summary>
-        /// Gets or sets the current pixel X position.
+        /// Gets the current pixel X position.
         /// </summary>
-        public int X { get; set; }
+        public int X { get; private set; }
 
         /// <summary>
-        /// Gets or sets the current pixel Y position.
+        /// Gets the current pixel Y position.
         /// </summary>
-        public int Y { get; set; }
+        public int Y { get; private set; }
 
         /// <summary>
         /// Gets or sets the image currently being tracked and updated. This width and height of this

@@ -15,6 +15,10 @@ if(Test-Path ./SteganographyApp.Common.Tests/obj){
 
 Write-Host("`n---------- Rebuilding Project ----------`n")
 dotnet build SteganographyApp.sln --no-incremental
+if ($LastExitCode -ne 0) {
+    Write-Host("Build failed with status code: $LastExitCode")
+    Exit
+}
 
 if(Test-Path ./reports){
     Write-Host("Removing old report directory and contents")
