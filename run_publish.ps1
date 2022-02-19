@@ -1,58 +1,67 @@
 Param(
-    [Switch]$release
+    [Switch]$Release
 )
 
-$folder = "debug"
-$childFolder = ""
-if ($release) {
-    $folder = "release"
-    $childFolder = "obfuscated"
+$Folder = "debug"
+$ChildFolder = ""
+if ($Release) {
+    $Folder = "release"
+    $ChildFolder = "obfuscated"
 }
 
-Write-Host("`n---------- Removing publish directories ----------`n")
 
-if(Test-Path ./publish){
-    Write-Host("Removing publish output folder")
-    Remove-Item -Recurse -Force ./publish | Out-Null
+Write-Host "`n---------- Removing publish directories ----------`n"
+function Remove-Folder {
+    [CmdletBinding()]
+	param(
+		[Parameter()]
+		[string] $FolderPath
+	)
+
+    if (Test-Path $FolderPath) {
+        Write-Host "Removing folder $FolderPath"
+        Remove-Item -Recurse -Force $FolderPath | Out-Null
+
+        if (Test-Path $FolderPath) {
+            throw "The folder at path $FolderPath could not be deleted."
+        }
+    }
 }
 
-if(Test-Path ./SteganographyApp/bin/$folder){
-    Write-Host("Removing SteganographyApp output folder")
-    Remove-Item -Recurse -Force ./SteganographyApp/bin/$folder | Out-Null
-}
+Remove-Folder ./publish
+Remove-Folder ./SteganographyApp/bin/$Folder
+Remove-Folder ./SteganographyApp.Calculator/bin/$Folder
+Remove-Folder ./SteganographyApp.Converter/bin/$Folder
 
-if(Test-Path ./SteganographyApp.Calculator/bin/$folder){
-    Write-Host("Removing SteganographyApp.Calculator output folder")
-    Remove-Item -Recurse -Force ./SteganographyApp.Calculator/bin/$folder | Out-Null
-}
 
-if(Test-Path ./SteganographyApp.Converter/bin/$folder){
-    Write-Host("Removing SteganographyApp.Converter output folder")
-    Remove-Item -Recurse -Force ./SteganographyApp.Converter/bin/$folder | Out-Null
-}
-
-Write-Host("`n---------- Publishing $folder build ----------`n")
-dotnet publish -c $folder
+Write-Host "`n---------- Publishing $Folder build ----------`n"
+dotnet publish -c $Folder
 if($LastExitCode -ne 0){
-    Write-Host("publish failed with status: $LastExitCode")
+    Write-Host "publish failed with status: $LastExitCode"
     Exit
 }
 
-Write-Host("`n---------- Copying publish output ----------`n")
-Write-Host("Copying output from SteganographyApp publish")
-Copy-Item ./SteganographyApp/bin/$folder/netcoreapp5.0/publish -Recurse -Destination .
-Get-ChildItem -Path ./SteganographyApp/bin/$folder/netcoreapp5.0/$childFolder | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish
 
-Write-Host("Copying output from SteganographyApp.Calculator publish")
-Copy-Item ./SteganographyApp.Calculator/bin/$folder/netcoreapp5.0/publish -Recurse -Destination ./publish
-Get-ChildItem -Path ./SteganographyApp.Calculator/bin/$folder/netcoreapp5.0/$childFolder | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish/publish
-cd publish
-Rename-Item -Path publish -NewName Calculator
-cd ..
+Write-Host "`n---------- Copying publish output ----------`n"
+function Copy-Folder {
+    [CmdletBinding()]
+    param(
+        [Parameter()][string] $Project,
+        [Parameter()][string] $Output,
+        [Parameter()][string] $Rename
+    )
 
-Write-Host("Copying output from SteganographyApp.Converter publish")
-Copy-Item ./SteganographyApp.Converter/bin/$folder/netcoreapp5.0/publish -Recurse -Destination ./publish
-Get-ChildItem -Path ./SteganographyApp.Converter/bin/$folder/netcoreapp5.0/$childFolder | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish/publish
-cd publish
-Rename-Item -Path publish -NewName Converter -Force
-cd ..
+    Write-Host "Copying output from $Project publish"
+    Copy-Item ./$Project/bin/$Folder/netcoreapp5.0/publish -Recurse -Destination $Output
+    Get-ChildItem -Path ./$Project/bin/$Folder/netcoreapp5.0/$ChildFolder | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish
+
+    if (-Not($Rename -eq "")) {
+        cd publish
+        Rename-Item -Path publish -NewName $Rename
+        cd ..
+    }
+}
+
+Copy-Folder "SteganographyApp" "."
+Copy-Folder "SteganographyApp.Calculator" "./publish" "Calculator"
+Copy-Folder "SteganographyApp.Converter" "./publish" "Converter"

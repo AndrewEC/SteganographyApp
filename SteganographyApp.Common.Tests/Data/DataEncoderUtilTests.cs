@@ -5,7 +5,6 @@
     using NUnit.Framework;
 
     using SteganographyApp.Common.Data;
-    using SteganographyApp.Common.Injection;
 
     using static Moq.It;
     using static Moq.Times;

@@ -17,6 +17,10 @@ namespace SteganographyApp.Common.Injection
         /// to lookup an instance of this attributed class when injecting a value.</param>
         public InjectableAttribute(Type correlatesWith)
         {
+            if (!correlatesWith.IsInterface)
+            {
+                throw new ArgumentException("The correlatesWith Type argument of the InjectableAttribute constructor must be a type of interface. Instead received: " + correlatesWith.FullName);
+            }
             CorrelatesWith = correlatesWith;
         }
 

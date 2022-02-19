@@ -1,42 +1,48 @@
 Param(
-    [Switch]$openReport,
-    [Switch]$reportOnFailure
+    [Switch]$OpenReport,
+    [Switch]$ReportOnFailure
 )
 
-Write-Host("`n---------- Cleaning out existing build artifacts ----------`n")
-if(Test-Path ./SteganographyApp.Common.Tests/bin){
-    Write-Host("Cleaning bin")
-    Remove-Item -Recurse -Force ./SteganographyApp.Common.Tests/bin | Out-Null
+
+Write-Host "`n---------- Cleaning out existing build artifacts ----------`n"
+$CommonBinFolder = "./SteganographyApp.Common.Tests/bin"
+if(Test-Path $CommonBinFolder){
+    Write-Host "Cleaning bin"
+    Remove-Item -Recurse -Force $CommonBinFolder | Out-Null
 }
-if(Test-Path ./SteganographyApp.Common.Tests/obj){
-    Write-Host("Cleaning obj")
-    Remove-Item -Recurse -Force ./SteganographyApp.Common.Tests/obj | Out-Null
+$CommonObjFolder = "./SteganographyApp.Common.Tests/obj"
+if(Test-Path $CommonObjFolder){
+    Write-Host "Cleaning obj"
+    Remove-Item -Recurse -Force $CommonObjFolder | Out-Null
 }
 
-Write-Host("`n---------- Rebuilding Project ----------`n")
+
+Write-Host "`n---------- Rebuilding Project ----------`n"
 dotnet build SteganographyApp.sln --no-incremental
 if ($LastExitCode -ne 0) {
-    Write-Host("Build failed with status code: $LastExitCode")
+    Write-Host "Build failed with status code: $LastExitCode"
     Exit
 }
 
-if(Test-Path ./reports){
-    Write-Host("Removing old report directory and contents")
-    Remove-Item -Recurse -Force ./reports | Out-Null
+$ReportsFolder = "./reports"
+if(Test-Path $ReportsFolder){
+    Write-Host "Removing old report directory and contents"
+    Remove-Item -Recurse -Force $ReportsFolder | Out-Null
+    if(Test-Path $ReportsFolder){
+        Write-Host "Unable to delete $ReportsFolder directory."
+        Exit
+    }
 }
-if(Test-Path ./reports){
-    Write-Host("Unable to delete ./reports directory.")
+
+Write-Host "Creating report directory"
+New-Item -ItemType directory -Path $ReportsFolder | Out-Null
+if(-Not (Test-Path $ReportsFolder)){
+    Write-Host "Could not create $ReportsFolder directory"
     Exit
 }
 
-Write-Host("Creating report directory")
-New-Item -ItemType directory -Path ./reports | Out-Null
-if(-Not (Test-Path ./reports)){
-    Write-Host("Could not create ./reports directory")
-    Exit
-}
 
-Write-Host("`n---------- Running unit tests ----------`n")
+Write-Host "`n---------- Running unit tests ----------`n"
 dotnet tool run coverlet `
     ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp5.0/SteganographyApp.Common.Tests.dll `
     --target "dotnet" `
@@ -47,21 +53,23 @@ dotnet tool run coverlet `
     --threshold-type line `
     --threshold-type branch `
     --threshold-stat total
+
 if($LastExitCode -ne 0){
-    Write-Host("'coverlet' command failed with status: $LastExitCode")
+    Write-Host "'coverlet' command failed with status: $LastExitCode"
     if (-Not($reportOnFailure)) {
         Exit
     }
 }
 
-Write-Host("`n---------- Generating coverage report ----------`n")
+
+Write-Host "`n---------- Generating coverage report ----------`n"
 dotnet tool run reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
 if($LastExitCode -ne 0){
-    Write-Host("'reportgenerator' command failed with status: $LastExitCode")
+    Write-Host "'reportgenerator' command failed with status: $LastExitCode"
     Exit
 }
 
 if ($openReport) {
-    Write-Host("`n---------- Opening report ----------`n")
+    Write-Host "Opening report"
     ./reports/index.htm
 }

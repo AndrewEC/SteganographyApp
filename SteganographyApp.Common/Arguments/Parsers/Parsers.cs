@@ -96,7 +96,7 @@ namespace SteganographyApp.Common.Arguments
             string enumName = string.Format(CompressionLevelTemplate, value);
             if (!Enum.TryParse(enumName, true, out PngCompressionLevel level))
             {
-                throw new ArgumentValueException($"Could nto parse compression level. Compression level must be a number between 0 and 9 inclusive.");
+                throw new ArgumentValueException($"Could not parse compression level. Compression level must be a number between 0 and 9 inclusive.");
             }
             arguments.CompressionLevel = level;
         }
