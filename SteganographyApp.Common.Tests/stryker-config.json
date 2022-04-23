@@ -5,11 +5,14 @@
             "html",
             "progress"
         ],
-        "log-level": "info",
-        "log-file": true,
-        "timeout-ms": 30000,
-        "threshold-high": 90,
-        "threshold-low": 85,
-        "threshold-break": 80
+
+        "verbosity": "info",
+        "additional-timeout": 30000,
+
+        "thresholds": {
+            "high": 90,
+            "low": 85,
+            "break": 80
+        }
     }
 }
