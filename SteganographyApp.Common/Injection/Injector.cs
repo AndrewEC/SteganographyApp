@@ -133,7 +133,15 @@ namespace SteganographyApp.Common.Injection
         /// with the <paramref name="instance"/> value.</typeparam>
         /// <param name="instance">An instance that conforms to T to be provided whenever Provide is called
         /// with type T as the type param.</param>
-        public static void UseInstance<T>(T instance) => injectionValues[typeof(T)] = instance;
+        public static void UseInstance<T>(T instance)
+        {
+            var type = typeof(T);
+            if (!type.IsInterface)
+            {
+                throw new ArgumentException("Cannot UseInstance when correlated type is not an interface. The provided type is not an interface: " + type.FullName);
+            }
+            injectionValues[type] = instance;
+        }
 
         /// <summary>
         /// Resets all of the initial provider functions back to their original state.
