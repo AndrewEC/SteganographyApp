@@ -33,7 +33,7 @@ namespace SteganographyApp.Common.Data
         {
             var keyBytes = GenerateKey(password);
             var iv = GenerateRandomBytes(IvSize);
-            using (var managed = new RijndaelManaged { Mode = CipherMode.CBC })
+            using (var managed = Aes.Create("AesManaged"))
             {
                 var cryptor = managed.CreateEncryptor(keyBytes, iv);
                 byte[] ciphertext;
@@ -59,7 +59,7 @@ namespace SteganographyApp.Common.Data
         {
             var valueBytes = Convert.FromBase64String(value);
             var keyBytes = GenerateKey(password);
-            using (var managed = new RijndaelManaged { Mode = CipherMode.CBC })
+            using (var managed = Aes.Create("AesManaged"))
             {
                 using (var ms = new MemoryStream(valueBytes))
                 {

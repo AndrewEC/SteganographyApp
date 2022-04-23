@@ -44,7 +44,7 @@ if(-Not (Test-Path $ReportsFolder)){
 
 Write-Host "`n---------- Running unit tests ----------`n"
 dotnet tool run coverlet `
-    ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp5.0/SteganographyApp.Common.Tests.dll `
+    ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp6.0/SteganographyApp.Common.Tests.dll `
     --target "dotnet" `
     --targetargs "test SteganographyApp.sln --no-build" `
     --format opencover `
