@@ -45,20 +45,14 @@ namespace SteganographyApp.Common.Arguments
         /// argument keys in this dictionary will have an IsSensitive value of false.
         /// </summary>
         /// <returns>A subset of all teh available arguments that are not sensitive.</returns>
-        public ImmutableDictionary<Argument, string> GetAllNonSensitiveArguments()
-        {
-            return argumentsAndValues.Where(pair => !pair.Key.IsSensitive).ToImmutableDictionary();
-        }
+        public ImmutableDictionary<Argument, string> GetAllNonSensitiveArguments() => argumentsAndValues.Where(pair => !pair.Key.IsSensitive).ToImmutableDictionary();
 
         /// <summary>
         /// Retrieves a subset of all the available arguments and the associated values to be parsed. All the
         /// argument keys in this dictionary will have an IsSensitive value of true.
         /// </summary>
         /// <returns>A subset of all the available arguments that are sensitive.</returns>
-        public ImmutableDictionary<Argument, string> GetAllSensitiveArguments()
-        {
-            return argumentsAndValues.Where(pair => pair.Key.IsSensitive).ToImmutableDictionary();
-        }
+        public ImmutableDictionary<Argument, string> GetAllSensitiveArguments() => argumentsAndValues.Where(pair => pair.Key.IsSensitive).ToImmutableDictionary();
 
         private ImmutableDictionary<Argument, string> MatchAllArgumentsWithValuesToParse(string[] userArguments)
         {
