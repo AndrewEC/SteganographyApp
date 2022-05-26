@@ -37,34 +37,19 @@ namespace SteganographyApp.Common.Injection
     public class FileIOProxy : IFileIOProxy
     {
         /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/GetFileSizeBytes/*' />
-        public long GetFileSizeBytes(string pathToFile)
-        {
-            return new FileInfo(pathToFile).Length;
-        }
+        public long GetFileSizeBytes(string pathToFile) => new FileInfo(pathToFile).Length;
 
         /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/IsExistingFile/*' />
-        public bool IsExistingFile(string pathToFile)
-        {
-            return File.Exists(pathToFile) && !File.GetAttributes(pathToFile).HasFlag(FileAttributes.Directory);
-        }
+        public bool IsExistingFile(string pathToFile) => File.Exists(pathToFile) && !File.GetAttributes(pathToFile).HasFlag(FileAttributes.Directory);
 
         /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/GetFiles/*' />
-        public string[] GetFiles(string pathToDirectory)
-        {
-            return Directory.GetFiles(pathToDirectory);
-        }
+        public string[] GetFiles(string pathToDirectory) => Directory.GetFiles(pathToDirectory);
 
         /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/OpenFileForRead/*' />
-        public IReadWriteStream OpenFileForRead(string pathToFile)
-        {
-            return ReadWriteStream.CreateStreamForRead(pathToFile);
-        }
+        public IReadWriteStream OpenFileForRead(string pathToFile) => ReadWriteStream.CreateStreamForRead(pathToFile);
 
         /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/OpenFileForWrite/*' />
-        public IReadWriteStream OpenFileForWrite(string pathToFile)
-        {
-            return ReadWriteStream.CreateStreamForWrite(pathToFile);
-        }
+        public IReadWriteStream OpenFileForWrite(string pathToFile) => ReadWriteStream.CreateStreamForWrite(pathToFile);
 
         /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/Delete/*' />
         public void Delete(string pathToFile)
@@ -73,9 +58,6 @@ namespace SteganographyApp.Common.Injection
         }
 
         /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/ReadAllLines/*' />
-        public string[] ReadAllLines(string pathToFile)
-        {
-            return File.ReadAllLines(pathToFile);
-        }
+        public string[] ReadAllLines(string pathToFile) => File.ReadAllLines(pathToFile);
     }
 }

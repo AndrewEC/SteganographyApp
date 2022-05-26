@@ -67,9 +67,6 @@ namespace SteganographyApp.Common
         /// <param name="numberOfChunks">The number of chunks that will need to be written to the content chunk table
         /// less the chunk table header.</param>
         /// <returns>A count of the total number of bits that will be required to store the content chunk table.</returns>
-        public static int CalculateRequiredBitsForContentTable(int numberOfChunks)
-        {
-            return (numberOfChunks + 1) * ChunkDefinitionBitSizeWithPadding;
-        }
+        public static int CalculateRequiredBitsForContentTable(int numberOfChunks) => (numberOfChunks + 1) * ChunkDefinitionBitSizeWithPadding;
     }
 }

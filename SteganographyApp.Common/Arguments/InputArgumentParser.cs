@@ -104,7 +104,7 @@
             }
             catch (Exception e) when (!(e is ArgumentParseException))
             {
-                throw new ValidationException($"An error occurred while validating your input: {e.Message}", e);
+                throw new ValidationException($"An error occurred while validating your input: [{e.Message}]", e);
             }
         }
 
@@ -116,7 +116,7 @@
             }
             catch (Exception e)
             {
-                throw new ArgumentParseException($"Invalid value provided for argument: {argument.Name}", e);
+                throw new ArgumentParseException($"Invalid value provided for argument: [{argument.Name}]", e);
             }
         }
     }
