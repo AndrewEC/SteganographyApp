@@ -19,11 +19,7 @@
         public void TestPrintCommonMessageOutputsCorrectMessagesToWriter()
         {
             var lines = new List<string>();
-            var mockWriter = new Mock<IConsoleWriter>();
-            mockWriter.Setup(writer => writer.WriteLine(IsAny<string>())).Callback<string>(line => lines.Add(line));
-
-            Injector.UseInstance(mockWriter.Object);
-            Injector.UseInstance<IConsoleReader>(new NullReader());
+            mockConsoleWriter.Setup(writer => writer.WriteLine(IsAny<string>())).Callback<string>(line => lines.Add(line));
 
             var inputs = new string[] { "--chunkSize", "abc" };
             var parser = new ArgumentParser();

@@ -9,7 +9,6 @@ namespace SteganographyApp.Common.Tests
     using NUnit.Framework;
 
     using SteganographyApp.Common.Arguments;
-    using SteganographyApp.Common.Injection;
 
     using static Moq.Times;
 
@@ -53,17 +52,13 @@ namespace SteganographyApp.Common.Tests
         public void TestParsePasswordWithInteractiveInput()
         {
             var queue = MockInput.CreateInputQueue(TestingInputMapping);
-            var mockReader = new Mock<IConsoleReader>();
-            mockReader.Setup(reader => reader.ReadKey(true)).Returns<bool>((intercept) => queue.Dequeue());
-
-            Injector.UseInstance(mockReader.Object);
-            Injector.UseInstance(new Mock<IConsoleWriter>().Object);
+            mockConsoleReader.Setup(reader => reader.ReadKey(true)).Returns<bool>((intercept) => queue.Dequeue());
 
             string[] inputArgs = new string[] { "--password", "?" };
             var parser = new ArgumentParser();
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments inputArguments, NullReturningPostValidator));
 
-            mockReader.Verify(reader => reader.ReadKey(true), Exactly(TestingInputMapping.Count));
+            mockConsoleReader.Verify(reader => reader.ReadKey(true), Exactly(TestingInputMapping.Count));
             Assert.AreEqual(0, queue.Count);
             Assert.AreEqual("Testin", inputArguments.Password);
         }

@@ -22,17 +22,17 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public abstract class FixtureWithMockConsoleReaderAndWriter : FixtureWithTestObjects
     {
-        [SetUp]
-        public void SetUp()
-        {
-            Injector.UseInstance(new Mock<IConsoleReader>().Object);
-            Injector.UseInstance(new Mock<IConsoleWriter>().Object);
-            Injector.UseInstance<ILoggerFactory>(new NullLoggerFactory());
-        }
+
+        [Mockup(typeof(IConsoleReader))]
+        public Mock<IConsoleReader> mockConsoleReader;
+        
+        [Mockup(typeof(IConsoleWriter))]
+        public Mock<IConsoleWriter> mockConsoleWriter;
+
     }
 
     [TestFixture]
-    public abstract class FixtureWithTestObjects
+    public abstract class FixtureWithTestObjects : FixtureWithLogger
     {
         [SetUp]
         public void InitializeMocks()

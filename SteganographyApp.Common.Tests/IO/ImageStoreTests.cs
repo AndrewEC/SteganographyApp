@@ -30,14 +30,8 @@ namespace SteganographyApp.Common.Tests
 
         private string imageLoadededEventPath;
 
+        [Mockup(typeof(IImageProxy))]
         private Mock<IImageProxy> mockImageProxy;
-
-        [SetUp]
-        public void Initialize()
-        {
-            mockImageProxy = new Mock<IImageProxy>();
-            Injector.UseInstance(mockImageProxy.Object);
-        }
 
         [Test]
         public void TestCleanImages()

@@ -13,6 +13,16 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class EnableDummiesParsingTests : FixtureWithMockConsoleReaderAndWriter
     {
+
+        [Mockup(typeof(IFileIOProxy))]
+        public Mock<IFileIOProxy> mockFileIOProxy;
+
+        [Mockup(typeof(IBasicImageInfo))]
+        public Mock<IBasicImageInfo> mockImage;
+
+        [Mockup(typeof(IImageProxy))]
+        public Mock<IImageProxy> mockImageProvider;
+
         [Test]
         public void TestParseInsertDummiesWithValidValue()
         {
@@ -26,19 +36,15 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestParseDummyCountIsParsedWhenDummiesAreEnabledAndCoverImagesAreProvided()
         {
-            var mockFileIOProxy = new Mock<IFileIOProxy>();
-            mockFileIOProxy.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(true);
-            Injector.UseInstance(mockFileIOProxy.Object);
+            string imagePath = "Test001.png";
 
-            var mockImage = new Mock<IBasicImageInfo>();
+            mockFileIOProxy.Setup(provider => provider.IsExistingFile(imagePath)).Returns(true);
+
             mockImage.Setup(image => image.Width).Returns(100);
             mockImage.Setup(image => image.Height).Returns(100);
 
-            var mockImageProvider = new Mock<IImageProxy>();
             mockImageProvider.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage.Object);
-            Injector.UseInstance(mockImageProvider.Object);
 
-            string imagePath = "Test001.png";
             string[] inputArgs = new string[] { "--enableDummies", "--images", imagePath };
             var first = new ArgumentParser();
 

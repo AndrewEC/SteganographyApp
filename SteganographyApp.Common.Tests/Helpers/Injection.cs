@@ -55,15 +55,9 @@ namespace SteganographyApp.Common.Tests
             return testFixture.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).Where(HasMockupAttribute);
         }
 
-        private static bool HasMockupAttribute(FieldInfo info)
-        {
-            return GetMockupAttribute(info) != null;
-        }
+        private static bool HasMockupAttribute(FieldInfo info) => GetMockupAttribute(info) != null;
 
-        private static Mockup GetMockupAttribute(FieldInfo info)
-        {
-            return info.GetCustomAttributes(typeof(Mockup), false).FirstOrDefault() as Mockup;
-        }
+        private static Mockup GetMockupAttribute(FieldInfo info) => info.GetCustomAttributes(typeof(Mockup), false).FirstOrDefault() as Mockup;
     }
 
     /// <summary>

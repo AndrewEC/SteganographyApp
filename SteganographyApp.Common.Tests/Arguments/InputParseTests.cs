@@ -10,36 +10,30 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class InputParseTests : FixtureWithMockConsoleReaderAndWriter
     {
+        [Mockup(typeof(IFileIOProxy))]
         private Mock<IFileIOProxy> mockFileIOProxy;
-
-        [SetUp]
-        public void InputSetUp()
-        {
-            mockFileIOProxy = new Mock<IFileIOProxy>();
-            Injector.UseInstance<IFileIOProxy>(mockFileIOProxy.Object);
-        }
 
         [Test]
         public void TestFileToEncodeWithValidFile()
         {
-            mockFileIOProxy.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(true);
-
             string path = "file_that_exists.zip";
+
+            mockFileIOProxy.Setup(provider => provider.IsExistingFile(path)).Returns(true);
+
             string[] inputArgs = new string[] { "--input", path };
             var parser = new ArgumentParser();
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.AreEqual(path, arguments.FileToEncode);
-
-            mockFileIOProxy.Verify(provider => provider.IsExistingFile(path), Times.Once());
         }
 
         [Test]
         public void TestFileToEncodeWithInvalidPathProducesFalseAndparseException()
         {
-            mockFileIOProxy.Setup(provider => provider.IsExistingFile(It.IsAny<string>())).Returns(false);
-
             string path = "file_that_doesnt_exist.zip";
+
+            mockFileIOProxy.Setup(provider => provider.IsExistingFile(path)).Returns(false);
+
             string[] inputArgs = new string[] { "--input", path };
             var parser = new ArgumentParser();
             Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
@@ -47,8 +41,6 @@ namespace SteganographyApp.Common.Tests
             Assert.AreEqual(typeof(ArgumentParseException), parser.LastError.GetType());
             Assert.IsNotNull(parser.LastError.InnerException);
             Assert.AreEqual(typeof(ArgumentValueException), parser.LastError.InnerException.GetType());
-
-            mockFileIOProxy.Verify(provider => provider.IsExistingFile(path), Times.Once());
         }
 
         private string NullReturningPostValidator(IInputArguments input) => null;
