@@ -63,3 +63,4 @@ This app takes advantage of the following third party nuget packages:
 * [StrykerNet](https://github.com/stryker-mutator/stryker-net) - Mutation testing framework
 * [ReportGenerator](https://github.com/danielpalme/ReportGenerator) - Generates an Html report from the mutation test results
 * [NUnit](https://github.com/nunit/nunit) - Unit testing framework
+* [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) - Benchmarking framework
