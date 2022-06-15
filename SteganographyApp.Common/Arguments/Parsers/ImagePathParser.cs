@@ -37,7 +37,7 @@ namespace SteganographyApp.Common.Arguments
         private static ImmutableArray<string> RetrieveImagePaths(string value)
         {
             value = ShorthandMappings.GetValueOrDefault(value, value);
-            string[] imagePaths = null;
+            string[] imagePaths;
             if (ImageRegexParser.IsValidRegex(value))
             {
                 imagePaths = ImageRegexParser.ImagePathsFromRegex(value);

@@ -21,6 +21,9 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class ImageStoreTests : FixtureWithRealObjects
     {
+        [Mockup(typeof(IImageProxy))]
+        public Mock<IImageProxy> mockImageProxy;
+
         private const int BinaryStringLength = 100_000;
         private static readonly IInputArguments Arguments = new InputArguments()
         {
@@ -29,9 +32,6 @@ namespace SteganographyApp.Common.Tests
         .ToImmutable();
 
         private string imageLoadededEventPath;
-
-        [Mockup(typeof(IImageProxy))]
-        private Mock<IImageProxy> mockImageProxy;
 
         [Test]
         public void TestCleanImages()

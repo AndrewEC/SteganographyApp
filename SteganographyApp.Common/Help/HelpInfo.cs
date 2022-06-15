@@ -102,14 +102,14 @@
         /// message or the parameter that it corresponds to and a value
         /// being the actual help message.
         /// </summary>
-        private readonly ImmutableDictionary<string, string> helpItems;
+        private readonly ImmutableDictionary<string, string>? helpItems;
 
         /// <summary>
         /// Initializes the HelpInfo instance with a list of all the help items that could be
         /// read from the help.prop file.
         /// </summary>
         /// <param name="helpItems">The dicionary of all help items that were found in the help info file.</param>
-        public HelpInfo(ImmutableDictionary<string, string> helpItems)
+        public HelpInfo(ImmutableDictionary<string, string>? helpItems)
         {
             this.helpItems = helpItems;
         }
@@ -131,7 +131,7 @@
             var messages = new string[helpLabels.Length];
             for (int i = 0; i < helpLabels.Length; i++)
             {
-                if (!helpItems.ContainsKey(helpLabels[i]))
+                if (!helpItems!.ContainsKey(helpLabels[i]))
                 {
                     messages[i] = $"No help information available for {helpLabels[i]}.\n";
                     continue;

@@ -26,7 +26,7 @@
         /// </summary>
         private readonly IInputArguments args;
 
-        private readonly ILogger log;
+        private readonly ILogger log = new LazyLogger<ImageStore>();
 
         /// <summary>
         /// The index used to determine which image will be read/written to in the
@@ -40,7 +40,7 @@
         /// The currently loaded image. The image is loaded whenever the Next
         /// method is called and the currentImageIndex has been incremented.
         /// </summary>
-        private IBasicImageInfo currentImage;
+        private IBasicImageInfo? currentImage;
 
         /// <summary>
         /// Creates a new instance of the ImageStore and calculates the RequiredContentChunkTableBitSize
@@ -58,14 +58,14 @@
         /// The main argument of the event will indicate the total number of bits written to the
         /// image(s).
         /// </summary>
-        public event EventHandler<ChunkWrittenArgs> OnChunkWritten;
+        public event EventHandler<ChunkWrittenArgs>? OnChunkWritten;
 
         /// <summary>
         /// Event handler that's invoked whenever the internal Next method is called.
         /// In the Next method another image will be loaded so it can be read/written to.
         /// The path of the file will be the main argument passed to the event handler.
         /// </summary>
-        public event EventHandler<NextImageLoadedEventArgs> OnNextImageLoaded;
+        public event EventHandler<NextImageLoadedEventArgs>? OnNextImageLoaded;
 
         /// <summary>
         /// Gets the current image being used in the write process.
@@ -102,7 +102,7 @@
                 {
                     while (true)
                     {
-                        var currentPixel = currentImage[pixelPosition.X, pixelPosition.Y];
+                        var currentPixel = currentImage![pixelPosition.X, pixelPosition.Y];
                         byte newRed = ShiftColourChannel(currentPixel.R, randomBit());
                         byte newGreen = ShiftColourChannel(currentPixel.G, randomBit());
                         byte newBlue = ShiftColourChannel(currentPixel.B, randomBit());
@@ -239,7 +239,7 @@
             int written = 0;
             for (int i = 0; i < binary.Length; i += 3)
             {
-                Rgba32 pixel = currentImage[pixelPosition.X, pixelPosition.Y];
+                Rgba32 pixel = currentImage![pixelPosition.X, pixelPosition.Y];
 
                 pixel.R = ShiftColourChannelByBinary(pixel.R, binary[i]);
                 written++;
@@ -263,7 +263,7 @@
                     LoadNextImage(true);
                 }
             }
-            OnChunkWritten?.Invoke(this, new ChunkWrittenArgs { ChunkLength = written });
+            OnChunkWritten?.Invoke(this, new ChunkWrittenArgs(written));
             return written;
         }
 
@@ -284,7 +284,7 @@
             int bitsRead = 0;
             while (bitsRead < bitsToRead)
             {
-                Rgba32 pixel = currentImage[pixelPosition.X, pixelPosition.Y];
+                Rgba32 pixel = currentImage![pixelPosition.X, pixelPosition.Y];
 
                 binary.Append(ReadLeastSignificantBit(pixel.R));
                 bitsRead++;
@@ -333,11 +333,7 @@
             pixelPosition.TrackImage(currentImage);
             log.Debug("Loaded image [{0}]", CurrentImage);
 
-            OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs
-            {
-                ImageIndex = currentImageIndex,
-                ImageName = CurrentImage,
-            });
+            OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs(CurrentImage, currentImageIndex));
         }
 
         /// <summary>

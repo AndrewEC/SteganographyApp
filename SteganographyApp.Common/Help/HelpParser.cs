@@ -23,7 +23,7 @@ namespace SteganographyApp.Common
         /// <summary>
         /// Gets a value representing the last exception message to be caught.
         /// </summary>
-        public string LastError { get; private set; }
+        public string? LastError { get; private set; }
 
         /// <summary>
         /// Utility to print out a common error message in the instance where there is an error parsing
@@ -49,7 +49,7 @@ namespace SteganographyApp.Common
         /// <returns>True if the help file was successfully parsed, otherwise false.</returns>
         public bool TryParseHelpFile(out HelpInfo info, string filename = "help.prop")
         {
-            string assemblyFolder = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+            string assemblyFolder = Directory.GetParent(Assembly.GetExecutingAssembly().Location)!.FullName;
             string helpFileLocation = Path.Combine(assemblyFolder, filename);
 
             if (!Injector.Provide<IFileIOProxy>().IsExistingFile(helpFileLocation))

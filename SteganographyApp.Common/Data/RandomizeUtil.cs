@@ -26,16 +26,7 @@ namespace SteganographyApp.Common.Data
     {
         private const int RandomizeIterationsModifier = 3;
 
-        private ILogger log;
-
-        /// <summary>
-        /// The post construct method for initializing the logger.
-        /// </summary>
-        [PostConstruct]
-        public void PostConstruct()
-        {
-            log = Injector.LoggerFor<RandomizeUtil>();
-        }
+        private ILogger log = new LazyLogger<RandomizeUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/RandomizeBinaryString/*' />
         public string RandomizeBinaryString(string binaryString, string randomSeed)

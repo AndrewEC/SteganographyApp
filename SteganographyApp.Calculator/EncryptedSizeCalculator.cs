@@ -53,7 +53,7 @@ namespace SteganographyAppCalculator
         {
             using (var contentReader = new ContentReader(arguments))
             {
-                return contentReader.ReadContentChunkFromFile().Length;
+                return contentReader.ReadContentChunkFromFile()!.Length;
             }
         }
 

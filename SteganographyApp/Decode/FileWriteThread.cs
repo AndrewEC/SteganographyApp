@@ -19,7 +19,7 @@ namespace SteganographyApp.Decode
         private readonly ErrorContainer errorContainer;
         private readonly IInputArguments arguments;
         private readonly ILogger log;
-        private Thread readThread;
+        private readonly Thread readThread;
 
         private FileWriteThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer, IInputArguments arguments)
         {
@@ -27,6 +27,7 @@ namespace SteganographyApp.Decode
             this.queue = queue;
             this.errorContainer = errorContainer;
             log = Injector.LoggerFor<FileWriteThread>();
+            readThread = new Thread(new ThreadStart(Write));
         }
 
         public static FileWriteThread CreateAndStartThread(BlockingCollection<WriteArgs> queue, ErrorContainer errorContainer, IInputArguments arguments)
@@ -44,7 +45,6 @@ namespace SteganographyApp.Decode
         private void StartWriting()
         {
             log.Trace("Starting file write thread.");
-            readThread = new Thread(new ThreadStart(Write));
             readThread.Start();
         }
 

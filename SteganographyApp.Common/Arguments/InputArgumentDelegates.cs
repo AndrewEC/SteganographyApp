@@ -17,5 +17,5 @@ namespace SteganographyApp.Common.Arguments
     /// <param name="args">The InputArguments and all their associated values.</param>
     /// <returns>An empty or null string if validation was successful, otherwise should return a message
     /// containing information about the validation failure.</returns>
-    public delegate string PostValidation(IInputArguments args);
+    public delegate string? PostValidation(IInputArguments args);
 }

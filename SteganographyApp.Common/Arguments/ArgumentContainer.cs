@@ -59,15 +59,15 @@ namespace SteganographyApp.Common.Arguments
             var identifiedArguments = new Dictionary<Argument, string>();
             for (int i = 0; i < userArguments.Length; i++)
             {
-                if (!TryGetArgument(userArguments[i], out Argument argument))
+                if (!TryGetArgument(userArguments[i], out Argument? argument))
                 {
                     throw new ArgumentParseException($"An unrecognized argument was provided: {userArguments[i]}");
                 }
 
-                string inputValue = GetRawArgumentValue(argument, userArguments, i);
-                identifiedArguments.Add(argument, inputValue);
+                string inputValue = GetRawArgumentValue(argument!, userArguments, i);
+                identifiedArguments.Add(argument!, inputValue);
 
-                if (!argument.IsFlag)
+                if (!argument!.IsFlag)
                 {
                     i++;
                 }
@@ -75,7 +75,7 @@ namespace SteganographyApp.Common.Arguments
             return identifiedArguments.ToImmutableDictionary();
         }
 
-        private bool TryGetArgument(string key, out Argument targetArgument)
+        private bool TryGetArgument(string key, out Argument? targetArgument)
         {
             var matchingArgument = arguments.Where(argument => argument.Name == key || argument.ShortName == key).FirstOrDefault();
             targetArgument = matchingArgument;

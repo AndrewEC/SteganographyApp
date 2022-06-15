@@ -28,16 +28,7 @@ namespace SteganographyApp.Common.Data
         private const int MaxLengthPerDummy = 500;
         private const int MinLengthPerDummy = 100;
 
-        private ILogger log;
-
-        /// <summary>
-        /// Post construct method for initializing the logger.
-        /// </summary>
-        [PostConstruct]
-        public void PostConstruct()
-        {
-            log = Injector.LoggerFor<DummyUtil>();
-        }
+        private ILogger log = new LazyLogger<DummyUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
         public string InsertDummies(int numDummies, string binary, string randomSeed)

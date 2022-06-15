@@ -22,20 +22,18 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public abstract class FixtureWithMockConsoleReaderAndWriter : FixtureWithTestObjects
     {
-
         [Mockup(typeof(IConsoleReader))]
         public Mock<IConsoleReader> mockConsoleReader;
-        
+
         [Mockup(typeof(IConsoleWriter))]
         public Mock<IConsoleWriter> mockConsoleWriter;
-
     }
 
     [TestFixture]
     public abstract class FixtureWithTestObjects : FixtureWithLogger
     {
         [SetUp]
-        public void InitializeMocks()
+        public void SetUp()
         {
             MocksInjector.InjectMocks(this);
             SetupMocks();
@@ -51,19 +49,20 @@ namespace SteganographyApp.Common.Tests
     }
 
     [TestFixture]
-    public abstract class FixtureWithRealObjects
+    public abstract class FixtureWithRealObjects : FixtureWithTestObjects
     {
         [SetUp]
-        public void SetUp()
+        public new void SetUp()
         {
             Injector.AllowAnyObjects();
+            base.SetUp();
         }
 
         [TearDown]
-        public void TearDown()
+        public new void TearDown()
         {
             Injector.AllowOnlyMockObjects();
-            Injector.ResetInstances();
+            base.TearDown();
         }
     }
 

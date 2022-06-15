@@ -24,16 +24,7 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(ICompressionUtil))]
     public sealed class CompressionUtil : ICompressionUtil
     {
-        private ILogger log;
-
-        /// <summary>
-        /// Post construct method for initializing the logger.
-        /// </summary>
-        [PostConstruct]
-        public void PostConstruct()
-        {
-            log = Injector.LoggerFor<CompressionUtil>();
-        }
+        private ILogger log = new LazyLogger<CompressionUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="CompressionUtil"]/Compress/*' />
         public byte[] Compress(byte[] fileBytes)

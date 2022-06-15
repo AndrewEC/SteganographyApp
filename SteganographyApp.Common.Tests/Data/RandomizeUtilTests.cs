@@ -17,7 +17,6 @@ namespace SteganographyApp.Common.Tests
         public void Setup()
         {
             util = new RandomizeUtil();
-            util.PostConstruct();
         }
 
         [Test]

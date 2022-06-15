@@ -28,8 +28,8 @@ namespace SteganographyApp.Common.Injection
 
             foreach (var injectableType in FindInjectableTypesInAssembly())
             {
-                var ctor = injectableType.GetConstructor(Type.EmptyTypes);
-                var correlatedType = GetInjectableAttribute(injectableType).CorrelatesWith;
+                var ctor = injectableType.GetConstructor(Type.EmptyTypes)!;
+                var correlatedType = GetInjectableAttribute(injectableType)!.CorrelatesWith;
                 injectables[correlatedType] = ctor.Invoke(new object[] { });
             }
 
@@ -46,7 +46,7 @@ namespace SteganographyApp.Common.Injection
             return type.IsClass && GetInjectableAttribute(type) != null;
         }
 
-        private static InjectableAttribute GetInjectableAttribute(Type type)
+        private static InjectableAttribute? GetInjectableAttribute(Type type)
         {
             return type.GetCustomAttribute(typeof(InjectableAttribute), false) as InjectableAttribute;
         }
@@ -73,7 +73,7 @@ namespace SteganographyApp.Common.Injection
             }
         }
 
-        private static MethodInfo GetPostConstructMethod(object instance) => instance.GetType().GetMethods().Where(HasPostConstructAttribute).FirstOrDefault();
+        private static MethodInfo? GetPostConstructMethod(object instance) => instance.GetType().GetMethods().Where(HasPostConstructAttribute).FirstOrDefault();
 
         private static bool HasPostConstructAttribute(MethodInfo info) => info.GetCustomAttribute(typeof(PostConstructAttribute), false) != null;
     }
@@ -96,6 +96,7 @@ namespace SteganographyApp.Common.Injection
         static Injector()
         {
             defaultInjectionValues = LookupDefaultInjectableDictionary();
+            injectionValues = new Dictionary<Type, object>();
             ResetInstances();
             InvokePostConstructMethods(defaultInjectionValues.Values);
         }
@@ -134,6 +135,7 @@ namespace SteganographyApp.Common.Injection
         /// <param name="instance">An instance that conforms to T to be provided whenever Provide is called
         /// with type T as the type param.</param>
         public static void UseInstance<T>(T instance)
+        where T : notnull
         {
             var type = typeof(T);
             if (!type.IsInterface)

@@ -57,7 +57,7 @@ namespace SteganographyApp
             }
         }
 
-        private void RecordLoadedImage(object sender, NextImageLoadedEventArgs args)
+        private void RecordLoadedImage(object? sender, NextImageLoadedEventArgs args)
         {
             imagesUsed.Add(args.ImageName);
         }

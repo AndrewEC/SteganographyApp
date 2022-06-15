@@ -27,16 +27,7 @@ namespace SteganographyApp.Common.IO
     [Injectable(typeof(IChunkTableHelper))]
     public class ChunkTableHelper : IChunkTableHelper
     {
-        private ILogger log;
-
-        /// <summary>
-        /// Post construct method to initialize the logger.
-        /// </summary>
-        [PostConstruct]
-        public void PostConstruct()
-        {
-            log = Injector.LoggerFor<ChunkTableHelper>();
-        }
+        private ILogger log = new LazyLogger<ChunkTableHelper>();
 
         /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertChunkTableToBinary/*' />
         public string ConvertChunkTableToBinary(ImmutableArray<int> chunkLengths, string randomSeed)

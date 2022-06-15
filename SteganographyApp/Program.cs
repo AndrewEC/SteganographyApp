@@ -17,7 +17,7 @@
             }
 
             var parser = new ArgumentParser();
-            if (!parser.TryParse(args, out IInputArguments arguments, PostValidate))
+            if (!parser.TryParse(args, out IInputArguments? arguments, PostValidate))
             {
                 parser.PrintCommonErrorMessage();
                 return;
@@ -25,11 +25,11 @@
 
             try
             {
-                new EntryPoint(arguments).Start();
+                new EntryPoint(arguments!).Start();
             }
             catch (Exception e)
             {
-                HandleException(e, arguments);
+                HandleException(e, arguments!);
             }
 
             Console.WriteLine(string.Empty);
@@ -58,7 +58,7 @@
         /// Performs some validation once all the user inputted values have been parsed and individually
         /// validated.
         /// </summary>
-        private static string PostValidate(IInputArguments input)
+        private static string? PostValidate(IInputArguments input)
         {
             if (!Checks.IsOneOf(input.EncodeOrDecode, ActionEnum.Clean, ActionEnum.Encode, ActionEnum.Decode))
             {

@@ -13,7 +13,6 @@ namespace SteganographyApp.Common.Tests
     [TestFixture]
     public class EnableDummiesParsingTests : FixtureWithMockConsoleReaderAndWriter
     {
-
         [Mockup(typeof(IFileIOProxy))]
         public Mock<IFileIOProxy> mockFileIOProxy;
 

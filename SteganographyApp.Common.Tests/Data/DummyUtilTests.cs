@@ -29,7 +29,6 @@ namespace SteganographyApp.Common.Tests
         public void TestInsertAndRemoveDummies()
         {
             var util = new DummyUtil();
-            util.PostConstruct();
 
             string inserted = util.InsertDummies(NumberOfDummies, OriginalBinaryString, RandomSeed);
             Assert.AreNotEqual(OriginalBinaryString, inserted);
@@ -44,7 +43,6 @@ namespace SteganographyApp.Common.Tests
         public void TestInsertAndRemoveWithIncorrectDummyCountReturnsBadResult()
         {
             var util = new DummyUtil();
-            util.PostConstruct();
 
             string inserted = util.InsertDummies(NumberOfDummies, OriginalBinaryString, RandomSeed);
             Assert.AreNotEqual(OriginalBinaryString, inserted);
@@ -59,7 +57,6 @@ namespace SteganographyApp.Common.Tests
         public void TestInsertAndRemoveWithIncorrectRandomSeedReturnsBadResult()
         {
             var util = new DummyUtil();
-            util.PostConstruct();
 
             string inserted = util.InsertDummies(NumberOfDummies, OriginalBinaryString, RandomSeed);
 
@@ -72,7 +69,6 @@ namespace SteganographyApp.Common.Tests
         public void TestInsertTwiceProducesDifferentResults()
         {
             var util = new DummyUtil();
-            util.PostConstruct();
 
             string insertedOnce = util.InsertDummies(NumberOfDummies, OriginalBinaryString, RandomSeed);
             string insertedTwice = util.InsertDummies(NumberOfDummies, OriginalBinaryString, RandomSeed);

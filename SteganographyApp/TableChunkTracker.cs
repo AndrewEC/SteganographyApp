@@ -18,7 +18,7 @@ namespace SteganographyApp
         /// </summary>
         private readonly LinkedList<int> contentChunks = new LinkedList<int>();
 
-        private LinkedListNode<int> lastNode = null;
+        private LinkedListNode<int>? lastNode = null;
 
         public TableChunkTracker(ImageStore store)
         {
@@ -32,7 +32,7 @@ namespace SteganographyApp
         /// </summary>
         public ImmutableArray<int> GetContentTable() => contentChunks.ToImmutableArray();
 
-        private void ChunkWritten(object sender, ChunkWrittenArgs args)
+        private void ChunkWritten(object? sender, ChunkWrittenArgs args)
         {
             var node = new LinkedListNode<int>(args.ChunkLength);
             if (lastNode == null)

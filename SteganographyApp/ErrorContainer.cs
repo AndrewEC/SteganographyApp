@@ -12,7 +12,7 @@ namespace SteganographyApp
         private static readonly object SyncLock = new object();
 
         private readonly CancellationTokenSource source = new CancellationTokenSource();
-        private Exception exception;
+        private Exception? exception;
 
         ~ErrorContainer()
         {
@@ -62,7 +62,7 @@ namespace SteganographyApp
         {
             lock (SyncLock)
             {
-                return exception;
+                return exception!;
             }
         }
     }

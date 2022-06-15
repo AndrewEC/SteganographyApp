@@ -20,7 +20,7 @@ namespace SteganographyApp.Encode
         private readonly IInputArguments arguments;
         private readonly ErrorContainer errorContainer;
         private readonly ILogger log;
-        private Thread readThread;
+        private readonly Thread readThread;
 
         private FileReadThread(BlockingCollection<ReadArgs> queue, IInputArguments arguments, ErrorContainer errorContainer)
         {
@@ -28,6 +28,7 @@ namespace SteganographyApp.Encode
             this.arguments = arguments;
             this.errorContainer = errorContainer;
             log = Injector.LoggerFor<FileReadThread>();
+            readThread = new Thread(new ThreadStart(Read));
         }
 
         public static FileReadThread CreateAndStart(BlockingCollection<ReadArgs> queue, IInputArguments arguments, ErrorContainer errorContainer)
@@ -40,7 +41,6 @@ namespace SteganographyApp.Encode
         public void StartReading()
         {
             log.Trace("Stating file read thread.");
-            readThread = new Thread(new ThreadStart(Read));
             readThread.Start();
         }
 
@@ -61,21 +61,21 @@ namespace SteganographyApp.Encode
             {
                 using (var reader = new ContentReader(arguments))
                 {
-                    string contentChunk = string.Empty;
+                    string? contentChunk = string.Empty;
                     while ((contentChunk = reader.ReadContentChunkFromFile()) != null)
                     {
                         if (errorContainer.HasException())
                         {
                             return;
                         }
-                        queue.Add(new ReadArgs { Status = Status.Incomplete, Data = contentChunk }, errorContainer.CancellationToken);
+                        queue.Add(new ReadArgs(Status.Incomplete, contentChunk), errorContainer.CancellationToken);
                     }
-                    queue.Add(new ReadArgs { Status = Status.Complete }, errorContainer.CancellationToken);
+                    queue.Add(new ReadArgs(Status.Complete), errorContainer.CancellationToken);
                 }
             }
             catch (Exception e)
             {
-                queue.Add(new ReadArgs { Status = Status.Failure, Exception = e }, errorContainer.CancellationToken);
+                queue.Add(new ReadArgs(Status.Failure, exception: e), errorContainer.CancellationToken);
                 return;
             }
         }

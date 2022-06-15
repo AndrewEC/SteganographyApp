@@ -11,7 +11,7 @@ namespace SteganographyApp.Common.Tests
     public class InputParseTests : FixtureWithMockConsoleReaderAndWriter
     {
         [Mockup(typeof(IFileIOProxy))]
-        private Mock<IFileIOProxy> mockFileIOProxy;
+        public Mock<IFileIOProxy> mockFileIOProxy;
 
         [Test]
         public void TestFileToEncodeWithValidFile()

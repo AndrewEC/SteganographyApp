@@ -35,13 +35,13 @@
             }
 
             var parser = new ArgumentParser();
-            if (!parser.TryParse(args, out IInputArguments arguments, PostValidate))
+            if (!parser.TryParse(args, out IInputArguments? arguments, PostValidate))
             {
                 parser.PrintCommonErrorMessage();
                 return;
             }
 
-            if (CalculateStorageSpaceActions.Contains(arguments.EncodeOrDecode))
+            if (CalculateStorageSpaceActions.Contains(arguments!.EncodeOrDecode))
             {
                 StorageSpaceCalculator.CalculateStorageSpace(arguments);
             }
@@ -57,7 +57,7 @@
         /// Performs some validation once all the user inputted values have been parsed and individually
         /// validated.
         /// </summary>
-        private static string PostValidate(IInputArguments input)
+        private static string? PostValidate(IInputArguments input)
         {
             if (!CalculateEncryptedSizeActions.Contains(input.EncodeOrDecode) && !CalculateStorageSpaceActions.Contains(input.EncodeOrDecode))
             {

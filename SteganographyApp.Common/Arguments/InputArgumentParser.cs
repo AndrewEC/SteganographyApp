@@ -16,7 +16,7 @@
         /// <summary>
         /// Gets last exception to ocurr while parsing the argument values.
         /// </summary>
-        public Exception LastError { get; private set; }
+        public Exception? LastError { get; private set; }
 
         /// <summary>
         /// A utility method to help print a common error message when parsing the user's arguments fails.
@@ -24,7 +24,7 @@
         public void PrintCommonErrorMessage()
         {
             var writer = Injector.Provide<IConsoleWriter>();
-            writer.WriteLine($"An exception occured while parsing provided arguments: {LastError.Message}");
+            writer.WriteLine($"An exception occured while parsing provided arguments: {LastError!.Message}");
             var exception = LastError.InnerException;
             while (exception != null)
             {
@@ -49,7 +49,7 @@
         /// else returns false.</returns>
         /// <exception cref="ArgumentParseException">Thrown if an exception ocurrs while parsing a given argument.
         /// The cause of the exception will be set to the original exception causing the parsing failure.</exception>
-        public bool TryParse(string[] args, out IInputArguments inputs, PostValidation validation)
+        public bool TryParse(string[] args, out IInputArguments? inputs, PostValidation validation)
         {
             try
             {
@@ -96,7 +96,7 @@
         {
             try
             {
-                string validationResult = validation(parsed);
+                string? validationResult = validation(parsed);
                 if (!string.IsNullOrEmpty(validationResult))
                 {
                     throw new ArgumentParseException($"Invalid arguments provided. {validationResult}");

@@ -20,9 +20,7 @@ namespace SteganographyApp.Common.Logging
         private static readonly object SyncLock = new object();
 
         private static LogLevel logLevel = LogLevel.None;
-        private IReadWriteStream writeLogStream;
-
-        private RootLogger() { }
+        private IReadWriteStream? writeLogStream;
 
         /// <summary>
         /// Cleanup code to try and close an open stream to the log file upon application exit.
@@ -107,7 +105,7 @@ namespace SteganographyApp.Common.Logging
             lock (SyncLock)
             {
                 byte[] messageBytes = Encoding.ASCII.GetBytes(message);
-                writeLogStream.Write(messageBytes, 0, messageBytes.Length);
+                writeLogStream!.Write(messageBytes, 0, messageBytes.Length);
                 writeLogStream.Flush();
             }
         }

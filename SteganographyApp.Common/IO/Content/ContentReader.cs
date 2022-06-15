@@ -25,7 +25,7 @@
         /// than the ChunkByteSize.</para>
         /// </summary>
         /// <returns>A binary string representation of the next availabe ChunkByteSize from the input file.</returns>
-        public string ReadContentChunkFromFile()
+        public string? ReadContentChunkFromFile()
         {
             byte[] buffer = new byte[Args.ChunkByteSize];
             int read = Stream.Read(buffer, 0, buffer.Length);

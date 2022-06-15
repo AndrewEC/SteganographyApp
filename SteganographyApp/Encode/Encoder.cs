@@ -25,11 +25,18 @@ namespace SteganographyApp.Encode
     /// Specifies the values to be added to our read queue by the file read
     /// thread.
     /// </summary>
-    internal struct ReadArgs
+    internal readonly struct ReadArgs
     {
-        public Status Status;
-        public string Data;
-        public Exception Exception;
+        public readonly Status Status;
+        public readonly string? Data;
+        public readonly Exception? Exception;
+
+        public ReadArgs(Status status, string? data = null, Exception? exception = null)
+        {
+            Status = status;
+            Data = data;
+            Exception = exception;
+        }
     }
 
     public class Encoder
@@ -126,11 +133,11 @@ namespace SteganographyApp.Encode
                 else if (readArgs.Status == Status.Failure)
                 {
                     thread.Join();
-                    throw readArgs.Exception;
+                    throw readArgs.Exception!;
                 }
                 else if (readArgs.Status == Status.Incomplete)
                 {
-                    wrapper.WriteContentChunkToImage(readArgs.Data);
+                    wrapper.WriteContentChunkToImage(readArgs.Data!);
                     progressTracker.UpdateAndDisplayProgress();
                 }
             }

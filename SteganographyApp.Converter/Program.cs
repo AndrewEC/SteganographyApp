@@ -29,20 +29,20 @@
             }
 
             var parser = new ArgumentParser();
-            if (!parser.TryParse(args, out IInputArguments arguments, PostValidation))
+            if (!parser.TryParse(args, out IInputArguments? arguments, PostValidation))
             {
                 parser.PrintCommonErrorMessage();
                 return;
             }
 
-            ConvertImagesToPng(arguments);
+            ConvertImagesToPng(arguments!);
         }
 
         /// <summary>
         /// Performs some validation once all the user inputted values have been parsed and individually
         /// validated.
         /// </summary>
-        private static string PostValidation(IInputArguments inputs) => Checks.IsNullOrEmpty(inputs.CoverImages) ?
+        private static string? PostValidation(IInputArguments inputs) => Checks.IsNullOrEmpty(inputs.CoverImages) ?
             "At least one image must be provided to convert."
             : null;
 
@@ -69,19 +69,16 @@
             encoder.CompressionLevel = args.CompressionLevel;
             foreach (string coverImage in lossyImages)
             {
-                string result = TrySaveImage(coverImage, encoder);
+                string? result = TrySaveImage(coverImage, encoder);
                 if (!string.IsNullOrEmpty(result))
                 {
                     failures.Add($"{coverImage}: {result}");
                     tracker.UpdateAndDisplayProgress();
                     continue;
                 }
-                else
+                if (args.DeleteAfterConversion)
                 {
-                    if (args.DeleteAfterConversion)
-                    {
-                        File.Delete(coverImage);
-                    }
+                    File.Delete(coverImage);
                 }
 
                 tracker.UpdateAndDisplayProgress();
@@ -90,7 +87,7 @@
             PrintFailures(failures);
         }
 
-        private static string TrySaveImage(string coverImage, PngEncoder encoder)
+        private static string? TrySaveImage(string coverImage, PngEncoder encoder)
         {
             try
             {
