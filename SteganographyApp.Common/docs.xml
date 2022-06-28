@@ -74,12 +74,6 @@
                 Only used by the Converter.
             </summary>
         </DeleteAfterConversion>
-        <CompressionLevel>
-            <summary>
-                The compression level to use when converting lossy images to a PNG format. Only used by the Converter.
-                <para>Default value is 5.</para>
-            </summary>
-        </CompressionLevel>
         <ChunkByteSize>
             <summary>
                 Gets the chunk size. I.e. the number of bytes to read, encode, and write at any given time.
@@ -88,6 +82,13 @@
                 <para>Default value of 131,072.</para>
             </summary>
         </ChunkByteSize>
+        <ImageFormat>
+            <summary>
+                The desired output file type. Can be either png or webp.
+                <para>Webp is a smaller format but takes much longer to process than a png.</para>
+                <para>Can only be used with the converter.</para>
+            </summary>
+        </ImageFormat>
     </members>
     <members name="BinaryUtil">
         <ToBase64String>
@@ -177,6 +178,21 @@
             <returns>If numDummies == 0 then it will return the original binary string otherwise will return the binary string with the dummy entries removed.</returns>
             <exception cref="TransformationException">Thrown if an our of range exception is caught while trying to remove the dummy entries from the chunk.</exception>
         </RemoveDummies>
+    </members>
+    <members name="EncoderProvider">
+        <GetEncoder>
+            <summary>Attempts to instantiate and return an IImageEncoder instance associated with the desired image format.</summary>
+            <param name="imageFormat">The desired image format.</param>
+            <returns>An IImageEncoder instance that corresponds to the requested image format.</returns>
+            <exception cref="ArgumentValueException">Thrown if there is no encoder associated with the input image format.</exception>
+        </GetEncoder>
+        <GetEncoder2>
+            <summary>Attempts to instantiate and return an IImageEncoder instance associated with the image format.</summary>
+            <param name="imagePath">The path to the image from which the extension will be pulled and used to determine the correct
+            encoder instance.</param>
+            <returns>An IImageEncoder instance that corresponds to the requested image format.</returns>
+            <exception cref="ArgumentValueException">Thrown if there is no encoder associated with the input image format.</exception>
+        </GetEncoder2>
     </members>
     <members name="EncryptionUtil">
         <Encrypt>
@@ -279,6 +295,7 @@
         <Save>
             <summary>Save the currently loaded image to the specified location.</summary>
             <param name="pathToImage">The absolute or relative file path where the image should be written to.</param>
+            <param name="encoder">The encoding options to save the image with.</param>
         </Save>
     </members>
     <members name="ConsoleProxy">
@@ -302,6 +319,11 @@
             <param name="pathToImage">The absolute or relative path to the image to load.</param>
             <returns>A new IBasicImageInfo instance loaded from the specified path.</returns>
         </LoadImage>
+        <GetImageMimeType>
+            <summary>Retrieves the format of the image located at the provided path.</summary>
+            <param name="pathToImage">The absolute or relative path to the image.</param>
+            <returns>The format of the image located at the input path.</returns>
+        </GetImageMimeType>
     </members>
     <members name="FileIOProxy">
         <GetFileSizeBytes>

@@ -18,7 +18,7 @@ namespace SteganographyApp.Common.Tests
         {
             string[] inputArgs = new string[] { "--action", actionString };
             var parser = new ArgumentParser();
-            parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator);
+            Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
             Assert.AreEqual(action, arguments.EncodeOrDecode);
         }

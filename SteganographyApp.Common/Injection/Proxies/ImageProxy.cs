@@ -13,6 +13,9 @@ namespace SteganographyApp.Common.Injection
     {
         /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/LoadImage/*' />
         IBasicImageInfo LoadImage(string pathToImage);
+
+        /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/GetImageMimeType/*' />
+        string GetImageMimeType(string pathToImage);
     }
 
     /// <summary>
@@ -24,5 +27,8 @@ namespace SteganographyApp.Common.Injection
     {
         /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/LoadImage/*' />
         public IBasicImageInfo LoadImage(string pathToImage) => new BasicImageInfo(Image.Load<Rgba32>(pathToImage));
+
+        /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/GetImageMimeType/*' />
+        public string GetImageMimeType(string pathToImage) => Image.DetectFormat(pathToImage).DefaultMimeType;
     }
 }

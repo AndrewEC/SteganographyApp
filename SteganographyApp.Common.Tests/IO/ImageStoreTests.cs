@@ -9,9 +9,12 @@ namespace SteganographyApp.Common.Tests
 
     using NUnit.Framework;
 
+    using SixLabors.ImageSharp.Formats;
+    using SixLabors.ImageSharp.Formats.Png;
     using SixLabors.ImageSharp.PixelFormats;
 
     using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Data;
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.IO;
 
@@ -23,6 +26,9 @@ namespace SteganographyApp.Common.Tests
     {
         [Mockup(typeof(IImageProxy))]
         public Mock<IImageProxy> mockImageProxy;
+
+        [Mockup(typeof(IEncoderProvider))]
+        public Mock<IEncoderProvider> mockEncoderProvider;
 
         private const int BinaryStringLength = 100_000;
         private static readonly IInputArguments Arguments = new InputArguments()
@@ -39,6 +45,8 @@ namespace SteganographyApp.Common.Tests
             var mockImage = GenerateMockImage(100, 100);
             mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
 
+            mockEncoderProvider.Setup(provider => provider.GetEncoder(IsAny<string>())).Returns(new PngEncoder());
+
             var imageStore = new ImageStore(Arguments);
             imageStore.OnNextImageLoaded += OnNextImageLoaded;
             imageStore.CleanImageLSBs();
@@ -54,6 +62,8 @@ namespace SteganographyApp.Common.Tests
         {
             var mockImage = GenerateMockImage(100, 100);
             mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
+
+            mockEncoderProvider.Setup(provider => provider.GetEncoder(IsAny<string>())).Returns(new PngEncoder());
 
             string binaryString = GenerateBinaryString(BinaryStringLength);
 
@@ -94,6 +104,8 @@ namespace SteganographyApp.Common.Tests
         {
             var mockImage = GenerateMockImage(1, 1);
             mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
+
+            mockEncoderProvider.Setup(provider => provider.GetEncoder(IsAny<string>())).Returns(new PngEncoder());
 
             var imageStore = new ImageStore(Arguments);
             var chunkTable = Enumerable.Range(0, 100).ToImmutableArray();
@@ -169,7 +181,7 @@ namespace SteganographyApp.Common.Tests
             }
         }
 
-        public void Save(string pathToImage)
+        public void Save(string pathToImage, IImageEncoder encoder)
         {
             SaveCalledWith = pathToImage;
         }

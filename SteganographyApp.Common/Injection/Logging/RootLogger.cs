@@ -19,7 +19,7 @@ namespace SteganographyApp.Common.Logging
         private const string LogMessageTemplate = "[{0}] [{1}] => {2}\n";
         private static readonly object SyncLock = new object();
 
-        private static LogLevel logLevel = LogLevel.None;
+        private LogLevel logLevel = LogLevel.None;
         private IReadWriteStream? writeLogStream;
 
         /// <summary>

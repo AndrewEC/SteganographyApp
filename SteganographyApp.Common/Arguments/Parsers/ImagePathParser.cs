@@ -16,6 +16,7 @@ namespace SteganographyApp.Common.Arguments
         {
             { "PNG_IMAGES", @"[r]<^[\W\w]+\.png$><.>" },
             { "JPG_IMAGES", @"[r]<^[\W\w]+\.(jpg|jpeg)$><.>" },
+            { "WEBP_IMAGES", @"[r]<^[\W\w]+\.webp$><.>" },
         }
         .ToImmutableDictionary();
 

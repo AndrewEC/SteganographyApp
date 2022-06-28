@@ -2,6 +2,8 @@ namespace SteganographyApp.Common.IO
 {
     using System;
 
+    using SteganographyApp.Common.Data;
+
     /// <summary>
     /// A wrapper class that exposes the IO related methods of an ImageStore instance while implementing
     /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
@@ -67,6 +69,7 @@ namespace SteganographyApp.Common.IO
         {
             store.CloseOpenImage(save);
             store.ResetToImage(0);
+            GlobalCounter.Instance.Reset();
         }
     }
 }

@@ -33,7 +33,7 @@ namespace SteganographyApp.Common.Arguments
                 new Argument("--randomSeed", "-rs", SensitiveArgumentParser.ParseRandomSeed, false, true),
                 new Argument("--enableDummies", "-d", Parsers.ParseInsertDummies, true),
                 new Argument("--deleteOriginals", "-do", Parsers.ParseDeleteOriginals, true),
-                new Argument("--compressionLevel", "-cl", Parsers.ParseCompressionLevel),
+                new Argument("--imageFormat", "-if", Parsers.ParseImageFormat),
                 new Argument("--logLevel", "-ll", Parsers.ParseLogLevel)
             );
 #pragma warning restore SA1009

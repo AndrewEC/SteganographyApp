@@ -3,6 +3,7 @@ namespace SteganographyApp.Common.Injection
     using System;
 
     using SixLabors.ImageSharp;
+    using SixLabors.ImageSharp.Formats;
     using SixLabors.ImageSharp.PixelFormats;
 
     /// <summary>
@@ -24,7 +25,7 @@ namespace SteganographyApp.Common.Injection
         }
 
         /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
-        void Save(string pathToImage);
+        void Save(string pathToImage, IImageEncoder encoder);
     }
 
     /// <summary>
@@ -85,6 +86,6 @@ namespace SteganographyApp.Common.Injection
         }
 
          /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
-        public void Save(string pathToImage) => image.Save(pathToImage);
+        public void Save(string pathToImage, IImageEncoder encoder) => image.Save(pathToImage, encoder);
     }
 }

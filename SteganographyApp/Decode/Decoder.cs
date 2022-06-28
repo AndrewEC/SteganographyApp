@@ -23,10 +23,16 @@ namespace SteganographyApp.Decode
     /// Specifies the values to be added to the queue whenever data is read
     /// from the file to encode.
     /// </summary>
-    internal struct WriteArgs
+    internal readonly struct WriteArgs
     {
-        public Status Status;
-        public string Data;
+        public readonly Status Status;
+        public readonly string? Data;
+
+        public WriteArgs(Status status, string? data = null)
+        {
+            Status = status;
+            Data = data;
+        }
     }
 
     public class Decoder
@@ -100,7 +106,7 @@ namespace SteganographyApp.Decode
             {
                 log.Debug("Processing chunk of [{0}] bits.", chunkLength);
                 string binary = wrapper.ReadContentChunkFromImage(chunkLength);
-                writeQueue.Add(new WriteArgs { Data = binary, Status = Status.Incomplete }, errorContainer.CancellationToken);
+                writeQueue.Add(new WriteArgs(Status.Incomplete, binary));
                 tracker.UpdateAndDisplayProgress();
 
                 if (errorContainer.HasException())
@@ -109,7 +115,7 @@ namespace SteganographyApp.Decode
                 }
             }
 
-            writeQueue.Add(new WriteArgs { Status = Status.Complete }, errorContainer.CancellationToken);
+            writeQueue.Add(new WriteArgs(Status.Complete));
 
             if (errorContainer.HasException())
             {

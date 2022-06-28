@@ -1,5 +1,7 @@
 ﻿namespace SteganographyApp.Common.Tests
 {
+    using System.Linq;
+
     using NUnit.Framework;
 
     using SteganographyApp.Common.Data;
@@ -51,10 +53,6 @@
 
         private bool HaveSameElements(int[] first, int[] second)
         {
-            if (first.Length != second.Length)
-            {
-                return false;
-            }
             for (int i = 0; i < first.Length; i++)
             {
                 if (first[i] != second[i])
@@ -77,15 +75,7 @@
             return true;
         }
 
-        private int[] Generate(IndexGenerator generator, int length, int max)
-        {
-            int[] nums = new int[length];
-            int count = 0;
-            while (count < length)
-            {
-                nums[count++] = generator.Next(max);
-            }
-            return nums;
-        }
+        private int[] Generate(IndexGenerator generator, int length, int max) => Enumerable.Range(0, length)
+            .Select(i => generator.Next(max)).ToArray();
     }
 }

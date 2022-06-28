@@ -6,17 +6,16 @@
     using System.Linq;
 
     using SixLabors.ImageSharp;
-    using SixLabors.ImageSharp.Formats.Png;
+    using SixLabors.ImageSharp.Formats;
 
     using SteganographyApp.Common;
     using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.Injection;
 
     public class Program
     {
-        /// <summary>
-        /// The mime type of png images. All images that have the png mimetype should not
-        /// be put through the conversion process.
-        /// </summary>
+        private const string WebpMimeType = "image/webp";
         private const string PngMimeType = "image/png";
 
         public static void Main(string[] args)
@@ -51,9 +50,9 @@
         /// the original images after convertion if the delete option was specified
         /// by the user.
         /// </summary>
-        private static void ConvertImagesToPng(IInputArguments args)
+        private static void ConvertImagesToPng(IInputArguments arguments)
         {
-            string[] lossyImages = args.CoverImages.Where(FilterOutPngImages).ToArray();
+            string[] lossyImages = arguments.CoverImages.Where(image => FilterOutUnconvertableImages(image, arguments.ImageFormat)).ToArray();
             if (lossyImages.Length == 0)
             {
                 Console.WriteLine("All images found are png images and will not be converted.");
@@ -65,18 +64,17 @@
 
             var failures = new List<string>();
 
-            var encoder = new PngEncoder();
-            encoder.CompressionLevel = args.CompressionLevel;
+            var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(arguments.ImageFormat);
             foreach (string coverImage in lossyImages)
             {
-                string? result = TrySaveImage(coverImage, encoder);
+                string? result = TrySaveImage(coverImage, encoder, arguments);
                 if (!string.IsNullOrEmpty(result))
                 {
                     failures.Add($"{coverImage}: {result}");
                     tracker.UpdateAndDisplayProgress();
                     continue;
                 }
-                if (args.DeleteAfterConversion)
+                if (arguments.DeleteAfterConversion)
                 {
                     File.Delete(coverImage);
                 }
@@ -87,14 +85,16 @@
             PrintFailures(failures);
         }
 
-        private static string? TrySaveImage(string coverImage, PngEncoder encoder)
+        private static string? TrySaveImage(string coverImage, IImageEncoder encoder, IInputArguments arguments)
         {
             try
             {
+                string updatedPath = ReplaceFileExtension(coverImage, arguments);
                 using (var image = Image.Load(coverImage))
                 {
-                    image.Save(ReplaceFileExtension(coverImage), encoder);
+                    image.Save(updatedPath, encoder);
                 }
+                Console.WriteLine($"Saved image [{coverImage}] to [{updatedPath}]");
             }
             catch (Exception e)
             {
@@ -120,17 +120,22 @@
         /// <summary>
         /// Filters out any images that already have the png format.
         /// </summary>
-        private static bool FilterOutPngImages(string image) => Image.DetectFormat(image).DefaultMimeType != PngMimeType;
+        private static bool FilterOutUnconvertableImages(string image, ImageFormat desiredImageFormat)
+        {
+            string imageType = Image.DetectFormat(image).DefaultMimeType;
+            return !((desiredImageFormat == ImageFormat.Png && imageType == PngMimeType) || (desiredImageFormat == ImageFormat.Webp && imageType == WebpMimeType));
+        }
 
         /// <summary>
         /// Takes in the path to the specified image, stripts out the existing file extension
         /// and replaces it with a png extension.
         /// </summary>
         /// <param name="image">The path to the image being converted</param>
-        private static string ReplaceFileExtension(string image)
+        private static string ReplaceFileExtension(string image, IInputArguments arguments)
         {
             int index = image.LastIndexOf('.');
-            return $"{image.Substring(0, index)}.png";
+            string extension = arguments.ImageFormat.ToString().ToLower();
+            return $"{image.Substring(0, index)}.{extension}";
         }
 
         /// <summary>

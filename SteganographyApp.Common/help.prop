@@ -76,8 +76,6 @@ Arguments must be specified as <argument_name>space<argument_value>.
 ~DeleteOriginals
 \t--deleteOriginals | -do :: Flag indicating to delete the original images after convertion.
 
-~CompressionLevel
-\t--compressionLevel | -cl :: Specifies the level of compression to use when converting the images to PNG.
-\t\tValue must be between 0 and 9.
-\t\tThe higher the value, the more the image will be compressed.
-\t\tThe default compression level is 5.
+~ImageFormat
+\t--imageFormat | -im :: Indicates the desired output image format.
+\t\tValue must be either 'png' or 'webp'

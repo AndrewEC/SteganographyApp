@@ -62,7 +62,7 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="arguments">The InputArguments instance to modify.</param>
         public static void ParseDummyCount(InputArguments arguments)
         {
-            if (!arguments.InsertDummies || arguments.CoverImages == null)
+            if (!arguments.InsertDummies || Checks.IsNullOrEmpty(arguments.CoverImages))
             {
                 return;
             }
@@ -85,20 +85,19 @@ namespace SteganographyApp.Common.Arguments
         }
 
         /// <summary>
-        /// Parses the compression level and sets the CompressionLevel property value.
+        /// Parses the desired image format and sets the ImageFormat property.
         /// </summary>
         /// <param name="arguments">The InputArguments instance to modify.</param>
         /// <param name="value">The string representation of an int value.</param>
         /// <exception cref="ArgumentValueException">Thrown if the string value could not be converted
         /// to an int or if the value is less than 0 or greater than 9.</exception>
-        public static void ParseCompressionLevel(InputArguments arguments, string value)
+        public static void ParseImageFormat(InputArguments arguments, string value)
         {
-            string enumName = string.Format(CompressionLevelTemplate, value);
-            if (!Enum.TryParse(enumName, true, out PngCompressionLevel level))
+            if (!Enum.TryParse(value, true, out ImageFormat imageFormat))
             {
-                throw new ArgumentValueException($"Could not parse compression level. Compression level must be a number between 0 and 9 inclusive.");
+                throw new ArgumentValueException($"Could not parse image format. Image format must be either png or webp.");
             }
-            arguments.CompressionLevel = level;
+            arguments.ImageFormat = imageFormat;
         }
 
         /// <summary>

@@ -81,7 +81,7 @@
                 "ConverterDescription",
                 "Images",
                 "DeleteOriginals",
-                "CompressionLevel",
+                "ImageFormat",
                 "EnableLogs",
             }
         );

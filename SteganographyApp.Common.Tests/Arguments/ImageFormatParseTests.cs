@@ -2,30 +2,27 @@ namespace SteganographyApp.Common.Tests
 {
     using NUnit.Framework;
 
-    using SixLabors.ImageSharp.Formats.Png;
-
     using SteganographyApp.Common.Arguments;
 
     [TestFixture]
-    public class CompressLevelParseTests
+    public class ImageFormatParseTests : FixtureWithLogger
     {
-        [TestCase(0, PngCompressionLevel.Level0)]
-        [TestCase(5, PngCompressionLevel.Level5)]
-        [TestCase(9, PngCompressionLevel.Level9)]
-        public void TestCompressionLevelWithValidValue(int value, PngCompressionLevel expected)
+        [TestCase("png", ImageFormat.Png)]
+        [TestCase("webp", ImageFormat.Webp)]
+        public void TestParseImageFormatWithValidValue(string value, ImageFormat expected)
         {
-            string[] inputArgs = new string[] { "--compressionLevel", value.ToString() };
+            string[] inputArgs = new string[] { "--imageFormat", value };
             var parser = new ArgumentParser();
             Assert.IsTrue(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNull(parser.LastError);
-            Assert.AreEqual(expected, arguments.CompressionLevel);
+            Assert.AreEqual(expected, arguments.ImageFormat);
         }
 
-        [TestCase(-1)]
-        [TestCase(10)]
-        public void TestCompressionLevelWithInvalidValueProducesFalseAndParseException(int value)
+        [TestCase("jpg")]
+        [TestCase("gif")]
+        public void TestParseImageFormatWithInvalidValueProducesFalseAndParseException(string value)
         {
-            string[] inputArgs = new string[] { "--compressionLevel", value.ToString() };
+            string[] inputArgs = new string[] { "--imageFormat", value };
             var parser = new ArgumentParser();
             Assert.IsFalse(parser.TryParse(inputArgs, out IInputArguments arguments, NullReturningPostValidator));
             Assert.IsNotNull(parser.LastError);

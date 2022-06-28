@@ -38,16 +38,16 @@
         public void TestEncode()
         {
             string encryptedString = "encrypted_string";
-            mockEncryptionProxy.Setup(provider => provider.Encrypt(IsAny<string>(), IsAny<string>())).Returns(encryptedString);
+            mockEncryptionProxy.Setup(provider => provider.Encrypt(IsAny<string>(), Password)).Returns(encryptedString);
 
             string binaryString = "binary_string";
-            mockBinaryUtil.Setup(provider => provider.ToBinaryString(IsAny<string>())).Returns(binaryString);
+            mockBinaryUtil.Setup(provider => provider.ToBinaryString(encryptedString)).Returns(binaryString);
 
             string dummyString = "dummy_string";
-            mockDummyUtil.Setup(provider => provider.InsertDummies(IsAny<int>(), IsAny<string>(), IsAny<string>())).Returns(dummyString);
+            mockDummyUtil.Setup(provider => provider.InsertDummies(DummyCount, binaryString, RandomSeed)).Returns(dummyString);
 
             string randomizedString = "randomized_string";
-            mockRandomUtil.Setup(provider => provider.RandomizeBinaryString(IsAny<string>(), IsAny<string>())).Returns(randomizedString);
+            mockRandomUtil.Setup(provider => provider.RandomizeBinaryString(dummyString, RandomSeed)).Returns(randomizedString);
 
             var util = new DataEncoderUtil();
 
@@ -55,10 +55,6 @@
 
             Assert.AreEqual(randomizedString, result);
 
-            mockEncryptionProxy.Verify(provider => provider.Encrypt(IsAny<string>(), Password), Once());
-            mockBinaryUtil.Verify(util => util.ToBinaryString(encryptedString), Once());
-            mockDummyUtil.Verify(util => util.InsertDummies(DummyCount, binaryString, RandomSeed), Once());
-            mockRandomUtil.Verify(util => util.RandomizeBinaryString(dummyString, RandomSeed), Once());
             mockCompressionUtil.Verify(util => util.Compress(IsAny<byte[]>()), Never());
         }
 
@@ -81,25 +77,21 @@
         public void TestDecode()
         {
             string randomizedString = "randomized_string";
-            mockRandomUtil.Setup(util => util.ReorderBinaryString(IsAny<string>(), IsAny<string>())).Returns(randomizedString);
+            mockRandomUtil.Setup(util => util.ReorderBinaryString(StringToDecode, RandomSeed)).Returns(randomizedString);
 
             string dummyString = "dummy_string";
-            mockDummyUtil.Setup(util => util.RemoveDummies(IsAny<int>(), IsAny<string>(), IsAny<string>())).Returns(dummyString);
+            mockDummyUtil.Setup(util => util.RemoveDummies(DummyCount, randomizedString, RandomSeed)).Returns(dummyString);
 
             string base64String = "base64String";
-            mockBinaryUtil.Setup(util => util.ToBase64String(IsAny<string>())).Returns(base64String);
+            mockBinaryUtil.Setup(util => util.ToBase64String(dummyString)).Returns(base64String);
 
             string encryptedString = "ZW5jcnlwdGVkX3N0cmluZw==";
-            mockEncryptionProxy.Setup(provider => provider.Decrypt(IsAny<string>(), IsAny<string>())).Returns(encryptedString);
+            mockEncryptionProxy.Setup(provider => provider.Decrypt(base64String, Password)).Returns(encryptedString);
 
             var util = new DataEncoderUtil();
 
             byte[] result = util.Decode(StringToDecode, Password, UseCompression, DummyCount, RandomSeed);
 
-            mockRandomUtil.Verify(provider => provider.ReorderBinaryString(StringToDecode, RandomSeed), Once());
-            mockDummyUtil.Verify(provider => provider.RemoveDummies(DummyCount, randomizedString, RandomSeed), Once());
-            mockBinaryUtil.Verify(provider => provider.ToBase64String(dummyString), Once());
-            mockEncryptionProxy.Verify(provider => provider.Decrypt(base64String, Password), Once());
             mockCompressionUtil.Verify(util => util.Decompress(IsAny<byte[]>()), Never());
         }
 

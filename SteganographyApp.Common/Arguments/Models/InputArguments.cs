@@ -43,11 +43,11 @@ namespace SteganographyApp.Common.Arguments
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
         bool DeleteAfterConversion { get; }
 
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CompressionLevel/*' />
-        PngCompressionLevel CompressionLevel { get; }
-
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
         int ChunkByteSize { get; }
+
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+        public ImageFormat ImageFormat { get; }
     }
 
     /// <summary>
@@ -104,11 +104,11 @@ namespace SteganographyApp.Common.Arguments
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
         public bool DeleteAfterConversion { get; set; } = false;
 
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CompressionLevel/*' />
-        public PngCompressionLevel CompressionLevel { get; set; } = PngCompressionLevel.Level5;
-
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
         public int ChunkByteSize { get; set; } = 131_072;
+
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+        public ImageFormat ImageFormat { get; set; } = ImageFormat.Png;
 
         /// <summary>
         /// Converts the current InputArguments instance into an ImmutableInputArguments instance with
@@ -145,8 +145,8 @@ namespace SteganographyApp.Common.Arguments
             DummyCount = source.DummyCount;
             InsertDummies = source.InsertDummies;
             DeleteAfterConversion = source.DeleteAfterConversion;
-            CompressionLevel = source.CompressionLevel;
             ChunkByteSize = source.ChunkByteSize;
+            ImageFormat = source.ImageFormat;
         }
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
@@ -182,10 +182,10 @@ namespace SteganographyApp.Common.Arguments
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
         public bool DeleteAfterConversion { get; }
 
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CompressionLevel/*' />
-        public PngCompressionLevel CompressionLevel { get; }
-
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
         public int ChunkByteSize { get; }
+
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+        public ImageFormat ImageFormat { get; }
     }
 }

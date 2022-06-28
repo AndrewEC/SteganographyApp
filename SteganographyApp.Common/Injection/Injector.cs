@@ -28,9 +28,10 @@ namespace SteganographyApp.Common.Injection
 
             foreach (var injectableType in FindInjectableTypesInAssembly())
             {
-                var ctor = injectableType.GetConstructor(Type.EmptyTypes)!;
+                var ctor = injectableType.GetConstructor(Type.EmptyTypes);
                 var correlatedType = GetInjectableAttribute(injectableType)!.CorrelatesWith;
-                injectables[correlatedType] = ctor.Invoke(new object[] { });
+                injectables[correlatedType] = ctor?.Invoke(new object[] { })
+                    ?? throw new ArgumentException("Injectable types must have a default empty construct. No matching constructor found for type: " + injectableType.Name);
             }
 
             return injectables.ToImmutableDictionary();

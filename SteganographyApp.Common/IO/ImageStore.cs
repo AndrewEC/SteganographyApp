@@ -7,6 +7,7 @@
     using SixLabors.ImageSharp.PixelFormats;
 
     using SteganographyApp.Common.Arguments;
+    using SteganographyApp.Common.Data;
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Logging;
 
@@ -215,7 +216,8 @@
                 if (saveImageChanges)
                 {
                     log.Debug("Saving changes to image [{0}]", CurrentImage);
-                    currentImage.Save(CurrentImage);
+                    var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(CurrentImage);
+                    currentImage.Save(CurrentImage, encoder);
                 }
                 currentImage.Dispose();
                 currentImage = null;
