@@ -88,14 +88,20 @@ namespace SteganographyApp.Common.Tests
             var chunkTableWrite = ImmutableArray.Create(new int[] { 100, 200, 300 });
             var imageStore = new ImageStore(Arguments);
             imageStore.ResetToImage(0);
-            imageStore.WriteContentChunkTable(chunkTableWrite);
-            imageStore.ResetToImage(0);
-            var chunkTableRead = imageStore.ReadContentChunkTable();
-
-            Assert.AreEqual(chunkTableWrite.Length, chunkTableRead.Length);
-            for (int i = 0; i < chunkTableWrite.Length; i++)
+            using (var tableWriter = new ChunkTableWriter(imageStore, Arguments))
             {
-                Assert.AreEqual(chunkTableWrite[i], chunkTableRead[i]);
+                tableWriter.WriteContentChunkTable(chunkTableWrite);
+            }
+            imageStore.ResetToImage(0);
+
+            using (var reader = new ChunkTableReader(imageStore, Arguments))
+            {
+                var chunkTableRead = reader.ReadContentChunkTable();
+                Assert.AreEqual(chunkTableWrite.Length, chunkTableRead.Length);
+                for (int i = 0; i < chunkTableWrite.Length; i++)
+                {
+                    Assert.AreEqual(chunkTableWrite[i], chunkTableRead[i]);
+                }
             }
         }
 
@@ -111,7 +117,10 @@ namespace SteganographyApp.Common.Tests
             var chunkTable = Enumerable.Range(0, 100).ToImmutableArray();
 
             imageStore.ResetToImage(0);
-            Assert.Throws<ImageProcessingException>(() => imageStore.WriteContentChunkTable(chunkTable));
+            using (var writer = new ChunkTableWriter(imageStore, Arguments))
+            {
+                Assert.Throws<ImageProcessingException>(() => writer.WriteContentChunkTable(chunkTable));
+            }
 
             Assert.IsTrue(mockImage.DisposeCalled);
             Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);

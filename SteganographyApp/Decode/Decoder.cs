@@ -98,28 +98,31 @@ namespace SteganographyApp.Decode
         private void DoDecode(ImageStore store, ImageStoreIO wrapper)
         {
             Console.WriteLine("Reading content chunk table.");
-            var contentChunkTable = store.ReadContentChunkTable();
-            var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
-
-            log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
-            foreach (int chunkLength in contentChunkTable)
+            using(var chunkTableReader = new ChunkTableReader(store, arguments))
             {
-                log.Debug("Processing chunk of [{0}] bits.", chunkLength);
-                string binary = wrapper.ReadContentChunkFromImage(chunkLength);
-                writeQueue.Add(new WriteArgs(Status.Incomplete, binary));
-                tracker.UpdateAndDisplayProgress();
+                var contentChunkTable = chunkTableReader.ReadContentChunkTable();
+                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
+
+                log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
+                foreach (int chunkLength in contentChunkTable)
+                {
+                    log.Debug("Processing chunk of [{0}] bits.", chunkLength);
+                    string binary = wrapper.ReadContentChunkFromImage(chunkLength);
+                    writeQueue.Add(new WriteArgs(Status.Incomplete, binary));
+                    tracker.UpdateAndDisplayProgress();
+
+                    if (errorContainer.HasException())
+                    {
+                        throw errorContainer.TakeException();
+                    }
+                }
+
+                writeQueue.Add(new WriteArgs(Status.Complete));
 
                 if (errorContainer.HasException())
                 {
                     throw errorContainer.TakeException();
                 }
-            }
-
-            writeQueue.Add(new WriteArgs(Status.Complete));
-
-            if (errorContainer.HasException())
-            {
-                throw errorContainer.TakeException();
             }
         }
     }

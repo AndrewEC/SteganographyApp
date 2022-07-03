@@ -48,7 +48,7 @@ dotnet tool run coverlet `
     --target "dotnet" `
     --targetargs "test SteganographyApp.sln --no-build" `
     --format opencover `
-    --threshold 85 `
+    --threshold 80 `
     --threshold-type line `
     --threshold-type branch `
     --threshold-stat total

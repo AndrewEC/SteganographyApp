@@ -146,7 +146,10 @@ namespace SteganographyApp.Encode
         private void Cleanup(EncodingUtilities utilities)
         {
             Console.WriteLine("Writing content chunk table.");
-            utilities.ImageStore.WriteContentChunkTable(utilities.TableTracker.GetContentTable());
+            using (var writer = new ChunkTableWriter(utilities.ImageStore, arguments))
+            {
+                writer.WriteContentChunkTable(utilities.TableTracker.GetContentTable());
+            }
             Console.WriteLine("Encoding process complete.");
             log.Trace("Encoding process complete.");
             utilities.ImageTracker.PrintImagesUtilized();

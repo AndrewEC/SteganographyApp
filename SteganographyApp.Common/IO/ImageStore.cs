@@ -133,64 +133,6 @@
         }
 
         /// <summary>
-        /// Reads the content chunk table from the current image and returns each
-        /// content entry except for the first meta entry as a list of ints.
-        /// <para>Each values in the list specifies the number of bits that make
-        /// up a chunk of encrypted data that makes up the original encoded file.</para>
-        /// </summary>
-        /// <returns>A list of int32 values specifies the bit length of each encrypted chunk
-        /// of data stored in the current set of images.</returns>
-        /// <exception cref="ImageProcessingException">Thrown if images do not have enough
-        /// storage space to read the entire content chunk table.</exception>
-        public ImmutableArray<int> ReadContentChunkTable()
-        {
-            log.Trace("Reading content chunk table");
-            try
-            {
-                var helper = Injector.Provide<IChunkTableHelper>();
-
-                // The first 32 bits of the table represent the number of chunk lengths
-                // contained within the table.
-                int chunkCount = helper.GetChunkTableSize(ReadBinaryString(Calculator.ChunkDefinitionBitSizeWithPadding), args.RandomSeed);
-                log.Debug("Content chunk table contains [{0}] entries.", chunkCount);
-
-                string chunkTableBinary = ReadBinaryString(chunkCount * Calculator.ChunkDefinitionBitSizeWithPadding);
-
-                return helper.ConvertBinaryToChunkTable(chunkTableBinary, chunkCount, args.RandomSeed);
-            }
-            catch (Exception)
-            {
-                CloseOpenImage();
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Writes the content chunk table so that the proper number of bits can be read
-        /// from the target images and properly decrypted.
-        /// </summary>
-        /// <param name="chunkTable">A list containing the bit length of each chunk of data that was
-        /// originally written to the target images during the encoding process.</param>
-        /// <exception cref="ImageProcessingException">Thrown if the leading image does not have enough
-        /// storage space to store the entire content chunk table.</exception>
-        public void WriteContentChunkTable(ImmutableArray<int> chunkTable)
-        {
-            log.Debug("Writing chunk table with [{0}] entries.", chunkTable.Length);
-            try
-            {
-                var binary = Injector.Provide<IChunkTableHelper>().ConvertChunkTableToBinary(chunkTable, args.RandomSeed);
-
-                WriteBinaryString(binary.ToString());
-                CloseOpenImage(true);
-            }
-            catch (Exception)
-            {
-                CloseOpenImage();
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Moves the current index back to the index before the specified image
         /// then calls the Next method to advance to the specified image.
         /// </summary>
@@ -239,7 +181,7 @@
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
         internal int WriteBinaryString(string binary)
         {
-            log.Debug("Writing [{0}] bits to image [{1}]", binary.Length, CurrentImage);
+            log.Debug("Writing [{0}] bits to image [{1}] starting at position [{2}]", binary.Length, CurrentImage, pixelPosition.ToString());
             int written = 0;
             for (int i = 0; i < binary.Length; i += 3)
             {
@@ -357,8 +299,7 @@
             {
                 if (!pixelPosition.TryMoveToNext())
                 {
-                    throw new ImageProcessingException("Could not skip by specified amount. The number of bits to "
-                        + "skip is greater than the remaining bits available in the currently loaded image.");
+                    LoadNextImage();
                 }
             }
         }
