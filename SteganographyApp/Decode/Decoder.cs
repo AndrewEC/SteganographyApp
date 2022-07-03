@@ -98,7 +98,7 @@ namespace SteganographyApp.Decode
         private void DoDecode(ImageStore store, ImageStoreIO wrapper)
         {
             Console.WriteLine("Reading content chunk table.");
-            using(var chunkTableReader = new ChunkTableReader(store, arguments))
+            using (var chunkTableReader = new ChunkTableReader(store, arguments))
             {
                 var contentChunkTable = chunkTableReader.ReadContentChunkTable();
                 var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");

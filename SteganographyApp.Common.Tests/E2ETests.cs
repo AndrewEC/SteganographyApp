@@ -1,5 +1,6 @@
 ﻿namespace SteganographyApp.Common.Tests
 {
+    using System;
     using System.Collections.Immutable;
     using System.IO;
 
@@ -73,7 +74,6 @@
 
             GlobalCounter.Instance.Reset();
 
-            wrapper.ResetToImage(0);
             using (var tableReader = new ChunkTableReader(imageStore, args))
             {
                 var readTable = tableReader.ReadContentChunkTable();
@@ -117,7 +117,6 @@
 
             // reading file content from image
             args.Password = "Wrong Password";
-            wrapper.ResetToImage(0);
             using (var tableReader = new ChunkTableReader(imageStore, args))
             {
                 var readTable = tableReader.ReadContentChunkTable();
@@ -157,7 +156,6 @@
 
             // reading file content from image
             args.DummyCount = 5;
-            wrapper.ResetToImage(0);
             using (var tableReader = new ChunkTableReader(imageStore, args))
             {
                 var readTable = tableReader.ReadContentChunkTable();
@@ -197,7 +195,6 @@
 
             // reading file content from image
             args.UseCompression = false;
-            wrapper.ResetToImage(0);
             using (var tableReader = new ChunkTableReader(imageStore, args))
             {
                 var readTable = tableReader.ReadContentChunkTable();
@@ -241,14 +238,9 @@
 
             // reading file content from image
             args.RandomSeed = string.Empty;
-            wrapper.ResetToImage(0);
             using (var tableReader = new ChunkTableReader(imageStore, args))
             {
-                var readTable = tableReader.ReadContentChunkTable();
-                using (var writer = new ContentWriter(args))
-                {
-                    Assert.Throws<ImageProcessingException>(() => wrapper.ReadContentChunkFromImage(readTable[0]));
-                }
+                Assert.Throws<OverflowException>(() => tableReader.ReadContentChunkTable());
             }
         }
     }

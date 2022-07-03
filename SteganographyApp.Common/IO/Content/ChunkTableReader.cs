@@ -33,24 +33,24 @@ namespace SteganographyApp.Common.IO
             log.Trace("Reading content chunk table.");
             var randomizeUtil = Injector.Provide<IRandomizeUtil>();
 
-            int chunkCount = ReadChunkCount(randomizeUtil);
+            short chunkCount = ReadChunkCount(randomizeUtil);
             log.Debug("Chunk table contains [{0}] chunks.", chunkCount);
 
             return ReadTableChunkLengths(randomizeUtil, chunkCount);
         }
 
-        private int ReadChunkCount(IRandomizeUtil randomizeUtil)
+        private short ReadChunkCount(IRandomizeUtil randomizeUtil)
         {
             log.Trace("Reading chunk table header.");
-            string headerBinary = ImageStoreIO.ReadContentChunkFromImage(Calculator.ChunkDefinitionBitSizeWithPadding);
+            string headerBinary = ImageStoreIO.ReadContentChunkFromImage(Calculator.ChunkTableHeaderSizeWithPadding);
             if (!string.IsNullOrEmpty(Arguments.RandomSeed))
             {
                 headerBinary = randomizeUtil.ReorderBinaryString(headerBinary, Arguments.RandomSeed);
             }
-            return Convert.ToInt32(headerBinary, 2);
+            return Convert.ToInt16(headerBinary, 2);
         }
 
-        private ImmutableArray<int> ReadTableChunkLengths(IRandomizeUtil randomizeUtil, int chunkCount)
+        private ImmutableArray<int> ReadTableChunkLengths(IRandomizeUtil randomizeUtil, short chunkCount)
         {
             log.Trace("Reading content of chunk table.");
             int chunkSize = Calculator.ChunkDefinitionBitSizeWithPadding * chunkCount;

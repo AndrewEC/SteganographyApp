@@ -23,11 +23,15 @@ namespace SteganographyApp.Common
 
         /// <summary>
         /// Specifies the number of bits that will be reserved for each entry in the content
-        /// chunk table + 1. The plus one is because each pixel in the image stores 3 bits
-        /// and since 11 pixels are used to store a content chunk table entry then it can store 33
-        /// bits in total. Although only 32 of them are needed for the actual entry.
+        /// chunk table.
         /// </summary>
         public static readonly int ChunkDefinitionBitSizeWithPadding = 33;
+
+        /// <summary>
+        /// Specifies the number of bits that will be reserved for the header of the content
+        /// chunk table.
+        /// </summary>
+        public static readonly int ChunkTableHeaderSizeWithPadding = 18;
 
         /// <summary>
         /// Specifies the number of times the file has to be read from, encoded, and written to the storage
@@ -57,7 +61,7 @@ namespace SteganographyApp.Common
         public static int CalculateRequiredBitsForContentTable(string fileToEncode, int chunkByteSize)
         {
             int requiredNumberOfWrites = CalculateRequiredNumberOfWrites(fileToEncode, chunkByteSize);
-            return (requiredNumberOfWrites + 1) * ChunkDefinitionBitSizeWithPadding;
+            return CalculateRequiredBitsForContentTable(requiredNumberOfWrites);
         }
 
         /// <summary>
@@ -67,6 +71,6 @@ namespace SteganographyApp.Common
         /// <param name="numberOfChunks">The number of chunks that will need to be written to the content chunk table
         /// less the chunk table header.</param>
         /// <returns>A count of the total number of bits that will be required to store the content chunk table.</returns>
-        public static int CalculateRequiredBitsForContentTable(int numberOfChunks) => (numberOfChunks + 1) * ChunkDefinitionBitSizeWithPadding;
+        public static int CalculateRequiredBitsForContentTable(int numberOfChunks) => (numberOfChunks * ChunkDefinitionBitSizeWithPadding) + ChunkTableHeaderSizeWithPadding;
     }
 }

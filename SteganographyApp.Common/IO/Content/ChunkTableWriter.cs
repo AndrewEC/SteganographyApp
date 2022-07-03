@@ -30,7 +30,7 @@ namespace SteganographyApp.Common.IO
         public void WriteContentChunkTable(ImmutableArray<int> chunkLengths)
         {
             log.Debug("Saving content chunk table with [{0}] chunks", chunkLengths.Length);
-            string tableHeader = To33BitBinaryString(chunkLengths.Length);
+            string tableHeader = To18BitBinaryString((short)chunkLengths.Length);
 
             var binary = new StringBuilder();
             foreach (int chunkLength in chunkLengths)
@@ -56,5 +56,7 @@ namespace SteganographyApp.Common.IO
         }
 
         private string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');
+
+        private string To18BitBinaryString(short value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkTableHeaderSizeWithPadding, '0');
     }
 }
