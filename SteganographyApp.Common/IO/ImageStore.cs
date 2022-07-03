@@ -147,14 +147,16 @@
             log.Trace("Reading content chunk table");
             try
             {
+                var helper = Injector.Provide<IChunkTableHelper>();
+
                 // The first 32 bits of the table represent the number of chunk lengths
                 // contained within the table.
-                int chunkCount = Convert.ToInt32(ReadBinaryString(Calculator.ChunkDefinitionBitSize), 2);
+                int chunkCount = helper.GetChunkTableSize(ReadBinaryString(Calculator.ChunkDefinitionBitSizeWithPadding), args.RandomSeed);
                 log.Debug("Content chunk table contains [{0}] entries.", chunkCount);
 
                 string chunkTableBinary = ReadBinaryString(chunkCount * Calculator.ChunkDefinitionBitSizeWithPadding);
 
-                return Injector.Provide<IChunkTableHelper>().ConvertBinaryToChunkTable(chunkTableBinary, chunkCount, args.RandomSeed);
+                return helper.ConvertBinaryToChunkTable(chunkTableBinary, chunkCount, args.RandomSeed);
             }
             catch (Exception)
             {

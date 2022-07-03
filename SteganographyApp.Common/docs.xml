@@ -402,5 +402,11 @@
             <param name="randomSeed">The random seed required to re-order the binary string.</param>
             <returns>A list of integers representing the number of bits in each chunk table.</returns>
         </ConvertBinaryToChunkTable>
+        <GetChunkTableSize>
+            <summary>Retrieve the number of chunk table entries from the leading 32 bits of the first cover image.</summary>
+            <param name="binary">The 33 bit long binary string read from the leading cover image.</param>
+            <param name="randomSeed">The seed used to re-order the binary string.</param>
+            <returns>An integer representing the number of entries in the content chunk table.</returns>
+        </GetChunkTableSize>
     </members>
 </docs>

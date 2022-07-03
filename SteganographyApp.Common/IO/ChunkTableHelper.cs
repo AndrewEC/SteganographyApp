@@ -19,6 +19,9 @@ namespace SteganographyApp.Common.IO
 
         /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertBinaryToChunkTable/*' />
         ImmutableArray<int> ConvertBinaryToChunkTable(string binary, int chunkCount, string randomSeed);
+
+        /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/GetChunkTableSize/*' />
+        int GetChunkTableSize(string binary, string randomSeed);
     }
 
     /// <summary>
@@ -44,10 +47,22 @@ namespace SteganographyApp.Common.IO
 
             if (!string.IsNullOrEmpty(randomSeed))
             {
-                binaryString = Injector.Provide<IRandomizeUtil>().RandomizeBinaryString(binaryString, randomSeed);
+                var randomize = Injector.Provide<IRandomizeUtil>();
+                tableHeader = randomize.RandomizeBinaryString(tableHeader, randomSeed);
+                binaryString = randomize.RandomizeBinaryString(binaryString, randomSeed);
             }
 
             return tableHeader + binaryString;
+        }
+
+        /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/GetChunkTableSize/*' />
+        public int GetChunkTableSize(string binary, string randomSeed)
+        {
+            if (!string.IsNullOrEmpty(randomSeed))
+            {
+                binary = Injector.Provide<IRandomizeUtil>().ReorderBinaryString(binary, randomSeed);
+            }
+            return Convert.ToInt32(binary.Remove(binary.Length - 1), 2);
         }
 
         /// <include file='../docs.xml' path='docs/members[@name="ChunkTableHelper"]/ConvertBinaryToChunkTable/*' />

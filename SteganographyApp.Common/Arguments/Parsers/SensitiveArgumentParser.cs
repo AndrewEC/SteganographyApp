@@ -24,7 +24,7 @@ namespace SteganographyApp.Common.Arguments
         public static void ParsePassword(InputArguments inputArguments, string value)
         {
             var password = ReadUserInput(value, PasswordPrompt);
-            var confirm = ReadUserInput(value, string.Format(ConfirmTemplate, RandomSeedPrompt));
+            var confirm = ReadUserInput(value, string.Format(ConfirmTemplate, PasswordPrompt));
             if (password != confirm)
             {
                 throw new ArgumentValueException("Passwords do not match.");
