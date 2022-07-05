@@ -6,6 +6,7 @@
     using System.Text.Json;
 
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     /// <summary>
     /// Singleton utility class to parse the provided array of arguments and return and instance of
@@ -13,6 +14,8 @@
     /// </summary>
     public sealed class ArgumentParser
     {
+        private readonly ILogger logger = new LazyLogger<ArgumentParser>();
+
         /// <summary>
         /// Gets last exception to ocurr while parsing the argument values.
         /// </summary>
@@ -25,6 +28,7 @@
         {
             var writer = Injector.Provide<IConsoleWriter>();
             writer.WriteLine($"An exception occured while parsing provided arguments: {LastError!.Message}");
+            logger.Error($"An exception occured while parsing provided arguments: {LastError!.Message}");
             var exception = LastError.InnerException;
             while (exception != null)
             {
@@ -51,6 +55,7 @@
         /// The cause of the exception will be set to the original exception causing the parsing failure.</exception>
         public bool TryParse(string[] args, out IInputArguments? inputs, PostValidation validation)
         {
+            logger.Debug("Attempting to parse arguments from values: [{0}]", () => string.Join(" ", args));
             try
             {
                 inputs = DoTryParse(args, validation);
@@ -74,15 +79,18 @@
             var parsedArguments = new InputArguments();
             var container = new ArgumentContainer(userArguments);
 
+            logger.Trace("Parsing non-sensitive arguments.");
             ParseArguments(container.GetAllNonSensitiveArguments(), parsedArguments);
 
+            logger.Trace("Invoking post validation.");
             InvokePostValidation(postValidationMethod, parsedArguments);
 
+            logger.Trace("Parsing sensitive arguments.");
             ParseArguments(container.GetAllSensitiveArguments(), parsedArguments);
 
             Parsers.ParseDummyCount(parsedArguments);
 
-            Injector.LoggerFor<ArgumentParser>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(parsedArguments) });
+            logger.Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(parsedArguments) });
 
             return parsedArguments.ToImmutable();
         }

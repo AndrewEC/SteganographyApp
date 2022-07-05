@@ -6,6 +6,7 @@ namespace SteganographyApp.Common.Data
 
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     /// <summary>
     /// Contract for interacting with the underlying IEncoderProvider implementation.
@@ -28,10 +29,12 @@ namespace SteganographyApp.Common.Data
     {
         private const string PngMimeType = "image/png";
         private const string WebpMimeType = "image/webp";
+        private readonly ILogger logger = new LazyLogger<EncoderProvider>();
 
         /// <include file='../docs.xml' path='docs/members[@name="EncoderProvider"]/GetEncoder2/*' />
         public IImageEncoder GetEncoder(string imagePath)
         {
+            logger.Debug("Looking up encoder supporting image at path: [{0}]", imagePath);
             var mimeType = Injector.Provide<IImageProxy>().GetImageMimeType(imagePath);
             switch (mimeType)
             {

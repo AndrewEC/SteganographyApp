@@ -64,7 +64,7 @@ namespace SteganographyApp.Decode
                         }
                         else
                         {
-                            log.Debug("Writing next binary chunk of [{0}] bits.", writeArgs.Data!.Length);
+                            log.Debug("Writing next binary chunk of [{0}] bits to output file.", writeArgs.Data!.Length);
                             writer.WriteContentChunkToFile(writeArgs.Data);
                         }
                     }

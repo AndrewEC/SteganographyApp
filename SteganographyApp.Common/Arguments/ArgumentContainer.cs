@@ -4,6 +4,8 @@ namespace SteganographyApp.Common.Arguments
     using System.Collections.Immutable;
     using System.Linq;
 
+    using SteganographyApp.Common.Logging;
+
     /// <summary>
     /// An internal class that contains the immatable list of arguments and their
     /// respective parsers as well as utility methods for identitifying active arguments
@@ -11,6 +13,7 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     internal class ArgumentContainer
     {
+        private readonly ILogger logger = new LazyLogger<ArgumentContainer>();
         private ImmutableList<Argument> arguments;
         private ImmutableDictionary<Argument, string> argumentsAndValues;
 
@@ -61,8 +64,10 @@ namespace SteganographyApp.Common.Arguments
             {
                 if (!TryGetArgument(userArguments[i], out Argument? argument))
                 {
+                    logger.Error("Unrecognized argument: [{0}]", userArguments[i]);
                     throw new ArgumentParseException($"An unrecognized argument was provided: {userArguments[i]}");
                 }
+                logger.Trace("Identified argument: [{0}]", argument!.Name);
 
                 string inputValue = GetRawArgumentValue(argument!, userArguments, i);
                 identifiedArguments.Add(argument!, inputValue);
@@ -72,6 +77,7 @@ namespace SteganographyApp.Common.Arguments
                     i++;
                 }
             }
+            logger.Debug("Identified [{0}] arguments.");
             return identifiedArguments.ToImmutableDictionary();
         }
 
