@@ -13,7 +13,7 @@
     [TestFixture]
     public class E2ETests : FixtureWithRealObjects
     {
-        private InputArguments args;
+        private CommonArguments args;
         private ImageStore imageStore;
         private ImageStoreIO wrapper;
 
@@ -22,7 +22,7 @@
         {
             GlobalCounter.Instance.Reset();
 
-            args = new InputArguments()
+            args = new CommonArguments()
             {
                 FileToEncode = "TestAssets/test.zip",
                 DecodedOutputFile = "TestAssets/testing.zip",

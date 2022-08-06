@@ -5,13 +5,9 @@ VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteganographyApp", "SteganographyApp\SteganographyApp.csproj", "{C43066A1-3FA6-4F95-A85E-6426F13A7623}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteganographyApp.Calculator", "SteganographyApp.Calculator\SteganographyApp.Calculator.csproj", "{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteganographyApp.Common", "SteganographyApp.Common\SteganographyApp.Common.csproj", "{13602190-A2CA-4387-BD3F-F77418A88B4A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteganographyApp.Common.Tests", "SteganographyApp.Common.Tests\SteganographyApp.Common.Tests.csproj", "{A8ED516F-EB4C-4EF5-8EC0-CCD28A280CEF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteganographyApp.Converter", "SteganographyApp.Converter\SteganographyApp.Converter.csproj", "{2D28EE91-0D29-4C55-9BE9-C57CB0AB9A13}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteganographyApp.Common.Benchmarks", "SteganographyApp.Common.Benchmarks\SteganographyApp.Common.Benchmarks.csproj", "{FC032F14-00A7-47E4-9B26-A27984BABF2F}"
 EndProject
@@ -25,10 +21,6 @@ Global
 		{C43066A1-3FA6-4F95-A85E-6426F13A7623}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C43066A1-3FA6-4F95-A85E-6426F13A7623}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C43066A1-3FA6-4F95-A85E-6426F13A7623}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0D07EBBC-EE41-4F34-9AC1-7B2FF33B2D0F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{13602190-A2CA-4387-BD3F-F77418A88B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{13602190-A2CA-4387-BD3F-F77418A88B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13602190-A2CA-4387-BD3F-F77418A88B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,10 +29,6 @@ Global
 		{A8ED516F-EB4C-4EF5-8EC0-CCD28A280CEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8ED516F-EB4C-4EF5-8EC0-CCD28A280CEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8ED516F-EB4C-4EF5-8EC0-CCD28A280CEF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D28EE91-0D29-4C55-9BE9-C57CB0AB9A13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D28EE91-0D29-4C55-9BE9-C57CB0AB9A13}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D28EE91-0D29-4C55-9BE9-C57CB0AB9A13}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D28EE91-0D29-4C55-9BE9-C57CB0AB9A13}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FC032F14-00A7-47E4-9B26-A27984BABF2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FC032F14-00A7-47E4-9B26-A27984BABF2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC032F14-00A7-47E4-9B26-A27984BABF2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
