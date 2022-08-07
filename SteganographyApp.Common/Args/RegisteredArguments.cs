@@ -5,16 +5,20 @@ namespace SteganographyApp.Common.Arguments
     using System.Collections.Immutable;
     using System.Linq;
     using System.Reflection;
-    
+
+    /// <summary>
+    /// Static class to help identify all the field and properties of a given type that are attributed
+    /// with the argument attribute.
+    /// </summary>
     internal static class ArgumentFinder
     {
-        private static ImmutableArray<MemberInfo> GetAllMembers(Type modelType)
-        {
-            MemberInfo[] fields = modelType.GetFields();
-            MemberInfo[] properties = modelType.GetProperties();
-            return new List<MemberInfo>(fields).Concat(properties).ToImmutableArray();
-        }
-
+        /// <summary>
+        /// Finds all the attributed argument fields and properties of the input type and returns an array of the attributed members,
+        /// the associated parsers, and the attribute info.
+        /// </summary>
+        /// <param name="modelType">The type of the class from which the attribute argument fields will be pulled from.</param>
+        /// <param name="additionalParsers">An optional provider that can provide a set of custom parsers for custom argument types.</param>
+        /// <returns>An array of the attributed members, the associated parsers, and the attribute info.</returns>
         public static ImmutableArray<RegisteredArgument> FindAttributedArguments(Type modelType, IParserProvider? additionalParsers)
         {
             var matcher = new ParserMatcher(additionalParsers);
@@ -64,6 +68,13 @@ namespace SteganographyApp.Common.Arguments
             return registered.ToImmutableArray();
         }
 
+        private static ImmutableArray<MemberInfo> GetAllMembers(Type modelType)
+        {
+            MemberInfo[] fields = modelType.GetFields();
+            MemberInfo[] properties = modelType.GetProperties();
+            return new List<MemberInfo>(fields).Concat(properties).ToImmutableArray();
+        }
+
         private static void VerifyArgumentPositions(List<RegisteredArgument> registeredArguments)
         {
             ImmutableArray<RegisteredArgument> positionalArguments = registeredArguments
@@ -88,8 +99,18 @@ namespace SteganographyApp.Common.Arguments
         }
     }
 
+    /// <summary>
+    /// Contains basic information about the argument found from the argument class including the attribute info,
+    /// member info, and the parser to use to parse a value for the Member.
+    /// </summary>
     internal class RegisteredArgument
     {
+        /// <summary>
+        /// Initializes the registered argument.
+        /// </summary>
+        /// <param name="attribute">The attribute.</param>
+        /// <param name="member">The field or property of the argument class that has been attributed.</param>
+        /// <param name="parser">The parser function that will parse a value from the user's input and set the member value.</param>
         public RegisteredArgument(ArgumentAttribute attribute, MemberInfo member, Func<object?, string, object> parser)
         {
             Attribute = attribute;
@@ -97,8 +118,19 @@ namespace SteganographyApp.Common.Arguments
             Parser = parser;
         }
 
+        /// <summary>
+        /// Gets a reference to the attribute info.
+        /// </summary>
         public ArgumentAttribute Attribute { get; }
+
+        /// <summary>
+        /// Gets a referce to the member of the argument class that has been attributed with the argument attribute.
+        /// </summary>
         public MemberInfo Member { get; }
+
+        /// <summary>
+        /// Gets the parser function that will be used to parse out a value from the user's input and set the Member value.
+        /// </summary>
         public Func<object?, string, object> Parser { get; }
     }
 }

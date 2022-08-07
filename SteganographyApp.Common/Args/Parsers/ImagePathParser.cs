@@ -20,6 +20,13 @@ namespace SteganographyApp.Common.Arguments
         }
         .ToImmutableDictionary();
 
+        /// <summary>
+        /// Parses a list of image paths from the original input string. This will also verify the paths actually
+        /// exist and point to a file and not a directory.
+        /// </summary>
+        /// <param name="value">The string to be parsed in the list of image paths. Can either be a comma delimited list of
+        /// paths, a regular expression, or a shorthand mapping like PNG_IMAGES, JPG_IMAGES, or WEBP_IMAGES.</param>
+        /// <returns>An array of string representing the paths to an image file.</returns>
         public static ImmutableArray<string> ParseImages(string value)
         {
             var images = RetrieveImagePaths(value);

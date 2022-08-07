@@ -6,8 +6,19 @@ namespace SteganographyApp.Common.Arguments
     using System.Reflection;
     using System.Text;
 
+    /// <summary>
+    /// A static utility class to print help related information about the program being executed and its attributes.
+    /// </summary>
     public static class Help
     {
+        /// <summary>
+        /// Logs all the help related information to the console.
+        /// </summary>
+        /// <param name="instanceType">The type of the class containing the arugments to be parsed.</param>
+        /// <param name="instance">An instance of the the argument class. The type of this objects needs to match the type specified
+        /// in the instanceType parameter.</param>
+        /// <param name="registeredArguments">The list of all the arguments specified within the instanceType that have been previously
+        /// identified.</param>
         internal static void PrintHelp(Type instanceType, object instance, ImmutableArray<RegisteredArgument> registeredArguments)
         {
             var positionalArguments = registeredArguments.Where(argument => argument.Attribute.Position > 0).OrderBy(argument => argument.Attribute.Position).ToImmutableArray();
@@ -28,7 +39,9 @@ namespace SteganographyApp.Common.Arguments
             }
         }
 
-        private static string FormUsageString(Type instanceType, ImmutableArray<RegisteredArgument> positionArguments,
+        private static string FormUsageString(
+            Type instanceType,
+            ImmutableArray<RegisteredArgument> positionArguments,
             ImmutableArray<RegisteredArgument> requiredArguments,
             ImmutableArray<RegisteredArgument> optionalArguments)
         {

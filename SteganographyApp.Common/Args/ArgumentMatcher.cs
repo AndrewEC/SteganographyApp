@@ -7,22 +7,79 @@ namespace SteganographyApp.Common.Arguments
     using System.Linq;
     using System.Reflection;
 
+    /// <summary>
+    /// The result of matching a registered argument to the user's input.
+    /// </summary>
+    internal readonly struct ArgumentMatchResult
+    {
+        /// <summary>
+        /// Initializes the match result.
+        /// </summary>
+        /// <param name="registeredArgument">The registered argument containing the attribute, member, and parser information.</param>
+        /// <param name="input">The user provided input to be parsed and set based on the info from the registered argumetn.</param>
+        public ArgumentMatchResult(RegisteredArgument registeredArgument, string input)
+        {
+            Attribute = registeredArgument.Attribute;
+            Member = registeredArgument.Member;
+            Parser = registeredArgument.Parser;
+            Input = input;
+        }
+
+        /// <summary>
+        /// Gets the argument attribute.
+        /// </summary>
+        public readonly ArgumentAttribute Attribute { get; }
+
+        /// <summary>
+        /// Gets the reflective info about the field or property being set.
+        /// </summary>
+        public readonly MemberInfo Member { get; }
+
+        /// <summary>
+        /// Gets the user provided input value to be parsed.
+        /// </summary>
+        public readonly string Input { get; }
+
+        /// <summary>
+        /// Gets the parser function used to parse the Input value and set the value of the Member.
+        /// </summary>
+        public readonly Func<object?, string, object> Parser { get; }
+    }
+
+    /// <summary>
+    /// Matches the arguments attributed on the target class with the values specified by the user's input.
+    /// </summary>
     internal sealed class ArgumentMatcher : IEnumerable<ArgumentMatchResult>
     {
         private const string TrueString = "true";
 
         private readonly ImmutableArray<ArgumentMatchResult> matchedArguments;
 
+        /// <summary>
+        /// Initializes the argument matcher.
+        /// </summary>
+        /// <param name="arguments">The array of user provided arguments to be paired with the registered arguments.</param>
+        /// <param name="registeredArguments">The array of attributed arguments from the class being parsed into.</param>
         public ArgumentMatcher(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
         {
             matchedArguments = PairAttributedArgumentsWithValues(arguments, registeredArguments);
             VerifyNoRequiredArgumentsAreMissing(registeredArguments, matchedArguments);
         }
 
-        private void VerifyNoRequiredArgumentsAreMissing(ImmutableArray<RegisteredArgument> registeredArguments,
-            ImmutableArray<ArgumentMatchResult> matchedArguments)
-        {
+        /// <summary>
+        /// Get the enumerator for the argument match results.
+        /// </summary>
+        /// <returns>Enumerator for the argument match results.</returns>
+        public IEnumerator<ArgumentMatchResult> GetEnumerator() => matchedArguments.AsEnumerable().GetEnumerator();
 
+        /// <summary>
+        /// Get the enumerator for the argument match results.
+        /// </summary>
+        /// <returns>Enumerator for the argument match results.</returns>
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        private void VerifyNoRequiredArgumentsAreMissing(ImmutableArray<RegisteredArgument> registeredArguments, ImmutableArray<ArgumentMatchResult> matchedArguments)
+        {
             ImmutableArray<string> matchedArgumentNames = matchedArguments.Select(argument => argument.Attribute.Name).ToImmutableArray();
 
             ImmutableArray<string> missingRequired = registeredArguments.Select(registered => registered.Attribute)
@@ -30,7 +87,7 @@ namespace SteganographyApp.Common.Arguments
                 .Select(argument => argument.Name)
                 .Where(name => !matchedArgumentNames.Contains(name))
                 .ToImmutableArray();
-            
+
             if (missingRequired.Length > 0)
             {
                 string joined = string.Join(", ", missingRequired);
@@ -58,11 +115,11 @@ namespace SteganographyApp.Common.Arguments
 
                 if (TypeHelper.DeclaredType(registered!.Member) == typeof(bool))
                 {
-                    paired.Add(new ArgumentMatchResult((RegisteredArgument) registered, TrueString));
+                    paired.Add(new ArgumentMatchResult((RegisteredArgument)registered, TrueString));
                 }
                 else if (registered?.Attribute.Position > 0)
                 {
-                    paired.Add(new ArgumentMatchResult((RegisteredArgument)  registered, input));
+                    paired.Add(new ArgumentMatchResult((RegisteredArgument)registered, input));
                 }
                 else
                 {
@@ -70,7 +127,7 @@ namespace SteganographyApp.Common.Arguments
                     {
                         throw new ParseException($"Received an invalid number of arguments. No value could be found corresponding to argument: [{input}]");
                     }
-                    paired.Add(new ArgumentMatchResult((RegisteredArgument) registered!, arguments[i + 1]));
+                    paired.Add(new ArgumentMatchResult((RegisteredArgument)registered!, arguments[i + 1]));
                     i++;
                 }
             }
@@ -79,28 +136,8 @@ namespace SteganographyApp.Common.Arguments
 
         private RegisteredArgument? FindMatchingArgument(string input, ImmutableArray<RegisteredArgument> pairedFields)
             => pairedFields.Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input).FirstOrDefault();
-        
+
         private RegisteredArgument? FindMatchingArgument(int position, ImmutableArray<RegisteredArgument> pairedFields)
             => pairedFields.Where(registered => registered.Attribute.Position == position).FirstOrDefault();
-        
-        public IEnumerator<ArgumentMatchResult> GetEnumerator() => matchedArguments.AsEnumerable().GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-    }
-
-    internal readonly struct ArgumentMatchResult
-    {
-        public ArgumentMatchResult(RegisteredArgument registeredArgument, string input)
-        {
-            Attribute = registeredArgument.Attribute;
-            Member = registeredArgument.Member;
-            Parser = registeredArgument.Parser;
-            Input = input;
-        }
-
-        public readonly ArgumentAttribute Attribute { get; }
-        public readonly MemberInfo Member { get; }
-        public readonly string Input { get; }
-        public readonly Func<object?, string, object> Parser;
     }
 }

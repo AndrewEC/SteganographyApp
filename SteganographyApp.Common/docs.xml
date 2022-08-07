@@ -38,12 +38,6 @@
                 The action to take.
             </summary>
         </EncodeOrDecode>
-        <PrintStack>
-            <summary>
-                Indicates whether or not stack trace should be printed whenever an exception ocurrs during an
-                encoding or decoding process.
-            </summary>
-        </PrintStack>
         <UseCompression>
             <summary>
                 Indicates whether or not the contents being encoded, decoded, or calculate, should be compressed

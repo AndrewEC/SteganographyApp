@@ -43,8 +43,18 @@ namespace SteganographyApp.Common.Arguments
         public ImageFormat ImageFormat { get; }
     }
 
+    /// <summary>
+    /// Convert a given set of user provided arguments into an IInputArguments instance containing a collection
+    /// of the arguments required throughout various parts of the application.
+    /// </summary>
     public interface IArgumentConverter
     {
+        /// <summary>
+        /// Convert a given set of user provided arguments into an IInputArguments instance containing a collection
+        /// of the arguments required throughout various parts of the application.
+        /// </summary>
+        /// <returns>A fully formed IInputArguments instance containing definitions for the common arguments
+        /// use throughout the application.</returns>
         IInputArguments ToCommonArguments();
     }
 
@@ -70,7 +80,7 @@ namespace SteganographyApp.Common.Arguments
         public bool UseCompression { get; set; } = false;
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
-        public string RandomSeed { get; set; } = "";
+        public string RandomSeed { get; set; } = string.Empty;
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
         public int DummyCount { get; set; } = 0;
@@ -88,8 +98,15 @@ namespace SteganographyApp.Common.Arguments
         public ImageFormat ImageFormat { get; set; } = ImageFormat.Png;
     }
 
+    /// <summary>
+    /// The exceptio thrown when an error occurs while trying to parse a command line argument value.
+    /// </summary>
     public sealed class ArgumentValueException : Exception
     {
+        /// <summary>
+        /// Initializes the exception instance.
+        /// </summary>
+        /// <param name="message">The message to initialize the exception with.</param>
         public ArgumentValueException(string message) : base(message) { }
     }
 }
