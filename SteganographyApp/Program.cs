@@ -3,8 +3,8 @@
     using System;
 
     using SteganographyApp.Common.Arguments.Commands;
-    using SteganographyApp.Encode;
     using SteganographyApp.Decode;
+    using SteganographyApp.Encode;
 
     public class Program
     {

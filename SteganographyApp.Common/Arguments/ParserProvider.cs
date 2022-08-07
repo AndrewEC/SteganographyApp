@@ -76,6 +76,7 @@ namespace SteganographyApp.Common.Arguments
         /// <summary>
         /// Returns the new IParserProvider instance.
         /// </summary>
+        /// <returns>Returns a new IParserProvider instance containing the all the previously added predicates and parsers.</returns>
         public IParserProvider Build() => new AdditionalParsers(parsers.ToImmutableDictionary());
     }
 

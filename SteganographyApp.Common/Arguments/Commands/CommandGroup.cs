@@ -34,6 +34,8 @@ namespace SteganographyApp.Common.Arguments.Commands
         /// <summary>
         /// Creates a GenericCommandGroup with a specified name.
         /// </summary>
+        /// <param name="name">The name of the group command.</param>
+        /// <param name="commands">The array of sub-commands to selectively execute.</param>
         /// <returns>A new GenericCommandGroup instance with the specified name and sub-commands.</returns>
         public static ICommand Group(string name, params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray(), name);
     }
@@ -70,11 +72,6 @@ namespace SteganographyApp.Common.Arguments.Commands
             ICommand? nextCommand = GetNextCommand(subCommands, nextCommandName);
 
             string[] nextArgs = args.Skip(1).ToArray();
-            if (nextCommand == null)
-            {
-                string expectedList = FormExpectedCommandNameList(subCommands);
-                throw new CommandException($"Could not find command with name [{nextCommandName}] to execute. Expected command to be one of: [{expectedList}]");
-            }
 
             nextCommand.Execute(program, nextArgs);
         }

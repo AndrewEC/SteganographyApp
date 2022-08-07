@@ -12,7 +12,7 @@ namespace SteganographyApp.Common.Arguments
         /// <summary>
         /// Initializes an instance of type T. Requires the type to have a default constructor.
         /// </summary>
-        /// <typeparam name="T">The type to reflectively instantiate. Type T must be a class.</typeparam
+        /// <typeparam name="T">The type to reflectively instantiate. Type T must be a class.</typeparam>
         /// <returns>A new instance of the type T.</returns>
         public static T Initialize<T>()
         where T : class

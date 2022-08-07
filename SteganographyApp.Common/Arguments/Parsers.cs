@@ -84,7 +84,7 @@ namespace SteganographyApp.Common.Arguments
         {
             MethodInfo? method = modelType.GetMethods().Where(info => info.Name == methodName).FirstOrDefault()
                 ?? throw new ParseException($"Could not locate parser. No method with the name [{methodName}] could be found on the type [{modelType.FullName}] .");
-            return (instance, value) => method.Invoke(null, new []{ instance, value })!;
+            return (instance, value) => method.Invoke(null, new[] { instance, value })!;
         }
 
         /// <summary>
@@ -94,6 +94,7 @@ namespace SteganographyApp.Common.Arguments
         /// </summary>
         /// <param name="argumentAttribute">The attribute on top of the property we are searching for a parser for.</param>
         /// <param name="memberInfo">The underlying member whose type will be used to lookup a parser function.</param>
+        /// <returns>The parser function that can parsed the specified argument. If no parser is found this will throw an exception.</returns>
         public Func<object?, string, object> FindParser(ArgumentAttribute argumentAttribute, MemberInfo memberInfo)
             => additionalParsers?.Find(argumentAttribute, memberInfo) ?? FindDefaultParserForField(argumentAttribute.Name, TypeHelper.DeclaredType(memberInfo));
 
