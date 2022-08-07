@@ -7,33 +7,13 @@ The apptly named SteganographyApp is a command line utility that hides data insi
 
 Important
 ---
-When you are hiding data inside in image it is important that the image uses a lossless format.
-Images such as BMP, and PNG, are both lossless and supported by the ImageSharp processing library.
-Using other formats, such as JPG, will most likely cause data loss when saving any modifications
-to the image.
+When you are hiding data inside in image it is important that the image uses a lossless format. This tool has support for PNG images and WEBP lossless images. Using a lossy format, like JPG, will cause data loss that can't be recovered by the program.
 
 Using the Tools
 ---
 Execute any of the tools using the relevant dotnet command such as `dotnet SteganographyApp.dll -h`.
 
 Use the `-h` or `--help` flags to get detailed information on the arguments available for each of the tools provided.
-
-SteganographyApp
----
-* Hide one file in one or more images
-* Encrypt the file's contents using AES-256
-* Minify the file's contents using standard GZip compression
-* Further obfuscate the file's contents by adding in dummy data and randomizing the order in which the data is stored
-* Clean function to randomize the LSBs of one or more images
-
-SteganographyApp.Calculator
----
-* Calculate the storage space provided by one or more images
-* Calculate the storage space required to store an encypted and/or compressed file
-
-SteganographyApp.Converter
----
-* Batch convert lossy images such as JPG to the lossless PNG format
 
 Running Tests
 ---
