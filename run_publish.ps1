@@ -3,10 +3,8 @@ Param(
 )
 
 $Folder = "debug"
-$ChildFolder = ""
 if ($Release) {
     $Folder = "release"
-    $ChildFolder = "obfuscated"
 }
 
 
@@ -30,8 +28,6 @@ function Remove-Folder {
 
 Remove-Folder ./publish
 Remove-Folder ./SteganographyApp/bin/$Folder
-Remove-Folder ./SteganographyApp.Calculator/bin/$Folder
-Remove-Folder ./SteganographyApp.Converter/bin/$Folder
 
 
 Write-Host "`n---------- Publishing $Folder build ----------`n"
@@ -53,7 +49,7 @@ function Copy-Folder {
 
     Write-Host "Copying output from $Project publish"
     Copy-Item ./$Project/bin/$Folder/netcoreapp6.0/publish -Recurse -Destination $Output
-    Get-ChildItem -Path ./$Project/bin/$Folder/netcoreapp6.0/$ChildFolder | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish
+    Get-ChildItem -Path ./$Project/bin/$Folder/netcoreapp6.0/ | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish
 
     if (-Not($Rename -eq "")) {
         cd publish
@@ -63,5 +59,3 @@ function Copy-Folder {
 }
 
 Copy-Folder "SteganographyApp" "."
-Copy-Folder "SteganographyApp.Calculator" "./publish" "Calculator"
-Copy-Folder "SteganographyApp.Converter" "./publish" "Converter"
