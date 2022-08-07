@@ -1,8 +1,7 @@
 namespace SteganographyApp.Common.Arguments
 {
+    using System;
     using System.Collections.Immutable;
-
-    using SixLabors.ImageSharp.Formats.Png;
 
     /// <summary>
     /// Generic interface containing all the getter methods required for retrieving
@@ -21,12 +20,6 @@ namespace SteganographyApp.Common.Arguments
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
         ImmutableArray<string> CoverImages { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/EncodeOrDecode/*' />
-        ActionEnum EncodeOrDecode { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/PrintStack/*' />
-        bool PrintStack { get; }
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
         bool UseCompression { get; }
@@ -51,25 +44,25 @@ namespace SteganographyApp.Common.Arguments
     }
 
     /// <summary>
-    /// A contract for converting a concrete mutatble instance to an immutable representation of the same instance.
+    /// Convert a given set of user provided arguments into an IInputArguments instance containing a collection
+    /// of the arguments required throughout various parts of the application.
     /// </summary>
-    /// <typeparam name="T">The immutable type that will be returned by the ToImmutable invocation.</typeparam>
-    public interface IImmutableFactory<T>
+    public interface IArgumentConverter
     {
         /// <summary>
-        /// Convert the underlying concrete instance to an immutable representation.
+        /// Convert a given set of user provided arguments into an IInputArguments instance containing a collection
+        /// of the arguments required throughout various parts of the application.
         /// </summary>
-        /// <returns>A preferrably immutable instance that conforms to type T.</returns>
-        T ToImmutable();
+        /// <returns>A fully formed IInputArguments instance containing definitions for the common arguments
+        /// use throughout the application.</returns>
+        IInputArguments ToCommonArguments();
     }
 
     /// <summary>
-    /// Contains a number of properties that will contain values parsed from the user provided command line arguments.
-    /// Should not be used outside of the argument parser. Outside the argument parser the immutable version should be
-    /// used instead.
+    /// Immutable class containg the parsed argument values. All of the properties within this class
+    /// are immutable and readonly.
     /// </summary>
-    /// <see cref="ImmutableInputArguments"></see>
-    public sealed class InputArguments : IInputArguments, IImmutableFactory<IInputArguments>
+    public sealed class CommonArguments : IInputArguments
     {
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
         public string Password { get; set; } = string.Empty;
@@ -82,12 +75,6 @@ namespace SteganographyApp.Common.Arguments
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
         public ImmutableArray<string> CoverImages { get; set; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/EncodeOrDecode/*' />
-        public ActionEnum EncodeOrDecode { get; set; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/PrintStack/*' />
-        public bool PrintStack { get; set; } = false;
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
         public bool UseCompression { get; set; } = false;
@@ -109,83 +96,17 @@ namespace SteganographyApp.Common.Arguments
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
         public ImageFormat ImageFormat { get; set; } = ImageFormat.Png;
-
-        /// <summary>
-        /// Converts the current InputArguments instance into an ImmutableInputArguments instance with
-        /// readonly properties.
-        /// </summary>
-        /// <returns>An ImmutableInputArguments instance created using this InputArguments instance as input.</returns>
-        public IInputArguments ToImmutable()
-        {
-            return new ImmutableInputArguments(this);
-        }
     }
 
     /// <summary>
-    /// Immutable class containg the parsed argument values. All of the properties within this class
-    /// are immutable and readonly.
+    /// The exceptio thrown when an error occurs while trying to parse a command line argument value.
     /// </summary>
-    public sealed class ImmutableInputArguments : IInputArguments
+    public sealed class ArgumentValueException : Exception
     {
         /// <summary>
-        /// Initializes an ImmutableInputArguments instance using the values pulled from the given
-        /// InputArguments instance.
+        /// Initializes the exception instance.
         /// </summary>
-        /// <param name="source">The InputArguments instance from which all properties will be set from.</param>
-        public ImmutableInputArguments(InputArguments source)
-        {
-            Password = source.Password;
-            FileToEncode = source.FileToEncode;
-            DecodedOutputFile = source.DecodedOutputFile;
-            CoverImages = source.CoverImages;
-            EncodeOrDecode = source.EncodeOrDecode;
-            PrintStack = source.PrintStack;
-            UseCompression = source.UseCompression;
-            RandomSeed = source.RandomSeed;
-            DummyCount = source.DummyCount;
-            InsertDummies = source.InsertDummies;
-            DeleteAfterConversion = source.DeleteAfterConversion;
-            ChunkByteSize = source.ChunkByteSize;
-            ImageFormat = source.ImageFormat;
-        }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
-        public string Password { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
-        public string FileToEncode { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
-        public string DecodedOutputFile { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
-        public ImmutableArray<string> CoverImages { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/EncodeOrDecode/*' />
-        public ActionEnum EncodeOrDecode { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/PrintStack/*' />
-        public bool PrintStack { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
-        public bool UseCompression { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
-        public string RandomSeed { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
-        public int DummyCount { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/InsertDummies/*' />
-        public bool InsertDummies { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
-        public bool DeleteAfterConversion { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
-        public int ChunkByteSize { get; }
-
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
-        public ImageFormat ImageFormat { get; }
+        /// <param name="message">The message to initialize the exception with.</param>
+        public ArgumentValueException(string message) : base(message) { }
     }
 }

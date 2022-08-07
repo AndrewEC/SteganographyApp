@@ -8,18 +8,6 @@ namespace SteganographyApp.Common.Tests
     public class ChecksTests
     {
         [Test]
-        public void TestCheckIsOneOfReturnsTrueWhenArrayContainsAction()
-        {
-            Assert.IsTrue(Checks.IsOneOf(ActionEnum.Encode, ActionEnum.Clean, ActionEnum.Decode, ActionEnum.Encode));
-        }
-
-        [Test]
-        public void TestCheckIsOneOfReturnsFalseWhenArrayContainsAction()
-        {
-            Assert.IsFalse(Checks.IsOneOf(ActionEnum.Encode, ActionEnum.Clean, ActionEnum.Decode));
-        }
-
-        [Test]
         public void TestWasHelpRequestedWhenShorthandHelpFlagIsInArgsReturnsTrue()
         {
             string[] args = new string[] { "-h" };

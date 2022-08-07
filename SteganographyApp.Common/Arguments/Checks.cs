@@ -20,15 +20,6 @@ namespace SteganographyApp.Common.Arguments
         public static bool IsNullOrEmpty<T>(ImmutableArray<T> value) => value == null || value.Length == 0;
 
         /// <summary>
-        /// Checks if the provided action value existst within the array specified by
-        /// the parameters values.
-        /// </summary>
-        /// <param name="action">The action type to validate exists in the values array.</param>
-        /// <param name="values">The array of action types to check against.</param>
-        /// <returns>True if the action can be found in the array of values, otherwise false.</returns>
-        public static bool IsOneOf(ActionEnum action, params ActionEnum[] values) => Array.IndexOf(values, action) != -1;
-
-        /// <summary>
         /// Checks to see if the help argument or the shortened help argument has been provided
         /// indicating that we should present the user with the help log.
         /// </summary>

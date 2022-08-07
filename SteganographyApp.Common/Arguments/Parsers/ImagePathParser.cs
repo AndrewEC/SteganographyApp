@@ -10,7 +10,7 @@ namespace SteganographyApp.Common.Arguments
     /// Static utility class to help parse out a list of paths to the images provided in the
     /// users arguments.
     /// </summary>
-    internal static class ImagePathParser
+    public static class ImagePathParser
     {
         private static readonly ImmutableDictionary<string, string> ShorthandMappings = new Dictionary<string, string>()
         {
@@ -21,18 +21,17 @@ namespace SteganographyApp.Common.Arguments
         .ToImmutableDictionary();
 
         /// <summary>
-        /// Takes in a string of comma delimited image names and returns an array of strings.
-        /// Will also parse for a regex expression if an expression has been specified with the [r]
-        /// prefix.
+        /// Parses a list of image paths from the original input string. This will also verify the paths actually
+        /// exist and point to a file and not a directory.
         /// </summary>
-        /// <param name="arguments">The input arguments instance to make modifications to.</param>
-        /// <param name="value">A string representation of a number, or a single, image where encoded
-        /// data will be writted to or where decoded data will be read from.</param>
-        public static void ParseImages(InputArguments arguments, string value)
+        /// <param name="value">The string to be parsed in the list of image paths. Can either be a comma delimited list of
+        /// paths, a regular expression, or a shorthand mapping like PNG_IMAGES, JPG_IMAGES, or WEBP_IMAGES.</param>
+        /// <returns>An array of string representing the paths to an image file.</returns>
+        public static ImmutableArray<string> ParseImages(string value)
         {
             var images = RetrieveImagePaths(value);
             ValidateImagePaths(images);
-            arguments.CoverImages = images;
+            return images;
         }
 
         private static ImmutableArray<string> RetrieveImagePaths(string value)

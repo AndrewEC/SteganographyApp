@@ -31,11 +31,10 @@ namespace SteganographyApp.Common.Tests
         public Mock<IEncoderProvider> mockEncoderProvider;
 
         private const int BinaryStringLength = 100_000;
-        private static readonly IInputArguments Arguments = new InputArguments()
+        private static readonly IInputArguments Arguments = new CommonArguments()
         {
             CoverImages = ImmutableArray.Create(new string[] { "test001.png" }),
-        }
-        .ToImmutable();
+        };
 
         private string imageLoadededEventPath;
 

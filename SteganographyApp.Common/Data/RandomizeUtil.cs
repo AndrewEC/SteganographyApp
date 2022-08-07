@@ -24,8 +24,6 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(IRandomizeUtil))]
     public sealed class RandomizeUtil : IRandomizeUtil
     {
-        private const int RandomizeIterationsModifier = 3;
-
         private ILogger log = new LazyLogger<RandomizeUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/RandomizeBinaryString/*' />
@@ -35,7 +33,7 @@ namespace SteganographyApp.Common.Data
 
             var generator = IndexGenerator.FromString(randomSeed);
 
-            int iterations = characters.Length * RandomizeIterationsModifier;
+            int iterations = characters.Length;
 
             log.Debug("Randomizing binary string using seed [{0}] over [{1}] iterations", randomSeed, iterations);
 
@@ -62,7 +60,7 @@ namespace SteganographyApp.Common.Data
             char[] characters = binaryString.ToCharArray();
             var generator = IndexGenerator.FromString(randomSeed);
 
-            int iterations = characters.Length * RandomizeIterationsModifier;
+            int iterations = characters.Length;
 
             log.Debug("Randomizing binary string using seed [{0}] over [{1}] iterations", randomSeed, iterations);
 

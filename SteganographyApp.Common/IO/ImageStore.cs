@@ -1,7 +1,6 @@
 ﻿namespace SteganographyApp.Common.IO
 {
     using System;
-    using System.Collections.Immutable;
     using System.Text;
 
     using SixLabors.ImageSharp.PixelFormats;
@@ -51,7 +50,6 @@
         public ImageStore(IInputArguments args)
         {
             this.args = args;
-            log = Injector.LoggerFor<ImageStore>();
         }
 
         /// <summary>

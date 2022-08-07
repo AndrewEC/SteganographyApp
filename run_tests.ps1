@@ -47,6 +47,8 @@ dotnet tool run coverlet `
     ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp6.0/SteganographyApp.Common.Tests.dll `
     --target "dotnet" `
     --targetargs "test SteganographyApp.sln --no-build" `
+    --exclude-by-file "**/SteganographyApp.Common/Arguments/Help.cs" `
+    --exclude-by-file "**/SteganographyApp.Common/Injection/Logging/RootLogger.cs" `
     --format opencover `
     --threshold 80 `
     --threshold-type line `

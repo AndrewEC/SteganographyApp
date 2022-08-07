@@ -166,7 +166,7 @@ namespace SteganographyApp.Encode
         {
             ImageStore = new ImageStore(args);
             TableTracker = new TableChunkTracker(ImageStore);
-            ImageTracker = ImageTracker.CreateTrackerFrom(args, ImageStore);
+            ImageTracker = ImageTracker.Create(args, ImageStore);
         }
 
         public ImageStore ImageStore { get; }

@@ -33,7 +33,7 @@ namespace SteganographyApp.Common.Tests
         private const int DummyCount = 10;
         private const string RandomSeed = "randomSeed";
 
-        private static readonly IInputArguments Arguments = new InputArguments
+        private static readonly IInputArguments Arguments = new CommonArguments
         {
             ChunkByteSize = ChunkByteSize,
             DecodedOutputFile = DecodedOutputFile,
@@ -41,8 +41,7 @@ namespace SteganographyApp.Common.Tests
             UseCompression = UseCompression,
             DummyCount = DummyCount,
             RandomSeed = RandomSeed,
-        }
-        .ToImmutable();
+        };
 
         [Test]
         public void TestWriteContentChunkToFile()
