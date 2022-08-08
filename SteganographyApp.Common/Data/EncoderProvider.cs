@@ -32,48 +32,31 @@ namespace SteganographyApp.Common.Data
         private readonly ILogger logger = new LazyLogger<EncoderProvider>();
 
         /// <include file='../docs.xml' path='docs/members[@name="EncoderProvider"]/GetEncoder2/*' />
-        public IImageEncoder GetEncoder(string imagePath)
+        public IImageEncoder GetEncoder(string imagePath) => Injector.Provide<IImageProxy>().GetImageMimeType(imagePath) switch
         {
-            logger.Debug("Looking up encoder supporting image at path: [{0}]", imagePath);
-            var mimeType = Injector.Provide<IImageProxy>().GetImageMimeType(imagePath);
-            switch (mimeType)
-            {
-                case PngMimeType:
-                    return GetEncoder(ImageFormat.Png);
-                case WebpMimeType:
-                    return GetEncoder(ImageFormat.Webp);
-                default:
-                    throw new ArgumentValueException($"Could not find appropriate encoder for mime type: [{mimeType}]");
-            }
-        }
+            PngMimeType => GetEncoder(ImageFormat.Png),
+            WebpMimeType => GetEncoder(ImageFormat.Webp),
+            _ => throw new ArgumentValueException($"Could not find appropriate encoder for file: [{imagePath}]")
+        };
 
         /// <include file='../docs.xml' path='docs/members[@name="EncoderProvider"]/GetEncoder/*' />
-        public IImageEncoder GetEncoder(ImageFormat imageFormat)
+        public IImageEncoder GetEncoder(ImageFormat imageFormat) => imageFormat switch
         {
-            switch (imageFormat)
+            ImageFormat.Png => new PngEncoder() { CompressionLevel = PngCompressionLevel.Level5, },
+            ImageFormat.Webp => new WebpEncoder()
             {
-                case ImageFormat.Png:
-                    return new PngEncoder()
-                    {
-                        CompressionLevel = PngCompressionLevel.Level5,
-                    };
-                case ImageFormat.Webp:
-                    return new WebpEncoder()
-                    {
-                        FileFormat = WebpFileFormatType.Lossless,
-                        Method = WebpEncodingMethod.BestQuality,
-                        UseAlphaCompression = false,
-                        EntropyPasses = 0,
-                        SpatialNoiseShaping = 0,
-                        FilterStrength = 0,
-                        TransparentColorMode = WebpTransparentColorMode.Preserve,
-                        Quality = 100,
-                        NearLossless = false,
-                        NearLosslessQuality = 100,
-                    };
-                default:
-                    throw new ArgumentValueException($"Invalid image format provided. Could not find encoder for image format of: [{imageFormat}]");
-            }
-        }
+                FileFormat = WebpFileFormatType.Lossless,
+                Method = WebpEncodingMethod.BestQuality,
+                UseAlphaCompression = false,
+                EntropyPasses = 0,
+                SpatialNoiseShaping = 0,
+                FilterStrength = 0,
+                TransparentColorMode = WebpTransparentColorMode.Preserve,
+                Quality = 100,
+                NearLossless = false,
+                NearLosslessQuality = 100,
+            },
+            _ => throw new ArgumentValueException($"Invalid image format provided. Could not find encoder for image format of: [{imageFormat}]")
+        };
     }
 }
