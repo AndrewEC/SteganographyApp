@@ -14,10 +14,8 @@ namespace SteganographyApp
     [ProgramDescriptor("Calculate the amount of storage space a set of cover images will provide.")]
     internal sealed class CalculateStorageSpaceArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The images from which the amount of storage space available will be derived.", parser: nameof(ParsePaths))]
+        [Argument("--coverImages", "-c", true, helpText: "The images from which the amount of storage space available will be derived.")]
         public ImmutableArray<string> CoverImages;
-
-        public static object ParsePaths(object? target, string value) => ImagePathParser.ParseImages(value);
 
         public IInputArguments ToCommonArguments()
         {

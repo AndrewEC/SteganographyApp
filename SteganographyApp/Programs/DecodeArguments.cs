@@ -11,7 +11,7 @@ namespace SteganographyApp
     [ProgramDescriptor("Decode data from the specified cover images to the output file.")]
     public sealed class DecodeArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be decoded from.", parser: nameof(ParsePaths))]
+        [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be decoded from.")]
         public ImmutableArray<string> CoverImages;
 
         [Argument("--password", "-p", helpText: "The optional password used to decrypt the input file contents.")]
@@ -28,8 +28,6 @@ namespace SteganographyApp
 
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
         public LogLevel LogLevel = LogLevel.None;
-
-        public static object ParsePaths(object? target, string value) => ImagePathParser.ParseImages(value);
 
         public IInputArguments ToCommonArguments()
         {

@@ -1,3 +1,7 @@
+Param(
+    [Switch]$OpenReport
+)
+
 $StrykerOutputFolder = "./SteganographyApp.Common.Tests/StrykerOutput"
 
 Write-Host "`n---------- Removed Previous Output Folders ----------`n"
@@ -24,6 +28,9 @@ if($LastExitCode -ne 0){
 
 Write-Host("`n---------- Opening report ----------`n")
 cd ..
+if (-Not $OpenReport) {
+    Exit
+}
 Get-ChildItem -Directory $StrykerOutputFolder | % {
     $path = $_.FullName
     Start-Process "$path\reports\mutation-report.html"

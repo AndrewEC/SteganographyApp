@@ -19,7 +19,7 @@ namespace SteganographyApp
     [ProgramDescriptor("Convert a set of images to either a webp or png format.")]
     internal sealed class ConvertArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The images to be converted into a png or webp format.", parser: nameof(ParsePaths))]
+        [Argument("--coverImages", "-c", true, helpText: "The images to be converted into a png or webp format.")]
         public ImmutableArray<string> CoverImages;
 
         [Argument("--imageFormat", "-i", helpText: "The format the images should be converted to.")]
@@ -27,8 +27,6 @@ namespace SteganographyApp
 
         [Argument("--deleteOriginals", "-d", helpText: "Specify whether the original image files should be deleted after conversion.")]
         public bool DeleteOriginals = false;
-
-        public static object ParsePaths(object? target, string value) => ImagePathParser.ParseImages(value);
 
         public IInputArguments ToCommonArguments()
         {

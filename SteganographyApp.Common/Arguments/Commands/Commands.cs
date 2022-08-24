@@ -52,11 +52,11 @@ namespace SteganographyApp.Common.Arguments.Commands
         public static ICommand Alias(string name, ICommand command) => new AliasedCommand(name, command);
 
         /// <summary>
-        /// Creates a new LaterCommand instance that allows the underlying command to be lazily initialized when it is first accessed by the CliProgram.
+        /// Creates a new LazyCommand instance that allows the underlying command to be lazily initialized when it is first accessed by the CliProgram.
         /// </summary>
         /// <typeparam name="T">The underlying ICommand type to reflectively instantiate. Requires the command type to provide
         /// a default constructor.</typeparam>
-        /// <returns>A new LaterCommand instance.</returns>
+        /// <returns>A new LazyCommand instance.</returns>
         public static ICommand Lazy<T>() where T : ICommand => new LazyCommand<T>();
     }
 

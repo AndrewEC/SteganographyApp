@@ -12,10 +12,8 @@ namespace SteganographyApp
     [ProgramDescriptor("Cleans the LSBs of each pixel colour of the specified cover images.")]
     internal sealed class CleanArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The list of images whose pixel colour LSBs need to be cleaned", parser: nameof(ParsePaths))]
+        [Argument("--coverImages", "-c", true, helpText: "The list of images whose pixel colour LSBs need to be cleaned")]
         public ImmutableArray<string> CoverImages;
-
-        public static object ParsePaths(object? target, string value) => ImagePathParser.ParseImages(value);
 
         public IInputArguments ToCommonArguments()
         {

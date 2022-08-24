@@ -2,6 +2,7 @@
 {
     using System;
 
+    using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Arguments.Commands;
     using SteganographyApp.Decode;
     using SteganographyApp.Encode;
@@ -23,7 +24,9 @@
                         Command.Lazy<CalculateStorageSpaceCommand>()
                     )
                 )
-            ).TryExecute(args);
+            )
+            .WithParsers(AdditionalParsers.ForFieldName("CoverImages", (target, value) => ImagePathParser.ParseImages(value)))
+            .TryExecute(args);
 #pragma warning restore SA1009
 
             if (exception != null)
