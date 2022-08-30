@@ -56,12 +56,6 @@
                 and calculating the encrypted size of a file.
             </summary>
         </DummyCount>
-        <InsertDummies>
-            <summary>
-                Specifies whether or not any dummies should be inserted or removed from the contents of a file when
-                encoding, decoding, or calculating the encrypted size of a file.
-            </summary>
-        </InsertDummies>
         <DeleteAfterConversion>
             <summary>
                 Specifies whether or not the original image should be deleted after being converted to a PNG image.
@@ -201,6 +195,12 @@
             <param name="password">The password to use in the AES cypher.</param>
             <returns>A decrypted base64 encoded string.</returns>
         </Decrypt>
+        <GenerateKey>
+            <summary>Generates a salted and hashed key from the input value.</summary>
+            <param name="value">The value to be salted and hashed.</param>
+            <param name="iterations">The number of times the key will be hashed. Default value is 100,000.</param>
+            <returns>A byte representation of the salted and hashed key derived from the value param.</returns>
+        </GenerateKey>
     </members>
     <members name="RandomizeUtil">
         <RandomizeBinaryString>
@@ -209,6 +209,7 @@
             </summary>
             <param name="binaryString">The binary string to randomize.</param>
             <param name="randomSeed">The user provided random seed that will be used to initialize the random number generator.</param>
+            <param name="dummyCount">The number of dummy entries used to help determine the complete random seed to be used.</param>
             <returns>A randomized binary string.</returns>
         </RandomizeBinaryString>
         <ReorderBinaryString>
@@ -217,6 +218,7 @@
             </summary>
             <param name="binaryString">The binary string in which the previous randomization process needs to be reversed.</param>
             <param name="randomSeed">The user provided randoom seed that will be used to initialize the random number generator.</param>
+            <param name="dummyCount">The number of dummy entries used to help determine the complete random seed to be used.</param>
             <returns>A non-randomized array of bytes matching the original input file.</returns>
         </ReorderBinaryString>
     </members>

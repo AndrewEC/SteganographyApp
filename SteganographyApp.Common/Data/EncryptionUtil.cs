@@ -4,7 +4,9 @@ namespace SteganographyApp.Common.Data
     using System.IO;
     using System.Security.Cryptography;
     using System.Text;
+
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     /// <summary>
     /// Contract for interacting with the EncryptionUtil instance.
@@ -16,6 +18,9 @@ namespace SteganographyApp.Common.Data
 
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
         string Decrypt(string value, string password);
+
+        /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/GenerateKey/*' />
+        byte[] GenerateKey(string value, int iterations);
     }
 
     /// <summary>
@@ -24,14 +29,19 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(IEncryptionUtil))]
     public sealed class EncryptionUtil : IEncryptionUtil
     {
-        private const int Iterations = 10000;
+        /// <summary>The default number of iterations that should be used when hashing a key.</summary>
+        public static readonly int DefaultIterations = 50_000;
+
+        private readonly ILogger log = new LazyLogger<EncryptionUtil>();
+
         private const int KeySize = 256;
         private const int IvSize = 16;
 
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />
         public string Encrypt(string value, string password)
         {
-            var keyBytes = GenerateKey(password);
+            log.Debug("Encrypting value using key: [{0}]", password);
+            var keyBytes = GenerateKey(password, DefaultIterations);
             var iv = GenerateRandomBytes(IvSize);
             using (var managed = Aes.Create("AesManaged")!)
             {
@@ -57,8 +67,9 @@ namespace SteganographyApp.Common.Data
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
         public string Decrypt(string value, string password)
         {
+            log.Debug("Decrypting value using key: [{0}]", password);
             var valueBytes = Convert.FromBase64String(value);
-            var keyBytes = GenerateKey(password);
+            var keyBytes = GenerateKey(password, DefaultIterations);
             using (var managed = Aes.Create("AesManaged")!)
             {
                 using (var ms = new MemoryStream(valueBytes))
@@ -79,11 +90,12 @@ namespace SteganographyApp.Common.Data
             }
         }
 
-        private static byte[] GenerateKey(string password)
+        /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/GenerateKey/*' />
+        public byte[] GenerateKey(string value, int iterations)
         {
-            var passwordBytes = Encoding.UTF8.GetBytes(password);
-            var salt = Pbkdf2(passwordBytes, Sha512(password + password.Length), Iterations, KeySize);
-            return Pbkdf2(passwordBytes, salt, Iterations, KeySize / 8);
+            var passwordBytes = Encoding.UTF8.GetBytes(value);
+            var salt = Pbkdf2(passwordBytes, Sha512(value + value.Length), iterations, KeySize);
+            return Pbkdf2(passwordBytes, salt, iterations, KeySize / 8);
         }
 
         private static byte[] Pbkdf2(byte[] data, byte[] salt, int iterations, int size) => new Rfc2898DeriveBytes(data, salt, iterations).GetBytes(size);

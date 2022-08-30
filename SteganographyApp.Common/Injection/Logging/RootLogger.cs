@@ -50,6 +50,10 @@ namespace SteganographyApp.Common.Logging
         /// to be written to the log file.</param>
         public void EnableLoggingAtLevel(LogLevel level)
         {
+            if (level == LogLevel.None)
+            {
+                return;
+            }
             logLevel = TryOpenLogFileForWrite() ? level : LogLevel.None;
         }
 

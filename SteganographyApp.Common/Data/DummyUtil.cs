@@ -27,22 +27,26 @@ namespace SteganographyApp.Common.Data
     {
         private const int MaxLengthPerDummy = 500;
         private const int MinLengthPerDummy = 100;
+        private const int HashIterationLimit = 1000;
 
         private ILogger log = new LazyLogger<DummyUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
         public string InsertDummies(int numDummies, string binary, string randomSeed)
         {
-            log.Debug("Inserting [{0}] dummies using seed [{1}] and global count [{2}]", numDummies, randomSeed, GlobalCounter.Instance.Count);
+            string seed = CreateRandomSeed(randomSeed);
+
+            log.Debug("Inserting [{0}] dummies using seed [{1}]", numDummies, seed);
             log.Debug("Bit count before inserting dummies: [{0}]", binary.Length);
+
             int amountToIncrement = SumBinaryString(binary);
 
-            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies);
+            var generator = IndexGenerator.FromString(seed);
 
-            var generator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
+            // generate an array in which each element represents the length that an inserted dummy entry will have.
+            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies, generator);
 
-            // we need to pre-calculate the positions that these dummy entries will be inserted at in order
-            // to make decoding possible.
+            // generate an array in which each element represents the index the dummy entry will be inserted at.
             int[] positions = Enumerable.Range(0, numDummies)
                 .Select(i => generator.Next(binary.Length))
                 .ToArray();
@@ -64,11 +68,17 @@ namespace SteganographyApp.Common.Data
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
         public string RemoveDummies(int numDummies, string binary, string randomSeed)
         {
-            log.Debug("Removing [{0}] dummies using seed [{1}] and global count [{2}]", numDummies, randomSeed, GlobalCounter.Instance.Count);
+            string seed = CreateRandomSeed(randomSeed);
+
+            log.Debug("Removing [{0}] dummies using seed [{1}]", numDummies, seed);
             log.Debug("Bit count before removing dummies: [{0}]", binary.Length);
 
+            int amountToIncrement = SumBinaryString(binary);
+
+            var generator = IndexGenerator.FromString(seed);
+
             // calculate the length of the dummies originally added to the string
-            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies);
+            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies, generator);
             Array.Reverse(lengths);
             int totalLength = lengths.Sum();
 
@@ -76,8 +86,7 @@ namespace SteganographyApp.Common.Data
             // determine the original position where the dummy entries were inserted.
             int binaryLengthWithoutDummies = binary.Length - totalLength;
 
-            var generator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
-
+            // generate the positions in which the dummy entries were inserted into the original string
             int[] positions = Enumerable.Range(0, numDummies)
                 .Select(i => generator.Next(binaryLengthWithoutDummies))
                 .Reverse()
@@ -103,15 +112,16 @@ namespace SteganographyApp.Common.Data
 
         private int SumBinaryString(string binary) => binary.ToCharArray().Where(c => c == '1').Count();
 
-        private string CreateRandomSeed(string randomSeed) => $"{randomSeed}{GlobalCounter.Instance.Count}";
-
-        private int[] GenerateLengthsOfDummies(string randomSeed, int numDummies)
+        private string CreateRandomSeed(string randomSeed)
         {
-            var lengthGenerator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
-            return Enumerable.Range(0, numDummies)
-                .Select(i => lengthGenerator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
-                .ToArray();
+            int iterations = (int)Math.Max(1, GlobalCounter.Instance.Count % HashIterationLimit);
+            var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed + iterations, iterations);
+            return Convert.ToBase64String(randomKey);
         }
+
+        private int[] GenerateLengthsOfDummies(string randomSeed, int numDummies, IndexGenerator generator) => Enumerable.Range(0, numDummies)
+                .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
+                .ToArray();
 
         private string GenerateDummyEntry(IndexGenerator generator, int length)
         {

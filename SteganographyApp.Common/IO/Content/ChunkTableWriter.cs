@@ -44,9 +44,9 @@ namespace SteganographyApp.Common.IO
             {
                 var randomize = Injector.Provide<IRandomizeUtil>();
                 log.Trace("Randomizing chunk table header.");
-                tableHeader = randomize.RandomizeBinaryString(tableHeader, Arguments.RandomSeed);
+                tableHeader = randomize.RandomizeBinaryString(tableHeader, Arguments.RandomSeed, 0);
                 log.Trace("Randomizing remaining chunk table content.");
-                binaryString = randomize.RandomizeBinaryString(binaryString, Arguments.RandomSeed);
+                binaryString = randomize.RandomizeBinaryString(binaryString, Arguments.RandomSeed, 0);
             }
 
             string tableBinary = tableHeader + binaryString;

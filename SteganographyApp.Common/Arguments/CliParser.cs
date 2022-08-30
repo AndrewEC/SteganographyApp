@@ -73,7 +73,7 @@ namespace SteganographyApp.Common.Arguments
                 }
                 catch (Exception e)
                 {
-                    throw new ParseException($"Could not read in argument [{match.Attribute.Name}] from value [{match.Input}] because: [{e.InnerException.Message}]", e);
+                    throw new ParseException($"Could not read in argument [{match.Attribute.Name}] from value [{match.Input}] because: [{e.InnerException?.Message ?? "No root cause."}]", e);
                 }
             }
 

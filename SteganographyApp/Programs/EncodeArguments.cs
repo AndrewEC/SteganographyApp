@@ -12,7 +12,7 @@ namespace SteganographyApp
     public sealed class EncodeArguments : IArgumentConverter
     {
         [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be encoded and written to.")]
-        public ImmutableArray<string> CoverImages;
+        public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents.")]
         public string Password = string.Empty;
@@ -23,8 +23,8 @@ namespace SteganographyApp
         [Argument("--randomSeed", "-r", helpText: "The optional value to determine how the contents of the input file will be randomized before writing them.")]
         public string RandomSeed = string.Empty;
 
-        [Argument("--insertDummies", "-i", helpText: "Choose whether dummy bytes should be inserted into the file contents before being randomized.")]
-        public bool InsertDummies = false;
+        [Argument("--dummyCount", "-d", helpText: "The number of dummy entries that should be inserted after compression and before randomization. Recommended value between 100 and 1,000")]
+        public int DummyCount = 0;
 
         [Argument("--chunkByteSize", "-cs", helpText: "The number of bytes to read and encode from the input file during each iteration.")]
         public int ChunkByteSize = 131_072;
@@ -43,9 +43,8 @@ namespace SteganographyApp
                 Password = Password,
                 FileToEncode = InputFile,
                 RandomSeed = RandomSeed,
-                InsertDummies = InsertDummies,
                 ChunkByteSize = ChunkByteSize,
-                DummyCount = ParserFunctions.ParseDummyCount(InsertDummies, CoverImages, RandomSeed)
+                DummyCount = DummyCount
             };
             Injector.LoggerFor<EncodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
             return arguments;

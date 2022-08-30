@@ -39,6 +39,12 @@
         /// <include file='../docs.xml' path='docs/members[@name="DataEncoderUtil"]/Encode/*' />
         public string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed)
         {
+            if (randomSeed != string.Empty)
+            {
+                var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed, EncryptionUtil.DefaultIterations);
+                randomSeed = Convert.ToBase64String(randomKey);
+            }
+
             if (useCompression)
             {
                 bytes = Injector.Provide<ICompressionUtil>().Compress(bytes);
@@ -67,7 +73,7 @@
 
             if (randomSeed != string.Empty)
             {
-                binary = Injector.Provide<IRandomizeUtil>().RandomizeBinaryString(binary, randomSeed);
+                binary = Injector.Provide<IRandomizeUtil>().RandomizeBinaryString(binary, randomSeed, dummyCount);
             }
 
             return binary;
@@ -78,7 +84,13 @@
         {
             if (randomSeed != string.Empty)
             {
-                binary = Injector.Provide<IRandomizeUtil>().ReorderBinaryString(binary, randomSeed);
+                var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed, EncryptionUtil.DefaultIterations);
+                randomSeed = Convert.ToBase64String(randomKey);
+            }
+
+            if (randomSeed != string.Empty)
+            {
+                binary = Injector.Provide<IRandomizeUtil>().ReorderBinaryString(binary, randomSeed, dummyCount);
             }
 
             if (dummyCount > 0)

@@ -1,6 +1,7 @@
 ﻿namespace SteganographyApp.Common.Data
 {
     using System;
+    using System.Linq;
 
 #pragma warning disable SA1121
 
@@ -70,26 +71,21 @@
         ///  number of times based on the provided seed string byte size.</returns>
         public static IndexGenerator FromString(string seed)
         {
-            Int32 total = 0;
-            foreach (char c in seed)
-            {
-                total += c * c;
-            }
+            Int32 total = seed.ToCharArray().Select(c => (int)c).Sum();
             return new IndexGenerator(total, seed.Length);
         }
 
         /// <summary>
-        /// Generates a new random number between 0 and max inclusive.
+        /// Generates a new random number between 0 and max exclusive.
         /// </summary>
         /// <param name="max">The largest values this method can return.</param>
-        /// <returns>A 32 bit integer between 0 and the maximum value inclusive.</returns>
+        /// <returns>A 32 bit integer between 0 and the maximum value exclusive.</returns>
         public Int32 Next(Int32 max)
         {
             if (max % 2 == 0)
             {
-                max -= 1;
+                max++;
             }
-
             Int32 xn = ((a1 * x[2]) + (a2 * x[1]) + (a3 * x[0])) % m1;
             Int32 yn = ((b1 * y[2]) + (b2 * y[1]) + (b3 * y[0])) % m2;
 
@@ -97,7 +93,7 @@
             Swap(y, yn);
 
             Int32 zn = (xn - yn) % max;
-            return Math.Abs(zn - 1);
+            return Math.Max(Math.Abs(zn) - 1, 0);
         }
 
         /// <summary>

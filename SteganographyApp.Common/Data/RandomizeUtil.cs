@@ -11,10 +11,10 @@ namespace SteganographyApp.Common.Data
     public interface IRandomizeUtil
     {
         /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/RandomizeBinaryString/*' />
-        string RandomizeBinaryString(string binaryString, string randomSeed);
+        string RandomizeBinaryString(string binaryString, string randomSeed, int dummyCount);
 
         /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/ReorderBinaryString/*' />
-        string ReorderBinaryString(string binaryString, string randomSeed);
+        string ReorderBinaryString(string binaryString, string randomSeed, int dummyCount);
     }
 
     /// <summary>
@@ -24,23 +24,25 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(IRandomizeUtil))]
     public sealed class RandomizeUtil : IRandomizeUtil
     {
+        private const int IterationLimit = 1000;
         private ILogger log = new LazyLogger<RandomizeUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/RandomizeBinaryString/*' />
-        public string RandomizeBinaryString(string binaryString, string randomSeed)
+        public string RandomizeBinaryString(string binaryString, string randomSeed, int dummyCount)
         {
             char[] characters = binaryString.ToCharArray();
 
-            var generator = IndexGenerator.FromString(randomSeed);
+            string seed = FormRandomSeed(randomSeed, dummyCount);
+            var generator = IndexGenerator.FromString(seed);
 
             int iterations = characters.Length;
 
-            log.Debug("Randomizing binary string using seed [{0}] over [{1}] iterations", randomSeed, iterations);
+            log.Debug("Randomizing binary string using seed [{0}] over [{1}] iterations", seed, iterations);
 
             for (int i = 0; i < iterations; i++)
             {
-                int first = generator.Next(characters.Length - 1);
-                int second = generator.Next(characters.Length - 1);
+                int first = generator.Next(characters.Length);
+                int second = generator.Next(characters.Length);
                 if (first != second)
                 {
                     char temp = characters[first];
@@ -55,20 +57,22 @@ namespace SteganographyApp.Common.Data
         }
 
         /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/ReorderBinaryString/*' />
-        public string ReorderBinaryString(string binaryString, string randomSeed)
+        public string ReorderBinaryString(string binaryString, string randomSeed, int dummyCount)
         {
             char[] characters = binaryString.ToCharArray();
-            var generator = IndexGenerator.FromString(randomSeed);
+            
+            string seed = FormRandomSeed(randomSeed, dummyCount);
+            var generator = IndexGenerator.FromString(seed);
 
             int iterations = characters.Length;
 
-            log.Debug("Randomizing binary string using seed [{0}] over [{1}] iterations", randomSeed, iterations);
+            log.Debug("Randomizing binary string using seed [{0}] over [{1}] iterations", seed, iterations);
 
             var pairs = new ValueTuple<int, int>[iterations];
             for (int i = iterations - 1; i >= 0; i--)
             {
-                int first = generator.Next(characters.Length - 1);
-                int second = generator.Next(characters.Length - 1);
+                int first = generator.Next(characters.Length);
+                int second = generator.Next(characters.Length);
                 pairs[i] = (first, second);
             }
             foreach ((int first, int second) in pairs)
@@ -78,6 +82,13 @@ namespace SteganographyApp.Common.Data
                 characters[second] = temp;
             }
             return new string(characters);
+        }
+
+        private string FormRandomSeed(string randomSeed, int dummyCount)
+        {
+            int iterations = (dummyCount == 0) ? 1 : (int)((dummyCount + (GlobalCounter.Instance.LastCount % int.MaxValue)) % IterationLimit);
+            var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed + iterations, iterations);
+            return Convert.ToBase64String(randomKey);
         }
 
         private void LogDegreeOfSimilarity(string newString, string originalString)

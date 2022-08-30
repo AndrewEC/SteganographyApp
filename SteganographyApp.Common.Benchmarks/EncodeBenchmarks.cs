@@ -41,25 +41,13 @@ namespace SteganographyApp.Common.Benchmarks
         [Benchmark]
         public string EncodeWithDummies()
         {
-            return new DataEncoderUtil().Encode(data, "", false, 10, "");
-        }
-
-        [Benchmark]
-        public string EncodeWithPasswordAndCompression()
-        {
-            return new DataEncoderUtil().Encode(data, "Password123!@#", true, 0, "");
-        }
-
-        [Benchmark]
-        public string EncodeWithPasswordAndCompressionAndDummies()
-        {
-            return new DataEncoderUtil().Encode(data, "Password123!@#", true, 10, "");
+            return new DataEncoderUtil().Encode(data, "", false, 375, "");
         }
 
         [Benchmark]
         public string EncodeWithPasswordAndCompressionAndDummiesAndRandomization()
         {
-            return new DataEncoderUtil().Encode(data, "Password123!@#", true, 10, "randomSeed");
+            return new DataEncoderUtil().Encode(data, "Password123!@#", true, 375, "randomSeed");
         }
 
     }

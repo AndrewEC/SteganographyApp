@@ -20,7 +20,7 @@ namespace SteganographyApp
     internal sealed class ConvertArguments : IArgumentConverter
     {
         [Argument("--coverImages", "-c", true, helpText: "The images to be converted into a png or webp format.")]
-        public ImmutableArray<string> CoverImages;
+        public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--imageFormat", "-i", helpText: "The format the images should be converted to.")]
         public ImageFormat ImageFormat = ImageFormat.Png;

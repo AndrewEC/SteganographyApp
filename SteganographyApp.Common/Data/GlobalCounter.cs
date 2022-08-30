@@ -15,6 +15,7 @@ namespace SteganographyApp.Common.Data
         private static readonly object SyncLock = new object();
 
         private long count = 0;
+        private long lastCount = 0;
 
         private GlobalCounter() { }
 
@@ -33,7 +34,22 @@ namespace SteganographyApp.Common.Data
 
             private set
             {
+                lastCount = count;
                 count = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the previous accumulated count.
+        /// </summary>
+        public long LastCount
+        {
+            get
+            {
+                lock (SyncLock)
+                {
+                    return lastCount;
+                }
             }
         }
 

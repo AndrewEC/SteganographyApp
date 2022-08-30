@@ -5,7 +5,7 @@ namespace SteganographyApp.Common.Tests
     using SteganographyApp.Common.Data;
 
     [TestFixture]
-    public class EncryptionUtilTests
+    public class EncryptionUtilTests : FixtureWithTestObjects
     {
         private const string InputString = "Testing123!@#";
         private const string Password = "Pass1";

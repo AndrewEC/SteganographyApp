@@ -45,7 +45,7 @@ namespace SteganographyApp.Common.IO
             string headerBinary = ImageStoreIO.ReadContentChunkFromImage(Calculator.ChunkTableHeaderSizeWithPadding);
             if (!string.IsNullOrEmpty(Arguments.RandomSeed))
             {
-                headerBinary = randomizeUtil.ReorderBinaryString(headerBinary, Arguments.RandomSeed);
+                headerBinary = randomizeUtil.ReorderBinaryString(headerBinary, Arguments.RandomSeed, 0);
             }
             return Convert.ToInt16(headerBinary, 2);
         }
@@ -57,7 +57,7 @@ namespace SteganographyApp.Common.IO
             string tableBinary = ImageStoreIO.ReadContentChunkFromImage(chunkSize);
             if (!string.IsNullOrEmpty(Arguments.RandomSeed))
             {
-                tableBinary = randomizeUtil.ReorderBinaryString(tableBinary, Arguments.RandomSeed);
+                tableBinary = randomizeUtil.ReorderBinaryString(tableBinary, Arguments.RandomSeed, 0);
             }
 
             return Enumerable.Range(0, chunkCount)

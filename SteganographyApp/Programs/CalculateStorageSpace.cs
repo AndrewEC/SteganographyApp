@@ -15,7 +15,7 @@ namespace SteganographyApp
     internal sealed class CalculateStorageSpaceArguments : IArgumentConverter
     {
         [Argument("--coverImages", "-c", true, helpText: "The images from which the amount of storage space available will be derived.")]
-        public ImmutableArray<string> CoverImages;
+        public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         public IInputArguments ToCommonArguments()
         {
