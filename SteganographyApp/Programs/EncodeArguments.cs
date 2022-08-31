@@ -32,6 +32,9 @@ namespace SteganographyApp
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
         public LogLevel LogLevel = LogLevel.None;
 
+        [Argument("--additionalHashes", "-a", helpText: "The number of additional times to hash the password. Has no effect if no password is provided.")]
+        public int AdditionalPasswordHashIterations = 0;
+
         public static object ParseFilePath(object? target, string value) => ParserFunctions.ParseFilePath(value);
 
         public IInputArguments ToCommonArguments()
@@ -44,7 +47,8 @@ namespace SteganographyApp
                 FileToEncode = InputFile,
                 RandomSeed = RandomSeed,
                 ChunkByteSize = ChunkByteSize,
-                DummyCount = DummyCount
+                DummyCount = DummyCount,
+                AdditionalPasswordHashIterations = AdditionalPasswordHashIterations,
             };
             Injector.LoggerFor<EncodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
             return arguments;

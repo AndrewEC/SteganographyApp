@@ -16,6 +16,7 @@ namespace SteganographyApp.Common.Tests
         private const string RandomSeed = "randomSeed";
         private const string BadRandomSeed = "badRandomSeed";
         private const int DummyCount = 350;
+        private const int IterationMultiplier = 3;
 
         [Mockup(typeof(IEncryptionUtil))]
         public Mock<IEncryptionUtil> mockEncryptionUtil;
@@ -31,8 +32,8 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestRandomizeTwiceWithSameSeedProducesSameResult()
         {
-            string randomizedFirst = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed, DummyCount);
-            string randomizedSecond = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed, DummyCount);
+            string randomizedFirst = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed, DummyCount, IterationMultiplier);
+            string randomizedSecond = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed, DummyCount, IterationMultiplier);
 
             Assert.AreEqual(randomizedFirst, randomizedSecond);
         }
@@ -42,10 +43,10 @@ namespace SteganographyApp.Common.Tests
         {
             mockEncryptionUtil.Setup(util => util.GenerateKey(RandomSeed + DummyCount, DummyCount)).Returns(Encoding.UTF8.GetBytes("random_key"));
 
-            string randomized = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed, DummyCount);
+            string randomized = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed, DummyCount, IterationMultiplier);
             Assert.AreNotEqual(OriginalBinaryString, randomized);
 
-            string unrandomized = util.ReorderBinaryString(randomized, RandomSeed, DummyCount);
+            string unrandomized = util.ReorderBinaryString(randomized, RandomSeed, DummyCount, IterationMultiplier);
             Assert.AreEqual(OriginalBinaryString, unrandomized);
         }
 
@@ -56,10 +57,10 @@ namespace SteganographyApp.Common.Tests
             mockEncryptionUtil.Setup(util => util.GenerateKey(RandomSeed + DummyCount, DummyCount))
                 .Returns(() => keyByteQueue.Dequeue());
 
-            string randomized = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed, DummyCount);
+            string randomized = util.RandomizeBinaryString(OriginalBinaryString, RandomSeed, DummyCount, IterationMultiplier);
             Assert.AreNotEqual(OriginalBinaryString, randomized);
 
-            string unrandomized = util.ReorderBinaryString(randomized, BadRandomSeed, DummyCount);
+            string unrandomized = util.ReorderBinaryString(randomized, BadRandomSeed, DummyCount, IterationMultiplier);
             Assert.AreNotEqual(OriginalBinaryString, unrandomized);
         }
     }

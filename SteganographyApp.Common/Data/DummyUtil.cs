@@ -39,8 +39,6 @@ namespace SteganographyApp.Common.Data
             log.Debug("Inserting [{0}] dummies using seed [{1}]", numDummies, seed);
             log.Debug("Bit count before inserting dummies: [{0}]", binary.Length);
 
-            int amountToIncrement = SumBinaryString(binary);
-
             var generator = IndexGenerator.FromString(seed);
 
             // generate an array in which each element represents the length that an inserted dummy entry will have.
@@ -51,15 +49,15 @@ namespace SteganographyApp.Common.Data
                 .Select(i => generator.Next(binary.Length))
                 .ToArray();
 
+            var builder = new StringBuilder(binary, binary.Length + lengths.Sum());
             for (int i = 0; i < positions.Length; i++)
             {
                 var nextDummy = GenerateDummyEntry(generator, lengths[i]);
                 var nextDummyPosition = positions[i];
                 log.Trace("Inserting dummy at position [{0}] with value [{1}]", nextDummyPosition, nextDummy);
-                binary = binary.Insert(positions[i], nextDummy);
+                builder.Insert(positions[i], nextDummy);
             }
-
-            GlobalCounter.Instance.Increment(amountToIncrement);
+            binary = builder.ToString();
 
             log.Debug("Bit count after inserting dummies: [{0}]", binary.Length);
             return binary;
@@ -72,8 +70,6 @@ namespace SteganographyApp.Common.Data
 
             log.Debug("Removing [{0}] dummies using seed [{1}]", numDummies, seed);
             log.Debug("Bit count before removing dummies: [{0}]", binary.Length);
-
-            int amountToIncrement = SumBinaryString(binary);
 
             var generator = IndexGenerator.FromString(seed);
 
@@ -94,23 +90,21 @@ namespace SteganographyApp.Common.Data
 
             try
             {
+                var builder = new StringBuilder(binary);
                 for (int i = 0; i < positions.Length; i++)
                 {
-                    binary = binary.Remove(positions[i], lengths[i]);
+                    builder.Remove(positions[i], lengths[i]);
                 }
+                binary = builder.ToString();
             }
             catch (ArgumentOutOfRangeException e)
             {
                 throw new TransformationException("Unable to remove all dummy entries from chunk.", e);
             }
 
-            GlobalCounter.Instance.Increment(SumBinaryString(binary));
-
             log.Debug("Bit count after removing dummies: [{0}]", binary.Length);
             return binary;
         }
-
-        private int SumBinaryString(string binary) => binary.ToCharArray().Where(c => c == '1').Count();
 
         private string CreateRandomSeed(string randomSeed)
         {

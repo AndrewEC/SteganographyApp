@@ -2,7 +2,6 @@
 namespace SteganographyApp
 {
     using System;
-    using System.Collections.Immutable;
     using System.Text.Json;
 
     using SteganographyApp.Common;
@@ -15,9 +14,6 @@ namespace SteganographyApp
     [ProgramDescriptor("Calculates the approximate size of an input file if it were to be encrypted.")]
     internal sealed class CalculateEncryptedSizeArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be encoded and written to.")]
-        public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
-
         [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents.")]
         public string Password = string.Empty;
 
@@ -36,6 +32,9 @@ namespace SteganographyApp
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
         public LogLevel LogLevel = LogLevel.None;
 
+        [Argument("--additionalHashes", "-a", helpText: "The number of additional times to has the password. Has no effect if no password is provided.")]
+        public int AdditionalPasswordHashIterations = 0;
+
         public static object ParseFilePath(object? target, string value) => ParserFunctions.ParseFilePath(value);
 
         public IInputArguments ToCommonArguments()
@@ -43,14 +42,14 @@ namespace SteganographyApp
             RootLogger.Instance.EnableLoggingAtLevel(LogLevel);
             var arguments = new CommonArguments
             {
-                CoverImages = CoverImages,
                 Password = Password,
                 FileToEncode = InputFile,
                 RandomSeed = RandomSeed,
                 ChunkByteSize = ChunkByteSize,
-                DummyCount = DummyCount
+                DummyCount = DummyCount,
+                AdditionalPasswordHashIterations = AdditionalPasswordHashIterations,
             };
-            Injector.LoggerFor<EncodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
+            Injector.LoggerFor<CalculateEncryptedSizeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
             return arguments;
         }
     }

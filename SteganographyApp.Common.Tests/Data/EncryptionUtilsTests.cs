@@ -9,17 +9,18 @@ namespace SteganographyApp.Common.Tests
     {
         private const string InputString = "Testing123!@#";
         private const string Password = "Pass1";
+        private const int AdditionalHashIterations = 2;
 
         [Test]
         public void TestEncryptAndDecrypt()
         {
             var util = new EncryptionUtil();
 
-            var encrypted = util.Encrypt(InputString, Password);
+            var encrypted = util.Encrypt(InputString, Password, AdditionalHashIterations);
 
             Assert.AreNotEqual(InputString, encrypted);
 
-            var decrypted = util.Decrypt(encrypted, Password);
+            var decrypted = util.Decrypt(encrypted, Password, AdditionalHashIterations);
 
             Assert.AreEqual(InputString, decrypted);
         }

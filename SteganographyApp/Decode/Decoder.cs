@@ -39,23 +39,11 @@ namespace SteganographyApp.Decode
     {
         private readonly IInputArguments arguments;
 
-        /// <summary>
-        /// This queue allows for communication between the decoder and the <see cref="FileWriteThread"/>.
-        /// Once each content chunk is read from the ImageStore it will be
-        /// added to the this collection so the raw binary content from the image can
-        /// be decoded and written to the decoded output file location.
-        /// </summary>
-        private readonly BlockingCollection<WriteArgs> writeQueue;
-
-        private readonly ErrorContainer errorContainer;
-
         private readonly ILogger log;
 
         private Decoder(IInputArguments arguments)
         {
             this.arguments = arguments;
-            writeQueue = new BlockingCollection<WriteArgs>(2);
-            errorContainer = new ErrorContainer();
             log = Injector.LoggerFor<Decoder>();
         }
 
@@ -72,56 +60,35 @@ namespace SteganographyApp.Decode
 
             var store = new ImageStore(arguments);
 
-            using (var wrapper = store.CreateIOWrapper())
-            {
-                var thread = FileWriteThread.CreateAndStartThread(writeQueue, errorContainer, arguments);
-                try
-                {
-                    DoDecode(store, wrapper);
-                }
-                catch (Exception e)
-                {
-                    errorContainer.PutException(e);
-                    log.Error("Decoder found exception in container: [{0}]", e.Message);
-                    throw;
-                }
-                finally
-                {
-                    thread.Join();
-                }
-            }
+            DoDecode(store);
 
             log.Trace("Decoding process completed.");
             Console.WriteLine("Decoding process complete.");
         }
 
-        private void DoDecode(ImageStore store, ImageStoreIO wrapper)
+        private void DoDecode(ImageStore store)
         {
             Console.WriteLine("Reading content chunk table.");
             using (var chunkTableReader = new ChunkTableReader(store, arguments))
             {
-                var contentChunkTable = chunkTableReader.ReadContentChunkTable();
-                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
-
-                log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
-                foreach (int chunkLength in contentChunkTable)
+                using (var wrapper = store.CreateIOWrapper())
                 {
-                    log.Debug("Processing chunk of [{0}] bits.", chunkLength);
-                    string binary = wrapper.ReadContentChunkFromImage(chunkLength);
-                    writeQueue.Add(new WriteArgs(Status.Incomplete, binary));
-                    tracker.UpdateAndDisplayProgress();
+                    var contentChunkTable = chunkTableReader.ReadContentChunkTable();
+                    var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
+                    log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
 
-                    if (errorContainer.HasException())
+                    using (var writer = new ContentWriter(arguments))
                     {
-                        throw errorContainer.TakeException();
+                        foreach (int chunkLength in contentChunkTable)
+                        {
+                            log.Debug("===== ===== ===== Begin Decoding Iteration ===== ===== =====");
+                            log.Debug("Processing chunk of [{0}] bits.", chunkLength);
+                            string binary = wrapper.ReadContentChunkFromImage(chunkLength);
+                            writer.WriteContentChunkToFile(binary);
+                            tracker.UpdateAndDisplayProgress();
+                            log.Debug("===== ===== ===== End Decoding Iteration ===== ===== =====");
+                        }
                     }
-                }
-
-                writeQueue.Add(new WriteArgs(Status.Complete));
-
-                if (errorContainer.HasException())
-                {
-                    throw errorContainer.TakeException();
                 }
             }
         }

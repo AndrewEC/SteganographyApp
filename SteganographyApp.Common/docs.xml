@@ -33,11 +33,6 @@
                 decoding a file, cleaning the images, or calculating the storage space of a series of images.
             </summary>
         </CoverImages>
-        <EncodeOrDecode>
-            <summary>
-                The action to take.
-            </summary>
-        </EncodeOrDecode>
         <UseCompression>
             <summary>
                 Indicates whether or not the contents being encoded, decoded, or calculate, should be compressed
@@ -77,6 +72,12 @@
                 <para>Can only be used with the converter.</para>
             </summary>
         </ImageFormat>
+        <AdditionalPasswordHashIterations>
+            <summary>
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                <para>Has no effect if no password has been provided.</para>
+            </summary>
+        </AdditionalPasswordHashIterations>
     </members>
     <members name="BinaryUtil">
         <ToBase64String>
@@ -125,6 +126,10 @@
             inserted if the dummy count is 0.</param>
             <param name="randomSeed">The random seed used to randomize the binary string being encoded. If the random seed is blank
             or null then no randmization will be done.</param>
+            <param name="additionalPasswordHashIterations">
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                Has no effect if no password has been provided.
+            </param>
             <returns>An binary string made up of the base64 bytes read from the file and possibly passed through an AES cipher.</returns>
             <exception cref="TransformationException">
                 Thrown if there was an issue trying to pass the base64 encoded string through the AES cipher.
@@ -142,6 +147,10 @@
             be removed.</param>
             <param name="randomSeed">The random seed to use in de-randomizing the binary string being decoded. If the random seed is null or blank then
             no randomization will be done.</param>
+            <param name="additionalPasswordHashIterations">
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                Has no effect if no password has been provided.
+            </param>
             <returns>A byte array containing the original decoded bytes of the file inputted during encoding.</returns>
             <exception cref="TransformationException">
                 Thrown if an error occured while decrypting the base64 string or when decompressing the byte stream.
@@ -187,12 +196,20 @@
             <summary>Encrypts the provided base64 encoded string using the input password.</summary>
             <param name="value">The base64 encoded string to encrypt.</param>
             <param name="password">The password to use in the AES cypher.</param>
+            <param name="additionalPasswordHashIterations">
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                Has no effect if no password has been provided.
+            </param>
             <returns>An encrypted base64 encoded string.</returns>
         </Encrypt>
         <Decrypt>
             <summary>Decrypts the provided base64 encoded string using the input password.</summary>
             <param name="value">The base64 encoded string to decrypt.</param>
             <param name="password">The password to use in the AES cypher.</param>
+            <param name="additionalPasswordHashIterations">
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                Has no effect if no password has been provided.
+            </param>
             <returns>A decrypted base64 encoded string.</returns>
         </Decrypt>
         <GenerateKey>
@@ -210,6 +227,10 @@
             <param name="binaryString">The binary string to randomize.</param>
             <param name="randomSeed">The user provided random seed that will be used to initialize the random number generator.</param>
             <param name="dummyCount">The number of dummy entries used to help determine the complete random seed to be used.</param>
+            <param name="iterationMultiplier">
+                A multiplier used in determining the number of bits to be swapped. The number of bits to be swapped is equal to the number
+                of bits in the binary string multiplied by the iterationMultipler.
+            </param>
             <returns>A randomized binary string.</returns>
         </RandomizeBinaryString>
         <ReorderBinaryString>
@@ -219,6 +240,10 @@
             <param name="binaryString">The binary string in which the previous randomization process needs to be reversed.</param>
             <param name="randomSeed">The user provided randoom seed that will be used to initialize the random number generator.</param>
             <param name="dummyCount">The number of dummy entries used to help determine the complete random seed to be used.</param>
+            <param name="iterationMultiplier">
+                A multiplier used in determining the number of bits to be swapped. The number of bits to be swapped is equal to the number
+                of bits in the binary string multiplied by the iterationMultipler.
+            </param>
             <returns>A non-randomized array of bytes matching the original input file.</returns>
         </ReorderBinaryString>
     </members>

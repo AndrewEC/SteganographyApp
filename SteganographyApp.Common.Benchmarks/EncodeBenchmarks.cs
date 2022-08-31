@@ -10,6 +10,7 @@ namespace SteganographyApp.Common.Benchmarks
     [MeanColumn, MinColumn, MaxColumn]
     public class EncodeBench
     {
+        private readonly int AdditionalHashIterations = 13;
 
         private byte[] data;
 
@@ -23,31 +24,31 @@ namespace SteganographyApp.Common.Benchmarks
         [Benchmark]
         public string Encode()
         {
-            return new DataEncoderUtil().Encode(data, "", false, 0, "");
+            return new DataEncoderUtil().Encode(data, "", false, 0, "", AdditionalHashIterations);
         }
 
         [Benchmark]
         public string EncodeWithPassword()
         {
-            return new DataEncoderUtil().Encode(data, "Password123!@#", false, 0, "");
+            return new DataEncoderUtil().Encode(data, "Password123!@#", false, 0, "", AdditionalHashIterations);
         }
 
         [Benchmark]
         public string EncodeWithCompression()
         {
-            return new DataEncoderUtil().Encode(data, "", true, 0, "");
+            return new DataEncoderUtil().Encode(data, "", true, 0, "", AdditionalHashIterations);
         }
 
         [Benchmark]
         public string EncodeWithDummies()
         {
-            return new DataEncoderUtil().Encode(data, "", false, 375, "");
+            return new DataEncoderUtil().Encode(data, "", false, 375, "", AdditionalHashIterations);
         }
 
         [Benchmark]
         public string EncodeWithPasswordAndCompressionAndDummiesAndRandomization()
         {
-            return new DataEncoderUtil().Encode(data, "Password123!@#", true, 375, "randomSeed");
+            return new DataEncoderUtil().Encode(data, "Password123!@#", true, 375, "randomSeed", AdditionalHashIterations);
         }
 
     }

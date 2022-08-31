@@ -64,16 +64,5 @@ namespace SteganographyApp.Common.Tests
 
             Assert.AreNotEqual(OriginalBinaryString, removed);
         }
-
-        [Test]
-        public void TestInsertTwiceProducesDifferentResults()
-        {
-            var util = new DummyUtil();
-
-            string insertedOnce = util.InsertDummies(NumberOfDummies, OriginalBinaryString, RandomSeed);
-            string insertedTwice = util.InsertDummies(NumberOfDummies, OriginalBinaryString, RandomSeed);
-
-            Assert.AreNotEqual(insertedOnce, insertedTwice);
-        }
     }
 }

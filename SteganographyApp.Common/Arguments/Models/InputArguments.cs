@@ -37,7 +37,10 @@ namespace SteganographyApp.Common.Arguments
         int ChunkByteSize { get; }
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
-        public ImageFormat ImageFormat { get; }
+        ImageFormat ImageFormat { get; }
+
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+        int AdditionalPasswordHashIterations { get; }
     }
 
     /// <summary>
@@ -90,6 +93,9 @@ namespace SteganographyApp.Common.Arguments
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
         public ImageFormat ImageFormat { get; set; } = ImageFormat.Png;
+
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+        public int AdditionalPasswordHashIterations { get; set; } = 0;
     }
 
     /// <summary>

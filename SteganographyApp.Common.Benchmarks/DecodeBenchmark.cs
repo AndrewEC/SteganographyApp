@@ -12,8 +12,8 @@ namespace SteganographyApp.Common.Benchmarks
     {
 
         private readonly string Password = "Password123!@#";
-
         private readonly string RandomSeed = "randomSeed";
+        private readonly int AdditionalHashIterations = 13;
 
         private string data;
 
@@ -22,13 +22,13 @@ namespace SteganographyApp.Common.Benchmarks
         {
             byte[] rawData = new byte[4_000_000];
             new Random(100).NextBytes(rawData);
-            data = new DataEncoderUtil().Encode(rawData, Password, false, 0, "");
+            data = new DataEncoderUtil().Encode(rawData, Password, false, 0, "", AdditionalHashIterations);
         }
 
         [Benchmark]
         public byte[] DecodeWithPassword()
         {
-            return new DataEncoderUtil().Decode(data, Password, false, 0, "");
+            return new DataEncoderUtil().Decode(data, Password, false, 0, "", AdditionalHashIterations);
         }
 
         [GlobalSetup(Target=nameof(DecodeWithPasswordAndCompression))]
@@ -36,13 +36,13 @@ namespace SteganographyApp.Common.Benchmarks
         {
             byte[] rawData = new byte[4_000_000];
             new Random(100).NextBytes(rawData);
-            data = new DataEncoderUtil().Encode(rawData, Password, true, 0, "");
+            data = new DataEncoderUtil().Encode(rawData, Password, true, 0, "", AdditionalHashIterations);
         }
 
         [Benchmark]
         public byte[] DecodeWithPasswordAndCompression()
         {
-            return new DataEncoderUtil().Decode(data, Password, true, 0, "");
+            return new DataEncoderUtil().Decode(data, Password, true, 0, "", AdditionalHashIterations);
         }
 
         [GlobalSetup(Target=nameof(DecodeWithPasswordAndCompressionAndRandomization))]
@@ -50,13 +50,13 @@ namespace SteganographyApp.Common.Benchmarks
         {
             byte[] rawData = new byte[4_000_000];
             new Random(100).NextBytes(rawData);
-            data = new DataEncoderUtil().Encode(rawData, Password, true, 0, RandomSeed);
+            data = new DataEncoderUtil().Encode(rawData, Password, true, 0, RandomSeed, AdditionalHashIterations);
         }
 
         [Benchmark]
         public byte[] DecodeWithPasswordAndCompressionAndRandomization()
         {
-            return new DataEncoderUtil().Decode(data, Password, true, 0, RandomSeed);
+            return new DataEncoderUtil().Decode(data, Password, true, 0, RandomSeed, AdditionalHashIterations);
         }
 
     }

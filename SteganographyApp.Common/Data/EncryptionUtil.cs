@@ -14,10 +14,10 @@ namespace SteganographyApp.Common.Data
     public interface IEncryptionUtil
     {
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />
-        string Encrypt(string value, string password);
+        string Encrypt(string value, string password, int additionalPasswordHashIterations);
 
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
-        string Decrypt(string value, string password);
+        string Decrypt(string value, string password, int additionalPasswordHashIterations);
 
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/GenerateKey/*' />
         byte[] GenerateKey(string value, int iterations);
@@ -38,10 +38,10 @@ namespace SteganographyApp.Common.Data
         private const int IvSize = 16;
 
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />
-        public string Encrypt(string value, string password)
+        public string Encrypt(string value, string password, int additionalPasswordHashIterations)
         {
-            log.Debug("Encrypting value using key: [{0}]", password);
-            var keyBytes = GenerateKey(password, DefaultIterations);
+            var keyBytes = GenerateKey(password, DefaultIterations + additionalPasswordHashIterations);
+            log.Debug("Encrypting value using key: [{0}]", () => new []{Convert.ToBase64String(keyBytes)});
             var iv = GenerateRandomBytes(IvSize);
             using (var managed = Aes.Create("AesManaged")!)
             {
@@ -65,11 +65,11 @@ namespace SteganographyApp.Common.Data
         }
 
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
-        public string Decrypt(string value, string password)
+        public string Decrypt(string value, string password, int additionalPasswordHashIterations)
         {
-            log.Debug("Decrypting value using key: [{0}]", password);
             var valueBytes = Convert.FromBase64String(value);
-            var keyBytes = GenerateKey(password, DefaultIterations);
+            var keyBytes = GenerateKey(password, DefaultIterations + additionalPasswordHashIterations);
+            log.Debug("Decrypting value using key: [{0}]", () => new []{Convert.ToBase64String(keyBytes)});
             using (var managed = Aes.Create("AesManaged")!)
             {
                 using (var ms = new MemoryStream(valueBytes))
