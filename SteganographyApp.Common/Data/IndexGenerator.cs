@@ -71,7 +71,7 @@
         ///  number of times based on the provided seed string byte size.</returns>
         public static IndexGenerator FromString(string seed)
         {
-            Int32 total = seed.ToCharArray().Select(c => (int)c).Sum();
+            Int32 total = seed.Select(c => (int)c).Sum();
             return new IndexGenerator(total, seed.Length);
         }
 

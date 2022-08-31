@@ -1,5 +1,7 @@
 namespace SteganographyApp.Common.Tests
 {
+    using System.Text;
+
     using NUnit.Framework;
 
     using SteganographyApp.Common.Data;
@@ -11,18 +13,20 @@ namespace SteganographyApp.Common.Tests
         private const string Password = "Pass1";
         private const int AdditionalHashIterations = 2;
 
+        private readonly byte[] InputStringBytes = Encoding.UTF8.GetBytes(InputString);
+
         [Test]
         public void TestEncryptAndDecrypt()
         {
             var util = new EncryptionUtil();
 
-            var encrypted = util.Encrypt(InputString, Password, AdditionalHashIterations);
+            byte[] encrypted = util.Encrypt(InputStringBytes, Password, AdditionalHashIterations);
 
-            Assert.AreNotEqual(InputString, encrypted);
+            Assert.AreNotEqual(InputStringBytes, encrypted);
 
-            var decrypted = util.Decrypt(encrypted, Password, AdditionalHashIterations);
+            byte[] decrypted = util.Decrypt(encrypted, Password, AdditionalHashIterations);
 
-            Assert.AreEqual(InputString, decrypted);
+            Assert.AreEqual(InputStringBytes, decrypted);
         }
     }
 }

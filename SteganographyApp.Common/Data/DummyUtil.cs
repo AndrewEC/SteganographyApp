@@ -1,8 +1,8 @@
 namespace SteganographyApp.Common.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
 
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Logging;
@@ -13,31 +13,31 @@ namespace SteganographyApp.Common.Data
     public interface IDummyUtil
     {
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
-        string InsertDummies(int numDummies, string binary, string randomSeed);
+        byte[] InsertDummies(int numDummies, byte[] value, string randomSeed);
 
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
-        string RemoveDummies(int numDummies, string binary, string randomSeed);
+        byte[] RemoveDummies(int numDummies, byte[] value, string randomSeed);
     }
 
     /// <summary>
-    /// Utility class for inserting and removing dummy entries in a binary string.
+    /// Utility class for inserting and removing dummy entries in the original byte array.
     /// </summary>
     [Injectable(typeof(IDummyUtil))]
     public sealed class DummyUtil : IDummyUtil
     {
-        private const int MaxLengthPerDummy = 500;
-        private const int MinLengthPerDummy = 100;
+        private const int MaxLengthPerDummy = 100;
+        private const int MinLengthPerDummy = 10;
         private const int HashIterationLimit = 1000;
 
         private ILogger log = new LazyLogger<DummyUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
-        public string InsertDummies(int numDummies, string binary, string randomSeed)
+        public byte[] InsertDummies(int numDummies, byte[] value, string randomSeed)
         {
             string seed = CreateRandomSeed(randomSeed);
 
             log.Debug("Inserting [{0}] dummies using seed [{1}]", numDummies, seed);
-            log.Debug("Bit count before inserting dummies: [{0}]", binary.Length);
+            log.Debug("Byte count before inserting dummies: [{0}]", value.Length);
 
             var generator = IndexGenerator.FromString(seed);
 
@@ -46,30 +46,31 @@ namespace SteganographyApp.Common.Data
 
             // generate an array in which each element represents the index the dummy entry will be inserted at.
             int[] positions = Enumerable.Range(0, numDummies)
-                .Select(i => generator.Next(binary.Length))
+                .Select(i => generator.Next(value.Length))
                 .ToArray();
 
-            var builder = new StringBuilder(binary, binary.Length + lengths.Sum());
+            var endValue = new List<byte>(value.Length + lengths.Sum());
+            endValue.InsertRange(0, value);
             for (int i = 0; i < positions.Length; i++)
             {
-                var nextDummy = GenerateDummyEntry(generator, lengths[i]);
+                var nextDummy = GenerateDummyBytes(generator, lengths[i]);
                 var nextDummyPosition = positions[i];
-                log.Trace("Inserting dummy at position [{0}] with value [{1}]", nextDummyPosition, nextDummy);
-                builder.Insert(positions[i], nextDummy);
+                log.Trace("Inserting dummy at position [{0}] with with length [{1}]", nextDummyPosition, nextDummy.Length);
+                endValue.InsertRange(positions[i], nextDummy);
             }
-            binary = builder.ToString();
 
-            log.Debug("Bit count after inserting dummies: [{0}]", binary.Length);
-            return binary;
+            var result = endValue.ToArray();
+            log.Debug("Byte count after inserting dummies: [{0}]", result.Length);
+            return result;
         }
 
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
-        public string RemoveDummies(int numDummies, string binary, string randomSeed)
+        public byte[] RemoveDummies(int numDummies, byte[] value, string randomSeed)
         {
             string seed = CreateRandomSeed(randomSeed);
 
             log.Debug("Removing [{0}] dummies using seed [{1}]", numDummies, seed);
-            log.Debug("Bit count before removing dummies: [{0}]", binary.Length);
+            log.Debug("Byte count before removing dummies: [{0}]", value.Length);
 
             var generator = IndexGenerator.FromString(seed);
 
@@ -78,32 +79,33 @@ namespace SteganographyApp.Common.Data
             Array.Reverse(lengths);
             int totalLength = lengths.Sum();
 
-            // Calculate the length of the binary string before the dummies were added so we can
+            // Calculate the length of the byte array before the dummies were added so we can
             // determine the original position where the dummy entries were inserted.
-            int binaryLengthWithoutDummies = binary.Length - totalLength;
+            int lengthWithoutDummies = value.Length - totalLength;
 
             // generate the positions in which the dummy entries were inserted into the original string
             int[] positions = Enumerable.Range(0, numDummies)
-                .Select(i => generator.Next(binaryLengthWithoutDummies))
+                .Select(i => generator.Next(lengthWithoutDummies))
                 .Reverse()
                 .ToArray();
 
+            byte[] result;
             try
             {
-                var builder = new StringBuilder(binary);
+                var valueList = new List<byte>(value);
                 for (int i = 0; i < positions.Length; i++)
                 {
-                    builder.Remove(positions[i], lengths[i]);
+                    valueList.RemoveRange(positions[i], lengths[i]);
                 }
-                binary = builder.ToString();
+                result = valueList.ToArray();
             }
             catch (ArgumentOutOfRangeException e)
             {
                 throw new TransformationException("Unable to remove all dummy entries from chunk.", e);
             }
 
-            log.Debug("Bit count after removing dummies: [{0}]", binary.Length);
-            return binary;
+            log.Debug("Bit count after removing dummies: [{0}]", result.Length);
+            return result;
         }
 
         private string CreateRandomSeed(string randomSeed)
@@ -117,15 +119,8 @@ namespace SteganographyApp.Common.Data
                 .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
                 .ToArray();
 
-        private string GenerateDummyEntry(IndexGenerator generator, int length)
-        {
-            var dummy = new StringBuilder(length, length);
-            for (int i = 0; i < length; i++)
-            {
-                int next = generator.Next(10);
-                dummy.Append((next % 2 == 0) ? '0' : '1');
-            }
-            return dummy.ToString();
-        }
+        private byte[] GenerateDummyBytes(IndexGenerator generator, int length) => Enumerable.Range(0, length)
+            .Select(i => (byte)generator.Next(byte.MaxValue))
+            .ToArray();
     }
 }

@@ -27,13 +27,16 @@ namespace SteganographyApp
         public int DummyCount = 0;
 
         [Argument("--chunkByteSize", "-cs", helpText: "The number of bytes to read and encode from the input file during each iteration.")]
-        public int ChunkByteSize = 131_072;
+        public int ChunkByteSize = 524_288;
 
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
         public LogLevel LogLevel = LogLevel.None;
 
         [Argument("--additionalHashes", "-a", helpText: "The number of additional times to hash the password. Has no effect if no password is provided.")]
         public int AdditionalPasswordHashIterations = 0;
+
+        [Argument("--compress", "-co", helpText: "If provided will compress the contents of the file before encryption.")]
+        public bool EnableCompression = false;
 
         public static object ParseFilePath(object? target, string value) => ParserFunctions.ParseFilePath(value);
 
@@ -49,6 +52,7 @@ namespace SteganographyApp
                 ChunkByteSize = ChunkByteSize,
                 DummyCount = DummyCount,
                 AdditionalPasswordHashIterations = AdditionalPasswordHashIterations,
+                UseCompression = EnableCompression,
             };
             Injector.LoggerFor<EncodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
             return arguments;

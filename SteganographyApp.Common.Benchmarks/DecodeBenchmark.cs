@@ -11,18 +11,19 @@ namespace SteganographyApp.Common.Benchmarks
     public class DecodeBench
     {
 
-        private readonly string Password = "Password123!@#";
-        private readonly string RandomSeed = "randomSeed";
-        private readonly int AdditionalHashIterations = 13;
+        private const int RandomByteCount = 4_000_000;
+        private const string Password = "Password123!@#";
+        private const string RandomSeed = "randomSeed";
+        private const int AdditionalHashIterations = 13;
+        private const int DummyCount = 70;
 
         private string data;
 
         [GlobalSetup(Target=nameof(DecodeWithPassword))]
-        public void EncryptedSetup()
+        public void DecodeWithPasswordSetup()
         {
-            byte[] rawData = new byte[4_000_000];
-            new Random(100).NextBytes(rawData);
-            data = new DataEncoderUtil().Encode(rawData, Password, false, 0, "", AdditionalHashIterations);
+            data = new DataEncoderUtil().Encode(GenerateRandomBytes(), Password, false, 0, "", AdditionalHashIterations);
+            GlobalCounter.Instance.Reset();
         }
 
         [Benchmark]
@@ -31,32 +32,63 @@ namespace SteganographyApp.Common.Benchmarks
             return new DataEncoderUtil().Decode(data, Password, false, 0, "", AdditionalHashIterations);
         }
 
-        [GlobalSetup(Target=nameof(DecodeWithPasswordAndCompression))]
-        public void EncryptedAndCompressedSetup()
+        [GlobalSetup(Target=nameof(DecodeWithRandomization))]
+        public void DecodeWithRandomizationSetup()
         {
-            byte[] rawData = new byte[4_000_000];
-            new Random(100).NextBytes(rawData);
-            data = new DataEncoderUtil().Encode(rawData, Password, true, 0, "", AdditionalHashIterations);
+            data = new DataEncoderUtil().Encode(GenerateRandomBytes(), Password, false, 0, "", AdditionalHashIterations);
+            GlobalCounter.Instance.Reset();
         }
 
         [Benchmark]
-        public byte[] DecodeWithPasswordAndCompression()
+        public byte[] DecodeWithRandomization()
         {
-            return new DataEncoderUtil().Decode(data, Password, true, 0, "", AdditionalHashIterations);
+            return new DataEncoderUtil().Decode(data, "", false, 0, RandomSeed, 0);
         }
 
-        [GlobalSetup(Target=nameof(DecodeWithPasswordAndCompressionAndRandomization))]
-        public void DecodeWithPasswordAndCompressionAndRandomizationSetup()
+        [GlobalSetup(Target=nameof(DecodeWithDummies))]
+        public void DecodeWithDummiesSetup()
         {
-            byte[] rawData = new byte[4_000_000];
-            new Random(100).NextBytes(rawData);
-            data = new DataEncoderUtil().Encode(rawData, Password, true, 0, RandomSeed, AdditionalHashIterations);
+            data = new DataEncoderUtil().Encode(GenerateRandomBytes(), "", false, DummyCount, "", 0);
+            GlobalCounter.Instance.Reset();
         }
 
         [Benchmark]
-        public byte[] DecodeWithPasswordAndCompressionAndRandomization()
+        public byte[] DecodeWithDummies()
         {
-            return new DataEncoderUtil().Decode(data, Password, true, 0, RandomSeed, AdditionalHashIterations);
+            return new DataEncoderUtil().Decode(data, "", false, DummyCount, "", 0);
+        }
+
+        [GlobalSetup(Target=nameof(DecodeWithCompression))]
+        public void DecodeWithCompressionSetup()
+        {
+            data = new DataEncoderUtil().Encode(GenerateRandomBytes(), "", true, 0, "", 0);
+            GlobalCounter.Instance.Reset();
+        }
+
+        [Benchmark]
+        public byte[] DecodeWithCompression()
+        {
+            return new DataEncoderUtil().Decode(data, "", true, 0, "", 0);
+        }
+
+        [GlobalSetup(Target=nameof(DecodeWithPasswordAndRandomizationAndDummies))]
+        public void DecodeWithPasswordAndCompressionAndRandomizationAndDummiesSetup()
+        {
+            data = new DataEncoderUtil().Encode(GenerateRandomBytes(), Password, false, DummyCount, RandomSeed, AdditionalHashIterations);
+            GlobalCounter.Instance.Reset();
+        }
+
+        [Benchmark]
+        public byte[] DecodeWithPasswordAndRandomizationAndDummies()
+        {
+            return new DataEncoderUtil().Decode(data, Password, false, DummyCount, RandomSeed, AdditionalHashIterations);
+        }
+
+        private byte[] GenerateRandomBytes()
+        {
+            byte[] bytes = new byte[RandomByteCount];
+            new Random(100).NextBytes(bytes);
+            return bytes;
         }
 
     }

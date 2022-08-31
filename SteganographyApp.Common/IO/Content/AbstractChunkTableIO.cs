@@ -9,6 +9,12 @@ namespace SteganographyApp.Common.IO
     /// </summary>
     public abstract class AbstractChunkTableIO : IDisposable
     {
+        /// <summary>The number of iterations to be used when randomizing or reordering the chunk table binary.</summary>
+        protected const int IterationMultiplier = 100;
+
+        /// <summary>The number of dummies to be inserted.</summary>
+        protected const int DummyCount = 0;
+
         /// <summary>
         /// Initializes the base class. This will keep a reference to the input arguments and
         /// store a reference to the result of store.CreateIOWrapper for future use.

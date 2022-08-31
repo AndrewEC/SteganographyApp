@@ -26,7 +26,7 @@
             {
                 FileToEncode = "TestAssets/test.zip",
                 DecodedOutputFile = "TestAssets/testing.zip",
-                CoverImages = ImmutableArray.Create(new string[] { "TestAssets/001.png" }),
+                CoverImages = ImmutableArray.Create(new string[] { "TestAssets/CoverImage.png" }),
                 Password = "testing",
                 UseCompression = true,
                 DummyCount = 3,
@@ -162,7 +162,9 @@
                 using (var writer = new ContentWriter(args))
                 {
                     string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                    Assert.Throws<TransformationException>(() => writer.WriteContentChunkToFile(binary));
+                    long target = new FileInfo(args.FileToEncode).Length;
+                    long actual = new FileInfo(args.DecodedOutputFile).Length;
+                    Assert.AreNotEqual(target, actual);
                 }
             }
         }
@@ -202,11 +204,8 @@
                 {
                     string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
                     Assert.AreEqual(content, binary);
-                    writer.WriteContentChunkToFile(binary);
+                    Assert.Throws(typeof(TransformationException), () => writer.WriteContentChunkToFile(binary));
                 }
-                long target = new FileInfo(args.FileToEncode).Length;
-                long actual = new FileInfo(args.DecodedOutputFile).Length;
-                Assert.AreNotEqual(target, actual);
             }
         }
 

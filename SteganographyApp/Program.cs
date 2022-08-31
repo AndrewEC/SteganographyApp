@@ -31,7 +31,7 @@
 
             if (exception != null)
             {
-                Console.WriteLine(exception.Message);
+                Console.WriteLine($"An error occured: [{exception.Message}]");
             }
         }
     }

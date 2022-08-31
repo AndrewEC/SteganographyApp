@@ -35,6 +35,9 @@ namespace SteganographyApp
         [Argument("--additionalHashes", "-a", helpText: "The number of additional times to has the password. Has no effect if no password is provided.")]
         public int AdditionalPasswordHashIterations = 0;
 
+        [Argument("--compress", "-co", helpText: "If provided will compress the contents of the file before encryption.")]
+        public bool EnableCompression = false;
+
         public static object ParseFilePath(object? target, string value) => ParserFunctions.ParseFilePath(value);
 
         public IInputArguments ToCommonArguments()
@@ -48,6 +51,7 @@ namespace SteganographyApp
                 ChunkByteSize = ChunkByteSize,
                 DummyCount = DummyCount,
                 AdditionalPasswordHashIterations = AdditionalPasswordHashIterations,
+                UseCompression = EnableCompression
             };
             Injector.LoggerFor<CalculateEncryptedSizeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
             return arguments;

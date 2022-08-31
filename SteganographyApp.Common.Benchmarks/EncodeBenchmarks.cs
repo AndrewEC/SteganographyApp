@@ -24,7 +24,7 @@ namespace SteganographyApp.Common.Benchmarks
         [Benchmark]
         public string Encode()
         {
-            return new DataEncoderUtil().Encode(data, "", false, 0, "", AdditionalHashIterations);
+            return new DataEncoderUtil().Encode(data, "", false, 0, "", 0);
         }
 
         [Benchmark]
@@ -36,13 +36,19 @@ namespace SteganographyApp.Common.Benchmarks
         [Benchmark]
         public string EncodeWithCompression()
         {
-            return new DataEncoderUtil().Encode(data, "", true, 0, "", AdditionalHashIterations);
+            return new DataEncoderUtil().Encode(data, "", true, 0, "", 0);
         }
 
         [Benchmark]
         public string EncodeWithDummies()
         {
-            return new DataEncoderUtil().Encode(data, "", false, 375, "", AdditionalHashIterations);
+            return new DataEncoderUtil().Encode(data, "", false, 375, "", 0);
+        }
+
+        [Benchmark]
+        public string EncodeWithRandomization()
+        {
+            return new DataEncoderUtil().Encode(data, "", false, 0, "12345", 0);
         }
 
         [Benchmark]

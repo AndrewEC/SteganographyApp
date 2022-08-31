@@ -1,7 +1,6 @@
 namespace SteganographyApp.Encode
 {
     using System;
-    using System.Collections.Concurrent;
 
     using SteganographyApp.Common;
     using SteganographyApp.Common.Arguments;
