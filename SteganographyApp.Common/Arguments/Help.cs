@@ -93,6 +93,13 @@ namespace SteganographyApp.Common.Arguments
                 }
             }
 
+            Type memberType = TypeHelper.DeclaredType(member);
+            if (memberType.IsEnum)
+            {
+                var possibleValues = string.Join(", ", Enum.GetNames(memberType));
+                builder.Append("[Allowed Values]: ").Append($"[{possibleValues}]");
+            }
+
             return builder.Append("\n\t").Append(argument.HelpText).Append("\n")
                 .ToString();
         }

@@ -113,13 +113,13 @@ namespace SteganographyApp.Common.Arguments
                     currentPosition++;
                 }
 
-                if (TypeHelper.DeclaredType(registered!.Member) == typeof(bool))
+                if (TypeHelper.DeclaredType(registered.Member) == typeof(bool))
                 {
-                    paired.Add(new ArgumentMatchResult((RegisteredArgument)registered, TrueString));
+                    paired.Add(new ArgumentMatchResult(registered, TrueString));
                 }
-                else if (registered?.Attribute.Position > 0)
+                else if (registered.Attribute.Position > 0)
                 {
-                    paired.Add(new ArgumentMatchResult((RegisteredArgument)registered, input));
+                    paired.Add(new ArgumentMatchResult(registered, input));
                 }
                 else
                 {
@@ -127,7 +127,7 @@ namespace SteganographyApp.Common.Arguments
                     {
                         throw new ParseException($"Received an invalid number of arguments. No value could be found corresponding to argument: [{input}]");
                     }
-                    paired.Add(new ArgumentMatchResult((RegisteredArgument)registered!, arguments[i + 1]));
+                    paired.Add(new ArgumentMatchResult(registered, arguments[i + 1]));
                     i++;
                 }
             }

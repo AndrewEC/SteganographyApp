@@ -25,13 +25,17 @@ namespace SteganographyApp.Common.Arguments
             var names = new List<string>();
             var registered = new List<RegisteredArgument>();
 
-            ImmutableArray<MemberInfo> members = GetAllMembers(modelType);
-            foreach (MemberInfo member in members)
+            foreach (MemberInfo member in GetAllMembers(modelType))
             {
                 ArgumentAttribute? attribute = member.GetCustomAttribute(typeof(ArgumentAttribute)) as ArgumentAttribute;
                 if (attribute == null)
                 {
                     continue;
+                }
+
+                if (string.IsNullOrEmpty(attribute.Name))
+                {
+                    throw new ParseException($"An invalid argument was provided. No name was provided for the member: [{member.Name}]");
                 }
 
                 if (names.Contains(attribute.Name))

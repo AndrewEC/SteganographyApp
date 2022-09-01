@@ -82,14 +82,6 @@ namespace SteganographyApp
             PrintFailures(failures);
         }
 
-        /// <summary>
-        /// Performs some validation once all the user inputted values have been parsed and individually
-        /// validated.
-        /// </summary>
-        private static string? PostValidation(IInputArguments inputs) => Checks.IsNullOrEmpty(inputs.CoverImages) ?
-            "At least one image must be provided to convert."
-            : null;
-
         private static string? TrySaveImage(string coverImage, IImageEncoder encoder, IInputArguments arguments)
         {
             try
