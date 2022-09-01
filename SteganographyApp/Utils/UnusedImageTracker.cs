@@ -48,8 +48,8 @@ namespace SteganographyApp
             }
 
             Console.WriteLine("Not all images were written to.");
-            Console.WriteLine("While these images don't contain encoded data they will be needed to properly decode.");
-            Console.WriteLine("The following files were used:");
+            Console.WriteLine("Only the images that were written to are required to decode later.");
+            Console.WriteLine("The following images were used:")
 
             foreach (string image in imagesUsed)
             {
