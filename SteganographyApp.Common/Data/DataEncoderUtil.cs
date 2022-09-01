@@ -40,7 +40,7 @@
         /// <summary>
         /// The number of iteration multiplier to be applied when randomizing or re-ordering the encoded/decoded bytes.
         /// </summary>
-        public const int IterationMultiplier = 1;
+        public const int IterationMultiplier = 2;
 
         private readonly ILogger logger = new LazyLogger<DataEncoderUtil>();
 
