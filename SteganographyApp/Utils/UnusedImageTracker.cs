@@ -49,7 +49,7 @@ namespace SteganographyApp
 
             Console.WriteLine("Not all images were written to.");
             Console.WriteLine("Only the images that were written to are required to decode later.");
-            Console.WriteLine("The following images were used:")
+            Console.WriteLine("The following images were used:");
 
             foreach (string image in imagesUsed)
             {
