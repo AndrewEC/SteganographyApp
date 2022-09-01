@@ -1,5 +1,7 @@
 namespace SteganographyApp.Common.Tests
 {
+    using System;
+
     using NUnit.Framework;
 
     using SteganographyApp.Common.Data;
@@ -53,9 +55,7 @@ namespace SteganographyApp.Common.Tests
         {
             byte[] inserted = util.InsertDummies(NumberOfDummies, OriginalBytes, RandomSeed);
 
-            byte[] removed = util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed);
-
-            Assert.AreNotEqual(OriginalBytes, removed);
+            Assert.Throws(typeof(ArgumentException), () => util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed));
         }
     }
 }

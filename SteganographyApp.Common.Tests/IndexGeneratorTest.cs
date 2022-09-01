@@ -12,10 +12,10 @@
         [Test]
         public void TestDifferentSeedsDontMatch()
         {
-            var generator = new IndexGenerator(100, 5);
+            var generator = new Xor128Prng(100, 5);
             int[] nums = Generate(generator, 20, 20);
 
-            generator = new IndexGenerator(101, 5);
+            generator = new Xor128Prng(101, 5);
             int[] nums2 = Generate(generator, 20, 20);
 
             Assert.IsTrue(AreInRange(nums, 0, 20));
@@ -26,10 +26,10 @@
         [Test]
         public void TestDifferentGenerationsDontMatch()
         {
-            var generator = new IndexGenerator(100, 6);
+            var generator = new Xor128Prng(100, 6);
             int[] nums = Generate(generator, 20, 20);
 
-            generator = new IndexGenerator(101, 5);
+            generator = new Xor128Prng(101, 5);
             int[] nums2 = Generate(generator, 20, 20);
 
             Assert.IsTrue(AreInRange(nums, 0, 20));
@@ -40,10 +40,10 @@
         [Test]
         public void TestSameSeedsMatch()
         {
-            var generator = new IndexGenerator(100, 5);
+            var generator = new Xor128Prng(100, 5);
             int[] nums = Generate(generator, 20, 20);
 
-            generator = new IndexGenerator(100, 5);
+            generator = new Xor128Prng(100, 5);
             int[] nums2 = Generate(generator, 20, 20);
 
             Assert.IsTrue(AreInRange(nums, 0, 20));
@@ -75,7 +75,7 @@
             return true;
         }
 
-        private int[] Generate(IndexGenerator generator, int length, int max) => Enumerable.Range(0, length)
+        private int[] Generate(Xor128Prng generator, int length, int max) => Enumerable.Range(0, length)
             .Select(i => generator.Next(max)).ToArray();
     }
 }

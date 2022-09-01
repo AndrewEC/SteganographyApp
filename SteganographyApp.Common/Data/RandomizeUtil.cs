@@ -31,7 +31,7 @@ namespace SteganographyApp.Common.Data
         public byte[] Randomize(byte[] value, string randomSeed, int dummyCount, int iterationMultiplier)
         {
             string seed = FormRandomSeed(randomSeed, dummyCount);
-            var generator = IndexGenerator.FromString(seed);
+            var generator = Xor128Prng.FromString(seed);
 
             int iterations = value.Length * iterationMultiplier;
 
@@ -56,7 +56,7 @@ namespace SteganographyApp.Common.Data
         public byte[] Reorder(byte[] value, string randomSeed, int dummyCount, int iterationMultiplier)
         {
             string seed = FormRandomSeed(randomSeed, dummyCount);
-            var generator = IndexGenerator.FromString(seed);
+            var generator = Xor128Prng.FromString(seed);
 
             int iterations = value.Length * iterationMultiplier;
 

@@ -51,7 +51,7 @@
             mockDummyUtil.Setup(provider => provider.InsertDummies(DummyCount, encryptedBytes, randomKeyString)).Returns(dummyBytes);
 
             byte[] randomizedBytes = new byte[] { 3 };
-            mockRandomUtil.Setup(provider => provider.Randomize(dummyBytes, randomKeyString, DummyCount, 2)).Returns(randomizedBytes);
+            mockRandomUtil.Setup(provider => provider.Randomize(dummyBytes, randomKeyString, DummyCount, DataEncoderUtil.IterationMultiplier)).Returns(randomizedBytes);
 
             byte[] compressedBytes = new byte[] { 4 };
             mockCompressionUtil.Setup(provider => provider.Compress(randomizedBytes)).Returns(compressedBytes);
@@ -77,7 +77,7 @@
             mockCompressionUtil.Setup(provider => provider.Decompress(IsAny<byte[]>())).Returns(decompressBytes);
 
             byte[] orderedBytes = new byte[] { 2 };
-            mockRandomUtil.Setup(util => util.Reorder(decompressBytes, randomKeyString, DummyCount, 2)).Returns(orderedBytes);
+            mockRandomUtil.Setup(util => util.Reorder(decompressBytes, randomKeyString, DummyCount, DataEncoderUtil.IterationMultiplier)).Returns(orderedBytes);
 
             byte[] undummiedBytes = new byte[] { 3 };
             mockDummyUtil.Setup(util => util.RemoveDummies(DummyCount, orderedBytes, randomKeyString)).Returns(undummiedBytes);

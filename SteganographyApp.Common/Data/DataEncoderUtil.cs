@@ -37,7 +37,10 @@
     [Injectable(typeof(IDataEncoderUtil))]
     public sealed class DataEncoderUtil : IDataEncoderUtil
     {
-        private const int IterationMultiplier = 2;
+        /// <summary>
+        /// The number of iteration multiplier to be applied when randomizing or re-ordering the encoded/decoded bytes.
+        /// </summary>
+        public const int IterationMultiplier = 1;
 
         private readonly ILogger logger = new LazyLogger<DataEncoderUtil>();
 

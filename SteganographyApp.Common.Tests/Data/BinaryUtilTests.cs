@@ -13,14 +13,14 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestToBinaryString()
         {
-            string result = util.ToBinaryString(new byte[]{1, 2});
+            string result = util.ToBinaryString(new byte[] { 1, 2 });
             Assert.AreEqual(BinaryString, result);
         }
 
         [Test]
         public void TestBinaryToStringDirect()
         {
-            string result = util.ToBinaryStringDirect(new byte[]{1, 0, 1});
+            string result = util.ToBinaryStringDirect(new byte[] { 1, 0, 1 });
             Assert.AreEqual("101", result);
         }
 
