@@ -1,7 +1,6 @@
 namespace SteganographyApp.Encode
 {
     using System;
-    using System.Collections.Concurrent;
 
     using SteganographyApp.Common;
     using SteganographyApp.Common.Arguments;
@@ -43,28 +42,11 @@ namespace SteganographyApp.Encode
     {
         private readonly IInputArguments arguments;
 
-        /// <summary>
-        /// Allows for communication between the file read thread and the main thread.
-        /// In each iteration the read thread will read in a chunk from a file, encode it,
-        /// and add it to this collection so it can be picked up and written to an image.
-        /// <para>This also enables the read thread to send errors back to the main thread
-        /// so a proper error message can be displayed back to the user.</para>
-        /// </summary>
-        private readonly BlockingCollection<ReadArgs> readQueue;
-
-        /// <summary>
-        /// Used to help communicate the ocurrence of an error to the file read thread so
-        /// it can attempt to shutdown gracefully.
-        /// </summary>
-        private readonly ErrorContainer errorContainer;
-
         private readonly ILogger log;
 
         private Encoder(IInputArguments arguments)
         {
             this.arguments = arguments;
-            readQueue = new BlockingCollection<ReadArgs>(2);
-            errorContainer = new ErrorContainer();
             log = Injector.LoggerFor<Encoder>();
         }
 
@@ -87,59 +69,42 @@ namespace SteganographyApp.Encode
 
             var utilities = new EncodingUtilities(arguments);
 
-            using (var wrapper = utilities.ImageStore.CreateIOWrapper())
-            {
-                var thread = FileReadThread.CreateAndStart(readQueue, arguments, errorContainer);
-                try
-                {
-                    Encode(wrapper, thread);
-                }
-                catch (Exception e)
-                {
-                    log.Error("An exception ocurred while encoding the file: [{0}]", e.Message);
-                    errorContainer.PutException(e);
-                    thread.Join();
-                    throw;
-                }
-                finally
-                {
-                    thread.Join();
-                }
-            }
+            Encode(utilities);
 
             Cleanup(utilities);
         }
 
-        private void Encode(ImageStoreIO wrapper, FileReadThread thread)
+        private void Encode(EncodingUtilities utilities)
         {
-            log.Debug("Encoding file: [{0}]", arguments.FileToEncode);
-            int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
-            log.Debug("Content chunk table requires [{0}] bits of space to store.", startingPixel);
-            wrapper.SeekToPixel(startingPixel);
-
-            int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
-            log.Debug("File requires [{0}] iterations to encode.", requiredNumberOfWrites);
-            var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites, "Encoding file contents", "All input file contents have been encoded.");
-
-            while (true)
+            using (var wrapper = utilities.ImageStore.CreateIOWrapper())
             {
-                var readArgs = readQueue.Take(errorContainer.CancellationToken);
-                if (readArgs.Status == Status.Complete)
+                log.Debug("Encoding file: [{0}]", arguments.FileToEncode);
+                int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
+                log.Debug("Content chunk table requires [{0}] bits of space to store.", startingPixel);
+                wrapper.SeekToPixel(startingPixel);
+
+                int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
+                log.Debug("File requires [{0}] iterations to encode.", requiredNumberOfWrites);
+                var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites, "Encoding file contents", "All input file contents have been encoded.");
+
+                using (var reader = new ContentReader(arguments))
                 {
-                    thread.Join();
-                    wrapper.EncodeComplete();
-                    break;
+                    string? contentChunk = string.Empty;
+                    while (true)
+                    {
+                        log.Debug("===== ===== ===== Begin Encoding Iteration ===== ===== =====");
+                        contentChunk = reader.ReadContentChunkFromFile();
+                        if (contentChunk == null)
+                        {
+                            break;
+                        }
+                        log.Debug("Processing chunk of [{0}] bits.", contentChunk.Length);
+                        wrapper.WriteContentChunkToImage(contentChunk);
+                        progressTracker.UpdateAndDisplayProgress();
+                        log.Debug("===== ===== ===== End Encoding Iteration ===== ===== =====");
+                    }
                 }
-                else if (readArgs.Status == Status.Failure)
-                {
-                    thread.Join();
-                    throw readArgs.Exception!;
-                }
-                else if (readArgs.Status == Status.Incomplete)
-                {
-                    wrapper.WriteContentChunkToImage(readArgs.Data!);
-                    progressTracker.UpdateAndDisplayProgress();
-                }
+                wrapper.EncodeComplete();
             }
         }
 

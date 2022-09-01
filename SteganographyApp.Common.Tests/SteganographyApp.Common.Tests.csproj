@@ -29,16 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TestAssets\001.png">
+    <None Update="TestAssets\CoverImage.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TestAssets\002.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestAssets\positive-help.prop">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestAssets\negative-help.prop">
+    <None Update="TestAssets\test.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="TestAssets\test.zip">

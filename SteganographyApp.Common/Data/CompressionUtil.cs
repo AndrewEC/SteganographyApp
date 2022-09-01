@@ -38,7 +38,9 @@ namespace SteganographyApp.Common.Data
                     CopyTo(msi, gs);
                 }
 
-                return mso.ToArray();
+                byte[] afterCompression = mso.ToArray();
+                log.Debug("After compressing size is now [{0}] bytes.", afterCompression.Length);
+                return afterCompression;
             }
         }
 
@@ -54,7 +56,9 @@ namespace SteganographyApp.Common.Data
                     CopyTo(gs, mso);
                 }
 
-                return mso.ToArray();
+                byte[] afterDecompression = mso.ToArray();
+                log.Debug("After decompression size is now [{0}] bytes.", afterDecompression.Length);
+                return afterDecompression;
             }
         }
 

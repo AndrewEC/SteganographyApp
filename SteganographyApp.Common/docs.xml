@@ -33,11 +33,6 @@
                 decoding a file, cleaning the images, or calculating the storage space of a series of images.
             </summary>
         </CoverImages>
-        <EncodeOrDecode>
-            <summary>
-                The action to take.
-            </summary>
-        </EncodeOrDecode>
         <UseCompression>
             <summary>
                 Indicates whether or not the contents being encoded, decoded, or calculate, should be compressed
@@ -56,12 +51,6 @@
                 and calculating the encrypted size of a file.
             </summary>
         </DummyCount>
-        <InsertDummies>
-            <summary>
-                Specifies whether or not any dummies should be inserted or removed from the contents of a file when
-                encoding, decoding, or calculating the encrypted size of a file.
-            </summary>
-        </InsertDummies>
         <DeleteAfterConversion>
             <summary>
                 Specifies whether or not the original image should be deleted after being converted to a PNG image.
@@ -83,22 +72,48 @@
                 <para>Can only be used with the converter.</para>
             </summary>
         </ImageFormat>
+        <AdditionalPasswordHashIterations>
+            <summary>
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                <para>Has no effect if no password has been provided.</para>
+            </summary>
+        </AdditionalPasswordHashIterations>
     </members>
     <members name="BinaryUtil">
-        <ToBase64String>
-            <summary>
-                Converts a binary string to a base64 encoded string.
-            </summary>
-            <param name="binary">The original string representation of a binary figure to convert to base64.</param>
-            <returns>The base64 representation of the input binary string.</returns>
-        </ToBase64String>
         <ToBinaryString>
             <summary>
-                Converts a base64 encoded string to a string of binary.
+                Converts a byte array into a binary string representation. This will convert each byte into a padded 8 bit string
+                and concatenate all values into a single string.
             </summary>
-            <param name="base64String">The base64 encoded string to convert to binary.</param>
-            <returns>A binary representation of the input base64 formatted string.</returns>
+            <param name="bytes">The array of bytes to be converted into a binary string.</param>
+            <returns>A binary representation of the input byte array.</returns>
         </ToBinaryString>
+        <ToBinaryStringDirect>
+            <summary>
+                Converts a byte array into a binary string representation. This expects each byte in the array to
+                have a decimal value of 0 or 1. Each by will thus be added to the binary string using their
+                direct decimal representation.
+            </summary>
+            <param name="bytes">The array of bytes to be converted into a binary string.</param>
+            <returns>A binary representation of the input byte array.</returns>
+        </ToBinaryStringDirect>
+        <ToBytes>
+            <summary>
+                Converts a given binary string into an array of bytes. This break the binary string down and take 8 characters, 8 bits,
+                at a time and convert that set of 8 bits to a byte value before aggregating the values in the byte array.
+                This method expecs the binary string to have a length equally divisible by 8.
+            </summary>
+            <param name="binary">The binary string to be converted to a byte array.</param>
+            <returns>A byte array representation of the original input binary string.</returns>
+        </ToBytes>
+        <ToBytesDirect>
+            <summary>
+                Converts a given binary string into an array of bytes. This will take each bit in the binary string and convert that bit
+                directly into a byte. This means the resulting byte array will only have values of 0 or 1.
+            </summary>
+            <param name="binary">The binary string to be converted to a byte array.</param>
+            <returns>A byte array representation of the roiginal input binary string.</returns>
+        </ToBytesDirect>
     </members>
     <members name="CompressionUtil">
         <Compress>
@@ -131,6 +146,10 @@
             inserted if the dummy count is 0.</param>
             <param name="randomSeed">The random seed used to randomize the binary string being encoded. If the random seed is blank
             or null then no randmization will be done.</param>
+            <param name="additionalPasswordHashIterations">
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                Has no effect if no password has been provided.
+            </param>
             <returns>An binary string made up of the base64 bytes read from the file and possibly passed through an AES cipher.</returns>
             <exception cref="TransformationException">
                 Thrown if there was an issue trying to pass the base64 encoded string through the AES cipher.
@@ -148,6 +167,10 @@
             be removed.</param>
             <param name="randomSeed">The random seed to use in de-randomizing the binary string being decoded. If the random seed is null or blank then
             no randomization will be done.</param>
+            <param name="additionalPasswordHashIterations">
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                Has no effect if no password has been provided.
+            </param>
             <returns>A byte array containing the original decoded bytes of the file inputted during encoding.</returns>
             <exception cref="TransformationException">
                 Thrown if an error occured while decrypting the base64 string or when decompressing the byte stream.
@@ -156,20 +179,21 @@
     </members>
     <members name="DummyUtil">
         <InsertDummies>
-            <summary>Inserts the specified number of dummy entries into the current binary string.</summary>
-            <param name="numDummies">The number of dummy entries to insert into the binary string.</param>
-            <param name="binary">The original binary string to be modified with the dummy entries.</param>
+            <summary>Inserts the specified number of dummy entries into the current byte array. This does will result in the creation of a new byte array.</summary>
+            <param name="numDummies">The number of dummy entries to insert into the byte array.</param>
+            <param name="value">The original byte array to be modified with the dummy entries.</param>
             <param name="randomSeed">A random seed used to seed the random number generator used when generating the dummy entries.</param>
-            <returns>Returns the binary string with the new dummy entries.</returns>
+            <returns>Returns a new byte array with the inserted dummy values.</returns>
         </InsertDummies>
         <RemoveDummies>
             <summary>
-                Attempts to remove dummy entries from the string equal to the number of entries specified in the numDummies parameter.
+                Attempts to remove dummy entries from the byte array equal to the number of entries specified in the numDummies parameter.
+                This will create and return a new byte array.
             </summary>
-            <param name="numDummies">The number of dummy entries to remove from the binary string.</param>
-            <param name="binary">The binary string to remove the dummy entries from.</param>
+            <param name="numDummies">The number of dummy entries to remove from the byte array.</param>
+            <param name="value">The byte array to remove the dummy entries from.</param>
             <param name="randomSeed">A random seed used to seed the random number generator used when generating the dummy entries.</param>
-            <returns>If numDummies == 0 then it will return the original binary string otherwise will return the binary string with the dummy entries removed.</returns>
+            <returns>If numDummies == 0 then it will return the original byte array otherwise will return the byte array with the dummy entries removed.</returns>
             <exception cref="TransformationException">Thrown if an our of range exception is caught while trying to remove the dummy entries from the chunk.</exception>
         </RemoveDummies>
     </members>
@@ -193,32 +217,56 @@
             <summary>Encrypts the provided base64 encoded string using the input password.</summary>
             <param name="value">The base64 encoded string to encrypt.</param>
             <param name="password">The password to use in the AES cypher.</param>
+            <param name="additionalPasswordHashIterations">
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                Has no effect if no password has been provided.
+            </param>
             <returns>An encrypted base64 encoded string.</returns>
         </Encrypt>
         <Decrypt>
             <summary>Decrypts the provided base64 encoded string using the input password.</summary>
             <param name="value">The base64 encoded string to decrypt.</param>
             <param name="password">The password to use in the AES cypher.</param>
+            <param name="additionalPasswordHashIterations">
+                The additional number of times the password should be hashed before being encrypting or decrypting content.
+                Has no effect if no password has been provided.
+            </param>
             <returns>A decrypted base64 encoded string.</returns>
         </Decrypt>
+        <GenerateKey>
+            <summary>Generates a salted and hashed key from the input value.</summary>
+            <param name="value">The value to be salted and hashed.</param>
+            <param name="iterations">The number of times the key will be hashed. Default value is 100,000.</param>
+            <returns>A byte representation of the salted and hashed key derived from the value param.</returns>
+        </GenerateKey>
     </members>
     <members name="RandomizeUtil">
-        <RandomizeBinaryString>
+        <Randomize>
             <summary>
-                Randomizes the encrypted binary string from the file to encode.
+                Randomizes the already encrypted array of bytes.
             </summary>
-            <param name="binaryString">The binary string to randomize.</param>
+            <param name="value">The bytes to be randomized.</param>
             <param name="randomSeed">The user provided random seed that will be used to initialize the random number generator.</param>
+            <param name="dummyCount">The number of dummy entries used to help determine the complete random seed to be used.</param>
+            <param name="iterationMultiplier">
+                A multiplier used in determining the number of bits to be swapped. The number of bits to be swapped is equal to the number
+                of bits in the binary string multiplied by the iterationMultipler.
+            </param>
             <returns>A randomized binary string.</returns>
-        </RandomizeBinaryString>
-        <ReorderBinaryString>
+        </Randomize>
+        <Reorder>
             <summary>
-                Reverses the effect of the RandomizeBytes method when writing to file.
+                Reverses the effect of the Randomize method when writing to file.
             </summary>
-            <param name="binaryString">The binary string in which the previous randomization process needs to be reversed.</param>
+            <param name="value">The encrypted and randomized bytes to be re-ordered.</param>
             <param name="randomSeed">The user provided randoom seed that will be used to initialize the random number generator.</param>
+            <param name="dummyCount">The number of dummy entries used to help determine the complete random seed to be used.</param>
+            <param name="iterationMultiplier">
+                A multiplier used in determining the number of bits to be swapped. The number of bits to be swapped is equal to the number
+                of bits in the binary string multiplied by the iterationMultipler.
+            </param>
             <returns>A non-randomized array of bytes matching the original input file.</returns>
-        </ReorderBinaryString>
+        </Reorder>
     </members>
     <members name="Logger">
         <Trace>

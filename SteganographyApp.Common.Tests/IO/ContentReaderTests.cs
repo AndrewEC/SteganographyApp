@@ -30,6 +30,7 @@ namespace SteganographyApp.Common.Tests
         private const bool UseCompression = true;
         private const int DummyCount = 10;
         private const string RandomSeed = "randomSeed";
+        private const int AdditionalHashIterations = 2;
 
         private static readonly IInputArguments Arguments = new CommonArguments
         {
@@ -47,7 +48,7 @@ namespace SteganographyApp.Common.Tests
             mockReadWriteStream.Setup(stream => stream.Read(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Returns(100);
 
             string expected = "encoded_value";
-            mockDataEncoderUtil.Setup(encoder => encoder.Encode(IsAny<byte[]>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()))
+            mockDataEncoderUtil.Setup(encoder => encoder.Encode(IsAny<byte[]>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
                 .Returns("encoded_value");
 
             using (var reader = new ContentReader(Arguments))
@@ -61,7 +62,7 @@ namespace SteganographyApp.Common.Tests
             mockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
             mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
             mockDataEncoderUtil
-                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()), Once());
+                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()), Once());
         }
 
         [Test]
@@ -80,7 +81,7 @@ namespace SteganographyApp.Common.Tests
             mockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
             mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
             mockDataEncoderUtil
-                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()), Never());
+                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()), Never());
         }
 
         [Test]
@@ -95,7 +96,7 @@ namespace SteganographyApp.Common.Tests
             }
 
             mockDataEncoderUtil
-                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == alternateByteCount), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>()), Once());
+                .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == alternateByteCount), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()), Once());
         }
 
         protected override void SetupMocks()

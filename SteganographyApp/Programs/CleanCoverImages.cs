@@ -13,7 +13,7 @@ namespace SteganographyApp
     internal sealed class CleanArguments : IArgumentConverter
     {
         [Argument("--coverImages", "-c", true, helpText: "The list of images whose pixel colour LSBs need to be cleaned")]
-        public ImmutableArray<string> CoverImages;
+        public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         public IInputArguments ToCommonArguments()
         {

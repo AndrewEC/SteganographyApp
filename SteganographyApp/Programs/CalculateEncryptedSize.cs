@@ -2,7 +2,6 @@
 namespace SteganographyApp
 {
     using System;
-    using System.Collections.Immutable;
     using System.Text.Json;
 
     using SteganographyApp.Common;
@@ -15,9 +14,6 @@ namespace SteganographyApp
     [ProgramDescriptor("Calculates the approximate size of an input file if it were to be encrypted.")]
     internal sealed class CalculateEncryptedSizeArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be encoded and written to.")]
-        public ImmutableArray<string> CoverImages;
-
         [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents.")]
         public string Password = string.Empty;
 
@@ -27,14 +23,20 @@ namespace SteganographyApp
         [Argument("--randomSeed", "-r", helpText: "The optional value to determine how the contents of the input file will be randomized before writing them.")]
         public string RandomSeed = string.Empty;
 
-        [Argument("--insertDummies", "-i", helpText: "Choose whether dummy bytes should be inserted into the file contents before being randomized.")]
-        public bool InsertDummies = false;
+        [Argument("--dummyCount", "-d", helpText: "The number of dummy entries that should be inserted after compression and before randomization. Recommended value between 100 and 1,000.")]
+        public int DummyCount = 0;
 
         [Argument("--chunkByteSize", "-cs", helpText: "The number of bytes to read and encode from the input file during each iteration.")]
         public int ChunkByteSize = 131_072;
 
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
         public LogLevel LogLevel = LogLevel.None;
+
+        [Argument("--additionalHashes", "-a", helpText: "The number of additional times to has the password. Has no effect if no password is provided.")]
+        public int AdditionalPasswordHashIterations = 0;
+
+        [Argument("--compress", "-co", helpText: "If provided will compress the contents of the file before encryption.")]
+        public bool EnableCompression = false;
 
         public static object ParseFilePath(object? target, string value) => ParserFunctions.ParseFilePath(value);
 
@@ -43,15 +45,15 @@ namespace SteganographyApp
             RootLogger.Instance.EnableLoggingAtLevel(LogLevel);
             var arguments = new CommonArguments
             {
-                CoverImages = CoverImages,
                 Password = Password,
                 FileToEncode = InputFile,
                 RandomSeed = RandomSeed,
-                InsertDummies = InsertDummies,
                 ChunkByteSize = ChunkByteSize,
-                DummyCount = ParserFunctions.ParseDummyCount(InsertDummies, CoverImages, RandomSeed)
+                DummyCount = DummyCount,
+                AdditionalPasswordHashIterations = AdditionalPasswordHashIterations,
+                UseCompression = EnableCompression
             };
-            Injector.LoggerFor<EncodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
+            Injector.LoggerFor<CalculateEncryptedSizeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
             return arguments;
         }
     }

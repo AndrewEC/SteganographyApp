@@ -30,9 +30,6 @@ namespace SteganographyApp.Common.Arguments
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
         int DummyCount { get; }
 
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/InsertDummies/*' />
-        bool InsertDummies { get; }
-
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
         bool DeleteAfterConversion { get; }
 
@@ -40,7 +37,10 @@ namespace SteganographyApp.Common.Arguments
         int ChunkByteSize { get; }
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
-        public ImageFormat ImageFormat { get; }
+        ImageFormat ImageFormat { get; }
+
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+        int AdditionalPasswordHashIterations { get; }
     }
 
     /// <summary>
@@ -85,9 +85,6 @@ namespace SteganographyApp.Common.Arguments
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
         public int DummyCount { get; set; } = 0;
 
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/InsertDummies/*' />
-        public bool InsertDummies { get; set; } = false;
-
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
         public bool DeleteAfterConversion { get; set; } = false;
 
@@ -96,6 +93,9 @@ namespace SteganographyApp.Common.Arguments
 
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
         public ImageFormat ImageFormat { get; set; } = ImageFormat.Png;
+
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+        public int AdditionalPasswordHashIterations { get; set; } = 0;
     }
 
     /// <summary>

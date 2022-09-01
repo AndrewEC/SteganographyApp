@@ -2,6 +2,7 @@ namespace SteganographyApp.Common.IO
 {
     using System;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Text;
 
     using SteganographyApp.Common.Arguments;
@@ -31,6 +32,7 @@ namespace SteganographyApp.Common.IO
         {
             log.Debug("Saving content chunk table with [{0}] chunks", chunkLengths.Length);
             string tableHeader = To18BitBinaryString((short)chunkLengths.Length);
+            log.Debug("Chunk table header: [{0}]", tableHeader);
 
             var binary = new StringBuilder();
             foreach (int chunkLength in chunkLengths)
@@ -39,20 +41,31 @@ namespace SteganographyApp.Common.IO
             }
 
             var binaryString = binary.ToString();
+            log.Debug("Chunk table binary: [{0}]", binaryString);
 
             if (!string.IsNullOrEmpty(Arguments.RandomSeed))
             {
-                var randomize = Injector.Provide<IRandomizeUtil>();
-                log.Trace("Randomizing chunk table header.");
-                tableHeader = randomize.RandomizeBinaryString(tableHeader, Arguments.RandomSeed);
-                log.Trace("Randomizing remaining chunk table content.");
-                binaryString = randomize.RandomizeBinaryString(binaryString, Arguments.RandomSeed);
+                var randomizeUtil = Injector.Provide<IRandomizeUtil>();
+                var binaryUtil = Injector.Provide<IBinaryUtil>();
+
+                tableHeader = Randomize(randomizeUtil, binaryUtil, tableHeader);
+                log.Debug("Randomized chunk table header to: [{0}]", tableHeader);
+
+                binaryString = Randomize(randomizeUtil, binaryUtil, binaryString);
+                log.Debug("Randomized remaining chunk table content to: [{0}]", binaryString);
             }
 
             string tableBinary = tableHeader + binaryString;
 
             ImageStoreIO.WriteContentChunkToImage(tableBinary);
             ImageStoreIO.EncodeComplete();
+        }
+
+        private string Randomize(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil, string value)
+        {
+            byte[] valueBytes = binaryUtil.ToBytesDirect(value);
+            byte[] randomized = randomizeUtil.Randomize(valueBytes, Arguments.RandomSeed, DummyCount, IterationMultiplier);
+            return Injector.Provide<IBinaryUtil>().ToBinaryStringDirect(randomized);
         }
 
         private string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');

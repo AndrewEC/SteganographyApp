@@ -1,6 +1,0 @@
-~AppDescription
-Arguments must be specified as <argument_name>space<argument_value>.
-\tExample arguments for encoding a file to a set of images: 
-\t\tdotnet .\\SteganographApp --action encode --images 001.png,002.png --input FileToEncode.zip --password Pass1234 --randomSeed monkey --compress
-\tExample arguments for decoding data from a set of images to an output file.
-\t\tdotnet .\\SteganpgraphyApp --action decode --images 001.png,002.png --output DecodedOutputFile.zip --password Pass1234 --randomSeed monkey --compress

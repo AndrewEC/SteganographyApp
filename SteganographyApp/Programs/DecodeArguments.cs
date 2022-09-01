@@ -12,7 +12,7 @@ namespace SteganographyApp
     public sealed class DecodeArguments : IArgumentConverter
     {
         [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be decoded from.")]
-        public ImmutableArray<string> CoverImages;
+        public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--password", "-p", helpText: "The optional password used to decrypt the input file contents.")]
         public string Password = string.Empty;
@@ -23,11 +23,17 @@ namespace SteganographyApp
         [Argument("--randomSeed", "-r", helpText: "The optional value to determine how the contents cover image contents will be decoded while before writing them to the output file.")]
         public string RandomSeed = string.Empty;
 
-        [Argument("--insertDummies", "-i", helpText: "Choose whether dummy values need to be removed from the encoded cover image contents.")]
-        public bool InsertDummies = false;
+        [Argument("--dummyCount", "-d", helpText: "The number of dummy entries to be removed after randomization and before decryption. Recommended value between 100 and 1,000.")]
+        public int DummyCount = 0;
 
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
         public LogLevel LogLevel = LogLevel.None;
+
+        [Argument("--additionalHashes", "-a", helpText: "The number of additional times to has the password. Has no effect if no password is provided.")]
+        public int AdditionalPasswordHashIterations = 0;
+
+        [Argument("--compress", "-co", helpText: "If provided will compress the contents of the file after decryption.")]
+        public bool EnableCompression = false;
 
         public IInputArguments ToCommonArguments()
         {
@@ -38,10 +44,11 @@ namespace SteganographyApp
                 Password = Password,
                 DecodedOutputFile = OutputFile,
                 RandomSeed = RandomSeed,
-                InsertDummies = InsertDummies,
-                DummyCount = ParserFunctions.ParseDummyCount(InsertDummies, CoverImages, RandomSeed)
+                DummyCount = DummyCount,
+                AdditionalPasswordHashIterations = AdditionalPasswordHashIterations,
+                UseCompression = EnableCompression,
             };
-            Injector.LoggerFor<EncodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
+            Injector.LoggerFor<DecodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
             return arguments;
         }
     }

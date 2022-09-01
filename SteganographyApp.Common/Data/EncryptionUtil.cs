@@ -4,7 +4,9 @@ namespace SteganographyApp.Common.Data
     using System.IO;
     using System.Security.Cryptography;
     using System.Text;
+
     using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     /// <summary>
     /// Contract for interacting with the EncryptionUtil instance.
@@ -12,10 +14,13 @@ namespace SteganographyApp.Common.Data
     public interface IEncryptionUtil
     {
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />
-        string Encrypt(string value, string password);
+        byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations);
 
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
-        string Decrypt(string value, string password);
+        byte[] Decrypt(byte[] value, string password, int additionalPasswordHashIterations);
+
+        /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/GenerateKey/*' />
+        byte[] GenerateKey(string value, int iterations);
     }
 
     /// <summary>
@@ -24,66 +29,72 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(IEncryptionUtil))]
     public sealed class EncryptionUtil : IEncryptionUtil
     {
-        private const int Iterations = 10000;
+        /// <summary>The default number of iterations that should be used when hashing a key.</summary>
+        public static readonly int DefaultIterations = 50_000;
+
         private const int KeySize = 256;
         private const int IvSize = 16;
 
+        private readonly ILogger log = new LazyLogger<EncryptionUtil>();
+
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />
-        public string Encrypt(string value, string password)
+        public byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations)
         {
-            var keyBytes = GenerateKey(password);
+            var keyBytes = GenerateKey(password, DefaultIterations + additionalPasswordHashIterations);
+            log.Debug("Encrypting value using key: [{0}]", () => new[] { Convert.ToBase64String(keyBytes) });
             var iv = GenerateRandomBytes(IvSize);
             using (var managed = Aes.Create("AesManaged")!)
             {
                 var cryptor = managed.CreateEncryptor(keyBytes, iv);
-                byte[] ciphertext;
                 using (var ms = new MemoryStream())
                 {
                     ms.Write(iv, 0, iv.Length);
 
                     using (var cs = new CryptoStream(ms, cryptor, CryptoStreamMode.Write))
                     {
-                        cs.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
+                        cs.Write(value, 0, value.Length);
                         cs.FlushFinalBlock();
                     }
 
-                    ciphertext = ms.ToArray();
+                    return ms.ToArray();
                 }
-
-                return Convert.ToBase64String(ciphertext);
             }
         }
 
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
-        public string Decrypt(string value, string password)
+        public byte[] Decrypt(byte[] value, string password, int additionalPasswordHashIterations)
         {
-            var valueBytes = Convert.FromBase64String(value);
-            var keyBytes = GenerateKey(password);
+            var keyBytes = GenerateKey(password, DefaultIterations + additionalPasswordHashIterations);
+            log.Debug("Decrypting value using key: [{0}]", () => new[] { Convert.ToBase64String(keyBytes) });
+            log.Trace("Decrypting: [{0}]", Convert.ToBase64String(value));
+
             using (var managed = Aes.Create("AesManaged")!)
             {
-                using (var ms = new MemoryStream(valueBytes))
+                using (var ms = new MemoryStream(value))
                 {
-                    var iv = new byte[IvSize];
+                    byte[] iv = new byte[IvSize];
                     ms.Read(iv, 0, iv.Length);
 
                     var decryptor = managed.CreateDecryptor(keyBytes, iv);
 
                     using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
                     {
-                        using (var sr = new StreamReader(cs, Encoding.UTF8))
+                        using (var msOut = new MemoryStream())
                         {
-                            return sr.ReadToEnd();
+                            cs.CopyTo(msOut);
+                            return msOut.ToArray();
                         }
                     }
                 }
             }
         }
 
-        private static byte[] GenerateKey(string password)
+        /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/GenerateKey/*' />
+        public byte[] GenerateKey(string value, int iterations)
         {
-            var passwordBytes = Encoding.UTF8.GetBytes(password);
-            var salt = Pbkdf2(passwordBytes, Sha512(password + password.Length), Iterations, KeySize);
-            return Pbkdf2(passwordBytes, salt, Iterations, KeySize / 8);
+            var passwordBytes = Encoding.UTF8.GetBytes(value);
+            var salt = Pbkdf2(passwordBytes, Sha512(value + value.Length), iterations, KeySize);
+            return Pbkdf2(passwordBytes, salt, iterations, KeySize / 8);
         }
 
         private static byte[] Pbkdf2(byte[] data, byte[] salt, int iterations, int size) => new Rfc2898DeriveBytes(data, salt, iterations).GetBytes(size);

@@ -32,38 +32,48 @@ namespace SteganographyApp.Common.IO
         {
             log.Trace("Reading content chunk table.");
             var randomizeUtil = Injector.Provide<IRandomizeUtil>();
+            var binaryUtil = Injector.Provide<IBinaryUtil>();
 
-            short chunkCount = ReadChunkCount(randomizeUtil);
+            short chunkCount = ReadChunkCount(randomizeUtil, binaryUtil);
             log.Debug("Chunk table contains [{0}] chunks.", chunkCount);
 
-            return ReadTableChunkLengths(randomizeUtil, chunkCount);
+            return ReadTableChunkLengths(randomizeUtil, binaryUtil, chunkCount);
         }
 
-        private short ReadChunkCount(IRandomizeUtil randomizeUtil)
+        private short ReadChunkCount(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil)
         {
-            log.Trace("Reading chunk table header.");
             string headerBinary = ImageStoreIO.ReadContentChunkFromImage(Calculator.ChunkTableHeaderSizeWithPadding);
+            log.Debug("Chunk table header: [{0}]", headerBinary);
             if (!string.IsNullOrEmpty(Arguments.RandomSeed))
             {
-                headerBinary = randomizeUtil.ReorderBinaryString(headerBinary, Arguments.RandomSeed);
+                headerBinary = Reorder(randomizeUtil, binaryUtil, headerBinary);
+                log.Debug("Reordered chunk table header: [{0}]", headerBinary);
             }
             return Convert.ToInt16(headerBinary, 2);
         }
 
-        private ImmutableArray<int> ReadTableChunkLengths(IRandomizeUtil randomizeUtil, short chunkCount)
+        private ImmutableArray<int> ReadTableChunkLengths(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil, short chunkCount)
         {
-            log.Trace("Reading content of chunk table.");
             int chunkSize = Calculator.ChunkDefinitionBitSizeWithPadding * chunkCount;
             string tableBinary = ImageStoreIO.ReadContentChunkFromImage(chunkSize);
+            log.Debug("Chunk table content: [{0}]", tableBinary);
             if (!string.IsNullOrEmpty(Arguments.RandomSeed))
             {
-                tableBinary = randomizeUtil.ReorderBinaryString(tableBinary, Arguments.RandomSeed);
+                tableBinary = Reorder(randomizeUtil, binaryUtil, tableBinary);
+                log.Debug("Reordered chunk table content: [{0}]", tableBinary);
             }
 
             return Enumerable.Range(0, chunkCount)
                 .Select(i => NextBinaryChunk(i, tableBinary))
                 .Select(BinaryStringToInt)
                 .ToImmutableArray();
+        }
+
+        private string Reorder(IRandomizeUtil randomize, IBinaryUtil binaryUtil, string binary)
+        {
+            byte[] binaryBytes = binaryUtil.ToBytesDirect(binary);
+            byte[] ordered = randomize.Reorder(binaryBytes, Arguments.RandomSeed, DummyCount, IterationMultiplier);
+            return binaryUtil.ToBinaryStringDirect(ordered);
         }
 
         private string NextBinaryChunk(int index, string binaryString) => binaryString.Substring(index * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSizeWithPadding);

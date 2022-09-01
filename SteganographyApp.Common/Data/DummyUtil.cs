@@ -1,8 +1,8 @@
 namespace SteganographyApp.Common.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
 
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Logging;
@@ -13,115 +13,114 @@ namespace SteganographyApp.Common.Data
     public interface IDummyUtil
     {
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
-        string InsertDummies(int numDummies, string binary, string randomSeed);
+        byte[] InsertDummies(int numDummies, byte[] value, string randomSeed);
 
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
-        string RemoveDummies(int numDummies, string binary, string randomSeed);
+        byte[] RemoveDummies(int numDummies, byte[] value, string randomSeed);
     }
 
     /// <summary>
-    /// Utility class for inserting and removing dummy entries in a binary string.
+    /// Utility class for inserting and removing dummy entries in the original byte array.
     /// </summary>
     [Injectable(typeof(IDummyUtil))]
     public sealed class DummyUtil : IDummyUtil
     {
-        private const int MaxLengthPerDummy = 500;
-        private const int MinLengthPerDummy = 100;
+        private const int MaxLengthPerDummy = 100;
+        private const int MinLengthPerDummy = 10;
+        private const int HashIterationLimit = 1000;
 
         private ILogger log = new LazyLogger<DummyUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
-        public string InsertDummies(int numDummies, string binary, string randomSeed)
+        public byte[] InsertDummies(int numDummies, byte[] value, string randomSeed)
         {
-            log.Debug("Inserting [{0}] dummies using seed [{1}] and global count [{2}]", numDummies, randomSeed, GlobalCounter.Instance.Count);
-            log.Debug("Bit count before inserting dummies: [{0}]", binary.Length);
-            int amountToIncrement = SumBinaryString(binary);
+            string seed = CreateRandomSeed(randomSeed);
 
-            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies);
+            log.Debug("Inserting [{0}] dummies using seed [{1}]", numDummies, seed);
+            log.Debug("Byte count before inserting dummies: [{0}]", value.Length);
 
-            var generator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
+            var generator = Xor128Prng.FromString(seed);
 
-            // we need to pre-calculate the positions that these dummy entries will be inserted at in order
-            // to make decoding possible.
+            // generate an array in which each element represents the length that an inserted dummy entry will have.
+            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies, generator);
+
+            // generate an array in which each element represents the index the dummy entry will be inserted at.
             int[] positions = Enumerable.Range(0, numDummies)
-                .Select(i => generator.Next(binary.Length))
+                .Select(i => generator.Next(value.Length))
                 .ToArray();
 
+            var endValue = new List<byte>(value.Length + lengths.Sum());
+            endValue.InsertRange(0, value);
             for (int i = 0; i < positions.Length; i++)
             {
-                var nextDummy = GenerateDummyEntry(generator, lengths[i]);
+                var nextDummy = GenerateDummyBytes(generator, lengths[i]);
                 var nextDummyPosition = positions[i];
-                log.Trace("Inserting dummy at position [{0}] with value [{1}]", nextDummyPosition, nextDummy);
-                binary = binary.Insert(positions[i], nextDummy);
+                log.Trace("Inserting dummy at position [{0}] with with length [{1}]", nextDummyPosition, nextDummy.Length);
+                endValue.InsertRange(positions[i], nextDummy);
             }
 
-            GlobalCounter.Instance.Increment(amountToIncrement);
-
-            log.Debug("Bit count after inserting dummies: [{0}]", binary.Length);
-            return binary;
+            var result = endValue.ToArray();
+            log.Debug("Byte count after inserting dummies: [{0}]", result.Length);
+            return result;
         }
 
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
-        public string RemoveDummies(int numDummies, string binary, string randomSeed)
+        public byte[] RemoveDummies(int numDummies, byte[] value, string randomSeed)
         {
-            log.Debug("Removing [{0}] dummies using seed [{1}] and global count [{2}]", numDummies, randomSeed, GlobalCounter.Instance.Count);
-            log.Debug("Bit count before removing dummies: [{0}]", binary.Length);
+            string seed = CreateRandomSeed(randomSeed);
+
+            log.Debug("Removing [{0}] dummies using seed [{1}]", numDummies, seed);
+            log.Debug("Byte count before removing dummies: [{0}]", value.Length);
+
+            var generator = Xor128Prng.FromString(seed);
 
             // calculate the length of the dummies originally added to the string
-            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies);
+            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies, generator);
             Array.Reverse(lengths);
             int totalLength = lengths.Sum();
 
-            // Calculate the length of the binary string before the dummies were added so we can
+            // Calculate the length of the byte array before the dummies were added so we can
             // determine the original position where the dummy entries were inserted.
-            int binaryLengthWithoutDummies = binary.Length - totalLength;
+            int lengthWithoutDummies = value.Length - totalLength;
 
-            var generator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
-
+            // generate the positions in which the dummy entries were inserted into the original string
             int[] positions = Enumerable.Range(0, numDummies)
-                .Select(i => generator.Next(binaryLengthWithoutDummies))
+                .Select(i => generator.Next(lengthWithoutDummies))
                 .Reverse()
                 .ToArray();
 
+            byte[] result;
             try
             {
+                var valueList = new List<byte>(value);
                 for (int i = 0; i < positions.Length; i++)
                 {
-                    binary = binary.Remove(positions[i], lengths[i]);
+                    valueList.RemoveRange(positions[i], lengths[i]);
                 }
+                result = valueList.ToArray();
             }
             catch (ArgumentOutOfRangeException e)
             {
                 throw new TransformationException("Unable to remove all dummy entries from chunk.", e);
             }
 
-            GlobalCounter.Instance.Increment(SumBinaryString(binary));
-
-            log.Debug("Bit count after removing dummies: [{0}]", binary.Length);
-            return binary;
+            log.Debug("Bit count after removing dummies: [{0}]", result.Length);
+            return result;
         }
 
-        private int SumBinaryString(string binary) => binary.ToCharArray().Where(c => c == '1').Count();
-
-        private string CreateRandomSeed(string randomSeed) => $"{randomSeed}{GlobalCounter.Instance.Count}";
-
-        private int[] GenerateLengthsOfDummies(string randomSeed, int numDummies)
+        private string CreateRandomSeed(string randomSeed)
         {
-            var lengthGenerator = IndexGenerator.FromString(CreateRandomSeed(randomSeed));
-            return Enumerable.Range(0, numDummies)
-                .Select(i => lengthGenerator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
+            int iterations = (int)Math.Max(1, GlobalCounter.Instance.Count % HashIterationLimit);
+            var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed + iterations, iterations);
+            return Convert.ToBase64String(randomKey);
+        }
+
+        private int[] GenerateLengthsOfDummies(string randomSeed, int numDummies, Xor128Prng generator) => Enumerable.Range(0, numDummies)
+                .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
                 .ToArray();
-        }
 
-        private string GenerateDummyEntry(IndexGenerator generator, int length)
-        {
-            var dummy = new StringBuilder(length, length);
-            for (int i = 0; i < length; i++)
-            {
-                int next = generator.Next(10);
-                dummy.Append((next % 2 == 0) ? '0' : '1');
-            }
-            return dummy.ToString();
-        }
+        private byte[] GenerateDummyBytes(Xor128Prng generator, int length) => Enumerable.Range(0, length)
+            .Select(i => (byte)generator.Next(byte.MaxValue))
+            .ToArray();
     }
 }

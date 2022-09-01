@@ -64,7 +64,8 @@ namespace SteganographyApp.Common.Arguments.Commands
     /// A high level abstract command that provides some reasonable default logic to execute a single command.
     /// </summary>
     /// <typeparam name="T">The type which the args from the root Execute command will be parsed to using the CliParser.</typeparam>
-    public abstract class BaseCommand<T> : ICommand where T : class
+    public abstract class BaseCommand<T> : ICommand
+    where T : class
     {
         /// <summary>
         /// Parses the user provided arguments into an object of type T and passes it to the abstract
@@ -93,7 +94,7 @@ namespace SteganographyApp.Common.Arguments.Commands
     /// <summary>
     /// A high level generic command instantiated using a name and a function.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Specifies the type of the arguments to be passed into the Execute method.</typeparam>
     public class GenericCommand<T> : BaseCommand<T>
     where T : class
     {

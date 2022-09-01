@@ -24,7 +24,7 @@
         /// <param name="binary">The encrypted binary string read from the storage images.</param>
         public void WriteContentChunkToFile(string binary)
         {
-            byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed);
+            byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed, Args.AdditionalPasswordHashIterations);
             Stream.Write(decoded, 0, decoded.Length);
             Stream.Flush();
         }
