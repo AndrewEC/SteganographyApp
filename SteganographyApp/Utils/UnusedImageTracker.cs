@@ -16,21 +16,15 @@ namespace SteganographyApp
         private readonly HashSet<string> imagesUsed = new HashSet<string>();
         private readonly int availableImages;
 
-        private ImageTracker(int availableImages)
-        {
-            this.availableImages = availableImages;
-        }
-
         /// <summary>
         /// Creates a new <see cref="ImageTracker"/> instance from the provided arguments and
         /// hooks the tracker into the <see cref="ImageStore.OnNextImageLoaded"/> event to
         /// listen to when new images are loaded.
         /// <summary>
-        public static ImageTracker Create(IInputArguments arguments, ImageStore store)
+        public ImageTracker(IInputArguments arguments, ImageStore store)
         {
-            var tracker = new ImageTracker(arguments.CoverImages.Length);
-            store.OnNextImageLoaded += tracker.RecordLoadedImage;
-            return tracker;
+            this.availableImages = arguments.CoverImages.Length;
+            store.OnNextImageLoaded += RecordLoadedImage;
         }
 
         /// <summary>

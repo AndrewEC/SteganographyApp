@@ -67,6 +67,8 @@ namespace SteganographyApp
     {
         private readonly ILogger log = new LazyLogger<EncodeCommand>();
 
+        public override string GetName() => "encode";
+
         public override void Execute(EncodeArguments args)
         {
             var arguments = args.ToCommonArguments();
@@ -136,7 +138,7 @@ namespace SteganographyApp
         {
             ImageStore = new ImageStore(args);
             TableTracker = new TableChunkTracker(ImageStore);
-            ImageTracker = ImageTracker.Create(args, ImageStore);
+            ImageTracker = new ImageTracker(args, ImageStore);
         }
 
         public ImageStore ImageStore { get; }

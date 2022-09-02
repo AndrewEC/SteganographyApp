@@ -14,6 +14,7 @@
                     Command.Lazy<DecodeCommand>(),
                     Command.Lazy<EncodeCommand>(),
                     Command.Lazy<ConvertImagesCommand>(),
+                    Command.Lazy<VerifyImagesCommand>(),
                     Command.Group(
                         "calculate",
                         Command.Lazy<CalculateEncryptedSizeCommand>(),
