@@ -31,9 +31,6 @@ namespace SteganographyApp
 
         public override string GetName() => "storage-space";
 
-        /// <summary>
-        /// Calculates the total available storage space of all the specified images.
-        /// </summary>
         public override void Execute(CalculateStorageSpaceArguments args)
         {
             var arguments = args.ToCommonArguments();
@@ -52,10 +49,6 @@ namespace SteganographyApp
             }
         }
 
-        /// <summary>
-        /// Calculate the total number of pixels within all images.
-        /// </summary>
-        /// <param name="coverImages">The array of string paths to the images to check.</param>
         private static BigInteger CalculateNumberOfPixelsForImages(ImmutableArray<string> coverImages)
         {
             var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length, "Calculating image storage space", "Completed calculating image storage space.");
@@ -78,11 +71,6 @@ namespace SteganographyApp
             return count;
         }
 
-        /// <summary>
-        /// Prints out the binary size of an encypted file or storage space in bits, bytes,
-        /// megabytes and gigabytes.
-        /// </summary>
-        /// <param name="size">The size in bits to print out.</param>
         private static void PrintSize(BigInteger size)
         {
             Console.WriteLine("\t{0} bits", size);

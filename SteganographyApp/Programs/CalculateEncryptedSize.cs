@@ -71,7 +71,6 @@ namespace SteganographyApp
                 int singleChunkSize = CalculateChunkLength(arguments);
                 int numberOfChunks = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
 
-                // Plus 1 because we need an additional entry in the chunk table to indicate the number of entries in the table
                 int chunkTableSize = Calculator.CalculateRequiredBitsForContentTable(numberOfChunks);
                 double size = ((double)singleChunkSize * (double)numberOfChunks) + (double)chunkTableSize;
 
@@ -87,13 +86,6 @@ namespace SteganographyApp
             }
         }
 
-        /// <summary>
-        /// Read in a chunk of the file to encode and pass the read in bytes to the
-        /// encoder util.
-        /// </summary>
-        /// <param name="chunkId">Used to specify where the thread will start and stop reading.
-        /// The thread will use the equation chunkId * arguments.ChunkByteSize
-        /// to determine where to start reading the file to encode from.</param>
         private static int CalculateChunkLength(IInputArguments arguments)
         {
             using (var contentReader = new ContentReader(arguments))
@@ -102,11 +94,6 @@ namespace SteganographyApp
             }
         }
 
-        /// <summary>
-        /// Prints out the binary size of an encypted file or storage space in bits, bytes,
-        /// megabytes and gigabytes.
-        /// </summary>
-        /// <param name="size">The size in bits to print out.</param>
         private static void PrintSize(double size)
         {
             Console.WriteLine("\t{0} bits", size);
@@ -115,10 +102,6 @@ namespace SteganographyApp
             Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
         }
 
-        /// <summary>
-        /// Prints how many images at common resolutions it would take to store this content.
-        /// </summary>
-        /// <param name="size">The size of the encoded file in bits.</param>
         private static void PrintComparison(double size)
         {
             Console.WriteLine("\tAt 360p: \t{0}", size / CommonResolutionStorageSpace.P360);

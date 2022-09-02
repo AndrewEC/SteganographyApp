@@ -1,8 +1,5 @@
 namespace SteganographyApp.Common.Arguments
 {
-    using System.Collections.Immutable;
-
-    using SteganographyApp.Common.Data;
     using SteganographyApp.Common.Injection;
 
     /// <summary>

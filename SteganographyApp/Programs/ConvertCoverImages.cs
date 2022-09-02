@@ -5,10 +5,10 @@ namespace SteganographyApp
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
-    using System.Linq;
 
     using SixLabors.ImageSharp;
     using SixLabors.ImageSharp.Formats;
+    using SixLabors.ImageSharp.PixelFormats;
 
     using SteganographyApp.Common;
     using SteganographyApp.Common.Arguments;
@@ -49,31 +49,30 @@ namespace SteganographyApp
         public override void Execute(ConvertArguments args)
         {
             var arguments = args.ToCommonArguments();
-            string[] lossyImages = arguments.CoverImages.Where(image => FilterOutUnconvertableImages(image, arguments.ImageFormat)).ToArray();
-            if (lossyImages.Length == 0)
-            {
-                Console.WriteLine("All images found are already convert and will not be converted again.");
-                return;
-            }
 
-            Console.WriteLine("Converting [{0}] images.", lossyImages.Length);
-            var tracker = ProgressTracker.CreateAndDisplay(lossyImages.Length, "Converting images", "Finished converting all images");
+            Console.WriteLine("Converting [{0}] images.", arguments.CoverImages.Length);
+            var tracker = ProgressTracker.CreateAndDisplay(arguments.CoverImages.Length, "Converting images", "Finished converting all images");
 
             var failures = new List<string>();
 
             var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(arguments.ImageFormat);
-            foreach (string coverImage in lossyImages)
+            foreach (string sourceImage in arguments.CoverImages)
             {
-                string? result = TrySaveImage(coverImage, encoder, arguments);
-                if (!string.IsNullOrEmpty(result))
+                string destinationImage = ReplaceFileExtension(sourceImage, arguments);
+                try
                 {
-                    failures.Add($"{coverImage}: {result}");
+                    ConvertImage(sourceImage, destinationImage, encoder, arguments);
+                }
+                catch (Exception e)
+                {
+                    failures.Add($"{sourceImage}: {e.Message}");
                     tracker.UpdateAndDisplayProgress();
                     continue;
                 }
                 if (arguments.DeleteAfterConversion)
                 {
-                    File.Delete(coverImage);
+                    File.Delete(sourceImage);
+                    RenameFile(destinationImage);
                 }
 
                 tracker.UpdateAndDisplayProgress();
@@ -82,22 +81,23 @@ namespace SteganographyApp
             PrintFailures(failures);
         }
 
-        private static string? TrySaveImage(string coverImage, IImageEncoder encoder, IInputArguments arguments)
+        private static void ConvertImage(string sourceImage, string detinationImage, IImageEncoder encoder, IInputArguments arguments)
         {
-            try
+            using (var source = Image.Load<Rgba32>(sourceImage))
             {
-                string updatedPath = ReplaceFileExtension(coverImage, arguments);
-                using (var image = Image.Load(coverImage))
+                using (var destination = new Image<Rgba32>(source.Width, source.Height))
                 {
-                    image.Save(updatedPath, encoder);
+                    for (int i = 0; i < source.Width; i++)
+                    {
+                        for (int j = 0; j < source.Height; j++)
+                        {
+                            destination[i, j] = source[i, j];
+                        }
+                    }
+                    destination.Save(detinationImage, encoder);
                 }
-                Console.WriteLine($"Saved image [{coverImage}] to [{updatedPath}]");
             }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-            return null;
+            Console.WriteLine($"Saved image [{sourceImage}] to [{detinationImage}]");
         }
 
         private static void PrintFailures(List<string> failures)
@@ -114,25 +114,18 @@ namespace SteganographyApp
             }
         }
 
-        /// <summary>
-        /// Filters out any images that are already in the desired format.
-        /// </summary>
-        private static bool FilterOutUnconvertableImages(string image, ImageFormat desiredImageFormat)
-        {
-            string imageType = Image.DetectFormat(image).DefaultMimeType;
-            return !((desiredImageFormat == ImageFormat.Png && imageType == PngMimeType) || (desiredImageFormat == ImageFormat.Webp && imageType == WebpMimeType));
-        }
-
-        /// <summary>
-        /// Takes in the path to the specified image, strips out the existing file extension and replaces it with the extension appropriate
-        /// for the output image format.
-        /// </summary>
-        /// <param name="image">The path to the image being converted</param>
         private static string ReplaceFileExtension(string image, IInputArguments arguments)
+            => Path.ChangeExtension(image, ".converted." + arguments.ImageFormat.ToString().ToLower());
+
+        private static void RenameFile(string path)
         {
-            int index = image.LastIndexOf('.');
-            string extension = arguments.ImageFormat.ToString().ToLower();
-            return $"{image.Substring(0, index)}.{extension}";
+            string parent = Directory.GetParent(path).FullName;
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            int index = fileName.LastIndexOf('.');
+            string withoutConverted = fileName.Substring(0, index);
+            string newPath = withoutConverted + Path.GetExtension(path);
+            File.Move(path, newPath);
+            Console.WriteLine($"Renamed image from [{path}] to [{newPath}]");
         }
     }
 }

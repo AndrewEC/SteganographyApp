@@ -128,10 +128,6 @@ namespace SteganographyApp
         }
     }
 
-    /// <summary>
-    /// Helps initialize the utilitiy classes required to fulfill the encoding
-    /// process.
-    /// </summary>
     internal class EncodingUtilities
     {
         public EncodingUtilities(IInputArguments args)
