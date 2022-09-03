@@ -89,13 +89,13 @@
 
         /// <summary>
         /// Will look over all images specified in the InputArguments
-        /// and set the LSB in all pixels in all images to 0.
+        /// and set the LSB in all pixels in all images to a random value of either 1 or 0.
         /// </summary>
         public void CleanImageLSBs()
         {
             try
             {
-                ResetToImage(0);
+                SeekToImage(0);
                 var randomBit = RandomBitGenerator();
                 for (int i = 0; i < args.CoverImages.Length; i++)
                 {
@@ -136,7 +136,7 @@
         /// </summary>
         /// <param name="coverImageIndex">The index of the image to start reading and writing from.</param>
         /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-        public void ResetToImage(int coverImageIndex)
+        public void SeekToImage(int coverImageIndex)
         {
             if (coverImageIndex < 0 || coverImageIndex >= args.CoverImages.Length)
             {
@@ -153,17 +153,18 @@
         /// made to the current image.</param>
         internal void CloseOpenImage(bool saveImageChanges = false)
         {
-            if (currentImage != null)
+            if (currentImage == null)
             {
-                if (saveImageChanges)
-                {
-                    log.Debug("Saving changes to image [{0}]", CurrentImage);
-                    var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(CurrentImage);
-                    currentImage.Save(CurrentImage, encoder);
-                }
-                currentImage.Dispose();
-                currentImage = null;
+                return;
             }
+            if (saveImageChanges)
+            {
+                log.Debug("Saving changes to image [{0}]", CurrentImage);
+                var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(CurrentImage);
+                currentImage.Save(CurrentImage, encoder);
+            }
+            currentImage.Dispose();
+            currentImage = null;
         }
 
         /// <summary>
@@ -180,42 +181,28 @@
         internal int WriteBinaryString(string binary)
         {
             log.Debug("Writing [{0}] bits to image [{1}] starting at position [{2}]", binary.Length, CurrentImage, pixelPosition.ToString());
-            int written = 0;
-            for (int i = 0; i < binary.Length; i += 3)
+            var queue = new ReadBitQueue(binary);
+            var writer = new PixelWriter(queue, args.BitsToUse);
+            while (queue.HasNext())
             {
-                Rgba32 pixel = currentImage![pixelPosition.X, pixelPosition.Y];
-
-                pixel.R = ShiftColourChannelByBinary(pixel.R, binary[i]);
-                written++;
-
-                if (written < binary.Length)
-                {
-                    pixel.G = ShiftColourChannelByBinary(pixel.G, binary[i + 1]);
-                    written++;
-
-                    if (written < binary.Length)
-                    {
-                        pixel.B = ShiftColourChannelByBinary(pixel.B, binary[i + 2]);
-                        written++;
-                    }
-                }
-
-                currentImage[pixelPosition.X, pixelPosition.Y] = new Rgba32(pixel.R, pixel.G, pixel.B, pixel.A);
+                Rgba32 source = currentImage![pixelPosition.X, pixelPosition.Y];
+                Rgba32 updated = writer.UpdatePixel(source);
+                currentImage[pixelPosition.X, pixelPosition.Y] = updated;
 
                 if (!pixelPosition.TryMoveToNext())
                 {
                     LoadNextImage(true);
                 }
             }
-            OnChunkWritten?.Invoke(this, new ChunkWrittenArgs(written));
-            return written;
+            OnChunkWritten?.Invoke(this, new ChunkWrittenArgs(binary.Length));
+            return binary.Length;
         }
 
         /// <summary>
         /// Attempts to read the specified number of bits from the current image starting
         /// at the last read/write position.
         /// <para>If there is not enough available space in the current image then it will
-        /// invoke the Next method and continue to read from the next available image.</para>
+        /// load the next cover image and continue to read from the next available image.</para>
         /// </summary>
         /// <param name="bitsToRead">Specifies the number of bits to be read from the current image.</param>
         /// <returns>A binary string whose length is equal to the length specified in the length
@@ -224,33 +211,18 @@
         internal string ReadBinaryString(int bitsToRead)
         {
             log.Debug("Reading [{0}] bits from image [{1}] starting from position [{2}]", bitsToRead, CurrentImage, pixelPosition.ToString());
-            var binary = new StringBuilder();
-            int bitsRead = 0;
-            while (bitsRead < bitsToRead)
+            var queue = new BitAggregator(bitsToRead);
+            var reader = new PixelReader(queue, args.BitsToUse);
+            while (!queue.IsFull())
             {
                 Rgba32 pixel = currentImage![pixelPosition.X, pixelPosition.Y];
-
-                binary.Append(ReadLeastSignificantBit(pixel.R));
-                bitsRead++;
-
-                if (bitsRead < bitsToRead)
-                {
-                    binary.Append(ReadLeastSignificantBit(pixel.G));
-                    bitsRead++;
-
-                    if (bitsRead < bitsToRead)
-                    {
-                        binary.Append(ReadLeastSignificantBit(pixel.B));
-                        bitsRead++;
-                    }
-                }
-
+                reader.ReadBinaryFromPixel(pixel);
                 if (!pixelPosition.TryMoveToNext())
                 {
                     LoadNextImage();
                 }
             }
-            return binary.ToString();
+            return queue.GetBits();
         }
 
         /// <summary>
@@ -292,7 +264,7 @@
             log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage);
             pixelPosition.Reset();
 
-            int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (double)Calculator.BitsPerPixel);
+            int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / ((double)Calculator.BitsPerPixel * (double)args.BitsToUse));
             for (int i = 0; i < pixelIndex; i++)
             {
                 if (!pixelPosition.TryMoveToNext())
@@ -326,17 +298,6 @@
         /// <param name="shiftByBit">Specifies the value that the colourChannel's
         /// least significant bit should be changed to.</param>
         private byte ShiftColourChannelByBinary(byte colourChannel, char shiftByBit) => ShiftColourChannel(colourChannel, (shiftByBit == '0') ? 0 : 1);
-
-        /// <summary>
-        /// Converts the provided input byte into binary and returns the last binary digit.
-        /// </summary>
-        /// <param name="colourChannel">The 0-255 representation of either the red, green, blue colour of any given pixel.</param>
-        /// <returns>The least (last) significant bit of the input value.</returns>
-        private string ReadLeastSignificantBit(byte colourChannel)
-        {
-            var binary = Convert.ToString(colourChannel, 2);
-            return binary.Substring(binary.Length - 1);
-        }
 
         /// <summary>
         /// Provides a consumable function that uses the standard Random class to generate

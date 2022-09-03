@@ -14,21 +14,24 @@ namespace SteganographyApp
     [ProgramDescriptor("Calculate the amount of storage space a set of cover images will provide.")]
     internal sealed class CalculateStorageSpaceArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", position: 1, helpText: "The images from which the amount of storage space available will be derived.")]
+        [Argument("--coverImages", "-c", required: true, helpText: "The images from which the amount of storage space available will be derived.")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
+
+        [Argument("--twoBits", "-tb", helpText: "If true will store data in the least and second-least significant bit rather than just the least significant.")]
+        public bool TwoBits = false;
 
         public IInputArguments ToCommonArguments()
         {
             return new CommonArguments()
             {
-                CoverImages = CoverImages
+                CoverImages = CoverImages,
+                BitsToUse = TwoBits ? 2 : 1,
             };
         }
     }
 
     internal sealed class CalculateStorageSpaceCommand : BaseCommand<CalculateStorageSpaceArguments>
     {
-
         public override string GetName() => "storage-space";
 
         public override void Execute(CalculateStorageSpaceArguments args)
@@ -38,7 +41,7 @@ namespace SteganographyApp
             Console.WriteLine("Calculating storage space in {0} images.", arguments.CoverImages.Length);
             try
             {
-                var availableSpace = CalculateNumberOfPixelsForImages(arguments.CoverImages) * Calculator.BitsPerPixel;
+                var availableSpace = CalculateNumberOfPixelsForImages(arguments.CoverImages) * (Calculator.BitsPerPixel * arguments.BitsToUse);
 
                 Console.WriteLine("\nImages are able to store:");
                 PrintSize(availableSpace);

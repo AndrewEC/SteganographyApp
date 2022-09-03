@@ -7,6 +7,7 @@ namespace SteganographyApp
     using System.Collections.Immutable;
     using System.Linq;
 
+    using SteganographyApp.Common;
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Arguments.Commands;
     using SteganographyApp.Common.IO;
@@ -77,6 +78,7 @@ namespace SteganographyApp
         {
             var arguments = args.ToCommonArguments();
             Console.WriteLine($"Identified [{args.CoverImages.Length}] images to verify.");
+            var tracker = ProgressTracker.CreateAndDisplay(arguments.CoverImages.Length, "Verifying image.", "Finished verifying all images.");
             var failedValidation = new List<string>();
             foreach (string path in args.CoverImages)
             {
@@ -91,6 +93,7 @@ namespace SteganographyApp
                         failedValidation.Add(path);
                     }
                 }
+                tracker.UpdateAndDisplayProgress();
             }
             PrintFailed(failedValidation);
         }

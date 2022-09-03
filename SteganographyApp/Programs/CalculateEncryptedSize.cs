@@ -38,6 +38,9 @@ namespace SteganographyApp
         [Argument("--compress", "-co", helpText: "If provided will compress the contents of the file before encryption.")]
         public bool EnableCompression = false;
 
+        [Argument("--twoBits", "-tb", helpText: "If true will store data in the least and second-least significant bit rather than just the least significant.")]
+        public bool TwoBits = false;
+
         public static object ParseFilePath(object? target, string value) => ParserFunctions.ParseFilePath(value);
 
         public IInputArguments ToCommonArguments()
@@ -51,7 +54,8 @@ namespace SteganographyApp
                 ChunkByteSize = ChunkByteSize,
                 DummyCount = DummyCount,
                 AdditionalPasswordHashIterations = AdditionalPasswordHashIterations,
-                UseCompression = EnableCompression
+                UseCompression = EnableCompression,
+                BitsToUse = TwoBits ? 2 : 1,
             };
             Injector.LoggerFor<CalculateEncryptedSizeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
             return arguments;
@@ -78,7 +82,7 @@ namespace SteganographyApp
                 PrintSize(size);
 
                 Console.WriteLine("\n# of images required to store this file at common resolutions:");
-                PrintComparison(size);
+                PrintComparison(size, arguments.BitsToUse);
             }
             catch (Exception e)
             {
@@ -102,14 +106,14 @@ namespace SteganographyApp
             Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
         }
 
-        private static void PrintComparison(double size)
+        private static void PrintComparison(double size, int bitsToUse)
         {
-            Console.WriteLine("\tAt 360p: \t{0}", size / CommonResolutionStorageSpace.P360);
-            Console.WriteLine("\tAt 480p: \t{0}", size / CommonResolutionStorageSpace.P480);
-            Console.WriteLine("\tAt 720p: \t{0}", size / CommonResolutionStorageSpace.P720);
-            Console.WriteLine("\tAt 1080p: \t{0}", size / CommonResolutionStorageSpace.P1080);
-            Console.WriteLine("\tAt 1440p: \t{0}", size / CommonResolutionStorageSpace.P1440);
-            Console.WriteLine("\tAt 4K (2160p): \t{0}", size / CommonResolutionStorageSpace.P2160);
+            Console.WriteLine("\tAt 360p: \t{0}", size / (CommonResolutionStorageSpace.P360 * bitsToUse));
+            Console.WriteLine("\tAt 480p: \t{0}", size / (CommonResolutionStorageSpace.P480 * bitsToUse));
+            Console.WriteLine("\tAt 720p: \t{0}", size / (CommonResolutionStorageSpace.P720 * bitsToUse));
+            Console.WriteLine("\tAt 1080p: \t{0}", size / (CommonResolutionStorageSpace.P1080 * bitsToUse));
+            Console.WriteLine("\tAt 1440p: \t{0}", size / (CommonResolutionStorageSpace.P1440 * bitsToUse));
+            Console.WriteLine("\tAt 4K (2160p): \t{0}", size / (CommonResolutionStorageSpace.P2160 * bitsToUse));
         }
     }
 }

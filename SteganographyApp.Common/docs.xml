@@ -78,6 +78,12 @@
                 <para>Has no effect if no password has been provided.</para>
             </summary>
         </AdditionalPasswordHashIterations>
+        <BitsToUse>
+            <summary>
+                Specifies the number of bits to read or write, starting the least significant bit, from each RGB value in
+                each pixel from the cover images.
+            </summary>
+        </BitsToUse>
     </members>
     <members name="BinaryUtil">
         <ToBinaryString>

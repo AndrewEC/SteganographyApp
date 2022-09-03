@@ -76,7 +76,8 @@ namespace SteganographyApp.Common.IO
             return binaryUtil.ToBinaryStringDirect(ordered);
         }
 
-        private string NextBinaryChunk(int index, string binaryString) => binaryString.Substring(index * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSizeWithPadding);
+        private string NextBinaryChunk(int index, string binaryString)
+            => binaryString.Substring(index * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSizeWithPadding);
 
         private int BinaryStringToInt(string binary) => Convert.ToInt32(binary, 2);
     }

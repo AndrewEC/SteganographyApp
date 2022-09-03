@@ -39,8 +39,11 @@ namespace SteganographyApp.Common.Arguments
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
         ImageFormat ImageFormat { get; }
 
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/AdditionalPasswordHashIterations/*' />
         int AdditionalPasswordHashIterations { get; }
+
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/BitsToUse/*' />
+        int BitsToUse { get; }
     }
 
     /// <summary>
@@ -94,8 +97,11 @@ namespace SteganographyApp.Common.Arguments
         /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
         public ImageFormat ImageFormat { get; set; } = ImageFormat.Png;
 
-        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/AdditionalPasswordHashIterations/*' />
         public int AdditionalPasswordHashIterations { get; set; } = 0;
+
+        /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/BitsToUse/*' />
+        public int BitsToUse { get; set; } = 1;
     }
 
     /// <summary>

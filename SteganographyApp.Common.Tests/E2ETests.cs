@@ -31,6 +31,7 @@
                 UseCompression = true,
                 DummyCount = 3,
                 RandomSeed = "random-seed",
+                BitsToUse = 1,
             };
             imageStore = new ImageStore(args);
             wrapper = imageStore.CreateIOWrapper();
@@ -41,8 +42,9 @@
         {
             GlobalCounter.Instance.Reset();
 
+            args.BitsToUse = 1;
             imageStore.CleanImageLSBs();
-            wrapper.ResetToImage(0);
+            wrapper.SeekToImage(0);
             if (File.Exists(args.DecodedOutputFile))
             {
                 File.Delete(args.DecodedOutputFile);
@@ -87,6 +89,13 @@
                 long actual = new FileInfo(args.DecodedOutputFile).Length;
                 Assert.AreEqual(target, actual);
             }
+        }
+
+        [Test]
+        public void TestFullWriteReadHappyPathWith2Bits()
+        {
+            args.BitsToUse = 2;
+            TestFullWriteReadHappyPath();
         }
 
         [Test]

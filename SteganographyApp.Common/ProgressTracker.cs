@@ -46,7 +46,18 @@ namespace SteganographyApp.Common
         /// <summary>
         /// Displays the progress message with a progress of 0.
         /// </summary>
-        public void Display() => outputWriter.Write($"{progressMessage} :: 0%\r");
+        public void Display()
+        {
+            double percent = currentProgress / maxProgress * 100.0;
+            if (percent >= 100.0)
+            {
+                outputWriter.WriteLine(completeMessage);
+            }
+            else
+            {
+                outputWriter.Write($"{progressMessage} :: {(int)percent}%\r");
+            }
+        }
 
         /// <summary>
         /// Increments the current progress by one and reprints the progress message.
@@ -56,17 +67,8 @@ namespace SteganographyApp.Common
         /// </summary>
         public void UpdateAndDisplayProgress()
         {
-            currentProgress = currentProgress + 1;
-            double percent = currentProgress / maxProgress * 100.0;
-            if (percent >= 100.0)
-            {
-                percent = 100.0;
-                outputWriter.WriteLine(completeMessage);
-            }
-            else
-            {
-                outputWriter.Write($"{progressMessage} :: {(int)percent}%\r");
-            }
+            currentProgress++;
+            Display();
         }
     }
 }

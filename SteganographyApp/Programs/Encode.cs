@@ -42,6 +42,9 @@ namespace SteganographyApp
         [Argument("--compress", "-co", helpText: "If provided will compress the contents of the file before encryption.")]
         public bool EnableCompression = false;
 
+        [Argument("--twoBits", "-tb", helpText: "If true will store data in the least and second-least significant bit rather than just the least significant.")]
+        public bool TwoBits = false;
+
         public static object ParseFilePath(object? target, string value) => ParserFunctions.ParseFilePath(value);
 
         public IInputArguments ToCommonArguments()
@@ -57,6 +60,7 @@ namespace SteganographyApp
                 DummyCount = DummyCount,
                 AdditionalPasswordHashIterations = AdditionalPasswordHashIterations,
                 UseCompression = EnableCompression,
+                BitsToUse = TwoBits ? 2 : 1,
             };
             Injector.LoggerFor<EncodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
             return arguments;

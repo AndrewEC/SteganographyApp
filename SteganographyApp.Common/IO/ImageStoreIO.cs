@@ -22,7 +22,7 @@ namespace SteganographyApp.Common.IO
         public ImageStoreIO(ImageStore store)
         {
             this.store = store;
-            store.ResetToImage(0);
+            store.SeekToImage(0);
         }
 
         /// <summary>
@@ -52,6 +52,7 @@ namespace SteganographyApp.Common.IO
 
         /// <summary>
         /// Invokes the wrapped image store SeekToPixel method passing in the provided <paramref name="bitsToSkip"/> argument.
+        /// This will first move to the first pixel in the currently loaded image before skipping to the specified pixel.
         /// </summary>
         /// <param name="bitsToSkip">The number of bigs to seek past.</param>
         public void SeekToPixel(int bitsToSkip) => store.SeekToPixel(bitsToSkip);
@@ -60,7 +61,7 @@ namespace SteganographyApp.Common.IO
         /// Invokes the wrapped image store ResetToImage method passing in the provided <paramref name="index"/> argument.
         /// </summary>
         /// <param name="index">The index of the cover image to start reading and writing from.</param>
-        public void ResetToImage(int index) => store.ResetToImage(index);
+        public void SeekToImage(int index) => store.SeekToImage(index);
 
         /// <summary>
         /// Invokes both the CloseOpenImage and ResetToImage methods of the wrapped image store.
@@ -68,7 +69,6 @@ namespace SteganographyApp.Common.IO
         public void Dispose()
         {
             store.CloseOpenImage(save);
-            store.ResetToImage(0);
             GlobalCounter.Instance.Reset();
         }
     }

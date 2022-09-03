@@ -40,16 +40,15 @@ namespace SteganographyApp.Common.IO
         /// <returns>False if there is no further pixel to move to, otherwise true.</returns>
         public bool TryMoveToNext()
         {
-            if (!CanMoveToNext())
-            {
-                return false;
-            }
-
             X = X + 1;
             if (X == TrackedImage!.Width)
             {
                 X = 0;
                 Y = Y + 1;
+                if (Y == TrackedImage.Height)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -69,7 +68,5 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <returns>The position of the pixel in the format (X: {0}, Y: {1}).</returns>
         public override string ToString() => string.Format("(X: {0}, Y: {1})", X, Y);
-
-        private bool CanMoveToNext() => !(X + 1 == TrackedImage!.Width && Y + 1 == TrackedImage.Height);
     }
 }

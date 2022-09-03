@@ -86,12 +86,12 @@ namespace SteganographyApp.Common.Tests
 
             var chunkTableWrite = ImmutableArray.Create(new int[] { 100, 200, 300 });
             var imageStore = new ImageStore(Arguments);
-            imageStore.ResetToImage(0);
+            imageStore.SeekToImage(0);
             using (var tableWriter = new ChunkTableWriter(imageStore, Arguments))
             {
                 tableWriter.WriteContentChunkTable(chunkTableWrite);
             }
-            imageStore.ResetToImage(0);
+            imageStore.SeekToImage(0);
 
             using (var reader = new ChunkTableReader(imageStore, Arguments))
             {
@@ -115,7 +115,7 @@ namespace SteganographyApp.Common.Tests
             var imageStore = new ImageStore(Arguments);
             var chunkTable = Enumerable.Range(0, 100).ToImmutableArray();
 
-            imageStore.ResetToImage(0);
+            imageStore.SeekToImage(0);
             using (var writer = new ChunkTableWriter(imageStore, Arguments))
             {
                 Assert.Throws<ImageProcessingException>(() => writer.WriteContentChunkTable(chunkTable));
