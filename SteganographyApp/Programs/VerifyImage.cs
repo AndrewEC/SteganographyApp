@@ -21,11 +21,15 @@ namespace SteganographyApp
     )]
     internal sealed class VerifyImagesArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", position: 1, helpText: "The list of images to verify.")]
+        [Argument("CoverImages", position: 1, helpText: "The list of images to verify.")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
+
+        [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
+        public LogLevel LogLevel = LogLevel.None;
 
         public IInputArguments ToCommonArguments()
         {
+            RootLogger.Instance.EnableLoggingAtLevel(LogLevel);
             return new CommonArguments
             {
                 CoverImages = CoverImages,

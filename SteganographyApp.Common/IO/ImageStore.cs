@@ -95,11 +95,11 @@
         {
             try
             {
-                var randomBit = RandomBitGenerator();
                 for (int i = 0; i < args.CoverImages.Length; i++)
                 {
                     SeekToImage(i);
                     string randomBinary = GenerateBinaryString();
+                    log.Trace("Generated random binary string of: [{0}]", randomBinary);
                     WriteBinaryString(randomBinary);
                     CloseOpenImage(true);
                 }
@@ -255,45 +255,10 @@
             }
         }
 
-        /// <summary>
-        /// Performs the appropriate bitwise and/or operation to the provided
-        /// byte value of the pixel colour channel to change its least significatnt
-        /// bit to be the same as the value specified by the lastBit argument.
-        /// </summary>
-        /// <param name="colourChannel">The byte value representing either the
-        /// red, green, or blue channel of a pixel.</param>
-        /// <param name="lastBit">Specifies the value that the colourChannel's
-        /// least significant bit should be changed to.</param>
-        /// <returns>The original colour channel byte that has been shifted based on the last bit value.</returns>
-        private byte ShiftColourChannel(byte colourChannel, int lastBit) => (lastBit == 0)
-            ? (byte)(colourChannel & ~1)
-            : (byte)(colourChannel | 1);
-
-        /// <summary>
-        /// Performs the appropriate bitwise and/or operation to the provided
-        /// byte value of the pixel colour channel to change its least significatnt
-        /// bit to be the same as the value specified by the lastBit argument.
-        /// </summary>
-        /// <param name="colourChannel">The byte value representing either the
-        /// red, green, or blue channel of a pixel.</param>
-        /// <param name="shiftByBit">Specifies the value that the colourChannel's
-        /// least significant bit should be changed to.</param>
-        private byte ShiftColourChannelByBinary(byte colourChannel, char shiftByBit) => ShiftColourChannel(colourChannel, (shiftByBit == '0') ? 0 : 1);
-
-        /// <summary>
-        /// Provides a consumable function that uses the standard Random class to generate
-        /// a random int value of either 0 or 1.
-        /// </summary>
-        private Func<int> RandomBitGenerator()
-        {
-            var random = new Random();
-            return () => (int)Math.Round(random.NextDouble());
-        }
-
         private string GenerateBinaryString()
         {
             int bitCount = (currentImage!.Width * currentImage.Height * args.BitsToUse) - 1;
-            log.Trace("Generating binary string with a length of [{0}] for image [{1}]", bitCount, CurrentImage);
+            log.Debug("Generating binary string with a length of [{0}] for image [{1}]", bitCount, CurrentImage);
             var random = new Random();
             return string.Concat(Enumerable.Range(0, bitCount).Select(i => random.Next(10) % 2 == 0 ? '0' : '1'));
         }

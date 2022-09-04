@@ -12,7 +12,7 @@ namespace SteganographyApp
     [ProgramDescriptor("Cleans the LSBs of each pixel colour of the specified cover images.")]
     internal sealed class CleanArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", position: 1, helpText: "The list of images whose pixel colour LSBs need to be cleaned")]
+        [Argument("CoverImages", position: 1, helpText: "The list of images whose pixel colour LSBs need to be cleaned.")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--twoBits", "-tb", helpText: "If true will store data in the least and second-least significant bit rather than just the least significant.")]

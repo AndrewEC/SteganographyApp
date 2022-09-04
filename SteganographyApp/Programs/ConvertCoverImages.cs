@@ -13,13 +13,14 @@ namespace SteganographyApp
     using SteganographyApp.Common;
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Arguments.Commands;
-    using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.Data;
+    using SteganographyApp.Common.Injection;
+    using SteganographyApp.Common.Logging;
 
     [ProgramDescriptor("Convert a set of images to either a webp or png format.")]
     internal sealed class ConvertArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The images to be converted into a png or webp format.")]
+        [Argument("CoverImages", position: 1, helpText: "The images to be converted into a png or webp format.")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--imageFormat", "-i", helpText: "The format the images should be converted to.")]
@@ -28,8 +29,12 @@ namespace SteganographyApp
         [Argument("--deleteOriginals", "-d", helpText: "Specify whether the original image files should be deleted after conversion.")]
         public bool DeleteOriginals = false;
 
+        [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
+        public LogLevel LogLevel = LogLevel.None;
+
         public IInputArguments ToCommonArguments()
         {
+            RootLogger.Instance.EnableLoggingAtLevel(LogLevel);
             return new CommonArguments
             {
                 CoverImages = CoverImages,

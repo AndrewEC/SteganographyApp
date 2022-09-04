@@ -82,9 +82,8 @@ namespace SteganographyApp.Common.Arguments
         {
             ImmutableArray<string> matchedArgumentNames = matchedArguments.Select(argument => argument.Attribute.Name).ToImmutableArray();
 
-            ImmutableArray<string> missingRequired = registeredArguments.Select(registered => registered.Attribute)
-                .Where(argument => argument.Required)
-                .Select(argument => argument.Name)
+            ImmutableArray<string> missingRequired = registeredArguments.Where(registered => registered.Attribute.Required)
+                .Select(registered => registered.Attribute.Name)
                 .Where(name => !matchedArgumentNames.Contains(name))
                 .ToImmutableArray();
 
