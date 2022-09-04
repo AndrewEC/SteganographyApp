@@ -15,11 +15,15 @@ namespace SteganographyApp
         [Argument("--coverImages", "-c", position: 1, helpText: "The list of images whose pixel colour LSBs need to be cleaned")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
+        [Argument("--twoBits", "-tb", helpText: "If true will store data in the least and second-least significant bit rather than just the least significant.")]
+        public bool TwoBits = false;
+
         public IInputArguments ToCommonArguments()
         {
             return new CommonArguments
             {
-                CoverImages = this.CoverImages
+                CoverImages = this.CoverImages,
+                BitsToUse = TwoBits ? 2 : 1,
             };
         }
     }
@@ -35,7 +39,7 @@ namespace SteganographyApp
             {
                 tracker.UpdateAndDisplayProgress();
             };
-            store.CleanImageLSBs();
+            store.CleanImages();
         }
 
         public override string GetName() => "clean";

@@ -43,7 +43,7 @@
             GlobalCounter.Instance.Reset();
 
             args.BitsToUse = 1;
-            imageStore.CleanImageLSBs();
+            imageStore.CleanImages();
             wrapper.SeekToImage(0);
             if (File.Exists(args.DecodedOutputFile))
             {

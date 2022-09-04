@@ -48,7 +48,7 @@ namespace SteganographyApp.Common.Tests
 
             var imageStore = new ImageStore(Arguments);
             imageStore.OnNextImageLoaded += OnNextImageLoaded;
-            imageStore.CleanImageLSBs();
+            imageStore.CleanImages();
 
             Assert.AreEqual(Arguments.CoverImages[0], imageLoadededEventPath);
             Assert.IsTrue(mockImage.DisposeCalled);

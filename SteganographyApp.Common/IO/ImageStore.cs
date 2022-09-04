@@ -1,7 +1,7 @@
 ﻿namespace SteganographyApp.Common.IO
 {
     using System;
-    using System.Text;
+    using System.Linq;
 
     using SixLabors.ImageSharp.PixelFormats;
 
@@ -91,36 +91,17 @@
         /// Will look over all images specified in the InputArguments
         /// and set the LSB in all pixels in all images to a random value of either 1 or 0.
         /// </summary>
-        public void CleanImageLSBs()
+        public void CleanImages()
         {
             try
             {
-                SeekToImage(0);
                 var randomBit = RandomBitGenerator();
                 for (int i = 0; i < args.CoverImages.Length; i++)
                 {
-                    while (true)
-                    {
-                        var currentPixel = currentImage![pixelPosition.X, pixelPosition.Y];
-                        byte newRed = ShiftColourChannel(currentPixel.R, randomBit());
-                        byte newGreen = ShiftColourChannel(currentPixel.G, randomBit());
-                        byte newBlue = ShiftColourChannel(currentPixel.B, randomBit());
-
-                        currentImage[pixelPosition.X, pixelPosition.Y] = new Rgba32(newRed, newGreen, newBlue, currentPixel.A);
-
-                        if (!pixelPosition.TryMoveToNext())
-                        {
-                            break;
-                        }
-                    }
-                    if (i == args.CoverImages.Length - 1)
-                    {
-                        CloseOpenImage(true);
-                    }
-                    else
-                    {
-                        LoadNextImage(true);
-                    }
+                    SeekToImage(i);
+                    string randomBinary = GenerateBinaryString();
+                    WriteBinaryString(randomBinary);
+                    CloseOpenImage(true);
                 }
             }
             catch (Exception)
@@ -307,6 +288,14 @@
         {
             var random = new Random();
             return () => (int)Math.Round(random.NextDouble());
+        }
+
+        private string GenerateBinaryString()
+        {
+            int bitCount = (currentImage!.Width * currentImage.Height * args.BitsToUse) - 1;
+            log.Trace("Generating binary string with a length of [{0}] for image [{1}]", bitCount, CurrentImage);
+            var random = new Random();
+            return string.Concat(Enumerable.Range(0, bitCount).Select(i => random.Next(10) % 2 == 0 ? '0' : '1'));
         }
     }
 }
