@@ -115,6 +115,8 @@ namespace SteganographyApp.Common.IO
         /// RGB values from the input pixel.
         /// </summary>
         /// <param name="source">The input pixel the original RGB bytes to update.</param>
+        /// <returns>A new pixel with each RGB value being an RGB valued pulled from the source pixel that
+        /// has been subsequently updated by pulling a bit from the ReadBitQueue instance provided during initialization.</returns>
         public Rgba32 UpdatePixel(Rgba32 source)
         {
             var destination = new Rgba32();

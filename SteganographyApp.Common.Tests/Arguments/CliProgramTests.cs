@@ -1,11 +1,11 @@
 namespace SteganographyApp.Common.Tests
 {
+    using System;
+
     using NUnit.Framework;
 
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Arguments.Commands;
-
-    using System;
 
     [TestFixture]
     public class CliProgramTests

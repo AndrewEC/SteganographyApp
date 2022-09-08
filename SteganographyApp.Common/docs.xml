@@ -384,11 +384,6 @@
             <param name="pathToFile">The absolute or relative path to the file.</param>
             <returns>True if the file exists, otherwise false.</returns>
         </IsExistingFile>
-        <GetFiles>
-            <summary>Gets a list of files in the specified directory using Directory.GetFiles.</summary>
-            <param name="pathToDirectory">The path to the directory to get the list of files from.</param>
-            <returns>The list of files in the specified directory.</returns>
-        </GetFiles>
         <OpenFileForRead>
             <summary>Opens an IO stream to read from a specified file.</summary>
             <param name="pathToFile">The path to the file to open the read stream to.</param>
@@ -403,11 +398,6 @@
             <summary>Deletes the specified file.</summary>
             <param name="pathToFile">The relative or absolute path to the file to delete.</param>
         </Delete>
-        <ReadAllLines>
-            <summary>Reads all the lines from the specified file.</summary>
-            <param name="pathToFile">The relative or absolute path to the file to read all lines from.</param>
-            <returns>An array of strings whose length is equal to the total number of lines in the file.</returns>
-        </ReadAllLines>
     </members>
     <members name="ReadWriteStream">
         <Read>

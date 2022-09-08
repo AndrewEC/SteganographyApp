@@ -15,7 +15,8 @@ namespace SteganographyApp
     [ProgramDescriptor("Decode data from the specified cover images to the output file.")]
     internal sealed class DecodeArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be decoded from.")]
+        [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be decoded from.\n"
+            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--password", "-p", helpText: "The optional password used to decrypt the input file contents.")]

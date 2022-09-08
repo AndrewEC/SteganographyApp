@@ -12,10 +12,11 @@ namespace SteganographyApp
     using SteganographyApp.Common.IO;
     using SteganographyApp.Common.Logging;
 
-    [ProgramDescriptor("Encode a file to the specified cover images.")]
+    [ProgramDescriptor("Encode an input file and hide it within a series of cover images.")]
     internal sealed class EncodeArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be encoded and written to.")]
+        [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be encoded and hidden within."
+            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents.")]

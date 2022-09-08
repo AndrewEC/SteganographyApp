@@ -4,9 +4,9 @@
     using System.Linq;
 
     /// <summary>
-    /// A predictable random number generator that will repeatably generate random sets
-    /// of numbers as long as the input seed is the always the same.
     /// Based on the existing implementation by David Blackman and Sebastiano Vigna: https://prng.di.unimi.it/xoroshiro128plus.c
+    /// A predictable random number generator that will repeatably generate the same random sets
+    /// of numbers as long as the input seed is the always the same.
     /// </summary>
     public sealed class Xor128Prng
     {

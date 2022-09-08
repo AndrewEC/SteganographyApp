@@ -20,7 +20,8 @@ namespace SteganographyApp
     [ProgramDescriptor("Convert a set of images to either a webp or png format.")]
     internal sealed class ConvertArguments : IArgumentConverter
     {
-        [Argument("CoverImages", position: 1, helpText: "The images to be converted into a png or webp format.")]
+        [Argument("CoverImages", position: 1, helpText: "The images to be converted into a png or webp format.\n"
+            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--imageFormat", "-i", helpText: "The format the images should be converted to.")]

@@ -69,7 +69,8 @@ namespace SteganographyApp.Common.IO
         /// <summary>
         /// Initializes the aggregator with a specified maximum capacity.
         /// </summary>
-        /// <param name="capacity"></param>
+        /// <param name="capacity">The total number of bits the aggregator can house.
+        /// any bit one attempts to add beyond the capacity will be silently rejected.</param>
         public BitAggregator(int capacity)
         {
             this.capacity = capacity;
@@ -89,7 +90,7 @@ namespace SteganographyApp.Common.IO
             }
             if (length + bits.Length > capacity)
             {
-                int bitsToTake = (bits.Length - (capacity - length));
+                int bitsToTake = bits.Length - (capacity - length);
                 string toTake = bits.Substring(0, bitsToTake);
                 binary.Append(toTake);
                 length += toTake.Length;

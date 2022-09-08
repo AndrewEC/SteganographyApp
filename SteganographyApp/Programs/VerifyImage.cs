@@ -21,7 +21,8 @@ namespace SteganographyApp
     )]
     internal sealed class VerifyImagesArguments : IArgumentConverter
     {
-        [Argument("CoverImages", position: 1, helpText: "The list of images to verify.")]
+        [Argument("CoverImages", position: 1, helpText: "The list of images to verify."
+            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
@@ -39,23 +40,19 @@ namespace SteganographyApp
 
     internal class TempCopy : IDisposable
     {
-        private TempCopy(string sourcePath)
+        private readonly ILogger logger = new LazyLogger<TempCopy>();
+
+        public TempCopy(string sourcePath)
         {
-            this.DestinationPath = DetermineCopyPath(sourcePath);
+            DestinationPath = DetermineCopyPath(sourcePath);
+            logger.Debug("Creating temp copy of file [{0}] at [{1}]", sourcePath, DestinationPath);
+            File.Copy(sourcePath, DestinationPath);
         }
 
         public string DestinationPath
         {
             get;
             private set;
-        }
-
-        public static TempCopy Create(string sourcePath)
-        {
-            var copy = new TempCopy(sourcePath);
-            Injector.LoggerFor<TempCopy>().Debug("Creating temp copy of file [{0}] at [{1}]", sourcePath, copy.DestinationPath);
-            File.Copy(sourcePath, copy.DestinationPath);
-            return copy;
         }
 
         private string DetermineCopyPath(string sourcePath)
@@ -88,7 +85,7 @@ namespace SteganographyApp
             {
                 Console.WriteLine($"Verifying image: [{path}]");
                 string binary = GenerateBinaryString(path);
-                using (var copy = TempCopy.Create(path))
+                using (var copy = new TempCopy(path))
                 {
                     WriteToImage(copy.DestinationPath, binary, arguments);
                     string readBinary = ReadFromImage(copy.DestinationPath, binary, arguments);
@@ -129,7 +126,6 @@ namespace SteganographyApp
 
         private void WriteToImage(string path, string binaryData, IInputArguments arguments)
         {
-            logger.Trace("Writing binary string to image: [{0}]", path);
             using (var wrapper = new ImageStore(arguments).CreateIOWrapper())
             {
                 wrapper.WriteContentChunkToImage(binaryData);
@@ -139,7 +135,6 @@ namespace SteganographyApp
 
         private string ReadFromImage(string path, string expectedData, IInputArguments arguments)
         {
-            logger.Trace("Reading binary string from image: [{0}]", path);
             using (var wrapper = new ImageStore(arguments).CreateIOWrapper())
             {
                 return wrapper.ReadContentChunkFromImage(expectedData.Length);

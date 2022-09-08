@@ -1,9 +1,6 @@
 Write-Host "`n---------- Removing testbed directories ----------`n"
 function Remove-Folder {
-    [CmdletBinding()]
-    param(
-        [Parameter()][string] $FolderPath
-    )
+    param([string] $FolderPath)
 
     if (Test-Path $FolderPath) {
         Write-Host "Removing folder $FolderPath"
@@ -35,13 +32,4 @@ Get-ChildItem -Path ./SteganographyApp/bin/release/netcoreapp6.0/publish | Copy-
 
 
 Write-Host "`n---------- Copying test assets ----------`n"
-function Copy-Assets {
-    [CmdletBinding()]
-    param(
-        [Parameter()][string] $Destination
-    )
-
-    Get-ChildItem -Path ./SteganographyApp.Common.Tests/TestAssets | Where-Object Name -Like "*.png" | Copy-Item -Force -Destination $Destination
-}
-
-Copy-Assets ./testbed
+Get-ChildItem -Path ./SteganographyApp.Common.Tests/TestAssets | Where-Object Name -Like "*.png" | Copy-Item -Force -Destination ./testbed

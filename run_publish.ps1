@@ -10,11 +10,7 @@ if ($Release) {
 
 Write-Host "`n---------- Removing publish directories ----------`n"
 function Remove-Folder {
-    [CmdletBinding()]
-	param(
-		[Parameter()]
-		[string] $FolderPath
-	)
+	param([string] $FolderPath)
 
     if (Test-Path $FolderPath) {
         Write-Host "Removing folder $FolderPath"
@@ -40,11 +36,10 @@ if($LastExitCode -ne 0){
 
 Write-Host "`n---------- Copying publish output ----------`n"
 function Copy-Folder {
-    [CmdletBinding()]
     param(
-        [Parameter()][string] $Project,
-        [Parameter()][string] $Output,
-        [Parameter()][string] $Rename
+        [string] $Project,
+        [string] $Output,
+        [string] $Rename
     )
 
     Write-Host "Copying output from $Project publish"
