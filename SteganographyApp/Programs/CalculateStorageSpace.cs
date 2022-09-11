@@ -14,8 +14,13 @@ namespace SteganographyApp
     [ProgramDescriptor("Calculate the amount of storage space a set of cover images will provide.")]
     internal sealed class CalculateStorageSpaceArguments : IArgumentConverter
     {
-        [Argument("CoverImages", position: 1, helpText: "The images from which the amount of storage space available will be derived.\n"
-            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.")]
+        [Argument(
+            "CoverImages",
+            position: 1,
+            helpText: "The images from which the amount of storage space available will be derived.\n"
+                + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
+            example: "*.png,*.webp"
+        )]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--twoBits", "-tb", helpText: "If true will store data in the least and second-least significant bit rather than just the least significant.")]

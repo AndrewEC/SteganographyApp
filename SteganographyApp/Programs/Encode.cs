@@ -12,23 +12,32 @@ namespace SteganographyApp
     using SteganographyApp.Common.IO;
     using SteganographyApp.Common.Logging;
 
-    [ProgramDescriptor("Encode an input file and hide it within a series of cover images.")]
+    [ProgramDescriptor(
+        "Encode an input file and hide it within a series of cover images.",
+        "dotnet SteganographyApp.dll encode -c *.png,*.webp -f input.zip -p testing -r 123 -d 300 -a 30 -l Debug"
+    )]
     internal sealed class EncodeArguments : IArgumentConverter
     {
-        [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be encoded and hidden within."
-            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.", example: "*.png,*.webp")]
+        [Argument(
+            "--coverImages",
+            "-c",
+            true,
+            helpText: "The images where the input file will be encoded and hidden within.\n"
+                + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
+            example: "*.png,*.webp"
+        )]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
-        [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents.")]
+        [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
         public string Password = string.Empty;
 
         [Argument("--file", "-f", true, helpText: "The path to the file to encode and write to the cover images.", parser: nameof(ParseFilePath))]
         public string InputFile = string.Empty;
 
-        [Argument("--randomSeed", "-r", helpText: "The optional value to determine how the contents of the input file will be randomized before writing them.")]
+        [Argument("--randomSeed", "-r", helpText: "The optional value to determine how the contents of the input file will be randomized before writing them.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
         public string RandomSeed = string.Empty;
 
-        [Argument("--dummyCount", "-d", helpText: "The number of dummy entries that should be inserted after compression and before randomization. Recommended value between 100 and 1,000")]
+        [Argument("--dummyCount", "-d", helpText: "The number of dummy entries that should be inserted after compression and before randomization. Recommended value between 100 and 1,000.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
         public int DummyCount = 0;
 
         [Argument("--chunkByteSize", "-cs", helpText: "The number of bytes to read and encode from the input file during each iteration.")]
@@ -37,10 +46,10 @@ namespace SteganographyApp
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
         public LogLevel LogLevel = LogLevel.None;
 
-        [Argument("--additionalHashes", "-a", helpText: "The number of additional times to hash the password. Has no effect if no password is provided.")]
+        [Argument("--additionalHashes", "-a", helpText: "The number of additional times to hash the password. Has no effect if no password is provided.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
         public int AdditionalPasswordHashIterations = 0;
 
-        [Argument("--compress", "-co", helpText: "If provided will compress the contents of the file before encryption.")]
+        [Argument("--compress", "-co", helpText: "If provided will compress the contents of the file after encryption.")]
         public bool EnableCompression = false;
 
         [Argument("--twoBits", "-tb", helpText: "If true will store data in the least and second-least significant bit rather than just the least significant.")]

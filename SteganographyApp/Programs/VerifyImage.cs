@@ -21,8 +21,13 @@ namespace SteganographyApp
     )]
     internal sealed class VerifyImagesArguments : IArgumentConverter
     {
-        [Argument("CoverImages", position: 1, helpText: "The list of images to verify."
-            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.")]
+        [Argument(
+            "CoverImages",
+            position: 1,
+            helpText: "The list of images to verify."
+                + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
+            example: "*.png,*.webp"
+        )]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]

@@ -12,11 +12,16 @@ namespace SteganographyApp
     [ProgramDescriptor("Cleans the LSBs of each pixel colour of the specified cover images.")]
     internal sealed class CleanArguments : IArgumentConverter
     {
-        [Argument("CoverImages", position: 1, helpText: "The list of images whose pixel colour LSBs need to be cleaned.\n"
-            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.")]
+        [Argument(
+            "CoverImages",
+            position: 1,
+            helpText: "The list of images whose pixel colour LSBs need to be cleaned.\n"
+                + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
+            example: "*.png,*.webp"
+        )]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
-        [Argument("--twoBits", "-tb", helpText: "If true will store data in the least and second-least significant bit rather than just the least significant.")]
+        [Argument("--twoBits", "-tb", helpText: "Tells the app to clean data in the least and second-least significant bit rather than just the least significant.")]
         public bool TwoBits = false;
 
         public IInputArguments ToCommonArguments()
