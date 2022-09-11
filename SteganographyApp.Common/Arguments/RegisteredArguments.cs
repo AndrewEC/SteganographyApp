@@ -115,7 +115,7 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="attribute">The attribute.</param>
         /// <param name="member">The field or property of the argument class that has been attributed.</param>
         /// <param name="parser">The parser function that will parse a value from the user's input and set the member value.</param>
-        public RegisteredArgument(ArgumentAttribute attribute, MemberInfo member, Func<object?, string, object> parser)
+        public RegisteredArgument(ArgumentAttribute attribute, MemberInfo member, Func<object, string, object> parser)
         {
             Attribute = attribute;
             Member = member;
@@ -135,6 +135,6 @@ namespace SteganographyApp.Common.Arguments
         /// <summary>
         /// Gets the parser function that will be used to parse out a value from the user's input and set the Member value.
         /// </summary>
-        public Func<object?, string, object> Parser { get; }
+        public Func<object, string, object> Parser { get; }
     }
 }

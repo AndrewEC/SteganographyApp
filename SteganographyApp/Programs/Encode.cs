@@ -16,7 +16,7 @@ namespace SteganographyApp
     internal sealed class EncodeArguments : IArgumentConverter
     {
         [Argument("--coverImages", "-c", true, helpText: "The images where the input file will be encoded and hidden within."
-            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.")]
+            + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.", example: "*.png,*.webp")]
         public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
         [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents.")]

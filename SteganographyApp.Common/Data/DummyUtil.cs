@@ -25,8 +25,8 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(IDummyUtil))]
     public sealed class DummyUtil : IDummyUtil
     {
-        private const int MaxLengthPerDummy = 100;
-        private const int MinLengthPerDummy = 10;
+        private const int MaxLengthPerDummy = 200;
+        private const int MinLengthPerDummy = 20;
         private const int HashIterationLimit = 1000;
 
         private ILogger log = new LazyLogger<DummyUtil>();
@@ -35,17 +35,18 @@ namespace SteganographyApp.Common.Data
         public byte[] InsertDummies(int numDummies, byte[] value, string randomSeed)
         {
             string seed = CreateRandomSeed(randomSeed);
+            int actualNumDummies = Xor128Prng.FromString(seed).Next(numDummies - numDummies / 2) + numDummies / 2;
 
-            log.Debug("Inserting [{0}] dummies using seed [{1}]", numDummies, seed);
+            log.Debug("Inserting [{0}] dummies using seed [{1}]", actualNumDummies, seed);
             log.Debug("Byte count before inserting dummies: [{0}]", value.Length);
 
             var generator = Xor128Prng.FromString(seed);
 
             // generate an array in which each element represents the length that an inserted dummy entry will have.
-            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies, generator);
+            int[] lengths = GenerateLengthsOfDummies(randomSeed, actualNumDummies, generator);
 
             // generate an array in which each element represents the index the dummy entry will be inserted at.
-            int[] positions = Enumerable.Range(0, numDummies)
+            int[] positions = Enumerable.Range(0, actualNumDummies)
                 .Select(i => generator.Next(value.Length))
                 .ToArray();
 
@@ -68,14 +69,15 @@ namespace SteganographyApp.Common.Data
         public byte[] RemoveDummies(int numDummies, byte[] value, string randomSeed)
         {
             string seed = CreateRandomSeed(randomSeed);
+            int actualNumDummies = Xor128Prng.FromString(seed).Next(numDummies - (numDummies / 2)) + (numDummies / 2);
 
-            log.Debug("Removing [{0}] dummies using seed [{1}]", numDummies, seed);
+            log.Debug("Removing [{0}] dummies using seed [{1}]", actualNumDummies, seed);
             log.Debug("Byte count before removing dummies: [{0}]", value.Length);
 
             var generator = Xor128Prng.FromString(seed);
 
             // calculate the length of the dummies originally added to the string
-            int[] lengths = GenerateLengthsOfDummies(randomSeed, numDummies, generator);
+            int[] lengths = GenerateLengthsOfDummies(randomSeed, actualNumDummies, generator);
             Array.Reverse(lengths);
             int totalLength = lengths.Sum();
 
@@ -84,7 +86,7 @@ namespace SteganographyApp.Common.Data
             int lengthWithoutDummies = value.Length - totalLength;
 
             // generate the positions in which the dummy entries were inserted into the original string
-            int[] positions = Enumerable.Range(0, numDummies)
+            int[] positions = Enumerable.Range(0, actualNumDummies)
                 .Select(i => generator.Next(lengthWithoutDummies))
                 .Reverse()
                 .ToArray();
@@ -116,8 +118,8 @@ namespace SteganographyApp.Common.Data
         }
 
         private int[] GenerateLengthsOfDummies(string randomSeed, int numDummies, Xor128Prng generator) => Enumerable.Range(0, numDummies)
-                .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
-                .ToArray();
+            .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
+            .ToArray();
 
         private byte[] GenerateDummyBytes(Xor128Prng generator, int length) => Enumerable.Range(0, length)
             .Select(i => (byte)generator.Next(byte.MaxValue))

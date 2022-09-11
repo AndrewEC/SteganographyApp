@@ -19,7 +19,8 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="position">Makes the argument positional if a value above -1 is provided.</param>
         /// <param name="helpText">The text to display describing this argument when the user provides the -h or --help arguments.</param>
         /// <param name="parser">The name of a parser function to use to parse the value for this argument.</param>
-        public ArgumentAttribute(string name, string? shortName = null, bool required = false, int position = -1, string helpText = "", string? parser = null)
+        /// <param name="example">Provides an example of how to use the argument within the context of the current program.</param>
+        public ArgumentAttribute(string name, string? shortName = null, bool required = false, int position = -1, string helpText = "", string? parser = null, string? example = null)
         {
             Name = name;
             ShortName = shortName;
@@ -31,6 +32,7 @@ namespace SteganographyApp.Common.Arguments
                 Required = true;
             }
             Parser = parser;
+            Example = example;
         }
 
         /// <summary>
@@ -69,5 +71,10 @@ namespace SteganographyApp.Common.Arguments
         /// have the signature matching: (object?, string) => object.
         /// </summary>
         public string? Parser { get; private set; }
+
+        /// <summary>
+        /// Gets a string outlining an example of how to apply this argument within the context of the current program.
+        /// </summary>
+        public string? Example { get; private set; }
     }
 }

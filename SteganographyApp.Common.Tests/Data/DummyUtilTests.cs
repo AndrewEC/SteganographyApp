@@ -55,7 +55,7 @@ namespace SteganographyApp.Common.Tests
         {
             byte[] inserted = util.InsertDummies(NumberOfDummies, OriginalBytes, RandomSeed);
 
-            Assert.Throws(typeof(ArgumentException), () => util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed));
+            Assert.AreNotEqual(OriginalBytes, util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed));
         }
     }
 }

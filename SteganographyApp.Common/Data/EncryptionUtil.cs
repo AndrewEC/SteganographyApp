@@ -41,7 +41,7 @@ namespace SteganographyApp.Common.Data
         public byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations)
         {
             var keyBytes = GenerateKey(password, DefaultIterations + additionalPasswordHashIterations);
-            log.Debug("Encrypting value using key: [{0}]", () => new[] { Convert.ToBase64String(keyBytes) });
+            log.Debug("Encrypting value using key: [{0}]/[{1}]", () => new object[] { password, Convert.ToBase64String(keyBytes) });
             var iv = GenerateRandomBytes(IvSize);
             using (var managed = Aes.Create("AesManaged")!)
             {

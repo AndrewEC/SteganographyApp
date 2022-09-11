@@ -27,7 +27,7 @@ namespace SteganographyApp
         public int DummyCount = 0;
 
         [Argument("--chunkByteSize", "-cs", helpText: "The number of bytes to read and encode from the input file during each iteration.")]
-        public int ChunkByteSize = 131_072;
+        public int ChunkByteSize = 524_288;
 
         [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
         public LogLevel LogLevel = LogLevel.None;

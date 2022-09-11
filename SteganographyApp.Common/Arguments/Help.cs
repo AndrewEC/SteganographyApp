@@ -51,14 +51,18 @@ namespace SteganographyApp.Common.Arguments
             {
                 builder.Append(descriptor.Description).Append("\n");
             }
-            return builder.Append("Usage: ")
+            builder.Append("Usage: ")
                 .AppendJoin(" ", positionArguments.Select(argument => argument.Attribute.Name))
                 .Append(" ")
                 .AppendJoin(" ", requiredArguments.Select(argument => argument.Attribute.Name))
                 .Append(" ")
                 .AppendJoin(" ", optionalArguments.Select(argument => $"[{argument.Attribute.Name}]"))
-                .Append("\n")
-                .ToString();
+                .Append("\n");
+            if (descriptor != null && descriptor.Example != null)
+            {
+                builder.Append("Example Usage: ").Append(descriptor.Example).Append("\n");
+            }
+            return builder.ToString();
         }
 
         private static ProgramDescriptorAttribute? GetDescriptorAttribute(Type instanceType) => instanceType
@@ -80,16 +84,18 @@ namespace SteganographyApp.Common.Arguments
                 builder.Append(" | ").Append(argument.ShortName);
             }
 
+            builder.Append("\n\t").Append(argument.HelpText);
+
             if (argument.Position > 0)
             {
-                builder.Append("\n[Position]: ").Append(argument.Position);
+                builder.Append("\n\t[Position]: ").Append(argument.Position);
             }
             else
             {
-                object? value = TypeHelper.GetValue(instance, member);
+                string? value = DefaultValueOf(instance, member);
                 if (value != null)
                 {
-                    builder.Append("\n[Default]: ").Append($"[{value.ToString()}]");
+                    builder.Append("\n\t[Default]: ").Append(value);
                 }
             }
 
@@ -97,11 +103,32 @@ namespace SteganographyApp.Common.Arguments
             if (memberType.IsEnum)
             {
                 var possibleValues = string.Join(", ", Enum.GetNames(memberType));
-                builder.Append("[Allowed Values]: ").Append($"[{possibleValues}]");
+                builder.Append("\n\t[Allowed Values]: ").Append($"[{possibleValues}]");
             }
 
-            return builder.Append("\n\t").Append(argument.HelpText).Append("\n")
-                .ToString();
+            if (argument.Example != null)
+            {
+                builder.Append("\n\t[Example]: ").Append(argument.Example);
+            }
+
+            return builder.ToString();
+        }
+
+        private static string? DefaultValueOf(object instance, MemberInfo member)
+        {
+            object? value = TypeHelper.GetValue(instance, member);
+            if (value == null)
+            {
+                return null;
+            }
+
+            Type memberType = TypeHelper.DeclaredType(member);
+            if (memberType.IsValueType && !memberType.IsEnum && !memberType.IsPrimitive)
+            {
+                return null;
+            }
+
+            return value.ToString();
         }
     }
 }

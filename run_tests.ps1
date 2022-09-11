@@ -50,7 +50,7 @@ dotnet tool run coverlet `
     --exclude-by-file "**/SteganographyApp.Common/Arguments/Help.cs" `
     --exclude-by-file "**/SteganographyApp.Common/Injection/Logging/RootLogger.cs" `
     --format opencover `
-    --threshold 80 `
+    --threshold 75 `
     --threshold-type line `
     --threshold-type branch `
     --threshold-stat total

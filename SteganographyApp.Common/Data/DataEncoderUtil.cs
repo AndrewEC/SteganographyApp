@@ -100,7 +100,7 @@
             byte[] bytes = Injector.Provide<IBinaryUtil>().ToBytes(binary);
 
             logger.Trace("Original binary: [{0}]", binary);
-            logger.Trace("Before decoding: [{0}]", () => new object[] { Convert.ToBase64String(bytes) });
+            logger.Trace("Before decoding: [{0}]", () => new[] { Convert.ToBase64String(bytes) });
 
             if (randomSeed != string.Empty)
             {

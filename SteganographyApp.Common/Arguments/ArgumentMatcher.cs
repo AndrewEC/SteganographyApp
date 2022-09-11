@@ -43,7 +43,7 @@ namespace SteganographyApp.Common.Arguments
         /// <summary>
         /// Gets the parser function used to parse the Input value and set the value of the Member.
         /// </summary>
-        public readonly Func<object?, string, object> Parser { get; }
+        public readonly Func<object, string, object> Parser { get; }
     }
 
     /// <summary>

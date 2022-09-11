@@ -1,7 +1,9 @@
 namespace SteganographyApp.Common.Arguments
 {
     using System.Collections.Immutable;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
 
     using Microsoft.Extensions.FileSystemGlobbing;
 
@@ -22,17 +24,26 @@ namespace SteganographyApp.Common.Arguments
         /// minimally ensures that each file exists and is a file and not a directory.</returns>
         public static ImmutableArray<string> ParseImages(string value)
         {
-            var images = RetrieveImagePaths(value);
-            ValidateImagePaths(images);
-            return images;
+            var images = new List<string>(RetrievePathsByGlobs(value));
+            images.AddRange(GetAbsolutePaths(value));
+            var imagePaths = images.ToImmutableArray();
+            ValidateImagePaths(imagePaths);
+            return imagePaths;
         }
 
-        private static ImmutableArray<string> RetrieveImagePaths(string value)
+        private static string[] RetrievePathsByGlobs(string value)
         {
+            var globs = value.Split(",").Where(path => !Path.IsPathFullyQualified(path)).ToArray();
+            if (globs.Length == 0)
+            {
+                return new string[0];
+            }
             var matcher = new Matcher();
-            matcher.AddIncludePatterns(value.Split(","));
-            return matcher.GetResultsInFullPath(Directory.GetCurrentDirectory()).ToImmutableArray();
+            matcher.AddIncludePatterns(globs);
+            return matcher.GetResultsInFullPath(Directory.GetCurrentDirectory()).ToArray();
         }
+
+        private static string[] GetAbsolutePaths(string value) => value.Split(",").Where(Path.IsPathFullyQualified).ToArray();
 
         private static void ValidateImagePaths(ImmutableArray<string> imagePaths)
         {
