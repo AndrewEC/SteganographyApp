@@ -90,20 +90,21 @@ namespace SteganographyApp.Common.Arguments
             {
                 builder.Append("\n\t[Position]: ").Append(argument.Position);
             }
-            else
-            {
-                string? value = DefaultValueOf(instance, member);
-                if (value != null)
-                {
-                    builder.Append("\n\t[Default]: ").Append(value);
-                }
-            }
 
             Type memberType = TypeHelper.DeclaredType(member);
             if (memberType.IsEnum)
             {
                 var possibleValues = string.Join(", ", Enum.GetNames(memberType));
                 builder.Append("\n\t[Allowed Values]: ").Append($"[{possibleValues}]");
+            }
+
+            if (argument.Position == -1)
+            {
+                string? value = DefaultValueOf(instance, member, argument);
+                if (value != null)
+                {
+                    builder.Append("\n\t[Default]: ").Append(value);
+                }
             }
 
             if (argument.Example != null)
@@ -114,8 +115,14 @@ namespace SteganographyApp.Common.Arguments
             return builder.ToString();
         }
 
-        private static string? DefaultValueOf(object instance, MemberInfo member)
+        private static string? DefaultValueOf(object instance, MemberInfo member, ArgumentAttribute argument)
         {
+            // Somce required parameters must be provided by the user there is no point in having a default value.
+            if (argument.Required)
+            {
+                return null;
+            }
+
             object? value = TypeHelper.GetValue(instance, member);
             if (value == null)
             {
@@ -123,6 +130,7 @@ namespace SteganographyApp.Common.Arguments
             }
 
             Type memberType = TypeHelper.DeclaredType(member);
+            // Check if the type is a struct.
             if (memberType.IsValueType && !memberType.IsEnum && !memberType.IsPrimitive)
             {
                 return null;

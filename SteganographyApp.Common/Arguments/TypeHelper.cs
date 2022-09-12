@@ -14,7 +14,7 @@ namespace SteganographyApp.Common.Arguments
         /// Gets the underlying type of the member. This only works on fields and properties. Attempting to use this with
         /// any other type will result in a TypeException.
         /// </summary>
-        /// <param name="memberInfo">The member info from which we want to extract the underlying type.</param>
+        /// <param name="memberInfo">The member info from which we want to extract the underlying field type or property type.</param>
         /// <returns>The underlying type of the member.</returns>
         public static Type DeclaredType(MemberInfo memberInfo) => memberInfo switch
         {

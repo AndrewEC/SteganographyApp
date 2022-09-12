@@ -11,7 +11,7 @@ namespace SteganographyApp.Common.Injection
     /// <summary>
     /// For looking up and initializing the things within the current assembly that can be injected.
     /// </summary>
-    public static partial class Injector
+    public static class InjectableLookup
     {
         /// <summary>
         /// This method looks up all the types in the same assembly as this Injector class in which the
@@ -22,7 +22,7 @@ namespace SteganographyApp.Common.Injection
         /// </summary>
         /// <returns>Returns an immutable dictionary with all the type and an instance
         /// of each type within this assembly that has the injectable attribute.</returns>
-        public static ImmutableDictionary<Type, object> LookupDefaultInjectableDictionary()
+        internal static ImmutableDictionary<Type, object> LookupDefaultInjectableDictionary()
         {
             var injectables = new Dictionary<Type, object>();
 
@@ -37,27 +37,18 @@ namespace SteganographyApp.Common.Injection
             return injectables.ToImmutableDictionary();
         }
 
-        private static IEnumerable<Type> FindInjectableTypesInAssembly()
-        {
-            return typeof(Injector).Assembly.GetTypes().Where(IsInjectableType);
-        }
+        private static IEnumerable<Type> FindInjectableTypesInAssembly() => typeof(Injector).Assembly.GetTypes().Where(IsInjectableType);
 
-        private static bool IsInjectableType(Type type)
-        {
-            return type.IsClass && GetInjectableAttribute(type) != null;
-        }
+        private static bool IsInjectableType(Type type) => type.IsClass && GetInjectableAttribute(type) != null;
 
-        private static InjectableAttribute? GetInjectableAttribute(Type type)
-        {
-            return type.GetCustomAttribute(typeof(InjectableAttribute), false) as InjectableAttribute;
-        }
+        private static InjectableAttribute? GetInjectableAttribute(Type type) => type.GetCustomAttribute(typeof(InjectableAttribute), false) as InjectableAttribute;
     }
 
     /// <summary>
     /// For invoking any post construct methods registered on the things within the assembly that are injectable
     /// and have already been instantiated.
     /// </summary>
-    public static partial class Injector
+    public static partial class PostConstruct
     {
         /// <summary>
         /// Attempts to lookup a publicly accessible method from each of the input instances that also
@@ -66,7 +57,7 @@ namespace SteganographyApp.Common.Injection
         /// </summary>
         /// <param name="instances">The collection of instanced injectable objects to invoke the post
         /// constructors of if they exist.</param>
-        public static void InvokePostConstructMethods(IEnumerable<object> instances)
+        internal static void InvokePostConstructMethods(IEnumerable<object> instances)
         {
             foreach (object instance in instances)
             {
@@ -96,10 +87,10 @@ namespace SteganographyApp.Common.Injection
 
         static Injector()
         {
-            defaultInjectionValues = LookupDefaultInjectableDictionary();
+            defaultInjectionValues = InjectableLookup.LookupDefaultInjectableDictionary();
             injectionValues = new Dictionary<Type, object>();
             ResetInstances();
-            InvokePostConstructMethods(defaultInjectionValues.Values);
+            PostConstruct.InvokePostConstructMethods(defaultInjectionValues.Values);
         }
 
         /// <summary>
