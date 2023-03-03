@@ -69,12 +69,12 @@ namespace SteganographyApp
 
         public void Dispose()
         {
-            Injector.LoggerFor<TempCopy>().Debug("Deleting temp file from: [{0}]", DestinationPath);
+            logger.Debug("Deleting temp file from: [{0}]", DestinationPath);
             File.Delete(DestinationPath);
         }
     }
 
-    internal sealed class VerifyImagesCommand : BaseCommand<VerifyImagesArguments>
+    internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
     {
         private ILogger logger = new LazyLogger<VerifyImagesCommand>();
 

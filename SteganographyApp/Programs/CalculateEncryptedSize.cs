@@ -62,7 +62,7 @@ namespace SteganographyApp
         }
     }
 
-    internal sealed class CalculateEncryptedSizeCommand : BaseCommand<CalculateEncryptedSizeArguments>
+    internal sealed class CalculateEncryptedSizeCommand : Command<CalculateEncryptedSizeArguments>
     {
         public override string GetName() => "encrypted-size";
 
@@ -106,14 +106,14 @@ namespace SteganographyApp
             Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
         }
 
-        private static void PrintComparison(double size, int bitsToUse)
+        private static void PrintComparison(double size, int bitsToUsePerPixel)
         {
-            Console.WriteLine("\tAt 360p: \t{0}", size / (CommonResolutionStorageSpace.P360 * bitsToUse));
-            Console.WriteLine("\tAt 480p: \t{0}", size / (CommonResolutionStorageSpace.P480 * bitsToUse));
-            Console.WriteLine("\tAt 720p: \t{0}", size / (CommonResolutionStorageSpace.P720 * bitsToUse));
-            Console.WriteLine("\tAt 1080p: \t{0}", size / (CommonResolutionStorageSpace.P1080 * bitsToUse));
-            Console.WriteLine("\tAt 1440p: \t{0}", size / (CommonResolutionStorageSpace.P1440 * bitsToUse));
-            Console.WriteLine("\tAt 4K (2160p): \t{0}", size / (CommonResolutionStorageSpace.P2160 * bitsToUse));
+            Console.WriteLine("\tAt 360p: \t{0}", size / (CommonResolutionStorageSpace.P360 * bitsToUsePerPixel));
+            Console.WriteLine("\tAt 480p: \t{0}", size / (CommonResolutionStorageSpace.P480 * bitsToUsePerPixel));
+            Console.WriteLine("\tAt 720p: \t{0}", size / (CommonResolutionStorageSpace.P720 * bitsToUsePerPixel));
+            Console.WriteLine("\tAt 1080p: \t{0}", size / (CommonResolutionStorageSpace.P1080 * bitsToUsePerPixel));
+            Console.WriteLine("\tAt 1440p: \t{0}", size / (CommonResolutionStorageSpace.P1440 * bitsToUsePerPixel));
+            Console.WriteLine("\tAt 4K (2160p): \t{0}", size / (CommonResolutionStorageSpace.P2160 * bitsToUsePerPixel));
         }
     }
 }

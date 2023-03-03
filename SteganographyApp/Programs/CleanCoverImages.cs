@@ -34,7 +34,7 @@ namespace SteganographyApp
         }
     }
 
-    internal sealed class CleanCoverImagesCommand : BaseCommand<CleanArguments>
+    internal sealed class CleanCoverImagesCommand : Command<CleanArguments>
     {
         public override void Execute(CleanArguments args)
         {

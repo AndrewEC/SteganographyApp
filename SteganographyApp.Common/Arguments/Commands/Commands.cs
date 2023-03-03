@@ -32,7 +32,7 @@ namespace SteganographyApp.Common.Arguments.Commands
     /// <summary>
     /// Provides some utility methods to allow you to more easily and concisely initialize a CliProgram.
     /// </summary>
-    public static partial class Command
+    public static partial class Commands
     {
         /// <summary>
         /// Initializes a GenericCommand instance from the specified name and CommandFunction.
@@ -64,7 +64,7 @@ namespace SteganographyApp.Common.Arguments.Commands
     /// A high level abstract command that provides some reasonable default logic to execute a single command.
     /// </summary>
     /// <typeparam name="T">The type which the args from the root Execute command will be parsed to using the CliParser.</typeparam>
-    public abstract class BaseCommand<T> : ICommand
+    public abstract class Command<T> : ICommand
     where T : class
     {
         /// <summary>
@@ -95,7 +95,7 @@ namespace SteganographyApp.Common.Arguments.Commands
     /// A high level generic command instantiated using a name and a function.
     /// </summary>
     /// <typeparam name="T">Specifies the type of the arguments to be passed into the Execute method.</typeparam>
-    public class GenericCommand<T> : BaseCommand<T>
+    public class GenericCommand<T> : Command<T>
     where T : class
     {
         private readonly string name;

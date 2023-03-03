@@ -71,7 +71,7 @@ namespace SteganographyApp
         }
     }
 
-    internal sealed class DecodeCommand : BaseCommand<DecodeArguments>
+    internal sealed class DecodeCommand : Command<DecodeArguments>
     {
         private readonly ILogger log = new LazyLogger<DecodeCommand>();
 

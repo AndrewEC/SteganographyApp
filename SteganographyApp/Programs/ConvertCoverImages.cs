@@ -50,7 +50,7 @@ namespace SteganographyApp
         }
     }
 
-    internal sealed class ConvertImagesCommand : BaseCommand<ConvertArguments>
+    internal sealed class ConvertImagesCommand : Command<ConvertArguments>
     {
         private const string WebpMimeType = "image/webp";
         private const string PngMimeType = "image/png";

@@ -17,14 +17,14 @@ namespace SteganographyApp.Common.Tests
         {
 #pragma warning disable SA1009
             program = CliProgram.Create(
-                Command.Group(
-                    Command.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function),
-                    Command.Lazy<SimpleCommand>(),
-                    Command.Alias("aliased", Command.From<GenericArguments>("no-alias", (args) => LastRun.Instance.Name = LastRunName.Aliased)),
-                    Command.Group(
+                Commands.Group(
+                    Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function),
+                    Commands.Lazy<SimpleCommand>(),
+                    Commands.Alias("aliased", Commands.From<GenericArguments>("no-alias", (args) => LastRun.Instance.Name = LastRunName.Aliased)),
+                    Commands.Group(
                         "duplicate",
-                        Command.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function),
-                        Command.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function)
+                        Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function),
+                        Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function)
                     )
                 )
             );
@@ -101,7 +101,7 @@ namespace SteganographyApp.Common.Tests
         public int Number;
     }
 
-    internal sealed class SimpleCommand : BaseCommand<GenericArguments>
+    internal sealed class SimpleCommand : Command<GenericArguments>
     {
         public override void Execute(GenericArguments args)
         {

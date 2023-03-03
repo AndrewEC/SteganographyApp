@@ -36,7 +36,7 @@ namespace SteganographyApp
         }
     }
 
-    internal sealed class CalculateStorageSpaceCommand : BaseCommand<CalculateStorageSpaceArguments>
+    internal sealed class CalculateStorageSpaceCommand : Command<CalculateStorageSpaceArguments>
     {
         public override string GetName() => "storage-space";
 

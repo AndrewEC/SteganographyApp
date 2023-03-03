@@ -11,16 +11,16 @@
         {
 #pragma warning disable SA1009
             CliProgram.Create(
-                Command.Group(
-                    Command.Lazy<CleanCoverImagesCommand>(),
-                    Command.Lazy<DecodeCommand>(),
-                    Command.Lazy<EncodeCommand>(),
-                    Command.Lazy<ConvertImagesCommand>(),
-                    Command.Lazy<VerifyImagesCommand>(),
-                    Command.Group(
+                Commands.Group(
+                    Commands.Lazy<CleanCoverImagesCommand>(),
+                    Commands.Lazy<DecodeCommand>(),
+                    Commands.Lazy<EncodeCommand>(),
+                    Commands.Lazy<ConvertImagesCommand>(),
+                    Commands.Lazy<VerifyImagesCommand>(),
+                    Commands.Group(
                         "calculate",
-                        Command.Lazy<CalculateEncryptedSizeCommand>(),
-                        Command.Lazy<CalculateStorageSpaceCommand>()
+                        Commands.Lazy<CalculateEncryptedSizeCommand>(),
+                        Commands.Lazy<CalculateStorageSpaceCommand>()
                     )
                 )
             )

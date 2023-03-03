@@ -21,7 +21,7 @@ namespace SteganographyApp.Common.Arguments.Commands
     /// <summary>
     /// Provides some utility methods to allow you to more easily and concisely initialize a CliProgram.
     /// </summary>
-    public static partial class Command
+    public static partial class Commands
     {
         /// <summary>
         /// Creates a generic GenericCommandGroup with a default name of genericcommandgroup. Useful if using a command
@@ -65,7 +65,7 @@ namespace SteganographyApp.Common.Arguments.Commands
             if (args.Length == 0)
             {
                 string expectedList = FormExpectedCommandNameList(subCommands);
-                throw new CommandException($"No command found. Expected to one of: [{expectedList}]");
+                throw new CommandException($"No command found. Expected one of: [{expectedList}]");
             }
 
             string nextCommandName = GetNameOfNextCommand(subCommands, args);
@@ -126,7 +126,7 @@ namespace SteganographyApp.Common.Arguments.Commands
                 string name = command.GetName();
                 if (names.Contains(name))
                 {
-                    throw new CommandException($"Two or more commands attempted to register with the same name. Found at least two commands with the name: [{name}]");
+                    throw new CommandException($"Two or more commands attempted to register with the same name. Found at least two commands with the name: [{name}] within group: [{GetName()}]");
                 }
                 names.Add(name);
             }
