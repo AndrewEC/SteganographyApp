@@ -1,5 +1,7 @@
 namespace SteganographyApp.Common.Tests
 {
+    using static Moq.It;
+
     using System.Collections.Generic;
     using System.Text;
 
@@ -32,19 +34,21 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestRandomizeTwiceWithSameSeedProducesSameResult()
         {
+            mockEncryptionUtil.Setup(util => util.GenerateKey(IsAny<string>(), IsAny<int>())).Returns(Encoding.UTF8.GetBytes("random_key"));
+
             byte[] first = (byte[])OriginalBytes.Clone();
             byte[] randomizedFirst = util.Randomize(first, RandomSeed, DummyCount, IterationMultiplier);
 
             byte[] second = (byte[])OriginalBytes.Clone();
-            byte[] randomizedSecond = util.Randomize(OriginalBytes, RandomSeed, DummyCount, IterationMultiplier);
+            byte[] randomizedSecond = util.Randomize(second, RandomSeed, DummyCount, IterationMultiplier);
 
-            Assert.AreEqual(first, second);
+            Assert.AreEqual(randomizedFirst, randomizedSecond);
         }
 
         [Test]
         public void TestRandomizeAndReorder()
         {
-            mockEncryptionUtil.Setup(util => util.GenerateKey(RandomSeed + DummyCount, DummyCount)).Returns(Encoding.UTF8.GetBytes("random_key"));
+            mockEncryptionUtil.Setup(util => util.GenerateKey(IsAny<string>(), IsAny<int>())).Returns(Encoding.UTF8.GetBytes("random_key"));
 
             byte[] copy = (byte[])OriginalBytes.Clone();
             byte[] randomized = util.Randomize(copy, RandomSeed, DummyCount, IterationMultiplier);
@@ -58,7 +62,7 @@ namespace SteganographyApp.Common.Tests
         public void TestRandomizeWithIncorrectRandomSeedReturnsBadResult()
         {   
             var keyByteQueue = new Queue<byte[]>(new[]{ Encoding.UTF8.GetBytes("random_key"), Encoding.UTF8.GetBytes("encoding_key") });
-            mockEncryptionUtil.Setup(util => util.GenerateKey(RandomSeed + DummyCount, DummyCount))
+            mockEncryptionUtil.Setup(util => util.GenerateKey(IsAny<string>(), IsAny<int>()))
                 .Returns(() => keyByteQueue.Dequeue());
 
             byte[] copy = (byte[])OriginalBytes.Clone();

@@ -24,7 +24,9 @@ namespace SteganographyApp.Common.Data
     [Injectable(typeof(IRandomizeUtil))]
     public sealed class RandomizeUtil : IRandomizeUtil
     {
-        private const int IterationLimit = 1000;
+        private const int MaxHashIterations = 622_000;
+        private const int MinHashIterations = 422_000;
+
         private ILogger log = new LazyLogger<RandomizeUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Randomize/*' />
@@ -80,7 +82,7 @@ namespace SteganographyApp.Common.Data
 
         private string FormRandomSeed(string randomSeed, int dummyCount)
         {
-            int iterations = (dummyCount == 0) ? 1 : (int)((dummyCount + (GlobalCounter.Instance.Count % int.MaxValue)) % IterationLimit);
+            int iterations = (dummyCount == 0) ? MaxHashIterations : (int)(((dummyCount + GlobalCounter.Instance.Count) % (MaxHashIterations - MinHashIterations)) + MinHashIterations);
             var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed + iterations, iterations);
             return Convert.ToBase64String(randomKey);
         }

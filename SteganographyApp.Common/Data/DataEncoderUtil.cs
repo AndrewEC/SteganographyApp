@@ -37,10 +37,8 @@
     [Injectable(typeof(IDataEncoderUtil))]
     public sealed class DataEncoderUtil : IDataEncoderUtil
     {
-        /// <summary>
-        /// The number of iteration multiplier to be applied when randomizing or re-ordering the encoded/decoded bytes.
-        /// </summary>
-        public const int IterationMultiplier = 2;
+        private const int IterationMultiplier = 5;
+        private const int RandomSeedHashIterations = 415_000;
 
         private readonly ILogger logger = new LazyLogger<DataEncoderUtil>();
 
@@ -52,7 +50,7 @@
 
             if (randomSeed != string.Empty)
             {
-                var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed, EncryptionUtil.DefaultIterations);
+                var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed, RandomSeedHashIterations + additionalPasswordHashIterations);
                 randomSeed = Convert.ToBase64String(randomKey);
             }
 
@@ -104,7 +102,7 @@
 
             if (randomSeed != string.Empty)
             {
-                var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed, EncryptionUtil.DefaultIterations);
+                var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed, RandomSeedHashIterations + additionalPasswordHashIterations);
                 randomSeed = Convert.ToBase64String(randomKey);
             }
 

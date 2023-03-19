@@ -49,7 +49,7 @@ namespace SteganographyApp.Common.Tests
 
             string expected = "encoded_value";
             mockDataEncoderUtil.Setup(encoder => encoder.Encode(IsAny<byte[]>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
-                .Returns("encoded_value");
+                .Returns(expected);
 
             using (var reader = new ContentReader(Arguments))
             {
@@ -57,7 +57,7 @@ namespace SteganographyApp.Common.Tests
                 Assert.AreEqual(expected, actual);
             }
 
-            mockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
+            mockReadWriteStream.Verify(stream => stream.Flush(), Once());
             mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
             mockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
             mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
@@ -76,7 +76,7 @@ namespace SteganographyApp.Common.Tests
                 Assert.IsNull(result);
             }
 
-            mockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
+            mockReadWriteStream.Verify(stream => stream.Flush(), Once());
             mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
             mockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
             mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
@@ -89,10 +89,12 @@ namespace SteganographyApp.Common.Tests
         {
             int alternateByteCount = 10;
             mockReadWriteStream.Setup(stream => stream.Read(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Returns(alternateByteCount);
+            mockDataEncoderUtil.Setup(encoder => encoder.Encode(IsAny<byte[]>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
+                .Returns("encoded_value");
 
             using (var contentReader = new ContentReader(Arguments))
             {
-                string result = contentReader.ReadContentChunkFromFile();
+                contentReader.ReadContentChunkFromFile();
             }
 
             mockDataEncoderUtil
@@ -102,6 +104,8 @@ namespace SteganographyApp.Common.Tests
         protected override void SetupMocks()
         {
             mockFileIOProxy.Setup(provider => provider.OpenFileForRead(IsAny<string>())).Returns(mockReadWriteStream.Object);
+            mockReadWriteStream.Setup(stream => stream.Flush()).Verifiable();
+            mockReadWriteStream.Setup(stream => stream.Dispose()).Verifiable();
         }
     }
 }

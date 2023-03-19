@@ -83,6 +83,7 @@ namespace SteganographyApp.Common.Tests
         {
             var mockImage = GenerateMockImage(1000, 1000);
             mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
+            mockEncoderProvider.Setup(provider => provider.GetEncoder(IsAny<string>())).Returns<IEncoderProvider>(null);
 
             var chunkTableWrite = ImmutableArray.Create(new int[] { 100, 200, 300 });
             var imageStore = new ImageStore(Arguments);

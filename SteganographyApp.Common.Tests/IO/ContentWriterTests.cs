@@ -52,6 +52,7 @@ namespace SteganographyApp.Common.Tests
             mockFileIOProxy.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(false);
             mockEncoderUtil.Setup(encoder => encoder.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
                 .Returns(bytes);
+            mockReadWriteStream.Setup(stream => stream.Write(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Verifiable();
 
             using (var writer = new ContentWriter(Arguments))
             {
@@ -72,9 +73,11 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestWriteContentChunkToFileWhenOutputFileExistsTriesToDeleteFileFirst()
         {
-            mockFileIOProxy.Setup(provider => provider.IsExistingFile(IsAny<string>())).Returns(true);
+            mockFileIOProxy.Setup(provider => provider.IsExistingFile(DecodedOutputFile)).Returns(true);
             mockEncoderUtil.Setup(encoder => encoder.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
                 .Returns(new byte[1024]);
+            mockFileIOProxy.Setup(proxy => proxy.Delete(DecodedOutputFile)).Verifiable();
+            mockReadWriteStream.Setup(stream => stream.Write(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Verifiable();
 
             using (var writer = new ContentWriter(Arguments))
             {
@@ -87,7 +90,9 @@ namespace SteganographyApp.Common.Tests
 
         protected override void SetupMocks()
         {
-            mockFileIOProxy.Setup(provider => provider.OpenFileForWrite(IsAny<string>())).Returns(mockReadWriteStream.Object);
+            mockFileIOProxy.Setup(provider => provider.OpenFileForWrite(DecodedOutputFile)).Returns(mockReadWriteStream.Object);
+            mockReadWriteStream.Setup(stream => stream.Flush()).Verifiable();
+            mockReadWriteStream.Setup(stream => stream.Dispose()).Verifiable();
         }
     }
 }
