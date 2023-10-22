@@ -10,9 +10,9 @@
         "additional-timeout": 30000,
 
         "thresholds": {
-            "high": 50,
-            "low": 50,
-            "break": 50
+            "high": 30,
+            "low": 30,
+            "break": 30
         },
 
         "mutate": [
