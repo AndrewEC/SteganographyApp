@@ -13,20 +13,20 @@ namespace SteganographyApp.Common.Tests
         private const string Password = "Pass1";
         private const int AdditionalHashIterations = 2;
 
-        private readonly byte[] InputStringBytes = Encoding.UTF8.GetBytes(InputString);
+        private readonly byte[] inputStringBytes = Encoding.UTF8.GetBytes(InputString);
 
         [Test]
         public void TestEncryptAndDecrypt()
         {
             var util = new EncryptionUtil();
 
-            byte[] encrypted = util.Encrypt(InputStringBytes, Password, AdditionalHashIterations);
+            byte[] encrypted = util.Encrypt(inputStringBytes, Password, AdditionalHashIterations);
 
-            Assert.AreNotEqual(InputStringBytes, encrypted);
+            Assert.AreNotEqual(inputStringBytes, encrypted);
 
             byte[] decrypted = util.Decrypt(encrypted, Password, AdditionalHashIterations);
 
-            Assert.AreEqual(InputStringBytes, decrypted);
+            Assert.AreEqual(inputStringBytes, decrypted);
         }
     }
 }

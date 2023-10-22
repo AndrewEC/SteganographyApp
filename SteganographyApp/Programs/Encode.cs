@@ -142,7 +142,7 @@ namespace SteganographyApp
         }
     }
 
-    internal class EncodingUtilities
+    internal sealed class EncodingUtilities
     {
         public EncodingUtilities(IInputArguments args)
         {

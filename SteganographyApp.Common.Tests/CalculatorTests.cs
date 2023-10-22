@@ -34,7 +34,7 @@ namespace SteganographyApp.Common.Tests
 
         protected override void SetupMocks()
         {
-            mockFileIOProxy.Setup(provider => provider.GetFileSizeBytes(It.IsAny<string>())).Returns(ChunkSize * 5);
+            mockFileIOProxy.Setup(provider => provider.GetFileSizeBytes(TestFile)).Returns(ChunkSize * 5);
         }
     }
 }

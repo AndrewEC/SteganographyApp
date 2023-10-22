@@ -62,5 +62,4 @@ namespace SteganographyApp.Common.Arguments
             return builder.ToString();
         }
     }
-
 }

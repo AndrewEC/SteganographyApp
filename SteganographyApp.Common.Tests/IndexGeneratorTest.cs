@@ -1,5 +1,7 @@
 ﻿namespace SteganographyApp.Common.Tests
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using NUnit.Framework;
@@ -49,6 +51,23 @@
             Assert.IsTrue(AreInRange(nums, 0, 20));
             Assert.IsTrue(AreInRange(nums2, 0, 20));
             Assert.IsTrue(HaveSameElements(nums, nums2));
+        }
+
+        [Test]
+        public void TestDistribution()
+        {
+            for (int j = 0; j < 100; j++)
+            {
+                var random = new Random();
+                int generations = random.Next(100, 10_000);
+                var generator = new Xor128Prng(random.Next(100, 10_000), random.Next(10, 100));
+                var generated = new HashSet<int>();
+                for (int i = 0; i < generations; i++)
+                {
+                    generated.Add(generator.Next(generations));
+                }
+                Assert.GreaterOrEqual(generations * 0.8, generated.Count);
+            }
         }
 
         private bool HaveSameElements(int[] first, int[] second)

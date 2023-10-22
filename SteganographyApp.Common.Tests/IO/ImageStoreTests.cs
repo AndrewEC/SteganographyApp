@@ -18,7 +18,6 @@ namespace SteganographyApp.Common.Tests
     using SteganographyApp.Common.Injection;
     using SteganographyApp.Common.IO;
 
-    using static Moq.It;
     using static Moq.Times;
 
     [TestFixture]
@@ -31,9 +30,10 @@ namespace SteganographyApp.Common.Tests
         public Mock<IEncoderProvider> mockEncoderProvider;
 
         private const int BinaryStringLength = 100_000;
+        private const string ImageName = "test001.png";
         private static readonly IInputArguments Arguments = new CommonArguments()
         {
-            CoverImages = ImmutableArray.Create(new string[] { "test001.png" }),
+            CoverImages = ImmutableArray.Create(new string[] { ImageName }),
         };
 
         private string imageLoadededEventPath;
@@ -42,9 +42,9 @@ namespace SteganographyApp.Common.Tests
         public void TestCleanImages()
         {
             var mockImage = GenerateMockImage(100, 100);
-            mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
+            mockImageProxy.Setup(provider => provider.LoadImage(ImageName)).Returns(mockImage);
 
-            mockEncoderProvider.Setup(provider => provider.GetEncoder(IsAny<string>())).Returns(new PngEncoder());
+            mockEncoderProvider.Setup(provider => provider.GetEncoder(ImageName)).Returns(new PngEncoder());
 
             var imageStore = new ImageStore(Arguments);
             imageStore.OnNextImageLoaded += OnNextImageLoaded;
@@ -60,9 +60,9 @@ namespace SteganographyApp.Common.Tests
         public void TestWriteToImageWhenNotEnoughImageSpacesThrowsImageProcessingException()
         {
             var mockImage = GenerateMockImage(100, 100);
-            mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
+            mockImageProxy.Setup(provider => provider.LoadImage(ImageName)).Returns(mockImage);
 
-            mockEncoderProvider.Setup(provider => provider.GetEncoder(IsAny<string>())).Returns(new PngEncoder());
+            mockEncoderProvider.Setup(provider => provider.GetEncoder(ImageName)).Returns(new PngEncoder());
 
             string binaryString = GenerateBinaryString(BinaryStringLength);
 
@@ -82,8 +82,8 @@ namespace SteganographyApp.Common.Tests
         public void TestReadAndWriteContentChunkTable()
         {
             var mockImage = GenerateMockImage(1000, 1000);
-            mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
-            mockEncoderProvider.Setup(provider => provider.GetEncoder(IsAny<string>())).Returns<IEncoderProvider>(null);
+            mockImageProxy.Setup(provider => provider.LoadImage(ImageName)).Returns(mockImage);
+            mockEncoderProvider.Setup(provider => provider.GetEncoder(ImageName)).Returns<IEncoderProvider>(null);
 
             var chunkTableWrite = ImmutableArray.Create(new int[] { 100, 200, 300 });
             var imageStore = new ImageStore(Arguments);
@@ -109,9 +109,9 @@ namespace SteganographyApp.Common.Tests
         public void TestWriteContentChunkTableWithNotEnoughSpaceInImageThrowsImageProcessingException()
         {
             var mockImage = GenerateMockImage(1, 1);
-            mockImageProxy.Setup(provider => provider.LoadImage(IsAny<string>())).Returns(mockImage);
+            mockImageProxy.Setup(provider => provider.LoadImage(ImageName)).Returns(mockImage);
 
-            mockEncoderProvider.Setup(provider => provider.GetEncoder(IsAny<string>())).Returns(new PngEncoder());
+            mockEncoderProvider.Setup(provider => provider.GetEncoder(ImageName)).Returns(new PngEncoder());
 
             var imageStore = new ImageStore(Arguments);
             var chunkTable = Enumerable.Range(0, 100).ToImmutableArray();

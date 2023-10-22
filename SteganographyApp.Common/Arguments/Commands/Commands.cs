@@ -179,14 +179,7 @@ namespace SteganographyApp.Common.Arguments.Commands
 
         private ICommand Actual
         {
-            get
-            {
-                if (actual == null)
-                {
-                    actual = Activator.CreateInstance(typeof(T)) as ICommand;
-                }
-                return actual!;
-            }
+            get => (actual ??= Activator.CreateInstance(typeof(T)) as ICommand)!;
         }
 
         /// <summary>

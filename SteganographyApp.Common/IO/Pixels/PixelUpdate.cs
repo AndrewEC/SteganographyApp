@@ -50,10 +50,10 @@ namespace SteganographyApp.Common.IO
     internal sealed class SingleBitColourChannelUpdateStrategy : IColourChannelUpdateStrategy
     {
         /// <summary>
-        /// Reads a set of bits from the queue and overwriter the lower bits of the source colour
-        /// with them to determine the new bit colour.
+        /// Replaces the least significant bit of the source colour byte with the value pulled from the bit queue. If
+        /// there is no value remaining in the bit queue this will return the original result.
         /// </summary>
-        /// <param name="sourceColour">The byte representation of a pixel colour channel.</param>
+        /// <param name="sourceColour">A byte representing a single colour channel.</param>
         /// <param name="bitQueue">The bit queue from which the bits to write will be pulled from.</param>
         /// <returns>The newly formed colour of the input source colour.</returns>
         public byte GetNewPixelColour(byte sourceColour, ReadBitQueue bitQueue)
@@ -72,12 +72,12 @@ namespace SteganographyApp.Common.IO
     internal sealed class TwoBitColourChannelUpdateStrategy : IColourChannelUpdateStrategy
     {
         /// <summary>
-        /// Reads a set of bits from the queue and overwriter the lower bits of the source colour
-        /// with them to determine the new bit colour.
+        /// Replaces the least and second least significant bit of the input source colour byte with the bits pulled from the bit queue.
+        /// If the bit queue is empty then this will return the original byte.
         /// </summary>
-        /// <param name="sourceColour">The byte representation of a pixel colour channel.</param>
+        /// <param name="sourceColour">A byte representing a single colour channel.</param>
         /// <param name="bitQueue">The bit queue from which the bits to write will be pulled from.</param>
-        /// <returns>The newly formed colour of the input source colour.</returns>
+        /// <returns>The newly formed byte with the two least significant bits replaced with the values pulled from the bitQueue.</returns>
         public byte GetNewPixelColour(byte sourceColour, ReadBitQueue bitQueue)
         {
             if (!bitQueue.HasNext())
@@ -91,7 +91,8 @@ namespace SteganographyApp.Common.IO
     }
 
     /// <summary>
-    /// Utility class to read in binary data from a pixel and write it to a bit queue.
+    /// Utility class to take data from a bit queue and use it to update the colour of a series of pixels
+    /// represented by the Rgba32 struct.
     /// </summary>
     internal sealed class PixelWriter
     {
@@ -101,7 +102,7 @@ namespace SteganographyApp.Common.IO
         /// <summary>
         /// Constructs an instance of the pixel writer.
         /// </summary>
-        /// <param name="bitQueue">The queue to write the read bits to.</param>
+        /// <param name="bitQueue">The queue to read the bits from.</param>
         /// <param name="writableBitsPerPixel">The number of bits to read, starting from the LSB, from a given input pixels
         /// RGB colours.</param>
         public PixelWriter(ReadBitQueue bitQueue, int writableBitsPerPixel)
@@ -111,19 +112,18 @@ namespace SteganographyApp.Common.IO
         }
 
         /// <summary>
-        /// Performs an in place mutation of the input pixel struct by updating the LSBs of the
-        /// RGB values from the input pixel.
+        /// Takes a source pixel and creates a new pixel in which the new pixel will have the least or least and second least
+        /// bits updated depending on the number of pixels to update specified during the PixelWriter's initialization.
+        /// The bits used to update each of the RGB values will be pulled from the bigQueue provided during initialization.
         /// </summary>
-        /// <param name="source">The input pixel the original RGB bytes to update.</param>
+        /// <param name="source">The input pixel.</param>
         /// <returns>A new pixel with each RGB value being an RGB valued pulled from the source pixel that
         /// has been subsequently updated by pulling a bit from the ReadBitQueue instance provided during initialization.</returns>
-        public Rgba32 UpdatePixel(Rgba32 source)
+        public Rgba32 UpdatePixel(Rgba32 source) => new Rgba32
         {
-            var destination = new Rgba32();
-            destination.R = strategy.GetNewPixelColour(source.R, bitQueue);
-            destination.G = strategy.GetNewPixelColour(source.G, bitQueue);
-            destination.B = strategy.GetNewPixelColour(source.B, bitQueue);
-            return destination;
-        }
+            R = strategy.GetNewPixelColour(source.R, bitQueue),
+            G = strategy.GetNewPixelColour(source.G, bitQueue),
+            B = strategy.GetNewPixelColour(source.B, bitQueue)
+        };
     }
 }

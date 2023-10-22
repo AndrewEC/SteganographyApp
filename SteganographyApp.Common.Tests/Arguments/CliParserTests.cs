@@ -1,5 +1,6 @@
 namespace SteganographyApp.Common.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -41,7 +42,7 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestRequiredMissing()
         {
-            var arguments = new string[] { };
+            var arguments = Array.Empty<string>();
             var parser = new CliParser();
             parser.TryParseArgs(out TestDefaultParsersArguments args, arguments);
             Assert.NotNull(parser.LastError);
@@ -65,7 +66,7 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestInvalidPositionThrowsException()
         {
-            Assert.Throws(typeof(ParseException), () => CliParser.ParseArgs<TestInvalidPositionalArguments>(new string[] { }));
+            Assert.Throws(typeof(ParseException), () => CliParser.ParseArgs<TestInvalidPositionalArguments>(Array.Empty<string>()));
         }
 
         [Test]

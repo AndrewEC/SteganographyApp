@@ -47,9 +47,6 @@
         /// Creates a new stream configured to read in the file that is to be encoded.
         /// </summary>
         /// <returns>A stream instance configured for reading from the FileToEncode.</returns>
-        protected override IReadWriteStream InitializeStream()
-        {
-            return Injector.Provide<IFileIOProxy>().OpenFileForRead(Args.FileToEncode);
-        }
+        protected override IReadWriteStream InitializeStream() => Injector.Provide<IFileIOProxy>().OpenFileForRead(Args.FileToEncode);        
     }
 }

@@ -30,7 +30,7 @@ namespace SteganographyApp.Common.Data
         private const int MaxHashIterationLimit = 500_000;
         private const int MinHashIterationLimit = 350_000;
 
-        private ILogger log = new LazyLogger<DummyUtil>();
+        private readonly ILogger log = new LazyLogger<DummyUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
         public byte[] InsertDummies(int numDummies, byte[] value, string randomSeed)
@@ -113,7 +113,7 @@ namespace SteganographyApp.Common.Data
             return Convert.ToBase64String(randomKey);
         }
 
-        private int ComputeActualNumberOfDummies(Xor128Prng generator, int numDummies) => generator.Next(numDummies - numDummies / 3) + numDummies / 3;
+        private int ComputeActualNumberOfDummies(Xor128Prng generator, int numDummies) => generator.Next(numDummies - (numDummies / 3)) + (numDummies / 3);
 
         private int[] GenerateLengthsOfDummies(string randomSeed, int numDummies, Xor128Prng generator) => Enumerable.Range(0, numDummies)
             .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
@@ -122,11 +122,11 @@ namespace SteganographyApp.Common.Data
         private byte[] GenerateDummyBytes(Xor128Prng generator, int length) => Enumerable.Range(0, length)
             .Select(i => (byte)generator.Next(byte.MaxValue))
             .ToArray();
-        
+
         private int[] GeneratePositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => GenerateEnumerablePositions(generator, numberOfDummies, maxPosition)
             .ToArray();
 
-        private int [] GenerateReversedPositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => GenerateEnumerablePositions(generator, numberOfDummies, maxPosition)
+        private int[] GenerateReversedPositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => GenerateEnumerablePositions(generator, numberOfDummies, maxPosition)
             .Reverse()
             .ToArray();
 

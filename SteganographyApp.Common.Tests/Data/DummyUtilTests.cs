@@ -14,7 +14,7 @@ namespace SteganographyApp.Common.Tests
         private const string RandomSeed = "random_seed";
         private const string IncorrectRandomSeed = "seed_random";
 
-        private readonly byte[] OriginalBytes = new byte[]{8, 3, 4, 9, 53, 6, 3, 25, 78, 42, 56, 14, 74, 32, 63};
+        private readonly byte[] originalBytes = new byte[] { 8, 3, 4, 9, 53, 6, 3, 25, 78, 42, 56, 14, 74, 32, 63 };
 
         private readonly DummyUtil util = new DummyUtil();
 
@@ -33,21 +33,21 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestInsertAndRemoveDummies()
         {
-            byte[] inserted = util.InsertDummies(NumberOfDummies, OriginalBytes, RandomSeed);
-            Assert.AreNotEqual(OriginalBytes, inserted);
+            byte[] inserted = util.InsertDummies(NumberOfDummies, originalBytes, RandomSeed);
+            Assert.AreNotEqual(originalBytes, inserted);
 
             byte[] removed = util.RemoveDummies(NumberOfDummies, inserted, RandomSeed);
-            Assert.AreEqual(OriginalBytes, removed);
+            Assert.AreEqual(originalBytes, removed);
         }
 
         [Test]
         public void TestInsertAndRemoveWithIncorrectDummyCountReturnsBadResult()
         {
-            byte[] inserted = util.InsertDummies(NumberOfDummies, OriginalBytes, RandomSeed);
-            Assert.AreNotEqual(OriginalBytes, inserted);
+            byte[] inserted = util.InsertDummies(NumberOfDummies, originalBytes, RandomSeed);
+            Assert.AreNotEqual(originalBytes, inserted);
 
             byte[] removed = util.RemoveDummies(IncorrectNumberOfDummies, inserted, RandomSeed);
-            Assert.AreNotEqual(OriginalBytes, removed);
+            Assert.AreNotEqual(originalBytes, removed);
         }
 
         [Test]
@@ -55,8 +55,8 @@ namespace SteganographyApp.Common.Tests
         {
             try
             {
-                byte[] inserted = util.InsertDummies(NumberOfDummies, OriginalBytes, RandomSeed);
-                Assert.AreNotEqual(OriginalBytes, util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed));
+                byte[] inserted = util.InsertDummies(NumberOfDummies, originalBytes, RandomSeed);
+                Assert.AreNotEqual(originalBytes, util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed));
             }
             catch (Exception)
             {

@@ -130,13 +130,14 @@ namespace SteganographyApp.Common.Arguments
             }
 
             Type memberType = TypeHelper.DeclaredType(member);
-            // Check if the type is a struct.
-            if (memberType.IsValueType && !memberType.IsEnum && !memberType.IsPrimitive)
+            if (IsStruct(memberType))
             {
                 return null;
             }
 
             return value.ToString();
         }
+
+        private static bool IsStruct(Type memberType) => memberType.IsValueType && !memberType.IsEnum && !memberType.IsPrimitive;
     }
 }

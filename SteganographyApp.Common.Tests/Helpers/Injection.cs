@@ -34,7 +34,7 @@ namespace SteganographyApp.Common.Tests
         private static void UseInstance(object instance, FieldInfo fieldInfo, Mockup mockableAttribute)
         {
             typeof(Injector)
-                .GetMethod("UseInstance")
+                .GetMethod(nameof(Injector.UseInstance))
                 .MakeGenericMethod(mockableAttribute.MockType)
                 .Invoke(null, new object[] { instance });
         }
