@@ -58,7 +58,7 @@ namespace SteganographyApp.Common.Arguments
                     writer.Write("*");
                 }
             }
-            writer.WriteLine("");
+            writer.WriteLine(string.Empty);
             return builder.ToString();
         }
     }

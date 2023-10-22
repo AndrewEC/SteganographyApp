@@ -1,13 +1,13 @@
 namespace SteganographyApp.Common.Arguments
 {
-    using SteganographyApp.Common.Injection;
-
-    using System.Collections.Immutable;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.IO;
     using System.Linq;
 
     using Microsoft.Extensions.FileSystemGlobbing;
+
+    using SteganographyApp.Common.Injection;
 
     /// <summary>
     /// Static utility class to help parse out a list of paths to the images provided in the

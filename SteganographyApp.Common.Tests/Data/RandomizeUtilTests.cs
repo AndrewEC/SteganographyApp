@@ -61,7 +61,7 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestRandomizeWithIncorrectRandomSeedReturnsBadResult()
         {
-            var keyByteQueue = new Queue<byte[]>(new[]{ Encoding.UTF8.GetBytes("random_key"), Encoding.UTF8.GetBytes("encoding_key") });
+            var keyByteQueue = new Queue<byte[]>(new[] { Encoding.UTF8.GetBytes("random_key"), Encoding.UTF8.GetBytes("encoding_key") });
             mockEncryptionUtil.Setup(util => util.GenerateKey(IsAny<string>(), IsAny<int>()))
                 .Returns(() => keyByteQueue.Dequeue());
 

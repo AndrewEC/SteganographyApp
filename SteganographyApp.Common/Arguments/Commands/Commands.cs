@@ -41,7 +41,8 @@ namespace SteganographyApp.Common.Arguments.Commands
         /// <param name="function">The function that will be executed when the command is executed.</param>
         /// <typeparam name="T">The type of the argument class.</typeparam>
         /// <returns>A new GenericCommand instance initialized with the specified name and function.</returns>
-        public static ICommand From<T>(string name, CommandFunction<T> function) where T : class => new GenericCommand<T>(name.ToLowerInvariant(), function);
+        public static ICommand From<T>(string name, CommandFunction<T> function)
+        where T : class => new GenericCommand<T>(name.ToLowerInvariant(), function);
 
         /// <summary>
         /// Creates a new AliasedCommand instance allowing the existing command to be executed using a different name.
@@ -57,7 +58,8 @@ namespace SteganographyApp.Common.Arguments.Commands
         /// <typeparam name="T">The underlying ICommand type to reflectively instantiate. Requires the command type to provide
         /// a default constructor.</typeparam>
         /// <returns>A new LazyCommand instance.</returns>
-        public static ICommand Lazy<T>() where T : ICommand => new LazyCommand<T>();
+        public static ICommand Lazy<T>()
+        where T : ICommand => new LazyCommand<T>();
     }
 
     /// <summary>

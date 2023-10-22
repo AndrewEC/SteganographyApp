@@ -42,7 +42,7 @@ namespace SteganographyApp.Common.Tests
         private static object CreateMockInstance(FieldInfo field, Mockup mockableAttribute)
         {
             var mockType = typeof(Mock<>).MakeGenericType(new Type[] { mockableAttribute.MockType });
-            return Activator.CreateInstance(mockType, new object[]{ MockBehavior.Strict });
+            return Activator.CreateInstance(mockType, new object[] { MockBehavior.Strict });
         }
 
         private static object GetProxyInstance(object mock)

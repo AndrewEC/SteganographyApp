@@ -38,8 +38,8 @@ namespace SteganographyApp.Common.IO
         /// <param name="lastBit">The character specifying a bit like value, 0 or 1, to swap in.</param>
         /// <returns>The newly formed byte.</returns>
         internal static byte SwapSecondLeastSignificantBit(byte value, char lastBit) => Shift(value, 2, lastBit);
-        
-        private static byte Shift(byte value, byte shift, char lastBit)  => (lastBit == '0')
+
+        private static byte Shift(byte value, byte shift, char lastBit) => (lastBit == '0')
             ? (byte)(value & ~shift)
             : (byte)(value | shift);
     }
@@ -123,7 +123,7 @@ namespace SteganographyApp.Common.IO
         {
             R = strategy.GetNewPixelColour(source.R, bitQueue),
             G = strategy.GetNewPixelColour(source.G, bitQueue),
-            B = strategy.GetNewPixelColour(source.B, bitQueue)
+            B = strategy.GetNewPixelColour(source.B, bitQueue),
         };
     }
 }

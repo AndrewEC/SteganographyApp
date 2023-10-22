@@ -16,7 +16,7 @@ namespace SteganographyApp.Common.IO
         /// <summary>
         /// Initializes a new pixel reader instance.
         /// </summary>
-        /// <param name="bitAggregator"></param>
+        /// <param name="bitAggregator">The aggregator which the bits pulled from each pixel will be added to.</param>
         /// <param name="readableBitsPerPixel">Specifies the number of bits to reach from each pixel colour.</param>
         public PixelReader(BitAggregator bitAggregator, int readableBitsPerPixel)
         {

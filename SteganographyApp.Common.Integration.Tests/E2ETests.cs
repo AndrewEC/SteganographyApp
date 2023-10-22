@@ -1,4 +1,4 @@
-﻿namespace SteganographyApp.Common.Tests
+﻿namespace SteganographyApp.Common.Integration.Tests
 {
     using System;
     using System.Collections.Immutable;
@@ -11,7 +11,7 @@
     using SteganographyApp.Common.IO;
 
     [TestFixture]
-    public class E2ETests : FixtureWithRealObjects
+    public class E2ETests
     {
         private CommonArguments args;
         private ImageStore imageStore;

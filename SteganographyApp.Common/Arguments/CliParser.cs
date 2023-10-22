@@ -26,7 +26,8 @@ namespace SteganographyApp.Common.Arguments
         /// <param name="additionalParsers">An optional parser provider to provide additional parsers for custom types.</param>
         /// <typeparam name="T">The class containing the argument attributes from which the arguments to parsed will be derived from.</typeparam>
         /// <returns>An instance of T.</returns>
-        public static T ParseArgs<T>(string[] arguments, IParserProvider? additionalParsers = null) where T : class => ParseArgs<T>(arguments, Initializer.Initialize<T>(), additionalParsers);
+        public static T ParseArgs<T>(string[] arguments, IParserProvider? additionalParsers = null)
+        where T : class => ParseArgs<T>(arguments, Initializer.Initialize<T>(), additionalParsers);
 
         /// <summary>
         /// Attempts to parse the user provided arguments into the specified class model. If an exception occurs during the parsing process
