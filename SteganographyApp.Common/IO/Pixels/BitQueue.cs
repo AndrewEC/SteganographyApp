@@ -60,18 +60,18 @@ namespace SteganographyApp.Common.IO
     /// <summary>
     /// A structure for taking in a series of bits and aggregating the bits into a continuous string.
     /// </summary>
-    internal sealed class BitAggregator
+    internal sealed class BinaryStringBuilder
     {
         private readonly int capacity = 0;
-        private int length = 0;
-        private StringBuilder binary = new StringBuilder();
+        private readonly StringBuilder binary = new StringBuilder();
+        private int bitsCurrentlyStored = 0;
 
         /// <summary>
-        /// Initializes the aggregator with a specified maximum capacity.
+        /// Initializes the binary string builder with the specified maximum capacity.
         /// </summary>
-        /// <param name="capacity">The total number of bits the aggregator can house.
-        /// any bit one attempts to add beyond the capacity will be silently rejected.</param>
-        public BitAggregator(int capacity)
+        /// <param name="capacity">The total number of bits the binary string builder can house.
+        /// Any bit one attempts to add beyond the capacity will be silently rejected.</param>
+        public BinaryStringBuilder(int capacity)
         {
             this.capacity = capacity;
         }
@@ -84,21 +84,21 @@ namespace SteganographyApp.Common.IO
         /// <param name="bits">The bits to add to the queue.</param>
         public void Put(string bits)
         {
-            if (length >= capacity)
+            if (bitsCurrentlyStored >= capacity)
             {
                 return;
             }
-            if (length + bits.Length > capacity)
+            if (bitsCurrentlyStored + bits.Length > capacity)
             {
-                int bitsToTake = bits.Length - (capacity - length);
-                string toTake = bits.Substring(0, bitsToTake);
-                binary.Append(toTake);
-                length += toTake.Length;
+                int bitsToTake = bits.Length - (capacity - bitsCurrentlyStored);
+                string bitsTaken = bits.Substring(0, bitsToTake);
+                binary.Append(bitsTaken);
+                bitsCurrentlyStored += bitsTaken.Length;
             }
             else
             {
                 binary.Append(bits);
-                length += bits.Length;
+                bitsCurrentlyStored += bits.Length;
             }
         }
 
@@ -107,12 +107,12 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <returns>True if the number of currently aggregated bits is greater than or equal to the capacity
         /// of the aggregator, otherwise false.</returns>
-        public bool IsFull() => length >= capacity;
+        public bool IsFull() => bitsCurrentlyStored >= capacity;
 
         /// <summary>
         /// Gets the aggregated series of bits as a single continuous string.
         /// </summary>
         /// <returns>Returns a continuous binary string.</returns>
-        public string GetBits() => binary.ToString();
+        public string ToBinaryString() => binary.ToString();
     }
 }

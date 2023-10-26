@@ -70,6 +70,7 @@ namespace SteganographyApp.Common.IO
         {
             store.CloseOpenImage(save);
             GlobalCounter.Instance.Reset();
+            GC.SuppressFinalize(this);
         }
     }
 }

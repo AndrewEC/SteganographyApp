@@ -10,7 +10,7 @@ namespace SteganographyApp.Common.IO
     /// </summary>
     internal sealed class PixelReader
     {
-        private readonly BitAggregator bitAggregator;
+        private readonly BinaryStringBuilder bitAggregator;
         private readonly int readableBitsPerPixel;
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <param name="bitAggregator">The aggregator which the bits pulled from each pixel will be added to.</param>
         /// <param name="readableBitsPerPixel">Specifies the number of bits to reach from each pixel colour.</param>
-        public PixelReader(BitAggregator bitAggregator, int readableBitsPerPixel)
+        public PixelReader(BinaryStringBuilder bitAggregator, int readableBitsPerPixel)
         {
             this.bitAggregator = bitAggregator;
             this.readableBitsPerPixel = readableBitsPerPixel;

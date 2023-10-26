@@ -163,11 +163,11 @@
         {
             log.Debug("Writing [{0}] bits to image [{1}] starting at position [{2}]", binary.Length, CurrentImage, pixelPosition.ToString());
             var queue = new ReadBitQueue(binary);
-            var writer = new PixelWriter(queue, args.BitsToUse);
+            var pixelWriter = new PixelWriter(queue, args.BitsToUse);
             while (queue.HasNext())
             {
                 Rgba32 source = currentImage![pixelPosition.X, pixelPosition.Y];
-                Rgba32 updated = writer.UpdatePixel(source);
+                Rgba32 updated = pixelWriter.UpdatePixel(source);
                 currentImage[pixelPosition.X, pixelPosition.Y] = updated;
 
                 if (!pixelPosition.TryMoveToNext())
@@ -192,18 +192,18 @@
         internal string ReadBinaryString(int bitsToRead)
         {
             log.Debug("Reading [{0}] bits from image [{1}] starting from position [{2}]", bitsToRead, CurrentImage, pixelPosition.ToString());
-            var queue = new BitAggregator(bitsToRead);
-            var reader = new PixelReader(queue, args.BitsToUse);
-            while (!queue.IsFull())
+            var binaryStringBuilder = new BinaryStringBuilder(bitsToRead);
+            var pixelReader = new PixelReader(binaryStringBuilder, args.BitsToUse);
+            while (!binaryStringBuilder.IsFull())
             {
                 Rgba32 pixel = currentImage![pixelPosition.X, pixelPosition.Y];
-                reader.ReadBinaryFromPixel(pixel);
+                pixelReader.ReadBinaryFromPixel(pixel);
                 if (!pixelPosition.TryMoveToNext())
                 {
                     LoadNextImage();
                 }
             }
-            return queue.GetBits();
+            return binaryStringBuilder.ToBinaryString();
         }
 
         /// <summary>
@@ -257,10 +257,10 @@
 
         private string GenerateBinaryString()
         {
-            int bitCount = (currentImage!.Width * currentImage.Height * args.BitsToUse) - 1;
+            int bitCount = currentImage!.Width * currentImage.Height * args.BitsToUse;
             log.Debug("Generating binary string with a length of [{0}] for image [{1}]", bitCount, CurrentImage);
             var random = new Random();
-            return string.Concat(Enumerable.Range(0, bitCount).Select(i => random.Next(10) % 2 == 0 ? '0' : '1'));
+            return string.Concat(Enumerable.Range(0, bitCount - 1).Select(i => random.Next(10) % 2 == 0 ? '0' : '1'));
         }
     }
 }

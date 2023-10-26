@@ -106,31 +106,31 @@ namespace SteganographyApp.Common.Data
             return result;
         }
 
-        private string CreateRandomSeed(string randomSeed)
+        private static string CreateRandomSeed(string randomSeed)
         {
             int iterations = (int)((MinHashIterationLimit + GlobalCounter.Instance.Count) % MaxHashIterationLimit);
             var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed + iterations, iterations);
             return Convert.ToBase64String(randomKey);
         }
 
-        private int ComputeActualNumberOfDummies(Xor128Prng generator, int numDummies) => generator.Next(numDummies - (numDummies / 3)) + (numDummies / 3);
+        private static int ComputeActualNumberOfDummies(Xor128Prng generator, int numDummies) => generator.Next(numDummies - (numDummies / 3)) + (numDummies / 3);
 
-        private int[] GenerateLengthsOfDummies(string randomSeed, int numDummies, Xor128Prng generator) => Enumerable.Range(0, numDummies)
+        private static int[] GenerateLengthsOfDummies(string randomSeed, int numDummies, Xor128Prng generator) => Enumerable.Range(0, numDummies)
             .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
             .ToArray();
 
-        private byte[] GenerateDummyBytes(Xor128Prng generator, int length) => Enumerable.Range(0, length)
+        private static byte[] GenerateDummyBytes(Xor128Prng generator, int length) => Enumerable.Range(0, length)
             .Select(i => (byte)generator.Next(byte.MaxValue))
             .ToArray();
 
-        private int[] GeneratePositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => GenerateEnumerablePositions(generator, numberOfDummies, maxPosition)
+        private static int[] GeneratePositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => GenerateEnumerablePositions(generator, numberOfDummies, maxPosition)
             .ToArray();
 
-        private int[] GenerateReversedPositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => GenerateEnumerablePositions(generator, numberOfDummies, maxPosition)
+        private static int[] GenerateReversedPositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => GenerateEnumerablePositions(generator, numberOfDummies, maxPosition)
             .Reverse()
             .ToArray();
 
-        private IEnumerable<int> GenerateEnumerablePositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => Enumerable.Range(0, numberOfDummies)
+        private static IEnumerable<int> GenerateEnumerablePositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => Enumerable.Range(0, numberOfDummies)
             .Select(i => generator.Next(maxPosition));
     }
 }

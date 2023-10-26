@@ -62,6 +62,6 @@
         /// <returns>An integer whose value is between 0 and less than the exclusive parameter.</returns>
         public int Next(int exclusive) => Math.Abs(Next()) % exclusive;
 
-        private ulong Rotl(ulong x, int k) => (x << k) | (x >> (64 - k));
+        private static ulong Rotl(ulong x, int k) => (x << k) | (x >> (64 - k));
     }
 }

@@ -5,7 +5,7 @@ namespace SteganographyApp.Common.IO
     /// <summary>
     /// Handles the current pixel position for the currently loaded image in the ImageStore.
     /// </summary>
-    internal class PixelPosition
+    internal sealed class PixelPosition
     {
         /// <summary>
         /// Gets the current pixel X position.
@@ -40,11 +40,11 @@ namespace SteganographyApp.Common.IO
         /// <returns>False if there is no further pixel to move to, otherwise true.</returns>
         public bool TryMoveToNext()
         {
-            X = X + 1;
+            X++;
             if (X == TrackedImage!.Width)
             {
                 X = 0;
-                Y = Y + 1;
+                Y++;
                 if (Y == TrackedImage.Height)
                 {
                     return false;

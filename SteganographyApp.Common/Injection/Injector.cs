@@ -30,7 +30,7 @@ namespace SteganographyApp.Common.Injection
             {
                 var ctor = injectableType.GetConstructor(Type.EmptyTypes);
                 var correlatedType = GetInjectableAttribute(injectableType)!.CorrelatesWith;
-                injectables[correlatedType] = ctor?.Invoke(new object[] { })
+                injectables[correlatedType] = ctor?.Invoke(Array.Empty<object>())
                     ?? throw new ArgumentException("Injectable types must have a default empty construct. No matching constructor found for type: " + injectableType.Name);
             }
 
@@ -61,7 +61,7 @@ namespace SteganographyApp.Common.Injection
         {
             foreach (object instance in instances)
             {
-                GetPostConstructMethod(instance)?.Invoke(instance, new object[] { });
+                GetPostConstructMethod(instance)?.Invoke(instance, Array.Empty<object>());
             }
         }
 
@@ -79,18 +79,18 @@ namespace SteganographyApp.Common.Injection
     /// </summary>
     public static partial class Injector
     {
-        private static Dictionary<Type, object> injectionValues;
+        private static readonly ImmutableDictionary<Type, object> DefaultInjectionValues;
 
-        private static ImmutableDictionary<Type, object> defaultInjectionValues;
+        private static Dictionary<Type, object> injectionValues;
 
         private static bool onlyTestObjectsState = false;
 
         static Injector()
         {
-            defaultInjectionValues = InjectableLookup.LookupDefaultInjectableDictionary();
+            DefaultInjectionValues = InjectableLookup.LookupDefaultInjectableDictionary();
             injectionValues = new Dictionary<Type, object>();
             ResetInstances();
-            PostConstruct.InvokePostConstructMethods(defaultInjectionValues.Values);
+            PostConstruct.InvokePostConstructMethods(DefaultInjectionValues.Values);
         }
 
         /// <summary>
@@ -143,9 +143,9 @@ namespace SteganographyApp.Common.Injection
         public static void ResetInstances()
         {
             injectionValues = new Dictionary<Type, object>();
-            foreach (Type key in defaultInjectionValues.Keys)
+            foreach (Type key in DefaultInjectionValues.Keys)
             {
-                injectionValues[key] = defaultInjectionValues[key];
+                injectionValues[key] = DefaultInjectionValues[key];
             }
         }
 
@@ -170,6 +170,6 @@ namespace SteganographyApp.Common.Injection
         }
 
         private static bool IsProvidingRealObjectWhenInTestState(Type type) => onlyTestObjectsState
-            && injectionValues[type] == defaultInjectionValues[type];
+            && injectionValues[type] == DefaultInjectionValues[type];
     }
 }

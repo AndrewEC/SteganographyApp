@@ -27,8 +27,7 @@ namespace SteganographyApp.Common.Arguments
 
             foreach (MemberInfo member in GetAllMembers(modelType))
             {
-                ArgumentAttribute? attribute = member.GetCustomAttribute(typeof(ArgumentAttribute)) as ArgumentAttribute;
-                if (attribute == null)
+                if (member.GetCustomAttribute(typeof(ArgumentAttribute)) is not ArgumentAttribute attribute)
                 {
                     continue;
                 }

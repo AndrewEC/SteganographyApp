@@ -27,7 +27,7 @@ namespace SteganographyApp.Common.Data
         private const int MaxHashIterations = 622_000;
         private const int MinHashIterations = 422_000;
 
-        private ILogger log = new LazyLogger<RandomizeUtil>();
+        private readonly ILogger log = new LazyLogger<RandomizeUtil>();
 
         /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Randomize/*' />
         public byte[] Randomize(byte[] value, string randomSeed, int dummyCount, int iterationMultiplier)
@@ -45,9 +45,7 @@ namespace SteganographyApp.Common.Data
                 int second = generator.Next(value.Length);
                 if (first != second)
                 {
-                    byte temp = value[first];
-                    value[first] = value[second];
-                    value[second] = temp;
+                    (value[second], value[first]) = (value[first], value[second]);
                 }
             }
 
@@ -73,9 +71,7 @@ namespace SteganographyApp.Common.Data
             }
             foreach ((int first, int second) in pairs)
             {
-                byte temp = value[first];
-                value[first] = value[second];
-                value[second] = temp;
+                (value[second], value[first]) = (value[first], value[second]);
             }
             return value;
         }

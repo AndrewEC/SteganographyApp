@@ -50,7 +50,7 @@ namespace SteganographyApp.Common.Data
             var builder = new StringBuilder();
             foreach (var b in bytes)
             {
-                builder.Append(b.ToString());
+                builder.Append(b);
             }
             return builder.ToString();
         }

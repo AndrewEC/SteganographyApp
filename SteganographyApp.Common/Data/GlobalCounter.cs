@@ -45,7 +45,7 @@ namespace SteganographyApp.Common.Data
         {
             lock (SyncLock)
             {
-                Count = Count + amount;
+                Count += amount;
             }
         }
 

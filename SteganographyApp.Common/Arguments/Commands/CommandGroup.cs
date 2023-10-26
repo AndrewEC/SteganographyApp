@@ -100,7 +100,7 @@ namespace SteganographyApp.Common.Arguments.Commands
             {
                 string expectedList = FormExpectedCommandNameList(subCommands);
                 Console.WriteLine($"Specify one of the following subcommands to execute: [{expectedList}]");
-                System.Environment.Exit(0);
+                Environment.Exit(0);
             }
             return nextCommandName;
         }

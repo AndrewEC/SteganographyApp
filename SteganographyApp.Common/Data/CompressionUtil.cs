@@ -62,10 +62,10 @@ namespace SteganographyApp.Common.Data
             }
         }
 
-        private void CopyTo(Stream src, Stream dest)
+        private static void CopyTo(Stream src, Stream dest)
         {
             byte[] bytes = new byte[2048];
-            int read = 0;
+            int read;
             while ((read = src.Read(bytes, 0, bytes.Length)) != 0)
             {
                 dest.Write(bytes, 0, read);

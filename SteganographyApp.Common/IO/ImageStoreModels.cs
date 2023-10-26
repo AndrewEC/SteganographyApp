@@ -56,7 +56,7 @@ namespace SteganographyApp.Common.IO
     /// A general exception to represent a specific error occured
     /// while reading or writing data to the images.
     /// </summary>
-    public class ImageProcessingException : Exception
+    public sealed class ImageProcessingException : Exception
     {
         /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessage/*' />
         public ImageProcessingException(string message) : base(message) { }
