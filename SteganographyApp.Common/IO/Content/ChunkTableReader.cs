@@ -28,7 +28,7 @@ namespace SteganographyApp.Common.IO
         /// </summary>
         /// <returns>An immutable array in whcih each element specifies the number of bits per chunk saved in the
         /// cover images.</returns>
-        public ImmutableArray<int> ReadContentChunkTable()
+        public ImmutableArray<int> ReadContentChunkTable() => RunIfNotDisposedWithResult(() =>
         {
             log.Trace("Reading content chunk table.");
             var randomizeUtil = Injector.Provide<IRandomizeUtil>();
@@ -38,7 +38,7 @@ namespace SteganographyApp.Common.IO
             log.Debug("Chunk table contains [{0}] chunks.", chunkCount);
 
             return ReadTableChunkLengths(randomizeUtil, binaryUtil, chunkCount);
-        }
+        });
 
         private short ReadChunkCount(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil)
         {
@@ -76,9 +76,9 @@ namespace SteganographyApp.Common.IO
             return binaryUtil.ToBinaryStringDirect(ordered);
         }
 
-        private string NextBinaryChunk(int index, string binaryString)
+        private static string NextBinaryChunk(int index, string binaryString)
             => binaryString.Substring(index * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSizeWithPadding);
 
-        private int BinaryStringToInt(string binary) => Convert.ToInt32(binary, 2);
+        private static int BinaryStringToInt(string binary) => Convert.ToInt32(binary, 2);
     }
 }

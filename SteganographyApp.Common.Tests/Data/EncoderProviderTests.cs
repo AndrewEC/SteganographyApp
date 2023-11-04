@@ -31,7 +31,7 @@ namespace SteganographyApp.Common.Tests
         public void TestGetEncoderByPath(string format, Type encoder)
         {
             string path = "/image/path";
-            mockImageProxy.Setup(proxy => proxy.GetImageMimeType(path)).Returns(format);
+            mockImageProxy.Setup(imageProxy => imageProxy.GetImageMimeType(path)).Returns(format);
 
             Assert.IsAssignableFrom(encoder, new EncoderProvider().GetEncoder(path));
         }

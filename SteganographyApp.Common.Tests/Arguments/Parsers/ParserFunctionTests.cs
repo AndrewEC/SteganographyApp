@@ -20,7 +20,7 @@ namespace SteganographyApp.Common.Tests
         public void ParseFilePath()
         {
             string expected = "image-path";
-            mockFileProxy.Setup(proxy => proxy.IsExistingFile(expected)).Returns(true);
+            mockFileProxy.Setup(fileProxy => fileProxy.IsExistingFile(expected)).Returns(true);
 
             string actual = ParserFunctions.ParseFilePath(expected);
 
@@ -31,7 +31,7 @@ namespace SteganographyApp.Common.Tests
         public void ParseFilePathThrowsExceptionWhenFileDoesNotExist()
         {
             string expected = "image-path";
-            mockFileProxy.Setup(proxy => proxy.IsExistingFile(expected)).Returns(false);
+            mockFileProxy.Setup(fileProxy => fileProxy.IsExistingFile(expected)).Returns(false);
 
             Assert.Throws(typeof(ArgumentValueException), () => ParserFunctions.ParseFilePath(expected));
         }

@@ -1,13 +1,11 @@
 namespace SteganographyApp.Common.IO
 {
-    using System;
-
     using SteganographyApp.Common.Arguments;
 
     /// <summary>
     /// The abstract base class for dealing with the content chunk table.
     /// </summary>
-    public abstract class AbstractChunkTableIO : IDisposable
+    public abstract class AbstractChunkTableIO : AbstractDisposable
     {
         /// <summary>The number of iterations to be used when randomizing or reordering the chunk table binary.</summary>
         protected const int IterationMultiplier = 100;
@@ -39,12 +37,17 @@ namespace SteganographyApp.Common.IO
         protected IInputArguments Arguments { get; }
 
         /// <summary>
-        /// Stores a reference to the image store IO wrapper created at the time this base class
-        /// was initialized.
+        /// Disposes of the current instance. Any implementation of this method should check if disposing is true and,
+        /// if it is not, skip the execution of the remainder of the method.
         /// </summary>
-        public void Dispose()
+        /// <param name="disposing">Indicates if this method was called from the base Dispose method.</param>
+        protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
         {
+            if (!disposing)
+            {
+                return;
+            }
             ImageStoreIO.Dispose();
-        }
+        });
     }
 }

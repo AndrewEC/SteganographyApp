@@ -30,12 +30,13 @@ namespace SteganographyApp.Common.Tests
     }
 
     [TestFixture]
-    public abstract class FixtureWithTestObjects : FixtureWithLogger
+    public abstract class FixtureWithTestObjects
     {
         [SetUp]
         public void SetUp()
         {
             MocksInjector.InjectMocks(this);
+            Injector.UseInstance<ILoggerFactory>(new NullLoggerFactory());
             SetupMocks();
         }
 
@@ -66,17 +67,7 @@ namespace SteganographyApp.Common.Tests
         }
     }
 
-    [TestFixture]
-    public abstract class FixtureWithLogger
-    {
-        [SetUp]
-        public void InitializeMockLogger()
-        {
-            Injector.UseInstance<ILoggerFactory>(new NullLoggerFactory());
-        }
-    }
-
-    internal class NullLogger : ILogger
+    internal sealed class NullLogger : ILogger
     {
         public void Trace(string message, params object[] arguments) { }
 
@@ -89,13 +80,9 @@ namespace SteganographyApp.Common.Tests
         public void Error(string message, params object[] arguments) { }
 
         public void Error(string message, Func<object[]> provider) { }
-
-        public void Log(LogLevel level, string message, params object[] arguments) { }
-
-        public void Log(LogLevel level, string message, Func<object[]> provider) { }
     }
 
-    internal class NullLoggerFactory : ILoggerFactory
+    internal sealed class NullLoggerFactory : ILoggerFactory
     {
         public ILogger LoggerFor(Type type)
         {

@@ -103,7 +103,7 @@ namespace SteganographyApp.Common.Tests
 
         protected override void SetupMocks()
         {
-            mockFileIOProxy.Setup(provider => provider.OpenFileForRead(IsAny<string>())).Returns(mockReadWriteStream.Object);
+            mockFileIOProxy.Setup(fileProxy => fileProxy.OpenFileForRead(IsAny<string>())).Returns(mockReadWriteStream.Object);
             mockReadWriteStream.Setup(stream => stream.Flush()).Verifiable();
             mockReadWriteStream.Setup(stream => stream.Dispose()).Verifiable();
         }

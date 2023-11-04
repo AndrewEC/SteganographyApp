@@ -9,7 +9,7 @@ namespace SteganographyApp.Common.IO
     /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
     /// more error prone IO operations.
     /// </summary>
-    public class ImageStoreIO : IDisposable
+    public class ImageStoreIO : AbstractDisposable
     {
         private readonly ImageStore store;
 
@@ -40,7 +40,7 @@ namespace SteganographyApp.Common.IO
         /// <param name="binary">The binary chunk to write to the cover images.</param>
         /// <see cref="ImageStore.WriteBinaryString(string)"/>
         /// <returns>A count of the number of bits that were written to the image.</returns>
-        public int WriteContentChunkToImage(string binary) => store.WriteBinaryString(binary);
+        public int WriteContentChunkToImage(string binary) => RunIfNotDisposedWithResult(() => store.WriteBinaryString(binary));
 
         /// <summary>
         /// Invokes the wrapped image store ReadBinaryString methods passing in the provided <paramref name="length"/> argument.
@@ -48,29 +48,34 @@ namespace SteganographyApp.Common.IO
         /// <param name="length">The number of bits to read from the cover images.</param>
         /// <returns>A binary string read from the cover images whose length is,
         /// at most, the length as specified by the input argument of the same name.</returns>
-        public string ReadContentChunkFromImage(int length) => store.ReadBinaryString(length);
+        public string ReadContentChunkFromImage(int length) => RunIfNotDisposedWithResult(() => store.ReadBinaryString(length));
 
         /// <summary>
         /// Invokes the wrapped image store SeekToPixel method passing in the provided <paramref name="bitsToSkip"/> argument.
         /// This will first move to the first pixel in the currently loaded image before skipping to the specified pixel.
         /// </summary>
         /// <param name="bitsToSkip">The number of bigs to seek past.</param>
-        public void SeekToPixel(int bitsToSkip) => store.SeekToPixel(bitsToSkip);
+        public void SeekToPixel(int bitsToSkip) => RunIfNotDisposed(() => store.SeekToPixel(bitsToSkip));
 
         /// <summary>
         /// Invokes the wrapped image store ResetToImage method passing in the provided <paramref name="index"/> argument.
         /// </summary>
         /// <param name="index">The index of the cover image to start reading and writing from.</param>
-        public void SeekToImage(int index) => store.SeekToImage(index);
+        public void SeekToImage(int index) => RunIfNotDisposed(() => store.SeekToImage(index));
 
         /// <summary>
-        /// Invokes both the CloseOpenImage and ResetToImage methods of the wrapped image store.
+        /// Disposes of the current instance. Any implementation of this method should check if disposing is true and,
+        /// if it is not, skip the execution of the remainder of the method.
         /// </summary>
-        public void Dispose()
+        /// <param name="disposing">Indicates if this method was called from the base Dispose method.</param>
+        protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
         {
+            if (!disposing)
+            {
+                return;
+            }
             store.CloseOpenImage(save);
             GlobalCounter.Instance.Reset();
-            GC.SuppressFinalize(this);
-        }
+        });
     }
 }

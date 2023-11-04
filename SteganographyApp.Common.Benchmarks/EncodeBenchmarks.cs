@@ -17,7 +17,7 @@ namespace SteganographyApp.Common.Benchmarks
         [GlobalSetup]
         public void Setup()
         {
-            data = new byte[4_000_000];
+            data = new byte[500_000];
             new Random(100).NextBytes(data);
         }
 

@@ -11,7 +11,7 @@ namespace SteganographyApp.Common.Benchmarks
     public class DecodeBench
     {
 
-        private const int RandomByteCount = 4_000_000;
+        private const int RandomByteCount = 500_000;
         private const string Password = "Password123!@#";
         private const string RandomSeed = "randomSeed";
         private const int AdditionalHashIterations = 13;
@@ -69,19 +69,6 @@ namespace SteganographyApp.Common.Benchmarks
         public byte[] DecodeWithCompression()
         {
             return new DataEncoderUtil().Decode(data, "", true, 0, "", 0);
-        }
-
-        [GlobalSetup(Target=nameof(DecodeWithPasswordAndRandomizationAndDummies))]
-        public void DecodeWithPasswordAndCompressionAndRandomizationAndDummiesSetup()
-        {
-            data = new DataEncoderUtil().Encode(GenerateRandomBytes(), Password, false, DummyCount, RandomSeed, AdditionalHashIterations);
-            GlobalCounter.Instance.Reset();
-        }
-
-        [Benchmark]
-        public byte[] DecodeWithPasswordAndRandomizationAndDummies()
-        {
-            return new DataEncoderUtil().Decode(data, Password, false, DummyCount, RandomSeed, AdditionalHashIterations);
         }
 
         private byte[] GenerateRandomBytes()

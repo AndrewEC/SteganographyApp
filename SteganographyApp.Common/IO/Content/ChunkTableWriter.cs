@@ -27,7 +27,7 @@ namespace SteganographyApp.Common.IO
         /// Writes the content chunk table to the cover images starting from the first.
         /// </summary>
         /// <param name="chunkLengths">The list of chunks lengths to be written to the cover images.</param>
-        public void WriteContentChunkTable(ImmutableArray<int> chunkLengths)
+        public void WriteContentChunkTable(ImmutableArray<int> chunkLengths) => RunIfNotDisposed(() =>
         {
             log.Debug("Saving content chunk table with [{0}] chunks", chunkLengths.Length);
             string tableHeader = To18BitBinaryString((short)chunkLengths.Length);
@@ -58,7 +58,7 @@ namespace SteganographyApp.Common.IO
 
             ImageStoreIO.WriteContentChunkToImage(tableBinary);
             ImageStoreIO.EncodeComplete();
-        }
+        });
 
         private string Randomize(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil, string value)
         {
@@ -67,8 +67,8 @@ namespace SteganographyApp.Common.IO
             return Injector.Provide<IBinaryUtil>().ToBinaryStringDirect(randomized);
         }
 
-        private string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');
+        private static string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');
 
-        private string To18BitBinaryString(short value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkTableHeaderSizeWithPadding, '0');
+        private static string To18BitBinaryString(short value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkTableHeaderSizeWithPadding, '0');
     }
 }

@@ -25,7 +25,7 @@
         /// than the ChunkByteSize.</para>
         /// </summary>
         /// <returns>A binary string representation of the next availabe ChunkByteSize from the input file.</returns>
-        public string? ReadContentChunkFromFile()
+        public string? ReadContentChunkFromFile() => RunIfNotDisposedWithResult(() =>
         {
             byte[] buffer = new byte[Args.ChunkByteSize];
             int read = Stream.Read(buffer, 0, buffer.Length);
@@ -41,7 +41,7 @@
             }
 
             return Injector.Provide<IDataEncoderUtil>().Encode(buffer, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed, Args.AdditionalPasswordHashIterations);
-        }
+        });
 
         /// <summary>
         /// Creates a new stream configured to read in the file that is to be encoded.

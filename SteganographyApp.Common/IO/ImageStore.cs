@@ -245,7 +245,7 @@
             log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage);
             pixelPosition.Reset();
 
-            int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / ((double)Calculator.BitsPerPixel * (double)args.BitsToUse));
+            int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (Calculator.BitsPerPixel * args.BitsToUse));
             for (int i = 0; i < pixelIndex; i++)
             {
                 if (!pixelPosition.TryMoveToNext())

@@ -32,7 +32,7 @@ namespace SteganographyApp.Common.Injection
     /// The concrete implementation of IBasicImageInfo. Used to manipulate images loaded
     /// via the image sharp library.
     /// </summary>
-    public class BasicImageInfo : IBasicImageInfo
+    public class BasicImageInfo : AbstractDisposable, IBasicImageInfo
     {
         private readonly Image<Rgba32> image;
 
@@ -48,44 +48,36 @@ namespace SteganographyApp.Common.Injection
         /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Width/*' />
         public int Width
         {
-            get
-            {
-                return image.Width;
-            }
+            get => RunIfNotDisposedWithResult(() => image.Width);
         }
 
          /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Height/*' />
         public int Height
         {
-            get
-            {
-                return image.Height;
-            }
+            get => RunIfNotDisposedWithResult(() => image.Height);
         }
 
          /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Accessor/*' />
         public Rgba32 this[int x, int y]
         {
-            get
-            {
-                return image[x, y];
-            }
+            get => RunIfNotDisposedWithResult(() => image[x, y]);
 
-            set
-            {
-                image[x, y] = value;
-            }
+            set => RunIfNotDisposed(() => image[x, y] = value);
         }
+
+         /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
+        public void Save(string pathToImage, IImageEncoder encoder) => RunIfNotDisposed(() => image.Save(pathToImage, encoder));
 
         /// <summary>
         /// Proxies the call to the Dispose method of the image managed by this class.
         /// </summary>
-        public void Dispose()
+        protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
         {
+            if (!disposing)
+            {
+                return;
+            }
             image.Dispose();
-        }
-
-         /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
-        public void Save(string pathToImage, IImageEncoder encoder) => image.Save(pathToImage, encoder);
+        });
     }
 }

@@ -34,7 +34,7 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestRandomizeTwiceWithSameSeedProducesSameResult()
         {
-            mockEncryptionUtil.Setup(util => util.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
+            mockEncryptionUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
 
             byte[] first = (byte[])originalBytes.Clone();
             byte[] randomizedFirst = util.Randomize(first, RandomSeed, DummyCount, IterationMultiplier);
@@ -48,7 +48,7 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestRandomizeAndReorder()
         {
-            mockEncryptionUtil.Setup(util => util.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
+            mockEncryptionUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
 
             byte[] copy = (byte[])originalBytes.Clone();
             byte[] randomized = util.Randomize(copy, RandomSeed, DummyCount, IterationMultiplier);
@@ -62,7 +62,7 @@ namespace SteganographyApp.Common.Tests
         public void TestRandomizeWithIncorrectRandomSeedReturnsBadResult()
         {
             var keyByteQueue = new Queue<byte[]>(new[] { Encoding.UTF8.GetBytes("random_key"), Encoding.UTF8.GetBytes("encoding_key") });
-            mockEncryptionUtil.Setup(util => util.GenerateKey(IsAny<string>(), IsAny<int>()))
+            mockEncryptionUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey(IsAny<string>(), IsAny<int>()))
                 .Returns(() => keyByteQueue.Dequeue());
 
             byte[] copy = (byte[])originalBytes.Clone();

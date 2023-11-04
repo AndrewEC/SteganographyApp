@@ -53,14 +53,7 @@ namespace SteganographyApp.Common.Logging
         /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
         public void Error(string message, Func<object[]> provider) => GetInstance().Error(message, provider);
 
-        private ILogger GetInstance()
-        {
-            if (instance == null)
-            {
-                instance = Injector.LoggerFor<T>();
-            }
-            return instance;
-        }
+        private ILogger GetInstance() => instance ??= Injector.LoggerFor<T>();
     }
 
     /// <summary>

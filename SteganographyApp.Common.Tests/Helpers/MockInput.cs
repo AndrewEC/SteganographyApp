@@ -12,7 +12,7 @@ namespace SteganographyApp.Common.Tests
             for (int i = 0; i < inputMapping.Count; i++)
             {
                 (char keyChar, ConsoleKey key) = inputMapping[i];
-                if ((int)keyChar >= 65)
+                if (keyChar >= 65)
                 {
                     queue.Enqueue(new ConsoleKeyInfo(keyChar, key, true, false, false));
                     continue;

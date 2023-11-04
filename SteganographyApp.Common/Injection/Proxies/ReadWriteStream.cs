@@ -23,7 +23,7 @@ namespace SteganographyApp.Common.Injection
     /// A concrete implementation of the read write stream. Used to help proxy calls to a file stream
     /// so they can be better mocked in unit tests.
     /// </summary>
-    public class ReadWriteStream : IReadWriteStream
+    public class ReadWriteStream : AbstractDisposable, IReadWriteStream
     {
         private readonly FileStream stream;
 
@@ -47,17 +47,25 @@ namespace SteganographyApp.Common.Injection
         public static ReadWriteStream CreateStreamForWrite(string pathToFile) => new ReadWriteStream(File.Open(pathToFile, FileMode.OpenOrCreate));
 
         /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Read/*' />
-        public int Read(byte[] array, int offset, int count) => stream.Read(array, offset, count);
+        public int Read(byte[] array, int offset, int count) => RunIfNotDisposedWithResult(() => stream.Read(array, offset, count));
 
         /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Write/*' />
-        public void Write(byte[] array, int offset, int count) => stream.Write(array, offset, count);
+        public void Write(byte[] array, int offset, int count) => RunIfNotDisposed(() => stream.Write(array, offset, count));
 
         /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Flush/*' />
-        public void Flush() => stream.Flush();
+        public void Flush() => RunIfNotDisposed(() => stream.Flush());
 
         /// <summary>
         /// Disposes of the currently opened stream represented by this instance.
         /// </summary>
-        public void Dispose() => stream.Dispose();
+        /// <param name="disposing">Specifies if this method is being invoked from the main Dispose method or the finalizer.</param>
+        protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
+        {
+            if (!disposing)
+            {
+                return;
+            }
+            stream.Dispose();
+        });
     }
 }

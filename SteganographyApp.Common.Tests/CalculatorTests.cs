@@ -20,7 +20,7 @@ namespace SteganographyApp.Common.Tests
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(TestFile, ChunkSize);
 
             Assert.AreEqual(183, requiredBitsForTable);
-            mockFileIOProxy.Verify(provider => provider.GetFileSizeBytes(TestFile), Times.Once());
+            mockFileIOProxy.Verify(fileProxy => fileProxy.GetFileSizeBytes(TestFile), Times.Once());
         }
 
         [Test]
@@ -29,12 +29,12 @@ namespace SteganographyApp.Common.Tests
             int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(TestFile, ChunkSize);
 
             Assert.AreEqual(5, requiredNumberOfWrites);
-            mockFileIOProxy.Verify(provider => provider.GetFileSizeBytes(TestFile), Times.Once());
+            mockFileIOProxy.Verify(fileProxy => fileProxy.GetFileSizeBytes(TestFile), Times.Once());
         }
 
         protected override void SetupMocks()
         {
-            mockFileIOProxy.Setup(provider => provider.GetFileSizeBytes(TestFile)).Returns(ChunkSize * 5);
+            mockFileIOProxy.Setup(fileProxy => fileProxy.GetFileSizeBytes(TestFile)).Returns(ChunkSize * 5);
         }
     }
 }

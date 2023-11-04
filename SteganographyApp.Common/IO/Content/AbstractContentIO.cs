@@ -1,7 +1,5 @@
 ﻿namespace SteganographyApp.Common.IO
 {
-    using System;
-
     using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Injection;
 
@@ -9,7 +7,7 @@
     /// Base class for read and write IO. Implements the basic disposable logic to be shared
     /// with the content read and write child classes.
     /// </summary>
-    public abstract class AbstractContentIO : IDisposable
+    public abstract class AbstractContentIO : AbstractDisposable
     {
         /// <summary>
         /// Initialize the abstract content IO instance with the user provided input arguments.
@@ -17,7 +15,7 @@
         /// <param name="args">The user provided input arguments.</param>
         public AbstractContentIO(IInputArguments args)
         {
-            this.Args = args;
+            Args = args;
             Stream = InitializeStream();
         }
 
@@ -33,16 +31,22 @@
         protected IReadWriteStream Stream { get; private set; }
 
         /// <summary>
-        /// Flushes the stream if it has been instantiated.
+        /// Disposes of the current instance. Any implementation of this method should check if disposing is true and,
+        /// if it is not, skip the execution of the remainder of the method.
         /// </summary>
-        public void Dispose()
+        /// <param name="disposing">Indicates if this method was called from the base Dispose method.</param>
+        protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
         {
+            if (!disposing)
+            {
+                return;
+            }
             if (Stream != null)
             {
                 Stream.Flush();
                 Stream.Dispose();
             }
-        }
+        });
 
         /// <summary>
         /// Gets the stream instance initialized for reading or writing.

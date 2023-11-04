@@ -7,7 +7,7 @@ namespace SteganographyApp.Common.Tests
     using SteganographyApp.Common.Data;
 
     [TestFixture]
-    public class DummyUtilTests : FixtureWithLogger
+    public class DummyUtilTests : FixtureWithTestObjects
     {
         private const int NumberOfDummies = 10;
         private const int IncorrectNumberOfDummies = 3;
