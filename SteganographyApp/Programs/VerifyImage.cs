@@ -43,7 +43,7 @@ namespace SteganographyApp
         }
     }
 
-    internal class TempCopy : IDisposable
+    internal class TempCopy : AbstractDisposable
     {
         private readonly ILogger logger = new LazyLogger<TempCopy>();
 
@@ -67,11 +67,14 @@ namespace SteganographyApp
             return Path.ChangeExtension(absolutePath, ".temp" + extension);
         }
 
-        public void Dispose()
-        {
+        protected override void Dispose(bool disposing) => RunIfNotDisposed(() => {
+            if (!disposing)
+            {
+                return;
+            }
             logger.Debug("Deleting temp file from: [{0}]", DestinationPath);
             File.Delete(DestinationPath);
-        }
+        });
     }
 
     internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
