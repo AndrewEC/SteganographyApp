@@ -48,7 +48,7 @@ namespace SteganographyApp.Common.Arguments.Commands
         /// <param name="args">The array of user provided command line arguments.</param>
         public void Execute(string[] args)
         {
-            this.root.Execute(this, args);
+            root.Execute(this, args);
         }
 
         /// <summary>

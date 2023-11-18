@@ -43,8 +43,8 @@ function Copy-Folder {
     )
 
     Write-Host "Copying output from $Project publish"
-    Copy-Item ./$Project/bin/$Folder/netcoreapp6.0/publish -Recurse -Destination $Output
-    Get-ChildItem -Path ./$Project/bin/$Folder/netcoreapp6.0/ | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish
+    Copy-Item ./$Project/bin/$Folder/netcoreapp8.0/publish -Recurse -Destination $Output
+    Get-ChildItem -Path ./$Project/bin/$Folder/netcoreapp8.0/ | Where-Object Name -Like "*.dll" | Copy-Item -Force -Destination ./publish
 
     if (-Not($Rename -eq "")) {
         cd publish

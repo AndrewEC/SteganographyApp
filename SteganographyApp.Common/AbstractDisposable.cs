@@ -2,8 +2,18 @@ namespace SteganographyApp.Common
 {
     using System;
 
+    /// <summary>
+    /// Deletegate to be invoked if the current AbstractDisposable instance has
+    /// not yet been disposed.
+    /// </summary>
     public delegate void UnmanagedResourceFunction();
 
+    /// <summary>
+    /// Delegate to be invoked, and its result returned, if the current AbstractDisposable
+    /// instance has not yet been disposed.
+    /// </summary>
+    /// <typeparam name="T">The type of the value being returned by this function.</typeparam>
+    /// <returns>The result of type T.</returns>
     public delegate T UnmanagedResourceFunctionWithResult<T>();
 
     /// <summary>

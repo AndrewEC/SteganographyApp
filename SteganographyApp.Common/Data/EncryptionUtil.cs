@@ -43,7 +43,7 @@ namespace SteganographyApp.Common.Data
             var keyBytes = GenerateKey(password, DefaultIterations + additionalPasswordHashIterations);
             log.Debug("Encrypting value using key: [{0}]/[{1}]", () => new object[] { password, Convert.ToBase64String(keyBytes) });
             var iv = GenerateRandomBytes(IvSize);
-            using (var managed = Aes.Create("AesManaged")!)
+            using (var managed = Aes.Create())
             {
                 var cryptor = managed.CreateEncryptor(keyBytes, iv);
                 using (var ms = new MemoryStream())
@@ -68,7 +68,7 @@ namespace SteganographyApp.Common.Data
             log.Debug("Decrypting value using key: [{0}]", () => new[] { Convert.ToBase64String(keyBytes) });
             log.Trace("Decrypting: [{0}]", Convert.ToBase64String(value));
 
-            using (var managed = Aes.Create("AesManaged")!)
+            using (var managed = Aes.Create())
             {
                 using (var ms = new MemoryStream(value))
                 {
@@ -97,9 +97,9 @@ namespace SteganographyApp.Common.Data
             return Pbkdf2(passwordBytes, salt, iterations, KeySize / 8);
         }
 
-        private static byte[] Pbkdf2(byte[] data, byte[] salt, int iterations, int size) => new Rfc2898DeriveBytes(data, salt, iterations).GetBytes(size);
+        private static byte[] Pbkdf2(byte[] data, byte[] salt, int iterations, int size) => new Rfc2898DeriveBytes(data, salt, iterations, HashAlgorithmName.SHA512).GetBytes(size);
 
-        private static byte[] Sha512(string data) => SHA512.Create().ComputeHash(Encoding.UTF8.GetBytes(data));
+        private static byte[] Sha512(string data) => SHA512.HashData(Encoding.UTF8.GetBytes(data));
 
         private static byte[] GenerateRandomBytes(int size)
         {
