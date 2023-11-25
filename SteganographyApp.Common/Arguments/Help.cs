@@ -53,11 +53,11 @@ namespace SteganographyApp.Common.Arguments
             }
             builder.Append("Usage: ")
                 .AppendJoin(" ", positionArguments.Select(argument => argument.Attribute.Name))
-                .Append(" ")
+                .Append(' ')
                 .AppendJoin(" ", requiredArguments.Select(argument => argument.Attribute.Name))
-                .Append(" ")
+                .Append(' ')
                 .AppendJoin(" ", optionalArguments.Select(argument => $"[{argument.Attribute.Name}]"))
-                .Append("\n");
+                .Append('\n');
             if (descriptor != null && descriptor.Example != null)
             {
                 builder.Append("Example Usage: ").Append(descriptor.Example).Append("\n");

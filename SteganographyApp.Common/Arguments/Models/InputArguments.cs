@@ -107,12 +107,11 @@ namespace SteganographyApp.Common.Arguments
     /// <summary>
     /// The exceptio thrown when an error occurs while trying to parse a command line argument value.
     /// </summary>
-    public sealed class ArgumentValueException : Exception
+    /// <remarks>
+    /// Initializes the exception instance.
+    /// </remarks>
+    /// <param name="message">The message to initialize the exception with.</param>
+    public sealed class ArgumentValueException(string message) : Exception(message)
     {
-        /// <summary>
-        /// Initializes the exception instance.
-        /// </summary>
-        /// <param name="message">The message to initialize the exception with.</param>
-        public ArgumentValueException(string message) : base(message) { }
     }
 }

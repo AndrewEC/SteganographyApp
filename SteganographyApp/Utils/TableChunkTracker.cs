@@ -16,10 +16,14 @@ namespace SteganographyApp
         /// <summary>
         /// Contains the ordered list of chunks that have been written to the storage images.
         /// </summary>
-        private readonly LinkedList<int> contentChunks = new LinkedList<int>();
+        private readonly LinkedList<int> contentChunks = new();
 
         private LinkedListNode<int>? lastNode = null;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TableChunkTracker"/> class.
+        /// </summary>
+        /// <param name="store">The ImageStore instance to attach to the OnChunkWritten event of.</param>
         public TableChunkTracker(ImageStore store)
         {
             store.OnChunkWritten += ChunkWritten;
@@ -30,6 +34,7 @@ namespace SteganographyApp
         /// LinkedList meaning the order of this array matches the order in which each
         /// content chunk was written to the storage image.
         /// </summary>
+        /// <returns>An immutable array with each element representing the length of a chunk.</returns>
         public ImmutableArray<int> GetContentTable() => contentChunks.ToImmutableArray();
 
         private void ChunkWritten(object? sender, ChunkWrittenArgs args)

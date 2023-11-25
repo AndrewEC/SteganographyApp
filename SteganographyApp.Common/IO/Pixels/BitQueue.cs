@@ -7,20 +7,15 @@ namespace SteganographyApp.Common.IO
     /// Internally this keeps track of the position of the last character taken. This will not
     /// remove a character from the provided binary string each time a character is taken.
     /// </summary>
-    internal sealed class ReadBitQueue
+    /// <remarks>
+    /// Initializes the queue.
+    /// </remarks>
+    /// <param name="binaryString">The binary string from which a character will be pulled each time
+    /// the Next method is invoked.</param>
+    internal sealed class ReadBitQueue(string binaryString)
     {
-        private readonly string binaryString;
+        private readonly string binaryString = binaryString;
         private int position = 0;
-
-        /// <summary>
-        /// Initializes the queue.
-        /// </summary>
-        /// <param name="binaryString">The binary string from which a character will be pulled each time
-        /// the Next method is invoked.</param>
-        public ReadBitQueue(string binaryString)
-        {
-            this.binaryString = binaryString;
-        }
 
         /// <summary>
         /// Returns a bit from the binary string then increments the current position.
@@ -60,21 +55,16 @@ namespace SteganographyApp.Common.IO
     /// <summary>
     /// A structure for taking in a series of bits and aggregating the bits into a continuous string.
     /// </summary>
-    internal sealed class BinaryStringBuilder
+    /// <remarks>
+    /// Initializes the binary string builder with the specified maximum capacity.
+    /// </remarks>
+    /// <param name="capacity">The total number of bits the binary string builder can house.
+    /// Any bit one attempts to add beyond the capacity will be silently rejected.</param>
+    internal sealed class BinaryStringBuilder(int capacity)
     {
-        private readonly int capacity = 0;
-        private readonly StringBuilder binary = new StringBuilder();
+        private readonly int capacity = capacity;
+        private readonly StringBuilder binary = new();
         private int bitsCurrentlyStored = 0;
-
-        /// <summary>
-        /// Initializes the binary string builder with the specified maximum capacity.
-        /// </summary>
-        /// <param name="capacity">The total number of bits the binary string builder can house.
-        /// Any bit one attempts to add beyond the capacity will be silently rejected.</param>
-        public BinaryStringBuilder(int capacity)
-        {
-            this.capacity = capacity;
-        }
 
         /// <summary>
         /// Adds a set of bits to the currently aggregated set of bits. If the number of input

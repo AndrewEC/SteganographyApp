@@ -7,27 +7,19 @@ namespace SteganographyApp.Common
     /// percent representing the progress currently made for the current
     /// operation.
     /// </summary>
-    public sealed class ProgressTracker
+    /// <remarks>
+    /// Initializes a new ProgressTracker instance.
+    /// </remarks>
+    /// <param name="maxProgress">The maximum progress.</param>
+    /// <param name="progressMessage">The message to print while progress has not yet reached 100.</param>
+    /// <param name="completeMessage">The message to print after the progress has reached 100.</param>
+    public sealed class ProgressTracker(double maxProgress, string progressMessage, string completeMessage)
     {
-        private readonly double maxProgress;
-        private readonly string progressMessage;
-        private readonly string completeMessage;
-        private readonly IConsoleWriter outputWriter;
+        private readonly double maxProgress = maxProgress;
+        private readonly string progressMessage = progressMessage;
+        private readonly string completeMessage = completeMessage;
+        private readonly IConsoleWriter outputWriter = Injector.Provide<IConsoleWriter>();
         private double currentProgress;
-
-        /// <summary>
-        /// Initializes a new ProgressTracker instance.
-        /// </summary>
-        /// <param name="maxProgress">The maximum progress.</param>
-        /// <param name="progressMessage">The message to print while progress has not yet reached 100.</param>
-        /// <param name="completeMessage">The message to print after the progress has reached 100.</param>
-        public ProgressTracker(double maxProgress, string progressMessage, string completeMessage)
-        {
-            this.maxProgress = maxProgress;
-            this.progressMessage = progressMessage;
-            this.completeMessage = completeMessage;
-            outputWriter = Injector.Provide<IConsoleWriter>();
-        }
 
         /// <summary>
         /// Initializes a ProgressTracker instance and prints the first progress message with a percentage of 0.

@@ -14,17 +14,22 @@
     /// Class that handles positioning a make shift write stream in the proper position so
     /// data can be reliably read and written to the storage images.
     /// </summary>
-    public sealed class ImageStore
+    /// <remarks>
+    /// Creates a new instance of the ImageStore and calculates the RequiredContentChunkTableBitSize
+    /// value.
+    /// </remarks>
+    /// <param name="args">The values parsed from the command line arguments.</param>
+    public sealed class ImageStore(IInputArguments args)
     {
         /// <summary>
         /// Stores the current x and y position for the current read/write operation.
         /// </summary>
-        private readonly PixelPosition pixelPosition = new PixelPosition();
+        private readonly PixelPosition pixelPosition = new();
 
         /// <summary>
         /// The values parsed from the command line arguments.
         /// </summary>
-        private readonly IInputArguments args;
+        private readonly IInputArguments args = args;
 
         private readonly ILogger log = new LazyLogger<ImageStore>();
 
@@ -41,16 +46,6 @@
         /// method is called and the currentImageIndex has been incremented.
         /// </summary>
         private IBasicImageInfo? currentImage;
-
-        /// <summary>
-        /// Creates a new instance of the ImageStore and calculates the RequiredContentChunkTableBitSize
-        /// value.
-        /// </summary>
-        /// <param name="args">The values parsed from the command line arguments.</param>
-        public ImageStore(IInputArguments args)
-        {
-            this.args = args;
-        }
 
         /// <summary>
         /// Event handler that's invoked whenever the WriteContentChunkToImage method completes.
@@ -85,7 +80,7 @@
         /// will be properly disposed.</para>
         /// </summary>
         /// <returns>A new wrapper for safely using the image store IO methods.</returns>
-        public ImageStoreIO CreateIOWrapper() => new ImageStoreIO(this);
+        public ImageStoreIO CreateIOWrapper() => new(this);
 
         /// <summary>
         /// Will look over all images specified in the InputArguments

@@ -13,11 +13,11 @@ namespace SteganographyApp.Common.Logging
         /// <summary>
         /// The static readonly singleton instance of the RootLogger.
         /// </summary>
-        public static readonly RootLogger Instance = new RootLogger();
+        public static readonly RootLogger Instance = new();
 
         private const string LogFileName = "steganography.logs.txt";
         private const string LogMessageTemplate = "[{0}] [{1}] => {2}\n";
-        private static readonly object SyncLock = new object();
+        private static readonly object SyncLock = new();
 
         private LogLevel logLevel = LogLevel.None;
         private IReadWriteStream? writeLogStream;
@@ -102,6 +102,12 @@ namespace SteganographyApp.Common.Logging
             }
         }
 
+        private static string FormLogMessage(string typeName, LogLevel level, string message, params object[] arguments)
+        {
+            string subMessage = string.Format(message, arguments);
+            return string.Format(LogMessageTemplate, level.ToString(), typeName, subMessage);
+        }
+
         private bool CanLog(LogLevel requestedLevel) => (int)requestedLevel >= (int)logLevel;
 
         private void LogToFile(string message)
@@ -112,12 +118,6 @@ namespace SteganographyApp.Common.Logging
                 writeLogStream!.Write(messageBytes, 0, messageBytes.Length);
                 writeLogStream.Flush();
             }
-        }
-
-        private string FormLogMessage(string typeName, LogLevel level, string message, params object[] arguments)
-        {
-            string subMessage = string.Format(message, arguments);
-            return string.Format(LogMessageTemplate, level.ToString(), typeName, subMessage);
         }
 
         private bool TryOpenLogFileForWrite()

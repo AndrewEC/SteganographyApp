@@ -12,16 +12,11 @@ namespace SteganographyApp.Common.IO
     /// <summary>
     /// Responsible for reading the content chunk table from the leading cover image.
     /// </summary>
-    public class ChunkTableReader : AbstractChunkTableIO
+    /// <param name="store">The image store instance.</param>
+    /// <param name="arguments">The user provided arguments.</param>
+    public class ChunkTableReader(ImageStore store, IInputArguments arguments) : AbstractChunkTableIO(store, arguments)
     {
         private readonly ILogger log = new LazyLogger<ChunkTableReader>();
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="store">The image store instance.</param>
-        /// <param name="arguments">The user provided arguments.</param>
-        public ChunkTableReader(ImageStore store, IInputArguments arguments) : base(store, arguments) { }
 
         /// <summary>
         /// Reads in and returns an array in which each element represents the number of bits in a chunk.

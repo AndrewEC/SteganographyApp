@@ -12,16 +12,11 @@ namespace SteganographyApp.Common.IO
     /// <summary>
     /// Responsible for writing the content chunk table to the cover images.
     /// </summary>
-    public sealed class ChunkTableWriter : AbstractChunkTableIO
+    /// <param name="store">The image store instance.</param>
+    /// <param name="arguments">The user provided arguments.</param>
+    public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments) : AbstractChunkTableIO(store, arguments)
     {
         private readonly ILogger log = new LazyLogger<ChunkTableWriter>();
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="store">The image store instance.</param>
-        /// <param name="arguments">The user provided arguments.</param>
-        public ChunkTableWriter(ImageStore store, IInputArguments arguments) : base(store, arguments) { }
 
         /// <summary>
         /// Writes the content chunk table to the cover images starting from the first.

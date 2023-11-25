@@ -32,18 +32,13 @@ namespace SteganographyApp.Common.Injection
     /// The concrete implementation of IBasicImageInfo. Used to manipulate images loaded
     /// via the image sharp library.
     /// </summary>
-    public class BasicImageInfo : AbstractDisposable, IBasicImageInfo
+    /// <remarks>
+    /// Initialize the BasicImageInfo instance using the image data loaded by the image sharp API.
+    /// </remarks>
+    /// <param name="image">The image data.</param>
+    public class BasicImageInfo(Image<Rgba32> image) : AbstractDisposable, IBasicImageInfo
     {
-        private readonly Image<Rgba32> image;
-
-        /// <summary>
-        /// Initialize the BasicImageInfo instance using the image data loaded by the image sharp API.
-        /// </summary>
-        /// <param name="image">The image data.</param>
-        public BasicImageInfo(Image<Rgba32> image)
-        {
-            this.image = image;
-        }
+        private readonly Image<Rgba32> image = image;
 
         /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Width/*' />
         public int Width
@@ -71,6 +66,7 @@ namespace SteganographyApp.Common.Injection
         /// <summary>
         /// Proxies the call to the Dispose method of the image managed by this class.
         /// </summary>
+        /// <param name="disposing">Specifies if this method is being invoked from the main Dispose method or the finalizer.</param>
         protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
         {
             if (!disposing)

@@ -63,7 +63,7 @@ namespace SteganographyApp.Common.Arguments
             if (WasHelpRequested(arguments))
             {
                 Help.PrintHelp(typeof(T), instance, registeredArguments);
-                System.Environment.Exit(0);
+                Environment.Exit(0);
             }
             foreach (ArgumentMatchResult match in new ArgumentMatcher(arguments, registeredArguments))
             {

@@ -63,12 +63,9 @@ namespace SteganographyApp.Common.Arguments
     /// <summary>
     /// An exception indicating the underlying type of the MemberInfo is not one of either FieldInfo or PropertyInfo.
     /// </summary>
-    public sealed class TypeException : Exception
-    {
-        /// <summary>
-        /// Initializes the exception.
-        /// </summary>
-        /// <param name="message">The exception message.</param>
-        public TypeException(string message) : base(message) { }
-    }
+    /// <remarks>
+    /// Initializes the exception.
+    /// </remarks>
+    /// <param name="message">The exception message.</param>
+    public sealed class TypeException(string message) : Exception(message) { }
 }

@@ -10,14 +10,9 @@
     /// Stream encapsulation class that reads and encodes data
     /// from the input file.
     /// </summary>
-    public sealed class ContentReader : AbstractContentIO
+    /// <param name="args">The values parsed from the command line values.</param>
+    public sealed class ContentReader(IInputArguments args) : AbstractContentIO(args)
     {
-        /// <summary>
-        /// Creates a new instance of the ContentReader.
-        /// </summary>
-        /// <param name="args">The values parsed from the command line values.</param>
-        public ContentReader(IInputArguments args) : base(args) { }
-
         /// <summary>
         /// Reads in the next unread chunk of data from the input file, encodes it,
         /// and returns the encoded value.

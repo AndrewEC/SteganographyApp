@@ -10,9 +10,9 @@ namespace SteganographyApp.Common.Data
         /// <summary>
         /// The singleton instance of the GlobalCounter.
         /// </summary>
-        public static readonly GlobalCounter Instance = new GlobalCounter();
+        public static readonly GlobalCounter Instance = new();
 
-        private static readonly object SyncLock = new object();
+        private static readonly object SyncLock = new();
 
         private long count = 0;
 

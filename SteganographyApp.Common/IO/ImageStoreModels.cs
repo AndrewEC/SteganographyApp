@@ -6,50 +6,39 @@ namespace SteganographyApp.Common.IO
     /// Event arguments passed into the OnNextImageLoaded event handler whenever the next image
     /// has been loaded in the read, write, or clean process.
     /// </summary>
-    public readonly struct NextImageLoadedEventArgs
+    /// <remarks>
+    /// Constructor.
+    /// </remarks>
+    /// <param name="imageName">The name of the image file that was loaded into memory.</param>
+    /// <param name="imageIndex">The index of the cover image that was just loaded.</param>
+    public readonly struct NextImageLoadedEventArgs(string imageName, int imageIndex)
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="imageName">The name of the image file that was loaded into memory.</param>
-        /// <param name="imageIndex">The index of the cover image that was just loaded.</param>
-        public NextImageLoadedEventArgs(string imageName, int imageIndex)
-        {
-            ImageName = imageName;
-            ImageIndex = imageIndex;
-        }
-
         /// <summary>
         /// Gets the name of the file that was loaded.
         /// </summary>
-        public readonly string ImageName { get; }
+        public readonly string ImageName { get; } = imageName;
 
         /// <summary>
         /// Gets the index of the image that was loaded. This represents the index of the image within the
         /// cover images parsed from the user's input.
         /// </summary>
-        public readonly int ImageIndex { get; }
+        public readonly int ImageIndex { get; } = imageIndex;
     }
 
     /// <summary>
     /// Event arguments passed into the OnChunkWritten event handler whenever an encoded binary
     /// content has been writtent to an image.
     /// </summary>
-    public readonly struct ChunkWrittenArgs
+    /// <remarks>
+    /// Constructor.
+    /// </remarks>
+    /// <param name="chunkLength">The number of bits written to the cover image.</param>
+    public readonly struct ChunkWrittenArgs(int chunkLength)
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="chunkLength">The number of bits written to the cover image.</param>
-        public ChunkWrittenArgs(int chunkLength)
-        {
-            ChunkLength = chunkLength;
-        }
-
         /// <summary>
         /// Gets the length, in bytes, of the number of bits that were just written to the cover images.
         /// </summary>
-        public readonly int ChunkLength { get; }
+        public readonly int ChunkLength { get; } = chunkLength;
     }
 
     /// <summary>

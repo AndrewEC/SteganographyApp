@@ -36,7 +36,7 @@ namespace SteganographyApp.Common.Arguments
             var globs = value.Split(",").Where(path => !Path.IsPathFullyQualified(path)).ToArray();
             if (globs.Length == 0)
             {
-                return new string[0];
+                return [];
             }
             var matcher = new Matcher();
             matcher.AddIncludePatterns(globs);

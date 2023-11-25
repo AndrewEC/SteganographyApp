@@ -60,18 +60,13 @@ namespace SteganographyApp.Common.Logging
     /// The concrete ILogger implementation that provides some proxy methods to help fill out values
     /// that will subsequently be passed to the RootLogger and written to the log file.
     /// </summary>
-    internal sealed class Logger : ILogger
+    /// <remarks>
+    /// Initialize a logger instance for the specified type.
+    /// </remarks>
+    /// <param name="typeName">The name of the object type that will be invoking thsi ILogger instance.</param>
+    internal sealed class Logger(string typeName) : ILogger
     {
-        private readonly string typeName;
-
-        /// <summary>
-        /// Initialize a logger instance for the specified type.
-        /// </summary>
-        /// <param name="typeName">The name of the object type that will be invoking thsi ILogger instance.</param>
-        public Logger(string typeName)
-        {
-            this.typeName = typeName;
-        }
+        private readonly string typeName = typeName;
 
         /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
         public void Trace(string message, params object[] arguments) => Log(LogLevel.Trace, message, arguments);

@@ -1,6 +1,7 @@
 {
     "stryker-config":
     {
+        "language-version": "preview",
         "reporters": [
             "html",
             "progress"

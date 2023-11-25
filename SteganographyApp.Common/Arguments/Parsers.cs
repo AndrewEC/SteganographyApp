@@ -60,18 +60,13 @@ namespace SteganographyApp.Common.Arguments
     /// <summary>
     /// Utility class to help lookup a parser for a specified argument.
     /// </summary>
-    internal sealed class ParserMatcher
+    /// <remarks>
+    /// Initializes the parser matcher with an option parser provider.
+    /// </remarks>
+    /// <param name="additionalParsers">An optional provide of to provide additional parsers for custom types.</param>
+    internal sealed class ParserMatcher(IParserProvider? additionalParsers)
     {
-        private readonly IParserProvider? additionalParsers;
-
-        /// <summary>
-        /// Initializes the parser matcher with an option parser provider.
-        /// </summary>
-        /// <param name="additionalParsers">An optional provide of to provide additional parsers for custom types.</param>
-        public ParserMatcher(IParserProvider? additionalParsers)
-        {
-            this.additionalParsers = additionalParsers;
-        }
+        private readonly IParserProvider? additionalParsers = additionalParsers;
 
         /// <summary>
         /// Creates a parser function from a specified method name. This requires the method, specified by methodName, has been declared by the
@@ -84,7 +79,7 @@ namespace SteganographyApp.Common.Arguments
         {
             MethodInfo method = modelType.GetMethods().Where(info => info.Name == methodName && info.IsStatic).FirstOrDefault()
                 ?? throw new ParseException($"Could not locate parser. No static method with the name [{methodName}] could be found on the type [{modelType.FullName}].");
-            return (instance, value) => method.Invoke(null, new[] { instance, value })!;
+            return (instance, value) => method.Invoke(null, [instance, value])!;
         }
 
         /// <summary>
@@ -98,7 +93,7 @@ namespace SteganographyApp.Common.Arguments
         public Func<object, string, object> FindParser(ArgumentAttribute argumentAttribute, MemberInfo memberInfo)
             => additionalParsers?.Find(argumentAttribute, memberInfo) ?? FindDefaultParserForField(argumentAttribute.Name, TypeHelper.DeclaredType(memberInfo));
 
-        private Func<object, string, object> FindDefaultParserForField(string name, Type fieldType)
+        private static Func<object, string, object> FindDefaultParserForField(string name, Type fieldType)
             => DefaultParsers.DefaultParserFor(fieldType)
                 ?? throw new ParseException($"No parser available to parse argument: [{name}]. There is no registered parser supporting type: [{fieldType}]");
     }

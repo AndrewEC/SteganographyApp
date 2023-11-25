@@ -70,6 +70,6 @@ namespace SteganographyApp.Common.Data
         /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBytesDirect/*' />
         public byte[] ToBytesDirect(string binary) => binary.Select(c => (byte)char.GetNumericValue(c)).ToArray();
 
-        private string To8BitBinaryString(byte input) => Convert.ToString(input, 2).PadLeft(BitsPerByte, '0');
+        private static string To8BitBinaryString(byte input) => Convert.ToString(input, 2).PadLeft(BitsPerByte, '0');
     }
 }

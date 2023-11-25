@@ -8,15 +8,13 @@
     /// Stream encapsulating class that decodes binary data and writes it
     /// to an output file.
     /// </summary>
-    public sealed class ContentWriter : AbstractContentIO
+    /// <remarks>
+    /// Instantiates a new ContentWrite instance and sets the
+    /// args field value.
+    /// </remarks>
+    /// <param name="args">The user provided input arguments.</param>
+    public sealed class ContentWriter(IInputArguments args) : AbstractContentIO(args)
     {
-        /// <summary>
-        /// Instantiates a new ContentWrite instance and sets the
-        /// args field value.
-        /// </summary>
-        /// <param name="args">The user provided input arguments.</param>
-        public ContentWriter(IInputArguments args) : base(args) { }
-
         /// <summary>
         /// Takes in an encrypted binary string, decyrypts it using the DataEncoderUtil
         /// and writes the resulting bytes to the output file.

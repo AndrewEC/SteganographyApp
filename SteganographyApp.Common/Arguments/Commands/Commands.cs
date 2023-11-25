@@ -97,22 +97,16 @@ namespace SteganographyApp.Common.Arguments.Commands
     /// A high level generic command instantiated using a name and a function.
     /// </summary>
     /// <typeparam name="T">Specifies the type of the arguments to be passed into the Execute method.</typeparam>
-    public class GenericCommand<T> : Command<T>
+    /// <remarks>
+    /// Initializes the generic command.
+    /// </remarks>
+    /// <param name="name">The name of the command.</param>
+    /// <param name="function">The function, associated with the command, to execute.</param>
+    public class GenericCommand<T>(string name, CommandFunction<T> function) : Command<T>
     where T : class
     {
-        private readonly string name;
-        private readonly CommandFunction<T> function;
-
-        /// <summary>
-        /// Initializes the generic command.
-        /// </summary>
-        /// <param name="name">The name of the command.</param>
-        /// <param name="function">The function, associated with the command, to execute.</param>
-        public GenericCommand(string name, CommandFunction<T> function)
-        {
-            this.name = name;
-            this.function = function;
-        }
+        private readonly string name = name;
+        private readonly CommandFunction<T> function = function;
 
         /// <summary>
         /// Invokes the command function provided during initialization.
@@ -134,21 +128,15 @@ namespace SteganographyApp.Common.Arguments.Commands
     /// Allows an underlying command to be aliased allowing said command to be executed or referenced
     /// using a different name other than the one it was originally initialized with.
     /// </summary>
-    public class AliasedCommand : ICommand
+    /// <remarks>
+    /// Initializes the aliased command.
+    /// </remarks>
+    /// <param name="name">The new name of the command that will override the name of the original command.</param>
+    /// <param name="actual">The actual command that is being aliased.</param>
+    public class AliasedCommand(string name, ICommand actual) : ICommand
     {
-        private readonly string name;
-        private readonly ICommand actual;
-
-        /// <summary>
-        /// Initializes the aliased command.
-        /// </summary>
-        /// <param name="name">The new name of the command that will override the name of the original command.</param>
-        /// <param name="actual">The actual command that is being aliased.</param>
-        public AliasedCommand(string name, ICommand actual)
-        {
-            this.name = name;
-            this.actual = actual;
-        }
+        private readonly string name = name;
+        private readonly ICommand actual = actual;
 
         /// <summary>
         /// Acts as a proxy to the underlying commands Execute function.
@@ -179,10 +167,13 @@ namespace SteganographyApp.Common.Arguments.Commands
     {
         private ICommand? actual;
 
+        // Stryker disable all
         private ICommand Actual
         {
             get => (actual ??= Activator.CreateInstance(typeof(T)) as ICommand)!;
         }
+
+        // Stryker restore all
 
         /// <summary>
         /// Proxies the call to the underlying command instance.
