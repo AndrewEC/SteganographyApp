@@ -20,7 +20,7 @@ namespace SteganographyApp.Common.Arguments
         {
             FieldInfo field => field.FieldType,
             PropertyInfo property => property.PropertyType,
-            _ => throw new TypeException(ErrorMessage)
+            _ => throw new TypeException(ErrorMessage),
         };
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SteganographyApp.Common.Arguments
         {
             FieldInfo field => field.GetValue(instance),
             PropertyInfo property => property.GetValue(instance),
-            _ => throw new TypeException(ErrorMessage)
+            _ => throw new TypeException(ErrorMessage),
         };
     }
 

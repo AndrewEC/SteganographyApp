@@ -68,7 +68,7 @@
             }
 
             int amountToIncrement = bytes.Length;
-            if (dummyCount > 0)
+            if (dummyCount > 0 && randomSeed != string.Empty)
             {
                 bytes = Injector.Provide<IDummyUtil>().InsertDummies(dummyCount, bytes, randomSeed);
                 logger.Trace("After inserting dummies: [{0}]", () => new[] { Convert.ToBase64String(bytes) });
@@ -125,7 +125,7 @@
                 logger.Trace("After reordering: [{0}]", () => new[] { Convert.ToBase64String(bytes) });
             }
 
-            if (dummyCount > 0)
+            if (dummyCount > 0 && randomSeed != string.Empty)
             {
                 bytes = Injector.Provide<IDummyUtil>().RemoveDummies(dummyCount, bytes, randomSeed);
                 logger.Trace("After removing dummies: [{0}]", () => new[] { Convert.ToBase64String(bytes) });

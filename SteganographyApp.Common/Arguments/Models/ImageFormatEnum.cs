@@ -5,10 +5,10 @@ namespace SteganographyApp.Common.Arguments
     /// </summary>
     public enum ImageFormat
     {
-        /// <summary>Indicates the image(s) should be converted to a png file</summary>
+        /// <summary>Indicates the image(s) should be converted to a png file.</summary>
         Png,
 
-        /// <summary>Indicates the image(s) should be converted to a webp file</summary>
+        /// <summary>Indicates the image(s) should be converted to a webp file.</summary>
         Webp,
     }
 }

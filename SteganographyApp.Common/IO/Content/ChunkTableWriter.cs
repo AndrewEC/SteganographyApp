@@ -55,15 +55,15 @@ namespace SteganographyApp.Common.IO
             ImageStoreIO.EncodeComplete();
         });
 
+        private static string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');
+
+        private static string To18BitBinaryString(short value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkTableHeaderSizeWithPadding, '0');
+
         private string Randomize(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil, string value)
         {
             byte[] valueBytes = binaryUtil.ToBytesDirect(value);
             byte[] randomized = randomizeUtil.Randomize(valueBytes, Arguments.RandomSeed, DummyCount, IterationMultiplier);
             return Injector.Provide<IBinaryUtil>().ToBinaryStringDirect(randomized);
         }
-
-        private static string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');
-
-        private static string To18BitBinaryString(short value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkTableHeaderSizeWithPadding, '0');
     }
 }

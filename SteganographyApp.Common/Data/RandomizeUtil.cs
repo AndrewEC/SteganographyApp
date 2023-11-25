@@ -76,7 +76,7 @@ namespace SteganographyApp.Common.Data
             return value;
         }
 
-        private string FormRandomSeed(string randomSeed, int dummyCount)
+        private static string FormRandomSeed(string randomSeed, int dummyCount)
         {
             int iterations = (dummyCount == 0) ? MaxHashIterations : (int)(((dummyCount + GlobalCounter.Instance.Count) % (MaxHashIterations - MinHashIterations)) + MinHashIterations);
             var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed + iterations, iterations);

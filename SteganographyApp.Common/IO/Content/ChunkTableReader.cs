@@ -35,6 +35,11 @@ namespace SteganographyApp.Common.IO
             return ReadTableChunkLengths(randomizeUtil, binaryUtil, chunkCount);
         });
 
+        private static string NextBinaryChunk(int index, string binaryString)
+            => binaryString.Substring(index * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSizeWithPadding);
+
+        private static int BinaryStringToInt(string binary) => Convert.ToInt32(binary, 2);
+
         private short ReadChunkCount(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil)
         {
             string headerBinary = ImageStoreIO.ReadContentChunkFromImage(Calculator.ChunkTableHeaderSizeWithPadding);
@@ -70,10 +75,5 @@ namespace SteganographyApp.Common.IO
             byte[] ordered = randomize.Reorder(binaryBytes, Arguments.RandomSeed, DummyCount, IterationMultiplier);
             return binaryUtil.ToBinaryStringDirect(ordered);
         }
-
-        private static string NextBinaryChunk(int index, string binaryString)
-            => binaryString.Substring(index * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSizeWithPadding);
-
-        private static int BinaryStringToInt(string binary) => Convert.ToInt32(binary, 2);
     }
 }

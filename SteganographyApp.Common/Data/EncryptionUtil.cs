@@ -92,6 +92,7 @@ namespace SteganographyApp.Common.Data
         /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/GenerateKey/*' />
         public byte[] GenerateKey(string value, int iterations)
         {
+            log.Debug("Generating key from value [{0}] over [{1}] iterations.", value, iterations);
             var passwordBytes = Encoding.UTF8.GetBytes(value);
             var salt = Pbkdf2(passwordBytes, Sha512(value + value.Length), iterations, KeySize);
             return Pbkdf2(passwordBytes, salt, iterations, KeySize / 8);

@@ -34,7 +34,7 @@ namespace SteganographyApp.Common.Data
         {
             PngMimeType => GetEncoder(ImageFormat.Png),
             WebpMimeType => GetEncoder(ImageFormat.Webp),
-            _ => throw new ArgumentValueException($"Could not find appropriate encoder for file: [{imagePath}]")
+            _ => throw new ArgumentValueException($"Could not find appropriate encoder for file: [{imagePath}]"),
         };
 
         /// <include file='../docs.xml' path='docs/members[@name="EncoderProvider"]/GetEncoder/*' />
@@ -54,7 +54,7 @@ namespace SteganographyApp.Common.Data
                 NearLossless = false,
                 NearLosslessQuality = 100,
             },
-            _ => throw new ArgumentValueException($"Invalid image format provided. Could not find encoder for image format of: [{imageFormat}]")
+            _ => throw new ArgumentValueException($"Invalid image format provided. Could not find encoder for image format of: [{imageFormat}]"),
         };
     }
 }

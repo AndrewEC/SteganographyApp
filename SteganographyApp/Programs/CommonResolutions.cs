@@ -4,7 +4,7 @@ namespace SteganographyApp
     /// Static reference class containing the number of available storage bits
     /// provided by images in common resolutions.
     /// </summary>
-    public struct CommonResolutionStorageSpace
+    public readonly struct CommonResolutionStorageSpace
     {
         public static readonly int P360 = 518_400;
         public static readonly int P480 = 921_600;

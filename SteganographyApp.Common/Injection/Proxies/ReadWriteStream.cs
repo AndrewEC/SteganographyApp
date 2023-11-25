@@ -37,14 +37,14 @@ namespace SteganographyApp.Common.Injection
         /// </summary>
         /// <param name="pathToFile">The relative or absolute path to the file to read from.</param>
         /// <returns>A ReadWriteStream instance configured to read from the specified file.</returns>
-        public static ReadWriteStream CreateStreamForRead(string pathToFile) => new ReadWriteStream(File.OpenRead(pathToFile));
+        public static ReadWriteStream CreateStreamForRead(string pathToFile) => new(File.OpenRead(pathToFile));
 
         /// <summary>
         /// Creates a ReadWriteStream instance which allows for writing to a specified destination.
         /// </summary>
         /// <param name="pathToFile">The relative or absolute path to the destination to write to.</param>
         /// <returns>A readWriteStream instance configured to write to the specified file.</returns>
-        public static ReadWriteStream CreateStreamForWrite(string pathToFile) => new ReadWriteStream(File.Open(pathToFile, FileMode.OpenOrCreate));
+        public static ReadWriteStream CreateStreamForWrite(string pathToFile) => new(File.Open(pathToFile, FileMode.OpenOrCreate));
 
         /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Read/*' />
         public int Read(byte[] array, int offset, int count) => RunIfNotDisposedWithResult(() => stream.Read(array, offset, count));
@@ -53,7 +53,7 @@ namespace SteganographyApp.Common.Injection
         public void Write(byte[] array, int offset, int count) => RunIfNotDisposed(() => stream.Write(array, offset, count));
 
         /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Flush/*' />
-        public void Flush() => RunIfNotDisposed(() => stream.Flush());
+        public void Flush() => RunIfNotDisposed(stream.Flush);
 
         /// <summary>
         /// Disposes of the currently opened stream represented by this instance.
