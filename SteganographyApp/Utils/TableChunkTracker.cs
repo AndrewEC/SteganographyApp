@@ -13,9 +13,6 @@ namespace SteganographyApp
     /// </summary>
     public class TableChunkTracker
     {
-        /// <summary>
-        /// Contains the ordered list of chunks that have been written to the storage images.
-        /// </summary>
         private readonly LinkedList<int> contentChunks = new();
 
         private LinkedListNode<int>? lastNode = null;

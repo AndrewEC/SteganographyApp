@@ -43,8 +43,7 @@ namespace SteganographyApp.Common.Arguments
         /// <returns>The current parser builder instance.</returns>
         public ParserBuilder ForType(Type type, Func<object, string, object> parser)
         {
-            var predicate = (ArgumentAttribute attribute, MemberInfo member) => TypeHelper.DeclaredType(member) == type;
-            parsers.Add(predicate, parser);
+            parsers.Add((attribute, member) => TypeHelper.DeclaredType(member) == type, parser);
             return this;
         }
 
@@ -56,8 +55,7 @@ namespace SteganographyApp.Common.Arguments
         /// <returns>The current parser builder instance.</returns>
         public ParserBuilder ForFieldNamed(string name, Func<object, string, object> parser)
         {
-            var predicate = (ArgumentAttribute attribute, MemberInfo member) => member.Name == name;
-            parsers.Add(predicate, parser);
+            parsers.Add((attribute, member) => member.Name == name, parser);
             return this;
         }
 
@@ -83,19 +81,14 @@ namespace SteganographyApp.Common.Arguments
     /// <summary>
     /// Assists in the process of building out an IParserProvider instance to provide additional parsers to be consumer by the cli parser.
     /// </summary>
-    public class AdditionalParsers : IParserProvider
+    /// <remarks>
+    /// Initializes a new instance.
+    /// </remarks>
+    /// <param name="parsers">An immutable dictionary containing the predicate functions to determine which argument member should
+    /// be parsed by which parser and the associated parser function to parse any argument member that satisfies the predicate.</param>
+    public class AdditionalParsers(ImmutableDictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers) : IParserProvider
     {
-        private readonly ImmutableDictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers;
-
-        /// <summary>
-        /// Initializes a new instance.
-        /// </summary>
-        /// <param name="parsers">An immutable dictionary containing the predicate functions to determine which argument member should
-        /// be parsed by which parser and the associated parser function to parse any argument member that satisfies the predicate.</param>
-        public AdditionalParsers(ImmutableDictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers)
-        {
-            this.parsers = parsers;
-        }
+        private readonly ImmutableDictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers = parsers;
 
         /// <summary>
         /// Creates a new builder instance to assist in adding new custom parsers.

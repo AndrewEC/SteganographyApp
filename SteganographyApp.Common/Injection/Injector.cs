@@ -163,7 +163,7 @@ namespace SteganographyApp.Common.Injection
         /// <summary>
         /// Sets the onlyTestObjectsState flag to false.
         /// </summary>
-        /// <seealso cref="Injector.AllowOnlyMockObjects()"/>
+        /// <seealso cref="AllowOnlyMockObjects()"/>
         public static void AllowAnyObjects()
         {
             onlyTestObjectsState = false;

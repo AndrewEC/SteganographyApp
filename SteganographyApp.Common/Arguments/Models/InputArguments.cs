@@ -111,7 +111,5 @@ namespace SteganographyApp.Common.Arguments
     /// Initializes the exception instance.
     /// </remarks>
     /// <param name="message">The message to initialize the exception with.</param>
-    public sealed class ArgumentValueException(string message) : Exception(message)
-    {
-    }
+    public sealed class ArgumentValueException(string message) : Exception(message) { }
 }

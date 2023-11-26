@@ -6,7 +6,7 @@ namespace SteganographyApp.Common.Tests
 
     public static class MockInput
     {
-        public static Queue<ConsoleKeyInfo> CreateInputQueue(ImmutableList<ValueTuple<char, ConsoleKey>> inputMapping)
+        public static Queue<ConsoleKeyInfo> CreateInputQueue(ImmutableList<(char KeyChar, ConsoleKey Key)> inputMapping)
         {
             var queue = new Queue<ConsoleKeyInfo>();
             for (int i = 0; i < inputMapping.Count; i++)

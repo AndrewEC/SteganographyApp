@@ -82,9 +82,11 @@ namespace SteganographyApp.Common.Arguments.Commands
         /// <returns>The name of the command.</returns>
         public abstract string GetName();
 
-        private ICommand GetNextCommand(ICommand[] subCommands, string nextCommandName)
+        private static string FormExpectedCommandNameList(ICommand[] subCommands) => string.Join(", ", subCommands.Select(command => command.GetName().ToLowerInvariant()));
+
+        private static ICommand GetNextCommand(ICommand[] subCommands, string nextCommandName)
         {
-            ICommand? nextCommand = subCommands.Where(command => command.GetName().ToLowerInvariant() == nextCommandName).FirstOrDefault();
+            ICommand? nextCommand = subCommands.Where(command => command.GetName().Equals(nextCommandName, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
             if (nextCommand == null)
             {
                 string expectedList = FormExpectedCommandNameList(subCommands);
@@ -93,7 +95,7 @@ namespace SteganographyApp.Common.Arguments.Commands
             return nextCommand!;
         }
 
-        private string GetNameOfNextCommand(ICommand[] subCommands, string[] args)
+        private static string GetNameOfNextCommand(ICommand[] subCommands, string[] args)
         {
             string nextCommandName = args[0].ToLowerInvariant();
             if (nextCommandName == "-h" || nextCommandName == "--help")
@@ -120,7 +122,7 @@ namespace SteganographyApp.Common.Arguments.Commands
 
         private void ValidateCommandNames(ICommand[] commands)
         {
-            List<string> names = new List<string>();
+            List<string> names = [];
             foreach (ICommand command in commands)
             {
                 string name = command.GetName();
@@ -131,8 +133,6 @@ namespace SteganographyApp.Common.Arguments.Commands
                 names.Add(name);
             }
         }
-
-        private string FormExpectedCommandNameList(ICommand[] subCommands) => string.Join(", ", subCommands.Select(command => command.GetName().ToLowerInvariant()));
     }
 
     /// <summary>

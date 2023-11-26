@@ -13,17 +13,18 @@ namespace SteganographyApp
     /// </summary>
     internal sealed class ImageTracker
     {
-        private readonly HashSet<string> imagesUsed = new HashSet<string>();
+        private readonly HashSet<string> imagesUsed = [];
         private readonly int availableImages;
 
         /// <summary>
-        /// Creates a new <see cref="ImageTracker"/> instance from the provided arguments and
-        /// hooks the tracker into the <see cref="ImageStore.OnNextImageLoaded"/> event to
-        /// listen to when new images are loaded.
-        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageTracker"/> class.
+        /// </summary>
+        /// <param name="arguments">Arguments from which a count of the number of cover images
+        /// available will be pulled.</param>
+        /// <param name="store">The ImageStore to attach to the the OnNextImageLoaded event of.</param>
         public ImageTracker(IInputArguments arguments, ImageStore store)
         {
-            this.availableImages = arguments.CoverImages.Length;
+            availableImages = arguments.CoverImages.Length;
             store.OnNextImageLoaded += RecordLoadedImage;
         }
 

@@ -28,7 +28,7 @@ namespace SteganographyApp.Common.Arguments.Commands
         /// </summary>
         /// <param name="root">The root command, or the first command, that will be executed by the CliProgram flow.</param>
         /// <returns>A new instance of the CliProgram with the first command to be executed being the root command parameter.</returns>
-        public static CliProgram Create(ICommand root) => new CliProgram(root);
+        public static CliProgram Create(ICommand root) => new(root);
 
         /// <summary>
         /// Allow the CliProgram to execute with an optional set of argument parsers.

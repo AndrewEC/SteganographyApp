@@ -49,7 +49,7 @@ namespace SteganographyApp.Common.Arguments
             ProgramDescriptorAttribute? descriptor = GetDescriptorAttribute(instanceType);
             if (descriptor != null)
             {
-                builder.Append(descriptor.Description).Append("\n");
+                builder.Append(descriptor.Description).Append('\n');
             }
             builder.Append("Usage: ")
                 .AppendJoin(" ", positionArguments.Select(argument => argument.Attribute.Name))
@@ -60,7 +60,7 @@ namespace SteganographyApp.Common.Arguments
                 .Append('\n');
             if (descriptor != null && descriptor.Example != null)
             {
-                builder.Append("Example Usage: ").Append(descriptor.Example).Append("\n");
+                builder.Append("Example Usage: ").Append(descriptor.Example).Append('\n');
             }
             return builder.ToString();
         }

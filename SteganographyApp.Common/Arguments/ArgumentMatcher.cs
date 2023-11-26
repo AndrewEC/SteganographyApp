@@ -68,9 +68,9 @@ namespace SteganographyApp.Common.Arguments
         /// Get the enumerator for the argument match results.
         /// </summary>
         /// <returns>Enumerator for the argument match results.</returns>
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        private void VerifyNoRequiredArgumentsAreMissing(ImmutableArray<RegisteredArgument> registeredArguments, ImmutableArray<ArgumentMatchResult> matchedArguments)
+        private static void VerifyNoRequiredArgumentsAreMissing(ImmutableArray<RegisteredArgument> registeredArguments, ImmutableArray<ArgumentMatchResult> matchedArguments)
         {
             ImmutableArray<string> matchedArgumentNames = matchedArguments.Select(argument => argument.Attribute.Name).ToImmutableArray();
 
@@ -85,6 +85,12 @@ namespace SteganographyApp.Common.Arguments
                 throw new ParseException($"Missing the following required arguments: [{joined}]");
             }
         }
+
+        private static RegisteredArgument? FindMatchingArgument(string input, ImmutableArray<RegisteredArgument> pairedFields)
+            => pairedFields.Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input).FirstOrDefault();
+
+        private static RegisteredArgument? FindMatchingArgument(int position, ImmutableArray<RegisteredArgument> pairedFields)
+            => pairedFields.Where(registered => registered.Attribute.Position == position).FirstOrDefault();
 
         private ImmutableArray<ArgumentMatchResult> PairAttributedArgumentsWithValues(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
         {
@@ -124,11 +130,5 @@ namespace SteganographyApp.Common.Arguments
             }
             return paired.ToImmutableArray();
         }
-
-        private RegisteredArgument? FindMatchingArgument(string input, ImmutableArray<RegisteredArgument> pairedFields)
-            => pairedFields.Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input).FirstOrDefault();
-
-        private RegisteredArgument? FindMatchingArgument(int position, ImmutableArray<RegisteredArgument> pairedFields)
-            => pairedFields.Where(registered => registered.Attribute.Position == position).FirstOrDefault();
     }
 }

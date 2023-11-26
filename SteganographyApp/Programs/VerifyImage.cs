@@ -43,7 +43,7 @@ namespace SteganographyApp
         }
     }
 
-    internal class TempCopy : AbstractDisposable
+    internal sealed class TempCopy : AbstractDisposable
     {
         private readonly ILogger logger = new LazyLogger<TempCopy>();
 
@@ -54,11 +54,7 @@ namespace SteganographyApp
             File.Copy(sourcePath, DestinationPath);
         }
 
-        public string DestinationPath
-        {
-            get;
-            private set;
-        }
+        public string DestinationPath { get; private set; }
 
         private string DetermineCopyPath(string sourcePath)
         {

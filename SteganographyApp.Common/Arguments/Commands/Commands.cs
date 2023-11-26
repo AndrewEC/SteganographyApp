@@ -144,10 +144,7 @@ namespace SteganographyApp.Common.Arguments.Commands
         /// <param name="program">The CliProgram instance being executed. Using this allows a command to access
         /// additional parsers if they have been made available.</param>
         /// <param name="args">The list of user provided command line arguments to execute.</param>
-        public void Execute(CliProgram program, string[] args)
-        {
-            actual.Execute(program, args);
-        }
+        public void Execute(CliProgram program, string[] args) => actual.Execute(program, args);
 
         /// <summary>
         /// Gets the alias provided during initialization.
@@ -180,10 +177,7 @@ namespace SteganographyApp.Common.Arguments.Commands
         /// </summary>
         /// <param name="program">The CliProgram instance being executed.</param>
         /// <param name="args">The array of user provided command line arguments.</param>
-        public void Execute(CliProgram program, string[] args)
-        {
-            Actual.Execute(program, args);
-        }
+        public void Execute(CliProgram program, string[] args) => Actual.Execute(program, args);
 
         /// <summary>
         /// Returns the name from the underlying command being proxies.

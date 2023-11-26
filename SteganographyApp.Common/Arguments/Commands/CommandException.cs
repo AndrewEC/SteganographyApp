@@ -9,7 +9,5 @@ namespace SteganographyApp.Common.Arguments.Commands
     /// Initializes the exception instance.
     /// </remarks>
     /// <param name="message">The exception message.</param>
-    public sealed class CommandException(string message) : Exception(message)
-    {
-    }
+    public sealed class CommandException(string message) : Exception(message) { }
 }
