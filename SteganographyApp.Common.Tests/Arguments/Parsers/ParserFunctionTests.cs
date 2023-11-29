@@ -1,39 +1,38 @@
-namespace SteganographyApp.Common.Tests
+namespace SteganographyApp.Common.Tests;
+
+using Moq;
+
+using NUnit.Framework;
+
+using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common.Injection;
+
+[TestFixture]
+public class ParserFunctionTests : FixtureWithTestObjects
 {
-    using Moq;
+    [Mockup(typeof(IImageProxy))]
+    public Mock<IImageProxy> mockImageProxy;
 
-    using NUnit.Framework;
+    [Mockup(typeof(IFileIOProxy))]
+    public Mock<IFileIOProxy> mockFileProxy;
 
-    using SteganographyApp.Common.Arguments;
-    using SteganographyApp.Common.Injection;
-
-    [TestFixture]
-    public class ParserFunctionTests : FixtureWithTestObjects
+    [Test]
+    public void ParseFilePath()
     {
-        [Mockup(typeof(IImageProxy))]
-        public Mock<IImageProxy> mockImageProxy;
+        string expected = "image-path";
+        mockFileProxy.Setup(fileProxy => fileProxy.IsExistingFile(expected)).Returns(true);
 
-        [Mockup(typeof(IFileIOProxy))]
-        public Mock<IFileIOProxy> mockFileProxy;
+        string actual = ParserFunctions.ParseFilePath(expected);
 
-        [Test]
-        public void ParseFilePath()
-        {
-            string expected = "image-path";
-            mockFileProxy.Setup(fileProxy => fileProxy.IsExistingFile(expected)).Returns(true);
+        Assert.AreEqual(expected, actual);
+    }
 
-            string actual = ParserFunctions.ParseFilePath(expected);
+    [Test]
+    public void ParseFilePathThrowsExceptionWhenFileDoesNotExist()
+    {
+        string expected = "image-path";
+        mockFileProxy.Setup(fileProxy => fileProxy.IsExistingFile(expected)).Returns(false);
 
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test]
-        public void ParseFilePathThrowsExceptionWhenFileDoesNotExist()
-        {
-            string expected = "image-path";
-            mockFileProxy.Setup(fileProxy => fileProxy.IsExistingFile(expected)).Returns(false);
-
-            Assert.Throws(typeof(ArgumentValueException), () => ParserFunctions.ParseFilePath(expected));
-        }
+        Assert.Throws(typeof(ArgumentValueException), () => ParserFunctions.ParseFilePath(expected));
     }
 }

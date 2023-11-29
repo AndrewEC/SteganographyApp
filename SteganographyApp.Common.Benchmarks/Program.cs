@@ -1,15 +1,12 @@
+namespace SteganographyApp.Common.Benchmarks;
+
 using BenchmarkDotNet.Running;
 
-namespace SteganographyApp.Common.Benchmarks
+public class Program
 {
-
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            BenchmarkRunner.Run<EncodeBench>();
-            BenchmarkRunner.Run<DecodeBench>();
-        }
+        BenchmarkRunner.Run<EncodeBench>();
+        BenchmarkRunner.Run<DecodeBench>();
     }
-
 }
