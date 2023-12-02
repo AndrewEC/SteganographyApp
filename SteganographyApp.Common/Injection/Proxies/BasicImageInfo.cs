@@ -17,6 +17,9 @@ public interface IBasicImageInfo : IDisposable
     /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Height/*' />
     int Height { get; }
 
+    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Path/*' />
+    string Path { get; }
+
     /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Accessor/*' />
     Rgba32 this[int x, int y]
     {
@@ -36,7 +39,8 @@ public interface IBasicImageInfo : IDisposable
 /// Initialize the BasicImageInfo instance using the image data loaded by the image sharp API.
 /// </remarks>
 /// <param name="image">The image data.</param>
-public class BasicImageInfo(Image<Rgba32> image) : AbstractDisposable, IBasicImageInfo
+/// <param name="path">The absolute path the image at the time it was loaded from disk.</param>
+public class BasicImageInfo(string path, Image<Rgba32> image) : AbstractDisposable, IBasicImageInfo
 {
     private readonly Image<Rgba32> image = image;
 
@@ -46,13 +50,19 @@ public class BasicImageInfo(Image<Rgba32> image) : AbstractDisposable, IBasicIma
         get => RunIfNotDisposedWithResult(() => image.Width);
     }
 
-        /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Height/*' />
+    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Height/*' />
     public int Height
     {
         get => RunIfNotDisposedWithResult(() => image.Height);
     }
 
-        /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Accessor/*' />
+    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Path/*' />
+    public string Path
+    {
+        get => path;
+    }
+
+    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Accessor/*' />
     public Rgba32 this[int x, int y]
     {
         get => RunIfNotDisposedWithResult(() => image[x, y]);
@@ -60,7 +70,7 @@ public class BasicImageInfo(Image<Rgba32> image) : AbstractDisposable, IBasicIma
         set => RunIfNotDisposed(() => image[x, y] = value);
     }
 
-        /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
+    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
     public void Save(string pathToImage, IImageEncoder encoder) => RunIfNotDisposed(() => image.Save(pathToImage, encoder));
 
     /// <summary>

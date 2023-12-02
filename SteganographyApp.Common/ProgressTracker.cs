@@ -20,6 +20,7 @@ public sealed class ProgressTracker(double maxProgress, string progressMessage, 
     private readonly string completeMessage = completeMessage;
     private readonly IConsoleWriter outputWriter = Injector.Provide<IConsoleWriter>();
     private double currentProgress;
+    private bool hasCompleted = false;
 
     /// <summary>
     /// Initializes a ProgressTracker instance and prints the first progress message with a percentage of 0.
@@ -43,6 +44,11 @@ public sealed class ProgressTracker(double maxProgress, string progressMessage, 
         double percent = currentProgress / maxProgress * 100.0;
         if (percent >= 100.0)
         {
+            if (hasCompleted)
+            {
+                return;
+            }
+            hasCompleted = true;
             outputWriter.WriteLine(completeMessage);
         }
         else

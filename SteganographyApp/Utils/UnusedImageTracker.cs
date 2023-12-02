@@ -54,6 +54,6 @@ internal sealed class ImageTracker
 
     private void RecordLoadedImage(object? sender, NextImageLoadedEventArgs args)
     {
-        imagesUsed.Add(args.ImageName);
+        imagesUsed.Add(args.Path);
     }
 }

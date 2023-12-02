@@ -335,6 +335,9 @@
         <Height>
             <summary>The height of the currently loaded image.</summary>
         </Height>
+        <Path>
+            <summary>The absolute path to the image file at the time it was loaded.</summary>
+        </Path>
         <Accessor>
             <summary>Accessor to lookup the colour of a pixel at the specified position.</summary>
             <param name="x">The x position of the pixel.</param>

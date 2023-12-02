@@ -73,6 +73,7 @@ public class ImageStoreIO : AbstractDisposable
             return;
         }
         store.CloseOpenImage(save);
+        store.SeekToImage(0);
         GlobalCounter.Instance.Reset();
     });
 }

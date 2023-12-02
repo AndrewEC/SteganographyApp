@@ -25,7 +25,7 @@ internal static class ArgumentFinder
         var names = new List<string>();
         var registered = new List<RegisteredArgument>();
 
-        foreach (MemberInfo member in GetAllMembers(modelType))
+        foreach (MemberInfo member in TypeHelper.GetAllFieldsAndProperties(modelType))
         {
             if (member.GetCustomAttribute(typeof(ArgumentAttribute)) is not ArgumentAttribute attribute)
             {
@@ -69,13 +69,6 @@ internal static class ArgumentFinder
 
         VerifyArgumentPositions(registered);
         return registered.ToImmutableArray();
-    }
-
-    private static ImmutableArray<MemberInfo> GetAllMembers(Type modelType)
-    {
-        MemberInfo[] fields = modelType.GetFields();
-        MemberInfo[] properties = modelType.GetProperties();
-        return new List<MemberInfo>(fields).Concat(properties).ToImmutableArray();
     }
 
     private static void VerifyArgumentPositions(List<RegisteredArgument> registeredArguments)

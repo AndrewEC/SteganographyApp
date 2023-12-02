@@ -1,203 +1,172 @@
-namespace SteganographyApp.Common.Tests
+namespace SteganographyApp.Common.Tests;
+
+using System;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Text;
+
+using Moq;
+
+using NUnit.Framework;
+
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
+
+using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common.Data;
+using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.IO;
+
+using static Moq.Times;
+
+[TestFixture]
+public class ImageStoreTests : FixtureWithRealObjects
 {
-    using System;
-    using System.Collections.Immutable;
-    using System.Linq;
-    using System.Text;
+    [Mockup(typeof(IImageProxy))]
+    public Mock<IImageProxy> mockImageProxy;
 
-    using Moq;
+    [Mockup(typeof(IEncoderProvider))]
+    public Mock<IEncoderProvider> mockEncoderProvider;
 
-    using NUnit.Framework;
-
-    using SixLabors.ImageSharp.Formats;
-    using SixLabors.ImageSharp.Formats.Png;
-    using SixLabors.ImageSharp.PixelFormats;
-
-    using SteganographyApp.Common.Arguments;
-    using SteganographyApp.Common.Data;
-    using SteganographyApp.Common.Injection;
-    using SteganographyApp.Common.IO;
-
-    using static Moq.Times;
-
-    [TestFixture]
-    public class ImageStoreTests : FixtureWithRealObjects
+    private const int BinaryStringLength = 100_000;
+    private const string ImagePath = "./test001.png";
+    private static readonly IInputArguments Arguments = new CommonArguments
     {
-        [Mockup(typeof(IImageProxy))]
-        public Mock<IImageProxy> mockImageProxy;
+        CoverImages = ImmutableArray.Create(new string[] { ImagePath }),
+    };
 
-        [Mockup(typeof(IEncoderProvider))]
-        public Mock<IEncoderProvider> mockEncoderProvider;
+    [Test]
+    public void TestWriteToImageWhenNotEnoughImageSpacesThrowsImageProcessingException()
+    {
+        var mockImage = GenerateMockImage(100, 100);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
 
-        private const int BinaryStringLength = 100_000;
-        private const string ImageName = "test001.png";
-        private static readonly IInputArguments Arguments = new CommonArguments()
+        mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImagePath)).Returns(new PngEncoder());
+
+        string binaryString = GenerateBinaryString(BinaryStringLength);
+
+        var imageStore = new ImageStore(Arguments);
+
+        using (var wrapper = imageStore.CreateIOWrapper())
         {
-            CoverImages = ImmutableArray.Create(new string[] { ImageName }),
-        };
-
-        private string imageLoadededEventPath;
-
-        [Test]
-        public void TestCleanImages()
-        {
-            var mockImage = GenerateMockImage(100, 100);
-            mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImageName)).Returns(mockImage);
-
-            mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImageName)).Returns(new PngEncoder());
-
-            var imageStore = new ImageStore(Arguments);
-            imageStore.OnNextImageLoaded += OnNextImageLoaded;
-            imageStore.CleanImages();
-
-            Assert.AreEqual(Arguments.CoverImages[0], imageLoadededEventPath);
-            Assert.IsTrue(mockImage.DisposeCalled);
-            Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);
-            mockImageProxy.Verify(imageProxy => imageProxy.LoadImage(Arguments.CoverImages[0]), Once());
+            var exception = Assert.Throws<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
+            Assert.AreEqual("Cannot load next image because there are no remaining cover images left to load.", exception.Message);
         }
 
-        [Test]
-        public void TestWriteToImageWhenNotEnoughImageSpacesThrowsImageProcessingException()
+        Assert.IsTrue(mockImage.DisposeCalled);
+        Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);
+    }
+
+    [Test]
+    public void TestReadAndWriteContentChunkTable()
+    {
+        var mockImage = GenerateMockImage(1000, 1000);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
+        mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImagePath)).Returns<IEncoderProvider>(null);
+
+        var chunkTableWrite = ImmutableArray.Create(new int[] { 100, 200, 300 });
+        var imageStore = new ImageStore(Arguments);
+        imageStore.SeekToImage(0);
+        using (var tableWriter = new ChunkTableWriter(imageStore, Arguments))
         {
-            var mockImage = GenerateMockImage(100, 100);
-            mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImageName)).Returns(mockImage);
-
-            mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImageName)).Returns(new PngEncoder());
-
-            string binaryString = GenerateBinaryString(BinaryStringLength);
-
-            var imageStore = new ImageStore(Arguments);
-
-            using (var wrapper = imageStore.CreateIOWrapper())
-            {
-                var exception = Assert.Throws<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
-                Assert.AreEqual("There is not enough available storage space in the provided images to continue.", exception.Message);
-            }
-
-            Assert.IsTrue(mockImage.DisposeCalled);
-            Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);
+            tableWriter.WriteContentChunkTable(chunkTableWrite);
         }
+        imageStore.SeekToImage(0);
 
-        [Test]
-        public void TestReadAndWriteContentChunkTable()
+        using (var reader = new ChunkTableReader(imageStore, Arguments))
         {
-            var mockImage = GenerateMockImage(1000, 1000);
-            mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImageName)).Returns(mockImage);
-            mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImageName)).Returns<IEncoderProvider>(null);
-
-            var chunkTableWrite = ImmutableArray.Create(new int[] { 100, 200, 300 });
-            var imageStore = new ImageStore(Arguments);
-            imageStore.SeekToImage(0);
-            using (var tableWriter = new ChunkTableWriter(imageStore, Arguments))
+            var chunkTableRead = reader.ReadContentChunkTable();
+            Assert.AreEqual(chunkTableWrite.Length, chunkTableRead.Length);
+            for (int i = 0; i < chunkTableWrite.Length; i++)
             {
-                tableWriter.WriteContentChunkTable(chunkTableWrite);
+                Assert.AreEqual(chunkTableWrite[i], chunkTableRead[i]);
             }
-            imageStore.SeekToImage(0);
-
-            using (var reader = new ChunkTableReader(imageStore, Arguments))
-            {
-                var chunkTableRead = reader.ReadContentChunkTable();
-                Assert.AreEqual(chunkTableWrite.Length, chunkTableRead.Length);
-                for (int i = 0; i < chunkTableWrite.Length; i++)
-                {
-                    Assert.AreEqual(chunkTableWrite[i], chunkTableRead[i]);
-                }
-            }
-        }
-
-        [Test]
-        public void TestWriteContentChunkTableWithNotEnoughSpaceInImageThrowsImageProcessingException()
-        {
-            var mockImage = GenerateMockImage(1, 1);
-            mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImageName)).Returns(mockImage);
-
-            mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImageName)).Returns(new PngEncoder());
-
-            var imageStore = new ImageStore(Arguments);
-            var chunkTable = Enumerable.Range(0, 100).ToImmutableArray();
-
-            imageStore.SeekToImage(0);
-            using (var writer = new ChunkTableWriter(imageStore, Arguments))
-            {
-                Assert.Throws<ImageProcessingException>(() => writer.WriteContentChunkTable(chunkTable));
-            }
-
-            Assert.IsTrue(mockImage.DisposeCalled);
-            Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);
-        }
-
-        private string GenerateBinaryString(int length)
-        {
-            var random = new Random();
-            var builder = new StringBuilder();
-            for (int i = 0; i < length; i++)
-            {
-                string nextBit = ((int)Math.Round(random.NextDouble())).ToString();
-                builder.Append(nextBit);
-            }
-            return builder.ToString();
-        }
-
-        private void OnNextImageLoaded(object sender, NextImageLoadedEventArgs args)
-        {
-            imageLoadededEventPath = args.ImageName;
-        }
-
-        private MockBasicImageInfo GenerateMockImage(int width, int height)
-        {
-            var pixels = new Rgba32[width, height];
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    pixels[i, j] = new Rgba32((byte)8);
-                }
-            }
-
-            return new MockBasicImageInfo(width, height, pixels);
         }
     }
 
-    internal class MockBasicImageInfo : IBasicImageInfo
+    [Test]
+    public void TestWriteContentChunkTableWithNotEnoughSpaceInImageThrowsImageProcessingException()
     {
-        private Rgba32[,] pixels;
+        var mockImage = GenerateMockImage(1, 1);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
 
-        public MockBasicImageInfo(int width, int height, Rgba32[,] pixels)
+        mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImagePath)).Returns(new PngEncoder());
+
+        var imageStore = new ImageStore(Arguments);
+        var chunkTable = Enumerable.Range(0, 100).ToImmutableArray();
+
+        imageStore.SeekToImage(0);
+        using (var writer = new ChunkTableWriter(imageStore, Arguments))
         {
-            Width = width;
-            Height = height;
-            this.pixels = pixels;
+            Assert.Throws<ImageProcessingException>(() => writer.WriteContentChunkTable(chunkTable));
         }
 
-        public int Width { get; set; }
+        Assert.IsTrue(mockImage.DisposeCalled);
+        Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);
+    }
 
-        public int Height { get; set; }
-
-        public string SaveCalledWith { get; private set; }
-
-        public bool DisposeCalled { get; private set; }
-
-        public Rgba32 this[int x, int y]
+    private static MockBasicImageInfo GenerateMockImage(int width, int height)
+    {
+        var pixels = new Rgba32[width, height];
+        for (int i = 0; i < width; i++)
         {
-            get
+            for (int j = 0; j < height; j++)
             {
-                return pixels[x, y];
-            }
-
-            set
-            {
-                pixels[x, y] = value;
+                pixels[i, j] = new Rgba32((byte)8);
             }
         }
 
-        public void Save(string pathToImage, IImageEncoder encoder)
+        return new MockBasicImageInfo(width, height, ImagePath, pixels);
+    }
+
+    private static string GenerateBinaryString(int length)
+    {
+        var random = new Random();
+        var builder = new StringBuilder();
+        for (int i = 0; i < length; i++)
         {
-            SaveCalledWith = pathToImage;
+            string nextBit = ((int)Math.Round(random.NextDouble())).ToString();
+            builder.Append(nextBit);
+        }
+        return builder.ToString();
+    }
+}
+
+internal class MockBasicImageInfo(int width, int height, string path, Rgba32[,] pixels) : IBasicImageInfo
+{
+    private readonly Rgba32[,] pixels = pixels;
+
+    public int Width { get; set; } = width;
+
+    public int Height { get; set; } = height;
+
+    public string Path { get; set; } = path;
+
+    public string SaveCalledWith { get; private set; }
+
+    public bool DisposeCalled { get; private set; }
+
+    public Rgba32 this[int x, int y]
+    {
+        get
+        {
+            return pixels[x, y];
         }
 
-        public void Dispose()
+        set
         {
-            DisposeCalled = true;
+            pixels[x, y] = value;
         }
+    }
+
+    public void Save(string pathToImage, IImageEncoder encoder)
+    {
+        SaveCalledWith = pathToImage;
+    }
+
+    public void Dispose()
+    {
+        DisposeCalled = true;
     }
 }

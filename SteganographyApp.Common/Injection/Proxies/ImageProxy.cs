@@ -26,7 +26,7 @@ public interface IImageProxy
 public class ImageProxy : IImageProxy
 {
     /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/LoadImage/*' />
-    public IBasicImageInfo LoadImage(string pathToImage) => new BasicImageInfo(Image.Load<Rgba32>(pathToImage));
+    public IBasicImageInfo LoadImage(string pathToImage) => new BasicImageInfo(pathToImage, Image.Load<Rgba32>(pathToImage));
 
     /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/GetImageMimeType/*' />
     public string GetImageMimeType(string pathToImage) => Image.DetectFormat(pathToImage).DefaultMimeType;

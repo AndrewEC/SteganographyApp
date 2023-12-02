@@ -1,6 +1,9 @@
 namespace SteganographyApp.Common.Arguments;
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 
 /// <summary>
@@ -58,6 +61,14 @@ public static class TypeHelper
         PropertyInfo property => property.GetValue(instance),
         _ => throw new TypeException(ErrorMessage),
     };
+
+    /// <summary>
+    /// Gets an array representing all field and property members of the specified type.
+    /// </summary>
+    /// <param name="modelType">The to get all the fields and properties of.</param>
+    /// <returns>An immutable array of all field and property members.</returns>
+    public static ImmutableArray<MemberInfo> GetAllFieldsAndProperties(Type modelType)
+        => new List<MemberInfo>(modelType.GetFields()).Concat(modelType.GetProperties()).ToImmutableArray();
 }
 
 /// <summary>

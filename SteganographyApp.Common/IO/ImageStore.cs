@@ -1,7 +1,6 @@
 ﻿namespace SteganographyApp.Common.IO;
 
 using System;
-using System.Linq;
 
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -22,7 +21,8 @@ using SteganographyApp.Common.Logging;
 public sealed class ImageStore(IInputArguments args)
 {
     /// <summary>
-    /// Stores the current x and y position for the current read/write operation.
+    /// Stores the current x and y position of the pixel the image store is about to
+    /// read from or write to.
     /// </summary>
     private readonly PixelPosition pixelPosition = new();
 
@@ -42,12 +42,6 @@ public sealed class ImageStore(IInputArguments args)
     private int currentImageIndex = -1;
 
     /// <summary>
-    /// The currently loaded image. The image is loaded whenever the Next
-    /// method is called and the currentImageIndex has been incremented.
-    /// </summary>
-    private IBasicImageInfo? currentImage;
-
-    /// <summary>
     /// Event handler that's invoked whenever the WriteContentChunkToImage method completes.
     /// The main argument of the event will indicate the total number of bits written to the
     /// image(s).
@@ -62,15 +56,10 @@ public sealed class ImageStore(IInputArguments args)
     public event EventHandler<NextImageLoadedEventArgs>? OnNextImageLoaded;
 
     /// <summary>
-    /// Gets the current image being used in the write process.
+    /// Gets the currently loaded image. The image is loaded whenever the Next
+    /// method is called and the currentImageIndex has been incremented.
     /// </summary>
-    private string CurrentImage
-    {
-        get
-        {
-            return args.CoverImages[currentImageIndex];
-        }
-    }
+    public IBasicImageInfo? CurrentImage { get; private set; }
 
     /// <summary>
     /// Utility method to create an <see cref="ImageStoreIO"/> instance to be used in conjunction with the
@@ -83,30 +72,6 @@ public sealed class ImageStore(IInputArguments args)
     public ImageStoreIO CreateIOWrapper() => new(this);
 
     /// <summary>
-    /// Will look over all images specified in the InputArguments
-    /// and set the LSB in all pixels in all images to a random value of either 1 or 0.
-    /// </summary>
-    public void CleanImages()
-    {
-        try
-        {
-            for (int i = 0; i < args.CoverImages.Length; i++)
-            {
-                SeekToImage(i);
-                string randomBinary = GenerateBinaryString();
-                log.Trace("Generated random binary string of: [{0}]", randomBinary);
-                WriteBinaryString(randomBinary);
-                CloseOpenImage(true);
-            }
-        }
-        catch (Exception)
-        {
-            CloseOpenImage();
-            throw;
-        }
-    }
-
-    /// <summary>
     /// Moves the current index back to the index before the specified image
     /// then calls the Next method to advance to the specified image.
     /// </summary>
@@ -116,7 +81,7 @@ public sealed class ImageStore(IInputArguments args)
     {
         if (coverImageIndex < 0 || coverImageIndex >= args.CoverImages.Length)
         {
-            throw new ImageProcessingException($"An invalid image index was provided in ResetTo. Expected value between {0} and {args.CoverImages.Length - 1}, instead got {coverImageIndex}");
+            throw new ImageProcessingException($"An invalid image index was provided in ResetTo. Expected value between [{0}] and [{args.CoverImages.Length - 1}], instead got [{coverImageIndex}].");
         }
         currentImageIndex = coverImageIndex - 1;
         LoadNextImage();
@@ -129,18 +94,18 @@ public sealed class ImageStore(IInputArguments args)
     /// made to the current image.</param>
     internal void CloseOpenImage(bool saveImageChanges = false)
     {
-        if (currentImage == null)
+        if (CurrentImage == null)
         {
             return;
         }
         if (saveImageChanges)
         {
             log.Debug("Saving changes to image [{0}]", CurrentImage);
-            var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(CurrentImage);
-            currentImage.Save(CurrentImage, encoder);
+            var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(CurrentImage.Path);
+            CurrentImage.Save(CurrentImage.Path, encoder);
         }
-        currentImage.Dispose();
-        currentImage = null;
+        CurrentImage.Dispose();
+        CurrentImage = null;
     }
 
     /// <summary>
@@ -156,14 +121,18 @@ public sealed class ImageStore(IInputArguments args)
     /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
     internal int WriteBinaryString(string binary)
     {
-        log.Debug("Writing [{0}] bits to image [{1}] starting at position [{2}]", binary.Length, CurrentImage, pixelPosition.ToString());
+        if (CurrentImage == null)
+        {
+            return -1;
+        }
+        log.Debug("Writing [{0}] bits to image [{1}] starting at position [{2}]", binary.Length, CurrentImage.Path, pixelPosition.ToString());
         var queue = new ReadBitQueue(binary);
         var pixelWriter = new PixelWriter(queue, args.BitsToUse);
         while (queue.HasNext())
         {
-            Rgba32 source = currentImage![pixelPosition.X, pixelPosition.Y];
+            Rgba32 source = CurrentImage[pixelPosition.X, pixelPosition.Y];
             Rgba32 updated = pixelWriter.UpdatePixel(source);
-            currentImage[pixelPosition.X, pixelPosition.Y] = updated;
+            CurrentImage[pixelPosition.X, pixelPosition.Y] = updated;
 
             if (!pixelPosition.TryMoveToNext())
             {
@@ -186,12 +155,16 @@ public sealed class ImageStore(IInputArguments args)
     /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
     internal string ReadBinaryString(int bitsToRead)
     {
+        if (CurrentImage == null)
+        {
+            return string.Empty;
+        }
         log.Debug("Reading [{0}] bits from image [{1}] starting from position [{2}]", bitsToRead, CurrentImage, pixelPosition.ToString());
         var binaryStringBuilder = new BinaryStringBuilder(bitsToRead);
         var pixelReader = new PixelReader(binaryStringBuilder, args.BitsToUse);
         while (!binaryStringBuilder.IsFull())
         {
-            Rgba32 pixel = currentImage![pixelPosition.X, pixelPosition.Y];
+            Rgba32 pixel = CurrentImage[pixelPosition.X, pixelPosition.Y];
             pixelReader.ReadBinaryFromPixel(pixel);
             if (!pixelPosition.TryMoveToNext())
             {
@@ -218,14 +191,14 @@ public sealed class ImageStore(IInputArguments args)
         currentImageIndex++;
         if (currentImageIndex == args.CoverImages.Length)
         {
-            throw new ImageProcessingException("There is not enough available storage space in the provided images to continue.");
+            throw new ImageProcessingException("Cannot load next image because there are no remaining cover images left to load.");
         }
 
-        currentImage = Injector.Provide<IImageProxy>().LoadImage(CurrentImage);
-        pixelPosition.TrackImage(currentImage);
-        log.Debug("Loaded image [{0}]", CurrentImage);
+        CurrentImage = Injector.Provide<IImageProxy>().LoadImage(args.CoverImages[currentImageIndex]);
+        pixelPosition.TrackImage(CurrentImage);
+        log.Debug("Loaded image [{0}]", CurrentImage.Path);
 
-        OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs(CurrentImage, currentImageIndex));
+        OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs(CurrentImage.Path, currentImageIndex));
     }
 
     /// <summary>
@@ -237,10 +210,14 @@ public sealed class ImageStore(IInputArguments args)
     /// the last bit of the currently loaded image then a processing exception will be thrown.</exception>
     internal void SeekToPixel(int bitsToSkip)
     {
+        if (CurrentImage == null)
+        {
+            return;
+        }
         log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage);
         pixelPosition.Reset();
 
-        int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (Calculator.BitsPerPixel * args.BitsToUse));
+        int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (Calculator.MinimumBitsPerPixel * args.BitsToUse));
         for (int i = 0; i < pixelIndex; i++)
         {
             if (!pixelPosition.TryMoveToNext())
@@ -248,13 +225,5 @@ public sealed class ImageStore(IInputArguments args)
                 LoadNextImage();
             }
         }
-    }
-
-    private string GenerateBinaryString()
-    {
-        int bitCount = currentImage!.Width * currentImage.Height * args.BitsToUse;
-        log.Debug("Generating binary string with a length of [{0}] for image [{1}]", bitCount, CurrentImage);
-        var random = new Random();
-        return string.Concat(Enumerable.Range(0, bitCount - 1).Select(i => random.Next(10) % 2 == 0 ? '0' : '1'));
     }
 }

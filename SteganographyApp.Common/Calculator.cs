@@ -19,7 +19,7 @@ public static class Calculator
     /// <summary>
     /// Indicates the maximum number of bits that can be stored in a single pixel.
     /// </summary>
-    public static readonly int BitsPerPixel = 3;
+    public static readonly int MinimumBitsPerPixel = 3;
 
     /// <summary>
     /// Specifies the number of bits that will be reserved for each entry in the content
@@ -36,7 +36,7 @@ public static class Calculator
     /// <summary>
     /// Specifies the number of times the file has to be read from, encoded, and written to the storage
     /// image. The number of writes is essentially based on the total size of the image divided by the
-    /// number of bytes to read from each iteration from the input file.
+    /// size, in bytes, of each chunk that will be read from the input file to encode.
     /// </summary>
     /// <param name="fileToEncode">The path to the file that is going to be encoded.</param>
     /// <param name="chunkByteSize">The number of bytes to read in at a time.</param>
@@ -72,4 +72,21 @@ public static class Calculator
     /// less the chunk table header.</param>
     /// <returns>A count of the total number of bits that will be required to store the content chunk table.</returns>
     public static int CalculateRequiredBitsForContentTable(int numberOfChunks) => (numberOfChunks * ChunkDefinitionBitSizeWithPadding) + ChunkTableHeaderSizeWithPadding;
+
+    /// <summary>
+    /// Computes the number of bits that can be stored in a given pixel. This effectively equals the prduct
+    /// of 3 and the bitsToUse.
+    /// </summary>
+    /// <param name="bitsToUse">The number of bits to store in each RGB channel of the pixel.</param>
+    /// <returns>The product of 3 and the number of bitsToUse per RGB channel of a given pixel.</returns>
+    public static int CalculateBitsPerPixel(int bitsToUse) => MinimumBitsPerPixel * bitsToUse;
+
+    /// <summary>
+    /// Computes the number of bits that can be stored in the image.
+    /// </summary>
+    /// <param name="width">The width of the image.</param>
+    /// <param name="height">The height of the image.</param>
+    /// <param name="bitsToUse">The number of bits to store in each RGB channel of each pixel.</param>
+    /// <returns>The total number of bits that can be stored in an image of the given width and height.</returns>
+    public static long CalculateStorageSpaceOfImage(int width, int height, int bitsToUse) => width * height * CalculateBitsPerPixel(bitsToUse);
 }

@@ -47,7 +47,7 @@ internal sealed class CalculateStorageSpaceCommand : Command<CalculateStorageSpa
         Console.WriteLine("Calculating storage space in {0} images.", arguments.CoverImages.Length);
         try
         {
-            var availableSpace = CalculateNumberOfPixelsForImages(arguments.CoverImages) * (Calculator.BitsPerPixel * arguments.BitsToUse);
+            var availableSpace = CalculateNumberOfPixelsForImages(arguments.CoverImages, arguments);
 
             Console.WriteLine("\nImages are able to store:");
             PrintSize(availableSpace);
@@ -58,7 +58,7 @@ internal sealed class CalculateStorageSpaceCommand : Command<CalculateStorageSpa
         }
     }
 
-    private static BigInteger CalculateNumberOfPixelsForImages(ImmutableArray<string> coverImages)
+    private static BigInteger CalculateNumberOfPixelsForImages(ImmutableArray<string> coverImages, IInputArguments arguments)
     {
         var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length, "Calculating image storage space", "Completed calculating image storage space.");
         var count = new BigInteger(0);
@@ -68,7 +68,7 @@ internal sealed class CalculateStorageSpaceCommand : Command<CalculateStorageSpa
             {
                 using (var image = Image.Load(imagePath))
                 {
-                    count += image.Width * image.Height;
+                    count += Calculator.CalculateStorageSpaceOfImage(image.Width, image.Height, arguments.BitsToUse);
                 }
             }
             catch (Exception e)
