@@ -21,12 +21,23 @@ Remove-Folder $CommonOutputFolder
 Remove-Folder $ArgumentsOutputFolder
 
 
-Write-Host("`n---------- Executing mutation tests ----------`n")
-cd ./SteganographyApp.Common.Tests
-dotnet tool run dotnet-stryker --config-file stryker-config.json
-if($LastExitCode -ne 0){
-    Write-Host("'stryker' failed with status: $LastExitCode")
+Write-Host "`n---------- Executing mutation tests ----------`n"
+function Run-Mutations {
+    param(
+        [string] $Project,
+        [string] $Output
+    )
+    Write-Host "---------- Running $Project mutation tests ----------"
+    cd $Project
+    dotnet tool run dotnet-stryker --config-file stryker-config.json
+    if($LastExitCode -ne 0){
+        Write-Host("'stryker' failed with status: $LastExitCode")
+        cd ..
+        Exit
+    }
+    Write-Host "Report available at $Output"
     cd ..
-    Exit
 }
-Write-Host "Report available at $CommonOutputFolder"
+
+Run-Mutations $CommonProject $CommonOutputFolder
+Run-Mutations $ArgumentsProject $ArgumentsOutputFolder
