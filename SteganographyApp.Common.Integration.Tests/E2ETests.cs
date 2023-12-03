@@ -6,7 +6,6 @@ using System.IO;
 
 using NUnit.Framework;
 
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.IO;
 
@@ -59,7 +58,7 @@ public class E2ETests
                 content = reader.ReadContentChunkFromFile();
                 int written = wrapper.WriteContentChunkToImage(content);
                 contentChunkSize = written;
-                Assert.AreEqual(content.Length, written);
+                Assert.That(written, Is.EqualTo(content.Length));
             }
             wrapper.EncodeComplete();
         }
@@ -79,12 +78,12 @@ public class E2ETests
                 using (var writer = new ContentWriter(args))
                 {
                     string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                    Assert.AreEqual(content, binary);
+                    Assert.That(binary, Is.EqualTo(content));
                     writer.WriteContentChunkToFile(binary);
                 }
                 long target = new FileInfo(args.FileToEncode).Length;
                 long actual = new FileInfo(args.DecodedOutputFile).Length;
-                Assert.AreEqual(target, actual);
+                Assert.That(actual, Is.EqualTo(target));
             }
         }
     }
@@ -111,7 +110,7 @@ public class E2ETests
                 content = reader.ReadContentChunkFromFile();
                 int written = wrapper.WriteContentChunkToImage(content);
                 contentChunkSize = written;
-                Assert.AreEqual(content.Length, written);
+                Assert.That(written, Is.EqualTo(content.Length));
             }
             wrapper.EncodeComplete();
         }
@@ -152,7 +151,7 @@ public class E2ETests
                 content = reader.ReadContentChunkFromFile();
                 int written = wrapper.WriteContentChunkToImage(content);
                 contentChunkSize = written;
-                Assert.AreEqual(content.Length, written);
+                Assert.That(written, Is.EqualTo(content.Length));
             }
             wrapper.EncodeComplete();
         }
@@ -174,7 +173,7 @@ public class E2ETests
                     string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
                     long target = new FileInfo(args.FileToEncode).Length;
                     long actual = new FileInfo(args.DecodedOutputFile).Length;
-                    Assert.AreNotEqual(target, actual);
+                    Assert.That(actual, Is.Not.EqualTo(target));
                 }
             }
         }
@@ -195,7 +194,7 @@ public class E2ETests
                 content = reader.ReadContentChunkFromFile();
                 int written = wrapper.WriteContentChunkToImage(content);
                 contentChunkSize = written;
-                Assert.AreEqual(content.Length, written);
+                Assert.That(written, Is.EqualTo(content.Length));
             }
             wrapper.EncodeComplete();
         }
@@ -214,7 +213,7 @@ public class E2ETests
                 using (var writer = new ContentWriter(args))
                 {
                     string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                    Assert.AreEqual(content, binary);
+                    Assert.That(binary, Is.EqualTo(content));
                     Assert.Throws(typeof(TransformationException), () => writer.WriteContentChunkToFile(binary));
                 }
             }
@@ -236,7 +235,7 @@ public class E2ETests
                 content = reader.ReadContentChunkFromFile();
                 int written = wrapper.WriteContentChunkToImage(content);
                 contentChunkSize = written;
-                Assert.AreEqual(content.Length, written);
+                Assert.That(written, Is.EqualTo(content.Length));
             }
             wrapper.EncodeComplete();
         }

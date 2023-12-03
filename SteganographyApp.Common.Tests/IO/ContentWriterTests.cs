@@ -4,7 +4,6 @@ using Moq;
 
 using NUnit.Framework;
 
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO;
@@ -16,13 +15,13 @@ using static Moq.Times;
 public class ContentWriterTests : FixtureWithTestObjects
 {
     [Mockup(typeof(IFileIOProxy))]
-    public Mock<IFileIOProxy> mockFileIOProxy;
+    public Mock<IFileIOProxy> MockFileIOProxy = new();
 
     [Mockup(typeof(IReadWriteStream))]
-    public Mock<IReadWriteStream> mockReadWriteStream;
+    public Mock<IReadWriteStream> MockReadWriteStream = new();
 
     [Mockup(typeof(IDataEncoderUtil))]
-    public Mock<IDataEncoderUtil> mockEncoderUtil;
+    public Mock<IDataEncoderUtil> MockEncoderUtil = new();
 
     private const string BinaryString = "00010010100100111110101001001001";
 
@@ -49,49 +48,49 @@ public class ContentWriterTests : FixtureWithTestObjects
     public void TestWriteContentChunkToFile()
     {
         byte[] bytes = new byte[1024];
-        mockFileIOProxy.Setup(fileProxy => fileProxy.IsExistingFile(IsAny<string>())).Returns(false);
-        mockEncoderUtil.Setup(encoder => encoder.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
+        MockFileIOProxy.Setup(fileProxy => fileProxy.IsExistingFile(IsAny<string>())).Returns(false);
+        MockEncoderUtil.Setup(encoder => encoder.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
             .Returns(bytes);
-        mockReadWriteStream.Setup(stream => stream.Write(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Verifiable();
+        MockReadWriteStream.Setup(stream => stream.Write(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Verifiable();
 
         using (var writer = new ContentWriter(Arguments))
         {
             writer.WriteContentChunkToFile(BinaryString);
         }
 
-        mockFileIOProxy.Verify(fileProxy => fileProxy.IsExistingFile(DecodedOutputFile), Once());
-        mockFileIOProxy.Verify(fileProxy => fileProxy.Delete(IsAny<string>()), Never());
-        mockFileIOProxy.Verify(fileProxy => fileProxy.OpenFileForWrite(DecodedOutputFile), Once());
+        MockFileIOProxy.Verify(fileProxy => fileProxy.IsExistingFile(DecodedOutputFile), Once());
+        MockFileIOProxy.Verify(fileProxy => fileProxy.Delete(IsAny<string>()), Never());
+        MockFileIOProxy.Verify(fileProxy => fileProxy.OpenFileForWrite(DecodedOutputFile), Once());
 
-        mockEncoderUtil.Verify(encoderUtil => encoderUtil.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations), Once());
+        MockEncoderUtil.Verify(encoderUtil => encoderUtil.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations), Once());
 
-        mockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
-        mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
-        mockReadWriteStream.Verify(stream => stream.Write(bytes, 0, bytes.Length), Once());
+        MockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
+        MockReadWriteStream.Verify(stream => stream.Dispose(), Once());
+        MockReadWriteStream.Verify(stream => stream.Write(bytes, 0, bytes.Length), Once());
     }
 
     [Test]
     public void TestWriteContentChunkToFileWhenOutputFileExistsTriesToDeleteFileFirst()
     {
-        mockFileIOProxy.Setup(fileProxy => fileProxy.IsExistingFile(DecodedOutputFile)).Returns(true);
-        mockEncoderUtil.Setup(encoderUtil => encoderUtil.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
+        MockFileIOProxy.Setup(fileProxy => fileProxy.IsExistingFile(DecodedOutputFile)).Returns(true);
+        MockEncoderUtil.Setup(encoderUtil => encoderUtil.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
             .Returns(new byte[1024]);
-        mockFileIOProxy.Setup(fileProxy => fileProxy.Delete(DecodedOutputFile)).Verifiable();
-        mockReadWriteStream.Setup(stream => stream.Write(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Verifiable();
+        MockFileIOProxy.Setup(fileProxy => fileProxy.Delete(DecodedOutputFile)).Verifiable();
+        MockReadWriteStream.Setup(stream => stream.Write(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Verifiable();
 
         using (var writer = new ContentWriter(Arguments))
         {
             writer.WriteContentChunkToFile(BinaryString);
         }
 
-        mockFileIOProxy.Verify(provider => provider.Delete(DecodedOutputFile), Once());
-        mockEncoderUtil.Verify(encoder => encoder.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations), Once());
+        MockFileIOProxy.Verify(provider => provider.Delete(DecodedOutputFile), Once());
+        MockEncoderUtil.Verify(encoder => encoder.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations), Once());
     }
 
     protected override void SetupMocks()
     {
-        mockFileIOProxy.Setup(fileProxy => fileProxy.OpenFileForWrite(DecodedOutputFile)).Returns(mockReadWriteStream.Object);
-        mockReadWriteStream.Setup(stream => stream.Flush()).Verifiable();
-        mockReadWriteStream.Setup(stream => stream.Dispose()).Verifiable();
+        MockFileIOProxy.Setup(fileProxy => fileProxy.OpenFileForWrite(DecodedOutputFile)).Returns(MockReadWriteStream.Object);
+        MockReadWriteStream.Setup(stream => stream.Flush()).Verifiable();
+        MockReadWriteStream.Setup(stream => stream.Dispose()).Verifiable();
     }
 }

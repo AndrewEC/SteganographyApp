@@ -1,6 +1,6 @@
 namespace SteganographyApp.Common.Arguments.Validation;
 
-using SteganographyApp.Common.Injection;
+using System.IO;
 
 /// <summary>
 /// Validates that an underlying property or field is a string value that points to
@@ -23,7 +23,7 @@ public class IsFileAttribute(string? name = null) : ValidationAttribute(name, [t
     /// file on disk.</exception>
     protected override void DoValidate(object value)
     {
-        if (!Injector.Provide<IFileIOProxy>().IsExistingFile((string)value))
+        if (!File.Exists((string)value))
         {
             throw new ValidationFailedException(string.Format(Message, value));
         }

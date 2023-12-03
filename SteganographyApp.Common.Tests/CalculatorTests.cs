@@ -9,7 +9,7 @@ namespace SteganographyApp.Common.Tests
     public class CalculatorTests : FixtureWithTestObjects
     {
         [Mockup(typeof(IFileIOProxy))]
-        public Mock<IFileIOProxy> mockFileIOProxy;
+        public Mock<IFileIOProxy> mockFileIOProxy = new();
 
         private const string TestFile = "Test001.png";
         private const int ChunkSize = 131_072;
@@ -19,7 +19,7 @@ namespace SteganographyApp.Common.Tests
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(TestFile, ChunkSize);
 
-            Assert.AreEqual(183, requiredBitsForTable);
+            Assert.That(requiredBitsForTable, Is.EqualTo(183));
             mockFileIOProxy.Verify(fileProxy => fileProxy.GetFileSizeBytes(TestFile), Times.Once());
         }
 
@@ -28,7 +28,7 @@ namespace SteganographyApp.Common.Tests
         {
             int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(TestFile, ChunkSize);
 
-            Assert.AreEqual(5, requiredNumberOfWrites);
+            Assert.That(requiredNumberOfWrites, Is.EqualTo(5));
             mockFileIOProxy.Verify(fileProxy => fileProxy.GetFileSizeBytes(TestFile), Times.Once());
         }
 

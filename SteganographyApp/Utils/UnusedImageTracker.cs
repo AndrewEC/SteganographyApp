@@ -3,7 +3,7 @@ namespace SteganographyApp;
 using System;
 using System.Collections.Generic;
 
-using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common;
 using SteganographyApp.Common.IO;
 
 /// <summary>

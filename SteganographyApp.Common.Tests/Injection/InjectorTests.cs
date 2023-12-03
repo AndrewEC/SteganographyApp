@@ -15,7 +15,7 @@ namespace SteganographyApp.Common.Tests
         public void TestProvideDefaultInjectableInstance()
         {
             var reader = Injector.Provide<IConsoleReader>();
-            Assert.True(reader is ConsoleKeyReader);
+            Assert.That(reader is ConsoleKeyReader, Is.True);
         }
 
         [Test]
@@ -26,7 +26,7 @@ namespace SteganographyApp.Common.Tests
 
             var actual = Injector.Provide<IConsoleReader>();
 
-            Assert.AreEqual(expected.Object, actual);
+            Assert.That(actual, Is.EqualTo(expected.Object));
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace SteganographyApp.Common.Tests
             Injector.ResetInstances();
             var reader = Injector.Provide<IConsoleReader>();
 
-            Assert.AreNotEqual(mockReader.Object, reader);
+            Assert.That(reader, Is.Not.EqualTo(mockReader.Object));
         }
     }
 }

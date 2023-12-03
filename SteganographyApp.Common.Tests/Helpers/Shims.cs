@@ -23,10 +23,10 @@ namespace SteganographyApp.Common.Tests
     public abstract class FixtureWithMockConsoleReaderAndWriter : FixtureWithTestObjects
     {
         [Mockup(typeof(IConsoleReader))]
-        public Mock<IConsoleReader> mockConsoleReader;
+        public Mock<IConsoleReader> mockConsoleReader = new();
 
         [Mockup(typeof(IConsoleWriter))]
-        public Mock<IConsoleWriter> mockConsoleWriter;
+        public Mock<IConsoleWriter> mockConsoleWriter = new();
     }
 
     [TestFixture]

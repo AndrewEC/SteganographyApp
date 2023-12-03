@@ -31,8 +31,8 @@ namespace SteganographyApp.Common.Tests
         {
             ExecuteUpdates(tracker);
 
-            Assert.AreEqual(DesiredWriteCount, mockWriter.WriteValues.Count);
-            Assert.AreEqual(DesiredWriteLineCount, mockWriter.WriteLineValues.Count);
+            Assert.That(mockWriter.WriteValues, Has.Count.EqualTo(DesiredWriteCount));
+            Assert.That(mockWriter.WriteLineValues, Has.Count.EqualTo(DesiredWriteLineCount));
         }
 
         [Test]
@@ -41,17 +41,17 @@ namespace SteganographyApp.Common.Tests
             ExecuteUpdates(tracker);
 
             int index = 0;
-            int[] percents = new int[] { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+            int[] percents = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             var currentNode = mockWriter.WriteValues.First;
             while (currentNode != null)
             {
-                Assert.IsTrue(currentNode.Value.Contains(percents[index].ToString()));
+                Assert.That(currentNode.Value, Does.Contain(percents[index].ToString()));
                 index++;
                 currentNode = currentNode.Next;
             }
         }
 
-        private void ExecuteUpdates(ProgressTracker tracker)
+        private static void ExecuteUpdates(ProgressTracker tracker)
         {
             tracker.Display();
             for (int i = 0; i < DesiredWriteCount; i++)

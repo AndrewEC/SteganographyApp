@@ -4,25 +4,23 @@ using Moq;
 
 using NUnit.Framework;
 
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO;
 
-using static Moq.It;
 using static Moq.Times;
 
 [TestFixture]
 public class ContentReaderTests : FixtureWithTestObjects
 {
     [Mockup(typeof(IFileIOProxy))]
-    public Mock<IFileIOProxy> mockFileIOProxy;
+    public Mock<IFileIOProxy> MockFileIOProxy = new();
 
     [Mockup(typeof(IReadWriteStream))]
-    public Mock<IReadWriteStream> mockReadWriteStream;
+    public Mock<IReadWriteStream> MockReadWriteStream = new();
 
     [Mockup(typeof(IDataEncoderUtil))]
-    public Mock<IDataEncoderUtil> mockDataEncoderUtil;
+    public Mock<IDataEncoderUtil> MockDataEncoderUtil = new();
 
     private const int ChunkByteSize = 100;
     private const string FileToEncode = "file_to_encode";
@@ -40,56 +38,57 @@ public class ContentReaderTests : FixtureWithTestObjects
         UseCompression = UseCompression,
         DummyCount = DummyCount,
         RandomSeed = RandomSeed,
+        AdditionalPasswordHashIterations = AdditionalHashIterations,
     };
 
     [Test]
     public void TestReadContentChunkFromFile()
     {
-        mockReadWriteStream.Setup(stream => stream.Read(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Returns(100);
+        MockReadWriteStream.Setup(stream => stream.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(100);
 
         string expected = "encoded_value";
-        mockDataEncoderUtil.Setup(encoder => encoder.Encode(IsAny<byte[]>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
+        MockDataEncoderUtil.Setup(encoder => encoder.Encode(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
             .Returns(expected);
 
         using (var reader = new ContentReader(Arguments))
         {
-            string actual = reader.ReadContentChunkFromFile();
-            Assert.AreEqual(expected, actual);
+            string? actual = reader.ReadContentChunkFromFile();
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
-        mockReadWriteStream.Verify(stream => stream.Flush(), Once());
-        mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
-        mockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
-        mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
-        mockDataEncoderUtil
-            .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()), Once());
+        MockReadWriteStream.Verify(stream => stream.Flush(), Once());
+        MockReadWriteStream.Verify(stream => stream.Dispose(), Once());
+        MockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
+        MockReadWriteStream.Verify(stream => stream.Read(It.IsAny<byte[]>(), 0, ChunkByteSize), Once());
+        MockDataEncoderUtil
+            .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()), Once());
     }
 
     [Test]
     public void TestReadContentChunkFromFile0BitesAreReadreturnsNull()
     {
-        mockReadWriteStream.Setup(stream => stream.Read(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Returns(0);
+        MockReadWriteStream.Setup(stream => stream.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(0);
 
         using (var contentReader = new ContentReader(Arguments))
         {
-            string result = contentReader.ReadContentChunkFromFile();
-            Assert.IsNull(result);
+            string? result = contentReader.ReadContentChunkFromFile();
+            Assert.That(result, Is.Null);
         }
 
-        mockReadWriteStream.Verify(stream => stream.Flush(), Once());
-        mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
-        mockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
-        mockReadWriteStream.Verify(stream => stream.Read(IsAny<byte[]>(), 0, ChunkByteSize), Once());
-        mockDataEncoderUtil
-            .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()), Never());
+        MockReadWriteStream.Verify(stream => stream.Flush(), Once());
+        MockReadWriteStream.Verify(stream => stream.Dispose(), Once());
+        MockFileIOProxy.Verify(provider => provider.OpenFileForRead(FileToEncode), Once());
+        MockReadWriteStream.Verify(stream => stream.Read(It.IsAny<byte[]>(), 0, ChunkByteSize), Once());
+        MockDataEncoderUtil
+            .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == ChunkByteSize), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()), Never());
     }
 
     [Test]
     public void TestReadContentChunkWhenBitsReadIsLessThanChunkSize()
     {
         int alternateByteCount = 10;
-        mockReadWriteStream.Setup(stream => stream.Read(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Returns(alternateByteCount);
-        mockDataEncoderUtil.Setup(encoder => encoder.Encode(IsAny<byte[]>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
+        MockReadWriteStream.Setup(stream => stream.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(alternateByteCount);
+        MockDataEncoderUtil.Setup(encoder => encoder.Encode(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
             .Returns("encoded_value");
 
         using (var contentReader = new ContentReader(Arguments))
@@ -97,14 +96,14 @@ public class ContentReaderTests : FixtureWithTestObjects
             contentReader.ReadContentChunkFromFile();
         }
 
-        mockDataEncoderUtil
-            .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == alternateByteCount), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()), Once());
+        MockDataEncoderUtil
+            .Verify(encoder => encoder.Encode(It.Is<byte[]>(bytes => bytes.Length == alternateByteCount), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()), Once());
     }
 
     protected override void SetupMocks()
     {
-        mockFileIOProxy.Setup(fileProxy => fileProxy.OpenFileForRead(IsAny<string>())).Returns(mockReadWriteStream.Object);
-        mockReadWriteStream.Setup(stream => stream.Flush()).Verifiable();
-        mockReadWriteStream.Setup(stream => stream.Dispose()).Verifiable();
+        MockFileIOProxy.Setup(fileProxy => fileProxy.OpenFileForRead(It.IsAny<string>())).Returns(MockReadWriteStream.Object);
+        MockReadWriteStream.Setup(stream => stream.Flush()).Verifiable();
+        MockReadWriteStream.Setup(stream => stream.Dispose()).Verifiable();
     }
 }

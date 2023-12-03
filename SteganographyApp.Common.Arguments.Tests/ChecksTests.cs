@@ -10,22 +10,22 @@ namespace SteganographyApp.Common.Tests
         [Test]
         public void TestWasHelpRequestedWhenShorthandHelpFlagIsInArgsReturnsTrue()
         {
-            string[] args = new string[] { "-h" };
-            Assert.IsTrue(Checks.WasHelpRequested(args));
+            string[] args = ["-h"];
+            Assert.That(Checks.WasHelpRequested(args), Is.True);
         }
 
         [Test]
         public void TestWasHelpRequestWhenHelpFlagIsInArgsReturnsTrue()
         {
-            string[] args = new string[] { "--help" };
-            Assert.IsTrue(Checks.WasHelpRequested(args));
+            string[] args = ["--help"];
+            Assert.That(Checks.WasHelpRequested(args), Is.True);
         }
 
         [Test]
         public void TestWasHelPRequestedWhenNoHelpFlagInArgsReturnsFalse()
         {
-            string[] args = new string[0];
-            Assert.IsFalse(Checks.WasHelpRequested(args));
+            string[] args = [];
+            Assert.That(Checks.WasHelpRequested(args), Is.False);
         }
     }
 }

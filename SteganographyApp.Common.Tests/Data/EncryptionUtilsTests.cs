@@ -21,12 +21,10 @@ namespace SteganographyApp.Common.Tests
             var util = new EncryptionUtil();
 
             byte[] encrypted = util.Encrypt(inputStringBytes, Password, AdditionalHashIterations);
-
-            Assert.AreNotEqual(inputStringBytes, encrypted);
+            Assert.That(encrypted, Is.Not.EqualTo(inputStringBytes));
 
             byte[] decrypted = util.Decrypt(encrypted, Password, AdditionalHashIterations);
-
-            Assert.AreEqual(inputStringBytes, decrypted);
+            Assert.That(decrypted, Is.EqualTo(inputStringBytes));
         }
     }
 }

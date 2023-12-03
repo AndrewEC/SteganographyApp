@@ -23,41 +23,41 @@ namespace SteganographyApp.Common.Tests
             {
                 var mockableAttribute = GetMockupAttribute(field);
 
-                object instance = CreateMockInstance(field, mockableAttribute);
+                object instance = CreateMockInstance(mockableAttribute);
                 field.SetValue(testFixture, instance);
 
                 object proxyInstance = GetProxyInstance(instance);
-                UseInstance(proxyInstance, field, mockableAttribute);
+                UseInstance(proxyInstance, mockableAttribute);
             }
         }
 
-        private static void UseInstance(object instance, FieldInfo fieldInfo, Mockup mockableAttribute)
+        private static void UseInstance(object instance, Mockup mockableAttribute)
         {
             typeof(Injector)
-                .GetMethod(nameof(Injector.UseInstance))
-                .MakeGenericMethod(mockableAttribute.MockType)
+                ?.GetMethod(nameof(Injector.UseInstance))
+                ?.MakeGenericMethod(mockableAttribute.MockType)
                 .Invoke(null, new object[] { instance });
         }
 
-        private static object CreateMockInstance(FieldInfo field, Mockup mockableAttribute)
+        private static object CreateMockInstance(Mockup mockableAttribute)
         {
             var mockType = typeof(Mock<>).MakeGenericType(new Type[] { mockableAttribute.MockType });
-            return Activator.CreateInstance(mockType, new object[] { MockBehavior.Strict });
+            return Activator.CreateInstance(mockType, new object[] { MockBehavior.Strict })
+                ?? throw new Exception($"Could not create mock instance for type: [{mockType.Name}]");
         }
 
         private static object GetProxyInstance(object mock)
-        {
-            return mock.GetType().GetProperty("Object", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).GetValue(mock);
-        }
+            => mock.GetType().GetProperty("Object", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)?.GetValue(mock)
+            ?? throw new Exception("Could not find Object property on proxy instance.");
 
         private static IEnumerable<FieldInfo> GetFieldsRequiringMocks(object testFixture)
-        {
-            return testFixture.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).Where(HasMockupAttribute);
-        }
+            => testFixture.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).Where(HasMockupAttribute);
 
         private static bool HasMockupAttribute(FieldInfo info) => GetMockupAttribute(info) != null;
 
-        private static Mockup GetMockupAttribute(FieldInfo info) => info.GetCustomAttributes(typeof(Mockup), false).FirstOrDefault() as Mockup;
+        private static Mockup GetMockupAttribute(FieldInfo info)
+            => info.GetCustomAttributes(typeof(Mockup), false).FirstOrDefault() as Mockup
+            ?? throw new Exception($"Could not find mockup attribute on field [{info.Name}]");
     }
 
     /// <summary>
@@ -67,13 +67,8 @@ namespace SteganographyApp.Common.Tests
     /// SetUp phase of the test fixture.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    public class Mockup : Attribute
+    public class Mockup(Type mockType) : Attribute
     {
-        public Mockup(Type mockType)
-        {
-            MockType = mockType;
-        }
-
-        public Type MockType { get; private set; }
+        public Type MockType { get; private set; } = mockType;
     }
 }

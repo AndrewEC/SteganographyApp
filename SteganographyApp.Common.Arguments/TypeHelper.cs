@@ -68,7 +68,7 @@ public static class TypeHelper
     /// <param name="modelType">The to get all the fields and properties of.</param>
     /// <returns>An immutable array of all field and property members.</returns>
     public static ImmutableArray<MemberInfo> GetAllFieldsAndProperties(Type modelType)
-        => new List<MemberInfo>(modelType.GetFields(BindingFlags.Public)).Concat(modelType.GetProperties(BindingFlags.Public)).ToImmutableArray();
+        => new List<MemberInfo>(modelType.GetFields()).Concat(modelType.GetProperties()).ToImmutableArray();
 }
 
 /// <summary>

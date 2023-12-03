@@ -20,9 +20,9 @@
             generator = new Xor128Prng(101, 5);
             int[] nums2 = Generate(generator, 20, 20);
 
-            Assert.IsTrue(AreInRange(nums, 0, 20));
-            Assert.IsTrue(AreInRange(nums2, 0, 20));
-            Assert.IsFalse(HaveSameElements(nums, nums2));
+            Assert.That(AreInRange(nums, 0, 20), Is.True);
+            Assert.That(AreInRange(nums2, 0, 20), Is.True);
+            Assert.That(HaveSameElements(nums, nums2), Is.False);
         }
 
         [Test]
@@ -34,9 +34,9 @@
             generator = new Xor128Prng(101, 5);
             int[] nums2 = Generate(generator, 20, 20);
 
-            Assert.IsTrue(AreInRange(nums, 0, 20));
-            Assert.IsTrue(AreInRange(nums2, 0, 20));
-            Assert.IsFalse(HaveSameElements(nums, nums2));
+            Assert.That(AreInRange(nums, 0, 20), Is.True);
+            Assert.That(AreInRange(nums2, 0, 20), Is.True);
+            Assert.That(HaveSameElements(nums, nums2), Is.False);
         }
 
         [Test]
@@ -48,9 +48,9 @@
             generator = new Xor128Prng(100, 5);
             int[] nums2 = Generate(generator, 20, 20);
 
-            Assert.IsTrue(AreInRange(nums, 0, 20));
-            Assert.IsTrue(AreInRange(nums2, 0, 20));
-            Assert.IsTrue(HaveSameElements(nums, nums2));
+            Assert.That(AreInRange(nums, 0, 20), Is.True);
+            Assert.That(AreInRange(nums2, 0, 20), Is.True);
+            Assert.That(HaveSameElements(nums, nums2), Is.True);
         }
 
         [Test]
@@ -66,11 +66,14 @@
                 {
                     generated.Add(generator.Next(generations));
                 }
-                Assert.GreaterOrEqual(generations * 0.8, generated.Count);
+                Assert.That(generations * 0.8, Is.GreaterThanOrEqualTo(generated.Count));
             }
         }
 
-        private bool HaveSameElements(int[] first, int[] second)
+        private static int[] Generate(Xor128Prng generator, int length, int max) => Enumerable.Range(0, length)
+            .Select(i => generator.Next(max)).ToArray();
+
+        private static bool HaveSameElements(int[] first, int[] second)
         {
             for (int i = 0; i < first.Length; i++)
             {
@@ -82,7 +85,7 @@
             return true;
         }
 
-        private bool AreInRange(int[] arr, int min, int max)
+        private static bool AreInRange(int[] arr, int min, int max)
         {
             foreach (int item in arr)
             {
@@ -93,8 +96,5 @@
             }
             return true;
         }
-
-        private int[] Generate(Xor128Prng generator, int length, int max) => Enumerable.Range(0, length)
-            .Select(i => generator.Next(max)).ToArray();
     }
 }

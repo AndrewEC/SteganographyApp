@@ -9,7 +9,6 @@ namespace SteganographyApp.Common.Tests
     using SixLabors.ImageSharp.Formats.Png;
     using SixLabors.ImageSharp.Formats.Webp;
 
-    using SteganographyApp.Common.Arguments;
     using SteganographyApp.Common.Data;
     using SteganographyApp.Common.Injection;
 
@@ -17,7 +16,7 @@ namespace SteganographyApp.Common.Tests
     public class EncoderProviderTests : FixtureWithTestObjects
     {
         [Mockup(typeof(IImageProxy))]
-        public Mock<IImageProxy> mockImageProxy;
+        public Mock<IImageProxy> mockImageProxy = new();
 
         [TestCase(ImageFormat.Png, typeof(PngEncoder))]
         [TestCase(ImageFormat.Webp, typeof(WebpEncoder))]

@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.Arguments;
+namespace SteganographyApp.Common;
 
 using System;
 using System.Collections.Immutable;
@@ -9,40 +9,40 @@ using System.Collections.Immutable;
 /// </summary>
 public interface IInputArguments
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
     string Password { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
     string FileToEncode { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
     string DecodedOutputFile { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
     ImmutableArray<string> CoverImages { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
     bool UseCompression { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
     string RandomSeed { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
     int DummyCount { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
     bool DeleteAfterConversion { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
     int ChunkByteSize { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
     ImageFormat ImageFormat { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/AdditionalPasswordHashIterations/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/AdditionalPasswordHashIterations/*' />
     int AdditionalPasswordHashIterations { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/BitsToUse/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/BitsToUse/*' />
     int BitsToUse { get; }
 }
 
@@ -67,40 +67,40 @@ public interface IArgumentConverter
 /// </summary>
 public sealed class CommonArguments : IInputArguments
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
     public string Password { get; set; } = string.Empty;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
     public string FileToEncode { get; set; } = string.Empty;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
     public string DecodedOutputFile { get; set; } = string.Empty;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
     public ImmutableArray<string> CoverImages { get; set; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
     public bool UseCompression { get; set; } = false;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
     public string RandomSeed { get; set; } = string.Empty;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
     public int DummyCount { get; set; } = 0;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
     public bool DeleteAfterConversion { get; set; } = false;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
     public int ChunkByteSize { get; set; } = 131_072;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
     public ImageFormat ImageFormat { get; set; } = ImageFormat.Png;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/AdditionalPasswordHashIterations/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/AdditionalPasswordHashIterations/*' />
     public int AdditionalPasswordHashIterations { get; set; } = 0;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="InputArguments"]/BitsToUse/*' />
+    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/BitsToUse/*' />
     public int BitsToUse { get; set; } = 1;
 }
 

@@ -1,37 +1,32 @@
-Param(
-    [Switch]$OpenReport
-)
+$CommonOutputFolder = "./SteganographyApp.Common.Tests/StrykerOutput"
+$CommonProject = "./SteganographyApp.Common.Tests"
+$ArgumentsOutputFolder = "./SteganographyApp.Common.Arguments.Tests/StrykerOutput"
+$ArgumentsProject = "./SteganographyApp.Common.Arguments.Tests"
 
-$StrykerOutputFolder = "./SteganographyApp.Common.Tests/StrykerOutput"
+Write-Host "`n---------- Removing Previous Output Folders ----------`n"
+function Remove-Folder {
+    param([string] $FolderPath)
 
-Write-Host "`n---------- Removed Previous Output Folders ----------`n"
-if(Test-Path $StrykerOutputFolder){
-    Write-Host "Removing old output folder and contents"
-    Remove-Item -Recurse -Force $StrykerOutputFolder | Out-Null
+    if (Test-Path $FolderPath) {
+        Write-Host "Removing folder $FolderPath"
+        Remove-Item -Recurse -Force $FolderPath | Out-Null
+
+        if (Test-Path $FolderPath) {
+            throw "Could not delete folder $FolderPath"
+        }
+    }
 }
-if(Test-Path $StrykerOutputFolder){
-    Write-Host("Could not delete existing StrykerOutput folder")
-    Exit
-}
 
-cd ./SteganographyApp.Common.Tests
+Remove-Folder $CommonOutputFolder
+Remove-Folder $ArgumentsOutputFolder
 
 
 Write-Host("`n---------- Executing mutation tests ----------`n")
+cd ./SteganographyApp.Common.Tests
 dotnet tool run dotnet-stryker --config-file stryker-config.json
 if($LastExitCode -ne 0){
     Write-Host("'stryker' failed with status: $LastExitCode")
     cd ..
     Exit
 }
-
-
-Write-Host("`n---------- Opening report ----------`n")
-cd ..
-if (-Not $OpenReport) {
-    Exit
-}
-Get-ChildItem -Directory $StrykerOutputFolder | % {
-    $path = $_.FullName
-    Start-Process "$path\reports\mutation-report.html"
-}
+Write-Host "Report available at $CommonOutputFolder"
