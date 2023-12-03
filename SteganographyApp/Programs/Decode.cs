@@ -8,6 +8,7 @@ using System.Text.Json;
 using SteganographyApp.Common;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Arguments.Commands;
+using SteganographyApp.Common.Arguments.Validation;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.Logging;
@@ -38,12 +39,14 @@ internal sealed class DecodeArguments : IArgumentConverter
     public string RandomSeed = string.Empty;
 
     [Argument("--dummyCount", "-d", helpText: "The number of dummy entries to be removed after randomization and before decryption. Recommended value between 100 and 1,000.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
+    [InRange(0, int.MaxValue)]
     public int DummyCount = 0;
 
     [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
     public LogLevel LogLevel = LogLevel.None;
 
     [Argument("--additionalHashes", "-a", helpText: "The number of additional times to has the password. Has no effect if no password is provided.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
+    [InRange(0, int.MaxValue)]
     public int AdditionalPasswordHashIterations = 0;
 
     [Argument("--compress", "-co", helpText: "If provided will decompress the contents of the file before decryption.")]

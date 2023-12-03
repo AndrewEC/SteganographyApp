@@ -51,7 +51,7 @@ internal static class ArgumentFinder
                 names.Add(attribute.ShortName);
             }
 
-            if (TypeHelper.DeclaredType(member) == typeof(bool) && attribute.Position > 0)
+            if (TypeHelper.GetDeclaredType(member) == typeof(bool) && attribute.Position > 0)
             {
                 throw new ParseException($"Argument [{attribute.Name}] is invalid. An argument cannot be a boolean and have a position.");
             }

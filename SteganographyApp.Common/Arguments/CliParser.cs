@@ -3,6 +3,7 @@ namespace SteganographyApp.Common.Arguments;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using SteganographyApp.Common.Arguments.Validation;
 
 /// <summary>
 /// Provides the functionality to parse the user provided arguments into a concrete class instance.
@@ -77,7 +78,7 @@ public sealed class CliParser
                 throw new ParseException($"Could not read in argument [{match.Attribute.Name}] from value [{match.Input}] because: [{e.InnerException?.Message ?? "No root cause."}]", e);
             }
         }
-
+        CliValidator.Validate(instance);
         return instance;
     }
 

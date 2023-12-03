@@ -19,7 +19,7 @@ public static class TypeHelper
     /// </summary>
     /// <param name="memberInfo">The member info from which we want to extract the underlying field type or property type.</param>
     /// <returns>The underlying type of the member.</returns>
-    public static Type DeclaredType(MemberInfo memberInfo) => memberInfo switch
+    public static Type GetDeclaredType(MemberInfo memberInfo) => memberInfo switch
     {
         FieldInfo field => field.FieldType,
         PropertyInfo property => property.PropertyType,
@@ -68,7 +68,7 @@ public static class TypeHelper
     /// <param name="modelType">The to get all the fields and properties of.</param>
     /// <returns>An immutable array of all field and property members.</returns>
     public static ImmutableArray<MemberInfo> GetAllFieldsAndProperties(Type modelType)
-        => new List<MemberInfo>(modelType.GetFields()).Concat(modelType.GetProperties()).ToImmutableArray();
+        => new List<MemberInfo>(modelType.GetFields(BindingFlags.Public)).Concat(modelType.GetProperties(BindingFlags.Public)).ToImmutableArray();
 }
 
 /// <summary>

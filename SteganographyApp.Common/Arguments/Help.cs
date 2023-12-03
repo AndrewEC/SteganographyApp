@@ -91,7 +91,7 @@ public static class Help
             builder.Append("\n\t[Position]: ").Append(argument.Position);
         }
 
-        Type memberType = TypeHelper.DeclaredType(member);
+        Type memberType = TypeHelper.GetDeclaredType(member);
         if (memberType.IsEnum)
         {
             var possibleValues = string.Join(", ", Enum.GetNames(memberType));
@@ -129,7 +129,7 @@ public static class Help
             return null;
         }
 
-        Type memberType = TypeHelper.DeclaredType(member);
+        Type memberType = TypeHelper.GetDeclaredType(member);
         if (IsStruct(memberType))
         {
             return null;

@@ -47,8 +47,8 @@ public interface IInputArguments
 }
 
 /// <summary>
-/// Convert a given set of user provided arguments into an IInputArguments instance containing a collection
-/// of the arguments required throughout various parts of the application.
+/// Convert a given set of user provided arguments into an IInputArguments instance containing values
+/// required at various places in the application.
 /// </summary>
 public interface IArgumentConverter
 {

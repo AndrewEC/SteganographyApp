@@ -91,7 +91,7 @@ internal sealed class ParserMatcher(IParserProvider? additionalParsers)
     /// <param name="memberInfo">The underlying member whose type will be used to lookup a parser function.</param>
     /// <returns>The parser function that can parsed the specified argument. If no parser is found this will throw an exception.</returns>
     public Func<object, string, object> FindParser(ArgumentAttribute argumentAttribute, MemberInfo memberInfo)
-        => additionalParsers?.Find(argumentAttribute, memberInfo) ?? FindDefaultParserForField(argumentAttribute.Name, TypeHelper.DeclaredType(memberInfo));
+        => additionalParsers?.Find(argumentAttribute, memberInfo) ?? FindDefaultParserForField(argumentAttribute.Name, TypeHelper.GetDeclaredType(memberInfo));
 
     private static Func<object, string, object> FindDefaultParserForField(string name, Type fieldType)
         => DefaultParsers.DefaultParserFor(fieldType)

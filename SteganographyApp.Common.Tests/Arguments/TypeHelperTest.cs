@@ -34,9 +34,9 @@ public class TypeHelperTests
     [Test]
     public void TestDeclaredType()
     {
-        Assert.AreEqual(typeof(string), TypeHelperAlias.DeclaredType(stringFieldMember));
-        Assert.AreEqual(typeof(long), TypeHelperAlias.DeclaredType(longPropertyMember));
-        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.DeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
+        Assert.AreEqual(typeof(string), TypeHelperAlias.GetDeclaredType(stringFieldMember));
+        Assert.AreEqual(typeof(long), TypeHelperAlias.GetDeclaredType(longPropertyMember));
+        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.GetDeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class TypeHelperTests
     {
         Assert.AreEqual(subject.StringField, TypeHelperAlias.GetValue(subject, stringFieldMember));
         Assert.AreEqual(subject.LongProperty, TypeHelperAlias.GetValue(subject, longPropertyMember));
-        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.DeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
+        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.GetDeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
     }
 
     [Test]

@@ -75,10 +75,7 @@ where T : class
     /// </summary>
     /// <param name="program">The CliProgram being executed.</param>
     /// <param name="args">The array of user provided command line arguments.</param>
-    public void Execute(CliProgram program, string[] args)
-    {
-        Execute(CliParser.ParseArgs<T>(args, program.AdditionalParsers));
-    }
+    public void Execute(CliProgram program, string[] args) => Execute(CliParser.ParseArgs<T>(args, program.AdditionalParsers));
 
     /// <summary>
     /// Execute the command providing some parsed argument object as input.
@@ -112,10 +109,7 @@ where T : class
     /// Invokes the command function provided during initialization.
     /// </summary>
     /// <param name="args">The arguments being executed.</param>
-    public override void Execute(T args)
-    {
-        function(args);
-    }
+    public override void Execute(T args) => function(args);
 
     /// <summary>
     /// Returns the name of the command provided during initialization.

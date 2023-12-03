@@ -25,7 +25,7 @@ public interface IParserProvider
 /// </summary>
 public class ParserBuilder
 {
-    private readonly Dictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers = new Dictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>>();
+    private readonly Dictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers = [];
 
     /// <summary>
     /// Register a new parser for the specified type of T.
@@ -43,7 +43,7 @@ public class ParserBuilder
     /// <returns>The current parser builder instance.</returns>
     public ParserBuilder ForType(Type type, Func<object, string, object> parser)
     {
-        parsers.Add((attribute, member) => TypeHelper.DeclaredType(member) == type, parser);
+        parsers.Add((attribute, member) => TypeHelper.GetDeclaredType(member) == type, parser);
         return this;
     }
 
@@ -94,7 +94,7 @@ public class AdditionalParsers(ImmutableDictionary<Func<ArgumentAttribute, Membe
     /// Creates a new builder instance to assist in adding new custom parsers.
     /// </summary>
     /// <returns>A new ParserBuilder instance.</returns>
-    public static ParserBuilder Builder() => new ParserBuilder();
+    public static ParserBuilder Builder() => new();
 
     /// <summary>
     /// Creates a new IParserProvider instance that will provide one additional custom parser to parse a field with the specified name.
