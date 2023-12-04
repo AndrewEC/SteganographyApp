@@ -100,7 +100,7 @@ public sealed class ImageStore(IInputArguments args)
         }
         if (saveImageChanges)
         {
-            log.Debug("Saving changes to image [{0}]", CurrentImage);
+            log.Debug("Saving changes to image [{0}]", CurrentImage.Path);
             var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(CurrentImage.Path);
             CurrentImage.Save(CurrentImage.Path, encoder);
         }

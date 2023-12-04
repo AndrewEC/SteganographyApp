@@ -19,7 +19,7 @@ public static class TypeHelper
     /// </summary>
     /// <param name="memberInfo">The member info from which we want to extract the underlying field type or property type.</param>
     /// <returns>The underlying type of the member.</returns>
-    public static Type DeclaredType(MemberInfo memberInfo) => memberInfo switch
+    public static Type GetDeclaredType(MemberInfo memberInfo) => memberInfo switch
     {
         FieldInfo field => field.FieldType,
         PropertyInfo property => property.PropertyType,

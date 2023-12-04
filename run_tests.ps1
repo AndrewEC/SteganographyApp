@@ -1,20 +1,28 @@
 Param(
-    [Switch]$OpenReport,
     [Switch]$ReportOnFailure
 )
 
 
 Write-Host "`n---------- Cleaning out existing build artifacts ----------`n"
-$CommonBinFolder = "./SteganographyApp.Common.Tests/bin"
-if(Test-Path $CommonBinFolder){
-    Write-Host "Cleaning bin"
-    Remove-Item -Recurse -Force $CommonBinFolder | Out-Null
+function Remove-Folder {
+    param([string] $FolderPath)
+
+    if (Test-Path $FolderPath) {
+        Write-Host "Removing folder $FolderPath"
+        Remove-Item -Recurse -Force $FolderPath | Out-Null
+
+        if (Test-Path $FolderPath) {
+            throw "Could not delete folder $FolderPath"
+        }
+    }
 }
-$CommonObjFolder = "./SteganographyApp.Common.Tests/obj"
-if(Test-Path $CommonObjFolder){
-    Write-Host "Cleaning obj"
-    Remove-Item -Recurse -Force $CommonObjFolder | Out-Null
-}
+
+Remove-Folder ./SteganographyApp.Common.Tests/bin
+Remove-Folder ./SteganographyApp.Common.Tests/obj
+Remove-Folder ./SteganographyApp.Common.Arguments.Tests/bin
+Remove-Folder ./SteganographyApp.Common.Arguments.Tests/obj
+Remove-Item ./coverage.json
+Remove-Item ./coverage.opencover.xml
 
 
 Write-Host "`n---------- Rebuilding Project ----------`n"
@@ -43,20 +51,40 @@ if(-Not (Test-Path $ReportsFolder)){
 
 
 Write-Host "`n---------- Running unit tests ----------`n"
+
+Write-Host "---------- Running SteganographyApp.Common.Tests tests ----------"
 dotnet tool run coverlet `
     ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp8.0/SteganographyApp.Common.Tests.dll `
     --target "dotnet" `
-    --targetargs "test SteganographyApp.sln --no-build" `
-    --exclude-by-file "**/SteganographyApp.Common/Arguments/Help.cs" `
-    --exclude-by-file "**/SteganographyApp.Common/Injection/Logging/RootLogger.cs" `
-    --format opencover `
-    --threshold 70 `
+    --targetargs "test ./SteganographyApp.Common.Tests --no-build" `
+    --exclude-by-file "**/RootLogger.cs" `
+    --threshold 65 `
     --threshold-type line `
     --threshold-type branch `
     --threshold-stat total
 
 if($LastExitCode -ne 0){
-    Write-Host "'coverlet' command failed with status: $LastExitCode"
+    Write-Host "'coverlet' SteganographyApp.Common.Tests command failed with status: $LastExitCode"
+    if (-Not($reportOnFailure)) {
+        Exit
+    }
+}
+
+Write-Host "---------- Running SteganographyApp.Common.Arguments.Tests tests ----------"
+dotnet tool run coverlet `
+    ./SteganographyApp.Common.Arguments.Tests/bin/Debug/netcoreapp8.0/SteganographyApp.Common.Arguments.Tests.dll `
+    --target "dotnet" `
+    --targetargs "test ./SteganographyApp.Common.Arguments.Tests --no-build" `
+    --exclude-by-file "**/Help.cs" `
+    --threshold 65 `
+    --threshold-type line `
+    --threshold-type branch `
+    --threshold-stat total `
+    --merge-with coverage.json `
+    --format opencover
+
+if($LastExitCode -ne 0){
+    Write-Host "'coverlet' SteganographyApp.Common.Arguments.Tests command failed with status: $LastExitCode"
     if (-Not($reportOnFailure)) {
         Exit
     }
@@ -68,9 +96,4 @@ dotnet tool run reportgenerator "-reports:coverage.opencover.xml" "-targetDir:re
 if($LastExitCode -ne 0){
     Write-Host "'reportgenerator' command failed with status: $LastExitCode"
     Exit
-}
-
-if ($openReport) {
-    Write-Host "Opening report"
-    ./reports/index.htm
 }

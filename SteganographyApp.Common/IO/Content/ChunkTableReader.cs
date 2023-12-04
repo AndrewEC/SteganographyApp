@@ -4,7 +4,6 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;

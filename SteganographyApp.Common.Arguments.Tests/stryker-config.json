@@ -1,0 +1,19 @@
+{
+    "stryker-config":
+    {
+        "language-version": "preview",
+        "reporters": [
+            "html",
+            "progress"
+        ],
+
+        "verbosity": "info",
+        "additional-timeout": 30000,
+
+        "thresholds": {
+            "high": 30,
+            "low": 30,
+            "break": 30
+        }
+    }
+}

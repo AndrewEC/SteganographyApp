@@ -10,7 +10,7 @@ using System.Reflection;
 /// Static class to help identify all the field and properties of a given type that are attributed
 /// with the argument attribute.
 /// </summary>
-internal static class ArgumentFinder
+internal static class ArgumentRegistration
 {
     /// <summary>
     /// Finds all the attributed argument fields and properties of the input type and returns an array of the attributed members,
@@ -51,7 +51,7 @@ internal static class ArgumentFinder
                 names.Add(attribute.ShortName);
             }
 
-            if (TypeHelper.DeclaredType(member) == typeof(bool) && attribute.Position > 0)
+            if (TypeHelper.GetDeclaredType(member) == typeof(bool) && attribute.Position > 0)
             {
                 throw new ParseException($"Argument [{attribute.Name}] is invalid. An argument cannot be a boolean and have a position.");
             }

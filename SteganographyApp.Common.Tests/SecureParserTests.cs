@@ -32,7 +32,7 @@ public class SecureParserTests : FixtureWithMockConsoleReaderAndWriter
 
         string actual = SecureParser.ReadUserInput(string.Empty, "?");
 
-        Assert.AreEqual("Testin", actual);
+        Assert.That(actual, Is.EqualTo("Testin"));
         mockConsoleReader.Verify(reader => reader.ReadKey(true), Times.Exactly(keys.Count));
     }
 
@@ -40,6 +40,6 @@ public class SecureParserTests : FixtureWithMockConsoleReaderAndWriter
     public void ReadUserInputWithNonSecureResponse()
     {
         string actual = SecureParser.ReadUserInput(string.Empty, "testing");
-        Assert.AreEqual("testing", actual);
+        Assert.That(actual, Is.EqualTo("testing"));
     }
 }

@@ -11,6 +11,9 @@ using System.Text;
 /// </summary>
 public static class Help
 {
+    private const int MaxDescriptionWidth = 80;
+    private static readonly char Space = ' ';
+
     /// <summary>
     /// Logs all the help related information to the console.
     /// </summary>
@@ -49,7 +52,7 @@ public static class Help
         ProgramDescriptorAttribute? descriptor = GetDescriptorAttribute(instanceType);
         if (descriptor != null)
         {
-            builder.Append(descriptor.Description).Append('\n');
+            builder.Append(SplitHelpText(descriptor.HelpText)).Append('\n');
         }
         builder.Append("Usage: ")
             .AppendJoin(" ", positionArguments.Select(argument => argument.Attribute.Name))
@@ -63,6 +66,38 @@ public static class Help
             builder.Append("Example Usage: ").Append(descriptor.Example).Append('\n');
         }
         return builder.ToString();
+    }
+
+    private static string SplitHelpText(string description)
+    {
+        if (description.Length < MaxDescriptionWidth)
+        {
+            return description;
+        }
+
+        string[] words = description.Split(' ');
+
+        var currentLine = new StringBuilder();
+        var entireDescription = new StringBuilder();
+        for (int i = 0; i < words.Length; i++)
+        {
+            string word = words[i];
+            currentLine.Append(word).Append(Space);
+            if (currentLine.Length > MaxDescriptionWidth)
+            {
+                if (i < words.Length - 1)
+                {
+                    currentLine.Append("\n\t");
+                }
+                entireDescription.Append(currentLine);
+                currentLine.Clear();
+            }
+        }
+        if (currentLine.Length > 0)
+        {
+            entireDescription.Append(currentLine);
+        }
+        return entireDescription.ToString();
     }
 
     private static ProgramDescriptorAttribute? GetDescriptorAttribute(Type instanceType) => instanceType
@@ -84,14 +119,14 @@ public static class Help
             builder.Append(" | ").Append(argument.ShortName);
         }
 
-        builder.Append("\n\t").Append(argument.HelpText);
+        builder.Append("\n\t").Append(SplitHelpText(argument.HelpText));
 
         if (argument.Position > 0)
         {
             builder.Append("\n\t[Position]: ").Append(argument.Position);
         }
 
-        Type memberType = TypeHelper.DeclaredType(member);
+        Type memberType = TypeHelper.GetDeclaredType(member);
         if (memberType.IsEnum)
         {
             var possibleValues = string.Join(", ", Enum.GetNames(memberType));
@@ -112,7 +147,7 @@ public static class Help
             builder.Append("\n\t[Example]: ").Append(argument.Example);
         }
 
-        return builder.ToString();
+        return builder.Append('\n').ToString();
     }
 
     private static string? DefaultValueOf(object instance, MemberInfo member, ArgumentAttribute argument)
@@ -129,7 +164,7 @@ public static class Help
             return null;
         }
 
-        Type memberType = TypeHelper.DeclaredType(member);
+        Type memberType = TypeHelper.GetDeclaredType(member);
         if (IsStruct(memberType))
         {
             return null;

@@ -17,7 +17,7 @@ internal sealed class CalculateStorageSpaceArguments : IArgumentConverter
     [Argument(
         "CoverImages",
         position: 1,
-        helpText: "The images from which the amount of storage space available will be derived.\n"
+        helpText: "The images from which the amount of storage space available will be derived."
             + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
         example: "*.png,*.webp"
     )]
@@ -49,7 +49,7 @@ internal sealed class CalculateStorageSpaceCommand : Command<CalculateStorageSpa
         {
             var availableSpace = CalculateNumberOfPixelsForImages(arguments.CoverImages, arguments);
 
-            Console.WriteLine("\nImages are able to store:");
+            Console.WriteLine("Images are able to store:");
             PrintSize(availableSpace);
         }
         catch (Exception e)

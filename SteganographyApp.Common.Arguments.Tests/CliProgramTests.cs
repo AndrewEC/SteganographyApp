@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.Tests;
+namespace SteganographyApp.Common.Arguments.Tests;
 
 using System;
 
@@ -42,7 +42,7 @@ public class CliProgramTests
     {
         var arguments = new string[] { "function", "--number", "10" };
         program.Execute(arguments);
-        Assert.AreEqual(LastRunName.Function, LastRun.Instance.Name);
+        Assert.That(LastRun.Instance.Name, Is.EqualTo(LastRunName.Function));
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class CliProgramTests
     {
         var arguments = new string[] { "base", "--number", "10" };
         program.Execute(arguments);
-        Assert.AreEqual(LastRunName.BaseCommand, LastRun.Instance.Name);
+        Assert.That(LastRun.Instance.Name, Is.EqualTo(LastRunName.BaseCommand));
     }
 
     [Test]
@@ -58,29 +58,29 @@ public class CliProgramTests
     {
         var arguments = new string[] { "aliased", "--number", "10" };
         program.Execute(arguments);
-        Assert.AreEqual(LastRunName.Aliased, LastRun.Instance.Name);
+        Assert.That(LastRun.Instance.Name, Is.EqualTo(LastRunName.Aliased));
     }
 
     [Test]
     public void TryExecuteWithDuplicateNames()
     {
         var arguments = new string[] { "duplicate", "function", "--number", "10" };
-        Exception error = program.TryExecute(arguments);
-        Assert.NotNull(error);
+        Exception? error = program.TryExecute(arguments);
+        Assert.That(error, Is.Not.Null);
     }
 
     [Test]
     public void TryExecuteWithInvalidSubCommandName()
     {
         var arguments = new string[] { "invalid", "--number", "10" };
-        Exception error = program.TryExecute(arguments);
-        Assert.NotNull(error);
+        Exception? error = program.TryExecute(arguments);
+        Assert.That(error, Is.Not.Null);
     }
 }
 
 internal sealed class LastRun
 {
-    public static readonly LastRun Instance = new LastRun();
+    public static readonly LastRun Instance = new();
 
     private LastRun() { }
 

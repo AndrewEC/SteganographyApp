@@ -13,21 +13,18 @@ using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO;
-
-using static Moq.Times;
 
 [TestFixture]
 public class ImageStoreTests : FixtureWithRealObjects
 {
     [Mockup(typeof(IImageProxy))]
-    public Mock<IImageProxy> mockImageProxy;
+    public Mock<IImageProxy> mockImageProxy = new();
 
     [Mockup(typeof(IEncoderProvider))]
-    public Mock<IEncoderProvider> mockEncoderProvider;
+    public Mock<IEncoderProvider> mockEncoderProvider = new();
 
     private const int BinaryStringLength = 100_000;
     private const string ImagePath = "./test001.png";
@@ -51,11 +48,11 @@ public class ImageStoreTests : FixtureWithRealObjects
         using (var wrapper = imageStore.CreateIOWrapper())
         {
             var exception = Assert.Throws<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
-            Assert.AreEqual("Cannot load next image because there are no remaining cover images left to load.", exception.Message);
+            Assert.That(exception.Message, Is.EqualTo("Cannot load next image because there are no remaining cover images left to load."));
         }
 
-        Assert.IsTrue(mockImage.DisposeCalled);
-        Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);
+        Assert.That(mockImage.DisposeCalled, Is.True);
+        Assert.That(mockImage.SaveCalledWith, Is.EqualTo(Arguments.CoverImages[0]));
     }
 
     [Test]
@@ -77,10 +74,10 @@ public class ImageStoreTests : FixtureWithRealObjects
         using (var reader = new ChunkTableReader(imageStore, Arguments))
         {
             var chunkTableRead = reader.ReadContentChunkTable();
-            Assert.AreEqual(chunkTableWrite.Length, chunkTableRead.Length);
+            Assert.That(chunkTableRead, Has.Length.EqualTo(chunkTableWrite.Length));
             for (int i = 0; i < chunkTableWrite.Length; i++)
             {
-                Assert.AreEqual(chunkTableWrite[i], chunkTableRead[i]);
+                Assert.That(chunkTableRead[i], Is.EqualTo(chunkTableWrite[i]));
             }
         }
     }
@@ -102,8 +99,8 @@ public class ImageStoreTests : FixtureWithRealObjects
             Assert.Throws<ImageProcessingException>(() => writer.WriteContentChunkTable(chunkTable));
         }
 
-        Assert.IsTrue(mockImage.DisposeCalled);
-        Assert.AreEqual(Arguments.CoverImages[0], mockImage.SaveCalledWith);
+        Assert.That(mockImage.DisposeCalled, Is.True);
+        Assert.That(mockImage.SaveCalledWith, Is.EqualTo(Arguments.CoverImages[0]));
     }
 
     private static MockBasicImageInfo GenerateMockImage(int width, int height)
@@ -143,7 +140,7 @@ internal class MockBasicImageInfo(int width, int height, string path, Rgba32[,] 
 
     public string Path { get; set; } = path;
 
-    public string SaveCalledWith { get; private set; }
+    public string SaveCalledWith { get; private set; } = string.Empty;
 
     public bool DisposeCalled { get; private set; }
 

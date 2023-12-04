@@ -8,6 +8,7 @@ using System.Text.Json;
 using SteganographyApp.Common;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Arguments.Commands;
+using SteganographyApp.Common.Arguments.Validation;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.Logging;
@@ -22,31 +23,35 @@ internal sealed class EncodeArguments : IArgumentConverter
         "--coverImages",
         "-c",
         true,
-        helpText: "The images where the input file will be encoded and hidden within.\n"
+        helpText: "The images where the input file will be encoded and hidden within."
             + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
         example: "*.png,*.webp"
     )]
     public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
 
-    [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
+    [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents. Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
     public string Password = string.Empty;
 
-    [Argument("--file", "-f", true, helpText: "The path to the file to encode and write to the cover images.", parser: nameof(ParseFilePath))]
+    [Argument("--file", "-f", true, helpText: "The path to the file to encode and write to the cover images.")]
+    [IsFile()]
     public string InputFile = string.Empty;
 
-    [Argument("--randomSeed", "-r", helpText: "The optional value to determine how the contents of the input file will be randomized before writing them.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
+    [Argument("--randomSeed", "-r", helpText: "The optional value to determine how the contents of the input file will be randomized before writing them. Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
     public string RandomSeed = string.Empty;
 
-    [Argument("--dummyCount", "-d", helpText: "The number of dummy entries that should be inserted after compression and before randomization. Recommended value between 100 and 1,000.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
+    [Argument("--dummyCount", "-d", helpText: "The number of dummy entries that should be inserted after compression and before randomization. Recommended value between 100 and 1,000. Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
+    [InRange(0, int.MaxValue)]
     public int DummyCount = 0;
 
     [Argument("--chunkByteSize", "-cs", helpText: "The number of bytes to read and encode from the input file during each iteration.")]
+    [InRange(1, int.MaxValue)]
     public int ChunkByteSize = 524_288;
 
     [Argument("--logLevel", "-l", helpText: "The log level to determine which logs will feed into the log file.")]
     public LogLevel LogLevel = LogLevel.None;
 
-    [Argument("--additionalHashes", "-a", helpText: "The number of additional times to hash the password. Has no effect if no password is provided.\n Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
+    [Argument("--additionalHashes", "-a", helpText: "The number of additional times to hash the password. Has no effect if no password is provided. Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
+    [InRange(0, int.MaxValue)]
     public int AdditionalPasswordHashIterations = 0;
 
     [Argument("--compress", "-co", helpText: "If provided will compress the contents of the file after encryption.")]
@@ -54,8 +59,6 @@ internal sealed class EncodeArguments : IArgumentConverter
 
     [Argument("--twoBits", "-tb", helpText: "If true will store data in the least and second-least significant bit rather than just the least significant.")]
     public bool TwoBits = false;
-
-    public static object ParseFilePath(object? target, string value) => ParserFunctions.ParseFilePath(value);
 
     public IInputArguments ToCommonArguments()
     {

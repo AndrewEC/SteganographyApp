@@ -86,13 +86,13 @@ internal sealed class ArgumentMatcher : IEnumerable<ArgumentMatchResult>
         }
     }
 
-    private static RegisteredArgument? FindMatchingArgument(string input, ImmutableArray<RegisteredArgument> pairedFields)
-        => pairedFields.Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input).FirstOrDefault();
+    private static RegisteredArgument? FindMatchingArgument(string input, ImmutableArray<RegisteredArgument> registeredArguments)
+        => registeredArguments.Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input).FirstOrDefault();
 
-    private static RegisteredArgument? FindMatchingArgument(int position, ImmutableArray<RegisteredArgument> pairedFields)
-        => pairedFields.Where(registered => registered.Attribute.Position == position).FirstOrDefault();
+    private static RegisteredArgument? FindMatchingArgument(int position, ImmutableArray<RegisteredArgument> registeredArguments)
+        => registeredArguments.Where(registered => registered.Attribute.Position == position).FirstOrDefault();
 
-    private ImmutableArray<ArgumentMatchResult> PairAttributedArgumentsWithValues(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
+    private static ImmutableArray<ArgumentMatchResult> PairAttributedArgumentsWithValues(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
     {
         var paired = new List<ArgumentMatchResult>();
         int currentPosition = 1;
@@ -110,7 +110,7 @@ internal sealed class ArgumentMatcher : IEnumerable<ArgumentMatchResult>
                 currentPosition++;
             }
 
-            if (TypeHelper.DeclaredType(registered.Member) == typeof(bool))
+            if (TypeHelper.GetDeclaredType(registered.Member) == typeof(bool))
             {
                 paired.Add(new ArgumentMatchResult(registered, TrueString));
             }

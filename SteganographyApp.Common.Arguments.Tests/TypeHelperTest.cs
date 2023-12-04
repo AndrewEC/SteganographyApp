@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.Tests;
+namespace SteganographyApp.Common.Arguments.Tests;
 
 using System;
 using System.Collections.Immutable;
@@ -20,7 +20,7 @@ public class TypeHelperTests
     public TypeHelperTests()
     {
         ImmutableArray<MemberInfo> members = TypeHelperAlias.GetAllFieldsAndProperties(subject.GetType());
-        Assert.AreEqual(2, members.Length);
+        Assert.That(members, Has.Length.EqualTo(2));
         stringFieldMember = MemberWithName(nameof(TestSubject.StringField), members);
         longPropertyMember = MemberWithName(nameof(TestSubject.LongProperty), members);
     }
@@ -34,17 +34,23 @@ public class TypeHelperTests
     [Test]
     public void TestDeclaredType()
     {
-        Assert.AreEqual(typeof(string), TypeHelperAlias.DeclaredType(stringFieldMember));
-        Assert.AreEqual(typeof(long), TypeHelperAlias.DeclaredType(longPropertyMember));
-        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.DeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
+        Assert.Multiple(() =>
+        {
+            Assert.That(TypeHelperAlias.GetDeclaredType(stringFieldMember), Is.EqualTo(typeof(string)));
+            Assert.That(TypeHelperAlias.GetDeclaredType(longPropertyMember), Is.EqualTo(typeof(long)));
+        });
+        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.GetDeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
     }
 
     [Test]
     public void TestGetValue()
     {
-        Assert.AreEqual(subject.StringField, TypeHelperAlias.GetValue(subject, stringFieldMember));
-        Assert.AreEqual(subject.LongProperty, TypeHelperAlias.GetValue(subject, longPropertyMember));
-        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.DeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
+        Assert.Multiple(() =>
+        {
+            Assert.That(TypeHelperAlias.GetValue(subject, stringFieldMember), Is.EqualTo(subject.StringField));
+            Assert.That(TypeHelperAlias.GetValue(subject, longPropertyMember), Is.EqualTo(subject.LongProperty));
+        });
+        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.GetDeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
     }
 
     [Test]
@@ -52,11 +58,11 @@ public class TypeHelperTests
     {
         string newStringValue = "new_value";
         TypeHelperAlias.SetValue(subject, stringFieldMember, newStringValue);
-        Assert.AreEqual(subject.StringField, newStringValue);
+        Assert.That(newStringValue, Is.EqualTo(subject.StringField));
 
         long newLongValue = 234;
         TypeHelperAlias.SetValue(subject, longPropertyMember, newLongValue);
-        Assert.AreEqual(subject.LongProperty, newLongValue);
+        Assert.That(newLongValue, Is.EqualTo(subject.LongProperty));
 
         Assert.Throws(typeof(TypeException), () => TypeHelperAlias.SetValue(subject, GetVoidMethod(subject, nameof(TestSubject.VoidMethod)), newLongValue));
     }

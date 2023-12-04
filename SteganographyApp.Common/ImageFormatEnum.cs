@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.Arguments;
+namespace SteganographyApp.Common;
 
 /// <summary>
 /// When using the Converter this specifies the format the image will be converted to.
