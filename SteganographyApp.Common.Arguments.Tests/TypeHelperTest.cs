@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.Tests;
+namespace SteganographyApp.Common.Arguments.Tests;
 
 using System;
 using System.Collections.Immutable;

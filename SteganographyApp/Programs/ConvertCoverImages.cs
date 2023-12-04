@@ -23,7 +23,7 @@ internal sealed class ConvertArguments : IArgumentConverter
     [Argument(
         "CoverImages",
         position: 1,
-        helpText: "The images to be converted into a png or webp format.\n"
+        helpText: "The images to be converted into a png or webp format."
             + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
         example: "*.png,*.webp"
     )]
@@ -117,7 +117,7 @@ internal sealed class ConvertImagesCommand : Command<ConvertArguments>
         {
             return;
         }
-        Console.WriteLine("\nOne or more of the specified images could not be converted.");
+        Console.WriteLine("One or more of the specified images could not be converted.");
         Console.WriteLine("Failed to convert: ");
         foreach (string failure in failures)
         {

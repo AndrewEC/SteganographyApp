@@ -57,7 +57,8 @@ dotnet tool run coverlet `
     ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp8.0/SteganographyApp.Common.Tests.dll `
     --target "dotnet" `
     --targetargs "test ./SteganographyApp.Common.Tests --no-build" `
-    --threshold 50 `
+    --exclude-by-file "**/RootLogger.cs" `
+    --threshold 65 `
     --threshold-type line `
     --threshold-type branch `
     --threshold-stat total
@@ -74,7 +75,8 @@ dotnet tool run coverlet `
     ./SteganographyApp.Common.Arguments.Tests/bin/Debug/netcoreapp8.0/SteganographyApp.Common.Arguments.Tests.dll `
     --target "dotnet" `
     --targetargs "test ./SteganographyApp.Common.Arguments.Tests --no-build" `
-    --threshold 50 `
+    --exclude-by-file "**/Help.cs" `
+    --threshold 65 `
     --threshold-type line `
     --threshold-type branch `
     --threshold-stat total `

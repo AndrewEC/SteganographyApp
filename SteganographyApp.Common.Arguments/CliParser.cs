@@ -60,7 +60,7 @@ public sealed class CliParser
     private static T ParseArgs<T>(string[] arguments, T instance, IParserProvider? additionalParsers = null)
     where T : class
     {
-        ImmutableArray<RegisteredArgument> registeredArguments = ArgumentFinder.FindAttributedArguments(typeof(T), additionalParsers);
+        ImmutableArray<RegisteredArgument> registeredArguments = ArgumentRegistration.FindAttributedArguments(typeof(T), additionalParsers);
         if (WasHelpRequested(arguments))
         {
             Help.PrintHelp(typeof(T), instance, registeredArguments);

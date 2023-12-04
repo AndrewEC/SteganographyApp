@@ -1,80 +1,79 @@
-namespace SteganographyApp.Common.Tests
+namespace SteganographyApp.Common.Tests;
+
+using System.Collections.Generic;
+
+using NUnit.Framework;
+
+using SteganographyApp.Common.Injection;
+
+[TestFixture]
+public class ProgressTrackerTests : FixtureWithTestObjects
 {
-    using System.Collections.Generic;
+    private const int DesiredWriteCount = 10;
+    private const int DesiredWriteLineCount = 1;
+    private const string Message = "testing";
+    private const string CompleteMessage = "testing complete";
 
-    using NUnit.Framework;
+    private MockWriter mockWriter;
 
-    using SteganographyApp.Common.Injection;
+    private ProgressTracker tracker;
 
-    [TestFixture]
-    public class ProgressTrackerTests : FixtureWithTestObjects
+    [SetUp]
+    public void BeforeEach()
     {
-        private const int DesiredWriteCount = 10;
-        private const int DesiredWriteLineCount = 1;
-        private const string Message = "testing";
-        private const string CompleteMessage = "testing complete";
+        mockWriter = new MockWriter();
+        Injector.UseInstance<IConsoleWriter>(mockWriter);
+        tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage);
+    }
 
-        private MockWriter mockWriter;
+    [Test]
+    public void TestProgressTrackerIsInvokedCorrectNumberOfTimes()
+    {
+        ExecuteUpdates(tracker);
 
-        private ProgressTracker tracker;
+        Assert.That(mockWriter.WriteValues, Has.Count.EqualTo(DesiredWriteCount));
+        Assert.That(mockWriter.WriteLineValues, Has.Count.EqualTo(DesiredWriteLineCount));
+    }
 
-        [SetUp]
-        public void BeforeEach()
+    [Test]
+    public void TestProgressTrackerInvokesWriteAndWriteLineWithCorrectPercentageIndicators()
+    {
+        ExecuteUpdates(tracker);
+
+        int index = 0;
+        int[] percents = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+        var currentNode = mockWriter.WriteValues.First;
+        while (currentNode != null)
         {
-            mockWriter = new MockWriter();
-            Injector.UseInstance<IConsoleWriter>(mockWriter);
-            tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage);
-        }
-
-        [Test]
-        public void TestProgressTrackerIsInvokedCorrectNumberOfTimes()
-        {
-            ExecuteUpdates(tracker);
-
-            Assert.That(mockWriter.WriteValues, Has.Count.EqualTo(DesiredWriteCount));
-            Assert.That(mockWriter.WriteLineValues, Has.Count.EqualTo(DesiredWriteLineCount));
-        }
-
-        [Test]
-        public void TestProgressTrackerInvokesWriteAndWriteLineWithCorrectPercentageIndicators()
-        {
-            ExecuteUpdates(tracker);
-
-            int index = 0;
-            int[] percents = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-            var currentNode = mockWriter.WriteValues.First;
-            while (currentNode != null)
-            {
-                Assert.That(currentNode.Value, Does.Contain(percents[index].ToString()));
-                index++;
-                currentNode = currentNode.Next;
-            }
-        }
-
-        private static void ExecuteUpdates(ProgressTracker tracker)
-        {
-            tracker.Display();
-            for (int i = 0; i < DesiredWriteCount; i++)
-            {
-                tracker.UpdateAndDisplayProgress();
-            }
+            Assert.That(currentNode.Value, Does.Contain(percents[index].ToString()));
+            index++;
+            currentNode = currentNode.Next;
         }
     }
 
-    internal class MockWriter : IConsoleWriter
+    private static void ExecuteUpdates(ProgressTracker tracker)
     {
-        public LinkedList<string> WriteValues { get; private set; } = new LinkedList<string>();
-
-        public LinkedList<string> WriteLineValues { get; private set; } = new LinkedList<string>();
-
-        public void Write(string line)
+        tracker.Display();
+        for (int i = 0; i < DesiredWriteCount; i++)
         {
-            WriteValues.AddLast(line);
+            tracker.UpdateAndDisplayProgress();
         }
+    }
+}
 
-        public void WriteLine(string line)
-        {
-            WriteLineValues.AddLast(line);
-        }
+internal class MockWriter : IConsoleWriter
+{
+    public LinkedList<string> WriteValues { get; private set; } = new LinkedList<string>();
+
+    public LinkedList<string> WriteLineValues { get; private set; } = new LinkedList<string>();
+
+    public void Write(string line)
+    {
+        WriteValues.AddLast(line);
+    }
+
+    public void WriteLine(string line)
+    {
+        WriteLineValues.AddLast(line);
     }
 }

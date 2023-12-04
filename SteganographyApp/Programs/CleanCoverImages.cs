@@ -17,7 +17,7 @@ internal sealed class CleanArguments : IArgumentConverter
     [Argument(
         "CoverImages",
         position: 1,
-        helpText: "The list of images whose pixel colour LSBs need to be cleaned.\n"
+        helpText: "The list of images whose pixel colour LSBs need to be cleaned."
             + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
         example: "*.png,*.webp"
     )]

@@ -10,7 +10,7 @@ using System.Reflection;
 /// Static class to help identify all the field and properties of a given type that are attributed
 /// with the argument attribute.
 /// </summary>
-internal static class ArgumentFinder
+internal static class ArgumentRegistration
 {
     /// <summary>
     /// Finds all the attributed argument fields and properties of the input type and returns an array of the attributed members,
