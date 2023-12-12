@@ -16,8 +16,9 @@ using SteganographyApp.Common.Logging;
 
 [ProgramDescriptor(
     "Verify the provided cover images can be safely used for encoding and decoding information."
-        + "This works by creating a copy of the image, writing some random data to the image,"
-        + "saving those changes, the re-reading from the image to affirm the data read matches the original written data."
+        + " This works by creating a copy of the image, writing some random data to the image,"
+        + " saving those changes, reading data from the image, the confirming the data read matches"
+        + " the original data written."
 )]
 internal sealed class VerifyImagesArguments : IArgumentConverter
 {

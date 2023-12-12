@@ -1,6 +1,5 @@
 ﻿namespace SteganographyApp.Common.IO;
 
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
 
@@ -20,15 +19,12 @@ public sealed class ContentWriter(IInputArguments args) : AbstractContentIO(args
     /// and writes the resulting bytes to the output file.
     /// </summary>
     /// <param name="binary">The encrypted binary string read from the storage images.</param>
-    public void WriteContentChunkToFile(string binary)
+    public void WriteContentChunkToFile(string binary) => RunIfNotDisposed(() =>
     {
-        RunIfNotDisposed(() =>
-        {
-            byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed, Args.AdditionalPasswordHashIterations);
-            Stream.Write(decoded, 0, decoded.Length);
-            Stream.Flush();
-        });
-    }
+        byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed, Args.AdditionalPasswordHashIterations);
+        Stream.Write(decoded, 0, decoded.Length);
+        Stream.Flush();
+    });
 
     /// <summary>
     /// Creates a new stream configured to write to the target file location as speicified in the

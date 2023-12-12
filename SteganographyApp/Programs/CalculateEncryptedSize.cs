@@ -109,13 +109,13 @@ internal sealed class CalculateEncryptedSizeCommand : Command<CalculateEncrypted
         Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
     }
 
-    private static void PrintComparison(double size, int bitsToUsePerPixel)
+    private static void PrintComparison(double size, int bitsToUse)
     {
-        Console.WriteLine("\tAt 360p: \t{0}", size / (CommonResolutionStorageSpace.P360 * bitsToUsePerPixel));
-        Console.WriteLine("\tAt 480p: \t{0}", size / (CommonResolutionStorageSpace.P480 * bitsToUsePerPixel));
-        Console.WriteLine("\tAt 720p: \t{0}", size / (CommonResolutionStorageSpace.P720 * bitsToUsePerPixel));
-        Console.WriteLine("\tAt 1080p: \t{0}", size / (CommonResolutionStorageSpace.P1080 * bitsToUsePerPixel));
-        Console.WriteLine("\tAt 1440p: \t{0}", size / (CommonResolutionStorageSpace.P1440 * bitsToUsePerPixel));
-        Console.WriteLine("\tAt 4K (2160p): \t{0}", size / (CommonResolutionStorageSpace.P2160 * bitsToUsePerPixel));
+        foreach (CommonResolutions resolution in Enum.GetValues(typeof(CommonResolutions)))
+        {
+            string name = Resolution.ToDisplayName(resolution);
+            (int width, int height) = Resolution.Dimensions[resolution];
+            Console.WriteLine("\tAt {0}: \t{1}", size / Calculator.CalculateStorageSpaceOfImage(width, height, bitsToUse));    
+        }
     }
 }

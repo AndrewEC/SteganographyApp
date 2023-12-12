@@ -17,7 +17,7 @@ public static class Calculator
     public static readonly int ChunkDefinitionBitSize = 32;
 
     /// <summary>
-    /// Indicates the maximum number of bits that can be stored in a single pixel.
+    /// Indicates the minimum number of bits that can be stored in a single pixel.
     /// </summary>
     public static readonly int MinimumBitsPerPixel = 3;
 

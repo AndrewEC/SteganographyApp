@@ -1,6 +1,5 @@
 ﻿namespace SteganographyApp.Common.IO;
 
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
 
 /// <summary>

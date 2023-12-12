@@ -21,7 +21,7 @@ internal sealed class CleanArguments : IArgumentConverter
             + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
         example: "*.png,*.webp"
     )]
-    public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
+    public ImmutableArray<string> CoverImages = [];
 
     [Argument("--twoBits", "-tb", helpText: "Tells the app to clean data in the least and second-least significant bit rather than just the least significant.")]
     public bool TwoBits = false;

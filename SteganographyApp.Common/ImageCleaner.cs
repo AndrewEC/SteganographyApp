@@ -2,7 +2,6 @@ namespace SteganographyApp.Common;
 
 using System;
 using System.Text;
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.Logging;
