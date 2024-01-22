@@ -13,11 +13,12 @@ using SteganographyApp.Common.Arguments.Commands;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
+using System.Text;
 
 [ProgramDescriptor(
     "Verify the provided cover images can be safely used for encoding and decoding information."
         + " This works by creating a copy of the image, writing some random data to the image,"
-        + " saving those changes, reading data from the image, the confirming the data read matches"
+        + " saving those changes, reading data from the image, then confirming the data read matches"
         + " the original data written."
 )]
 internal sealed class VerifyImagesArguments : IArgumentConverter
@@ -89,19 +90,25 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
         foreach (string path in args.CoverImages)
         {
             Console.WriteLine($"Verifying image: [{path}]");
-            string binary = GenerateBinaryString(path);
-            using (var copy = new TempCopy(path))
-            {
-                WriteToImage(copy.DestinationPath, binary, arguments);
-                string readBinary = ReadFromImage(copy.DestinationPath, binary, arguments);
-                if (binary != readBinary)
-                {
-                    failedValidation.Add(path);
-                }
-            }
+            failedValidation.Add(path);
             tracker.UpdateAndDisplayProgress();
         }
         PrintFailed(failedValidation);
+    }
+
+    private bool IsImageValid(string path, IInputArguments arguments)
+    {
+        string binary = GenerateBinaryString(path);
+        using (var copy = new TempCopy(path))
+        {
+            WriteToImage(copy.DestinationPath, binary, arguments);
+            string readBinary = ReadFromImage(copy.DestinationPath, binary, arguments);
+            if (binary != readBinary)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void PrintFailed(List<string> failedValidation)
@@ -122,10 +129,16 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
     {
         using (var image = Injector.Provide<IImageProxy>().LoadImage(path))
         {
-            int bitCount = (image.Width * image.Height) / 2;
+            long bitCount = Calculator.CalculateStorageSpaceOfImage(image.Width, image.Height, 1) / 2;
             logger.Trace("Generating binary string with a length of: [{0}]", bitCount);
+
             var random = new Random();
-            return string.Concat(Enumerable.Range(0, bitCount).Select(i => random.Next(10) % 2 == 0 ? '0' : '1'));
+            var builder = new StringBuilder();
+            for (long i = 0; i < bitCount; i++)
+            {
+                builder.Append(random.Next(10) % 2 == 0 ? '0' : '1');
+            }
+            return builder.ToString();
         }
     }
 

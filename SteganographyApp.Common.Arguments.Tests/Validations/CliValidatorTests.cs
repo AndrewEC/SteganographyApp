@@ -37,7 +37,7 @@ internal sealed class Invalid
     [InRange(0, 20)]
     public int ShouldBeValid = 10;
 
-    [Argument("--show-be-invalid")]
+    [Argument("--show-not-be-invalid")]
     [InRange(0, 20)]
     public int ShouldNotBeValid = 30;
 }

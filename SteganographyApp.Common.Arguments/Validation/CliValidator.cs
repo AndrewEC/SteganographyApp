@@ -28,8 +28,7 @@ public static class CliValidator
     /// on the model failed validation.</exception>
     public static void Validate(object instance)
     {
-        ImmutableArray<MemberInfo> members = TypeHelper.GetAllFieldsAndProperties(instance.GetType());
-        Dictionary<MemberInfo, (ArgumentAttribute Argument, ImmutableArray<ValidationAttribute> Validations)> verifiable = FilterAnnotatedMembers(members);
+        Dictionary<MemberInfo, (ArgumentAttribute Argument, ImmutableArray<ValidationAttribute> Validations)> verifiable = FindValidatableMembers(instance);
         if (verifiable.Count == 0)
         {
             return;
@@ -61,14 +60,16 @@ public static class CliValidator
         return string.Format(ArgumentIdentifierTemplate, argument.Name, argument.ShortName);
     }
 
-    private static Dictionary<MemberInfo, (ArgumentAttribute Argument, ImmutableArray<ValidationAttribute> Validations)> FilterAnnotatedMembers(ImmutableArray<MemberInfo> members)
+    private static Dictionary<MemberInfo, (ArgumentAttribute Argument, ImmutableArray<ValidationAttribute> Validations)> FindValidatableMembers(object instance)
     {
+        ImmutableArray<MemberInfo> verifiableMembers = TypeHelper.GetAllFieldsAndProperties(instance.GetType());
         Dictionary<MemberInfo, (ArgumentAttribute, ImmutableArray<ValidationAttribute>)> verifiable = [];
-        if (members.Length == 0)
+        if (verifiableMembers.Length == 0)
         {
             return verifiable;
         }
-        foreach (MemberInfo member in members)
+
+        foreach (MemberInfo member in verifiableMembers)
         {
             if (member.GetCustomAttribute(typeof(ArgumentAttribute)) is not ArgumentAttribute argumentAttribute)
             {
