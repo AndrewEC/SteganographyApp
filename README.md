@@ -11,7 +11,11 @@ When you are hiding data inside in image it is important that the image uses a l
 
 Using the Tools
 ---
-Execute any of the tools using the relevant dotnet command such as `dotnet SteganographyApp.dll -h`.
+This project provides a Powershell script called `create_testbed.ps1` that will build the project and copy the resulting binaries and some image
+files to the testbed directory.
+
+From the testbed directory you will be able to find the main `SteganographyApp.dll`. You can run the help command, `dotnet SteganographyApp.dll -h`,
+to get a list of sub-commands, arguments, and example usage strings.
 
 Use the `-h` or `--help` flags to get detailed information on the arguments available for each of the tools provided.
 
