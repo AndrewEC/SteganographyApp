@@ -90,7 +90,10 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
         foreach (string path in args.CoverImages)
         {
             Console.WriteLine($"Verifying image: [{path}]");
-            failedValidation.Add(path);
+            if (!IsImageValid(path, arguments))
+            {
+                failedValidation.Add(path);
+            }
             tracker.UpdateAndDisplayProgress();
         }
         PrintFailed(failedValidation);
