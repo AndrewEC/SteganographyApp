@@ -120,5 +120,6 @@ internal sealed class PixelWriter(ReadBitQueue bitQueue, int writableBitsPerPixe
         R = strategy.GetNewPixelColour(source.R, bitQueue),
         G = strategy.GetNewPixelColour(source.G, bitQueue),
         B = strategy.GetNewPixelColour(source.B, bitQueue),
+        A = source.A,
     };
 }

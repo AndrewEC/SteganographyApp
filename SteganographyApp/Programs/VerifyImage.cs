@@ -45,18 +45,21 @@ internal sealed class VerifyImagesArguments : IArgumentConverter
     }
 }
 
-internal sealed class TempCopy : AbstractDisposable
+internal sealed class TempFileBackup : AbstractDisposable
 {
-    private readonly ILogger logger = new LazyLogger<TempCopy>();
+    private readonly ILogger logger = new LazyLogger<TempFileBackup>();
 
-    public TempCopy(string sourcePath)
+    public TempFileBackup(string sourcePath)
     {
-        DestinationPath = DetermineCopyPath(sourcePath);
-        logger.Debug("Creating temp copy of file [{0}] at [{1}]", sourcePath, DestinationPath);
-        File.Copy(sourcePath, DestinationPath);
+        backupPath = DetermineCopyPath(sourcePath);
+        logger.Debug("Creating backup copy of file [{0}] at [{1}]", sourcePath, backupPath);
+        File.Copy(sourcePath, backupPath);
+        this.originalFilePath = sourcePath;
     }
 
-    public string DestinationPath { get; private set; }
+    private readonly string backupPath;
+
+    private readonly string originalFilePath;
 
     private string DetermineCopyPath(string sourcePath)
     {
@@ -70,8 +73,11 @@ internal sealed class TempCopy : AbstractDisposable
         {
             return;
         }
-        logger.Debug("Deleting temp file from: [{0}]", DestinationPath);
-        File.Delete(DestinationPath);
+        logger.Debug("Deleting modified file: [{0}]", originalFilePath);
+        logger.Debug("Restoring file [{0}] from [{1}]", originalFilePath, backupPath);
+        File.Delete(originalFilePath);
+        File.Copy(backupPath, originalFilePath);
+        File.Delete(backupPath);
     });
 }
 
@@ -102,10 +108,10 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
     private bool IsImageValid(string path, IInputArguments arguments)
     {
         string binary = GenerateBinaryString(path);
-        using (var copy = new TempCopy(path))
+        using (var copy = new TempFileBackup(path))
         {
-            WriteToImage(copy.DestinationPath, binary, arguments);
-            string readBinary = ReadFromImage(copy.DestinationPath, binary, arguments);
+            WriteToImage(binary, arguments);
+            string readBinary = ReadFromImage(binary, arguments);
             if (binary != readBinary)
             {
                 return false;
@@ -145,7 +151,7 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
         }
     }
 
-    private void WriteToImage(string path, string binaryData, IInputArguments arguments)
+    private void WriteToImage(string binaryData, IInputArguments arguments)
     {
         using (var wrapper = new ImageStore(arguments).CreateIOWrapper())
         {
@@ -154,7 +160,7 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
         }
     }
 
-    private string ReadFromImage(string path, string expectedData, IInputArguments arguments)
+    private string ReadFromImage(string expectedData, IInputArguments arguments)
     {
         using (var wrapper = new ImageStore(arguments).CreateIOWrapper())
         {

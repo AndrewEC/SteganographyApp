@@ -21,6 +21,8 @@ Remove-Folder ./SteganographyApp.Common.Tests/bin
 Remove-Folder ./SteganographyApp.Common.Tests/obj
 Remove-Folder ./SteganographyApp.Common.Arguments.Tests/bin
 Remove-Folder ./SteganographyApp.Common.Arguments.Tests/obj
+Remove-Folder ./SteganographyApp.Common.Integration.Tests/bin
+Remove-Folder ./SteganographyApp.Common.Integration.Tests/obj
 Remove-Item ./coverage.json
 Remove-Item ./coverage.opencover.xml
 
@@ -33,10 +35,10 @@ if ($LastExitCode -ne 0) {
 }
 
 $ReportsFolder = "./reports"
-if(Test-Path $ReportsFolder){
+if(Test-Path $ReportsFolder) {
     Write-Host "Removing old report directory and contents"
     Remove-Item -Recurse -Force $ReportsFolder | Out-Null
-    if(Test-Path $ReportsFolder){
+    if(Test-Path $ReportsFolder) {
         Write-Host "Unable to delete $ReportsFolder directory."
         Exit
     }
@@ -44,7 +46,7 @@ if(Test-Path $ReportsFolder){
 
 Write-Host "Creating report directory"
 New-Item -ItemType directory -Path $ReportsFolder | Out-Null
-if(-Not (Test-Path $ReportsFolder)){
+if(-Not (Test-Path $ReportsFolder)) {
     Write-Host "Could not create $ReportsFolder directory"
     Exit
 }
@@ -63,7 +65,7 @@ dotnet tool run coverlet `
     --threshold-type branch `
     --threshold-stat total
 
-if($LastExitCode -ne 0){
+if($LastExitCode -ne 0) {
     Write-Host "'coverlet' SteganographyApp.Common.Tests command failed with status: $LastExitCode"
     if (-Not($reportOnFailure)) {
         Exit
@@ -83,7 +85,7 @@ dotnet tool run coverlet `
     --merge-with coverage.json `
     --format opencover
 
-if($LastExitCode -ne 0){
+if($LastExitCode -ne 0) {
     Write-Host "'coverlet' SteganographyApp.Common.Arguments.Tests command failed with status: $LastExitCode"
     if (-Not($reportOnFailure)) {
         Exit
@@ -91,9 +93,17 @@ if($LastExitCode -ne 0){
 }
 
 
+Write-Host "`n---------- Running SteganographyApp.Common.Integration.Tests tests ----------`n"
+dotnet test ./SteganographyApp.Common.Integration.Tests
+if($LastExitCode -ne 0) {
+    Write-Host "dotnet test ./SteganographyApp.Common.Integration.Tests command failed with status: $LastExitCode"
+    Exit
+}
+
+
 Write-Host "`n---------- Generating coverage report ----------`n"
 dotnet tool run reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
-if($LastExitCode -ne 0){
+if($LastExitCode -ne 0) {
     Write-Host "'reportgenerator' command failed with status: $LastExitCode"
     Exit
 }

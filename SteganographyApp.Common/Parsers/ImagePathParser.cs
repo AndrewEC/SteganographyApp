@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.Arguments;
+namespace SteganographyApp.Common.Parsers;
 
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -52,12 +52,31 @@ public static class ImagePathParser
             throw new ArgumentValueException($"No images could be found.");
         }
 
+        VerifyAllImagesExist(imagePaths);
+
+        VerifyAllImagesAreUnique(imagePaths);
+    }
+
+    private static void VerifyAllImagesExist(ImmutableArray<string> imagePaths)
+    {
         var fileProxy = Injector.Provide<IFileIOProxy>();
         foreach (string path in imagePaths)
         {
             if (!fileProxy.IsExistingFile(path))
             {
                 throw new ArgumentValueException($"The file specified could not be read: [{path}]");
+            }
+        }
+    }
+
+    private static void VerifyAllImagesAreUnique(ImmutableArray<string> imagePaths)
+    {
+        var uniqueImages = new HashSet<string>();
+        foreach (string imagePath in imagePaths)
+        {
+            if (!uniqueImages.Add(imagePath))
+            {
+                throw new ArgumentValueException($"Two or more paths point to the same file of: [{imagePath}]");
             }
         }
     }

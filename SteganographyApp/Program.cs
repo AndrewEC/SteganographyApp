@@ -4,6 +4,7 @@ using System;
 
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Arguments.Commands;
+using SteganographyApp.Common.Parsers;
 
 public class Program
 {
