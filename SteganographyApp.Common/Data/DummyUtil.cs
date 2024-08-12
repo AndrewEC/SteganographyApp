@@ -55,7 +55,7 @@ public sealed class DummyUtil : IDummyUtil
         {
             var nextDummy = GenerateDummyBytes(generator, lengths[i]);
             var nextDummyPosition = positions[i];
-            log.Trace("Inserting dummy at position [{0}] with with length [{1}]", nextDummyPosition, nextDummy.Length);
+            log.Trace("Inserting dummy at position [{0}] with length [{1}]", nextDummyPosition, nextDummy.Length);
             endValue.InsertRange(positions[i], nextDummy);
         }
 

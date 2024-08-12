@@ -47,10 +47,26 @@ public static partial class Commands
 public abstract class BaseCommandGroup : ICommandGroup
 {
     /// <summary>
+    /// The array of commands to conditionally execute.
+    /// </summary>
+    private readonly ICommand[] subCommands;
+
+    /// <summary>
+    /// Initializes the command group with the array of subcommands. This will
+    /// also validate that the subcommands contain the correct names (none can be duplicates).
+    /// </summary>
+    /// <param name="subCommands">The array of commands to conditionally execute.</param>
+    protected BaseCommandGroup(ICommand[] subCommands)
+    {
+        ValidateCommandNames(subCommands);
+        this.subCommands = subCommands;
+    }
+
+    /// <summary>
     /// Gets a list of available sub-commands to execute.
     /// </summary>
-    /// <returns>The array of sub-commands to be selectively executed.</returns>
-    public abstract ICommand[] SubCommands();
+    /// <returns>The array of sub-commands to be executed.</returns>
+    public ICommand[] SubCommands() => subCommands;
 
     /// <summary>
     /// Executes the command group. This will effectively lookup the SubCommands, determing which command needs to
@@ -60,16 +76,13 @@ public abstract class BaseCommandGroup : ICommandGroup
     /// <param name="args">The array of user provided command line arguments.</param>
     public void Execute(CliProgram program, string[] args)
     {
-        ICommand[] subCommands = GetSubCommands();
-
         if (args.Length == 0)
         {
             string expectedList = FormExpectedCommandNameList(subCommands);
             throw new CommandException($"No command found. Expected one of: [{expectedList}]");
         }
 
-        string nextCommandName = GetNameOfNextCommand(subCommands, args);
-        ICommand? nextCommand = GetNextCommand(subCommands, nextCommandName);
+        ICommand nextCommand = GetNextCommand(args);
 
         string[] nextArgs = args.Skip(1).ToArray();
 
@@ -84,8 +97,19 @@ public abstract class BaseCommandGroup : ICommandGroup
 
     private static string FormExpectedCommandNameList(ICommand[] subCommands) => string.Join(", ", subCommands.Select(command => command.GetName().ToLowerInvariant()));
 
-    private static ICommand GetNextCommand(ICommand[] subCommands, string nextCommandName)
+    private ICommand GetNextCommand(string[] args)
     {
+        string nextCommandName = args[0].ToLowerInvariant();
+        if (nextCommandName == "-h" || nextCommandName == "--help")
+        {
+            Console.WriteLine("Commands:");
+            foreach (ICommand command in subCommands)
+            {
+                Console.WriteLine($"\t{command.GetName()}");
+            }
+            Environment.Exit(0);
+        }
+
         ICommand? nextCommand = subCommands.Where(command => command.GetName().Equals(nextCommandName, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
         if (nextCommand == null)
         {
@@ -93,31 +117,6 @@ public abstract class BaseCommandGroup : ICommandGroup
             throw new CommandException($"Could not find command with name [{nextCommandName}] to execute. Expected command to be one of: [{expectedList}]");
         }
         return nextCommand!;
-    }
-
-    private static string GetNameOfNextCommand(ICommand[] subCommands, string[] args)
-    {
-        string nextCommandName = args[0].ToLowerInvariant();
-        if (nextCommandName == "-h" || nextCommandName == "--help")
-        {
-            string expectedList = FormExpectedCommandNameList(subCommands);
-            Console.WriteLine($"Specify one of the following subcommands to execute: [{expectedList}]");
-            Environment.Exit(0);
-        }
-        return nextCommandName;
-    }
-
-    private ICommand[] GetSubCommands()
-    {
-        ICommand[] subCommands = SubCommands();
-        if (subCommands.Length == 0)
-        {
-            throw new ParseException($"The command group [{GetName()}] could not be executed because the group does not contain any commands.");
-        }
-
-        ValidateCommandNames(subCommands);
-
-        return subCommands;
     }
 
     private void ValidateCommandNames(ICommand[] commands)
@@ -128,7 +127,7 @@ public abstract class BaseCommandGroup : ICommandGroup
             string name = command.GetName();
             if (!names.Add(name))
             {
-                throw new CommandException($"Two or more commands attempted to register with the same name. Found at least two commands with the name: [{name}] within group: [{GetName()}]");
+                throw new CommandException($"Two or more commands attempted to register with the same name within the command group: [{GetName()}]. Found at least two commands with the name: [{name}].");
             }
         }
     }
@@ -139,7 +138,6 @@ public abstract class BaseCommandGroup : ICommandGroup
 /// </summary>
 public class GenericCommandGroup : BaseCommandGroup
 {
-    private readonly ImmutableArray<ICommand> commands;
     private readonly string name;
 
     /// <summary>
@@ -149,16 +147,10 @@ public class GenericCommandGroup : BaseCommandGroup
     /// <param name="name">An optional name to register this group command under. If no name is provided this will
     /// default to genericcommandgroup.</param>
     public GenericCommandGroup(ImmutableArray<ICommand> commands, string? name = null)
+    : base(commands.ToArray())
     {
-        this.commands = commands;
         this.name = name ?? GetType().Name.ToLowerInvariant();
     }
-
-    /// <summary>
-    /// Returns the commands provided during initialization as an array.
-    /// </summary>
-    /// <returns>The array of sub-command to execute.</returns>
-    public override ICommand[] SubCommands() => commands.ToArray();
 
     /// <summary>
     /// Returns the name provided during initialization.

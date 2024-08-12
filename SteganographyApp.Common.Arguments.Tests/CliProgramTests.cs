@@ -20,12 +20,7 @@ public class CliProgramTests
             Commands.Group(
                 Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function),
                 Commands.Lazy<SimpleCommand>(),
-                Commands.Alias("aliased", Commands.From<GenericArguments>("no-alias", (args) => LastRun.Instance.Name = LastRunName.Aliased)),
-                Commands.Group(
-                    "duplicate",
-                    Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function),
-                    Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function)
-                )
+                Commands.Alias("aliased", Commands.From<GenericArguments>("no-alias", (args) => LastRun.Instance.Name = LastRunName.Aliased))
             )
         );
 #pragma warning restore SA1009
@@ -67,6 +62,14 @@ public class CliProgramTests
         var arguments = new string[] { "duplicate", "function", "--number", "10" };
         Exception? error = program.TryExecute(arguments);
         Assert.That(error, Is.Not.Null);
+        Assert.Throws(
+            typeof(CommandException),
+            () => Commands.Group(
+                "duplicate",
+                Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function),
+                Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function)
+            )
+        );
     }
 
     [Test]

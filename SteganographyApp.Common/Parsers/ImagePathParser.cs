@@ -76,7 +76,7 @@ public static class ImagePathParser
         {
             if (!uniqueImages.Add(imagePath))
             {
-                throw new ArgumentValueException($"Two or more paths point to the same file of: [{imagePath}]");
+                throw new ArgumentValueException($"Two or more paths point to the same image of: [{imagePath}]");
             }
         }
     }
