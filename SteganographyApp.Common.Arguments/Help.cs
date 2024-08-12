@@ -15,6 +15,19 @@ public static class Help
     private static readonly char Space = ' ';
 
     /// <summary>
+    /// Returns the HelpText property of the ProgramDescriptor attribute on the input
+    /// type. If there is no ProgramDescriptor attribute on the input type then this
+    /// will return an empty string.
+    /// </summary>
+    /// <param name="commandType">The type from which the ProgramDescriptor attribute will be pulled.</param>
+    /// <returns>The HelpText property of the ProgramDescriptor attribute or null if no attribute is available.</returns>
+    public static string GetCommandDescription(Type commandType)
+    {
+        string helpText = GetDescriptorAttribute(commandType)?.HelpText ?? string.Empty;
+        return SplitHelpText(helpText);
+    }
+
+    /// <summary>
     /// Logs all the help related information to the console.
     /// </summary>
     /// <param name="instanceType">The type of the class containing the arugments to be parsed.</param>

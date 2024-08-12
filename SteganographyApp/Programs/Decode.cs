@@ -90,7 +90,7 @@ internal sealed class DecodeCommand : Command<DecodeArguments>
         Console.WriteLine("Decoding process complete.");
     }
 
-    public override string GetName() => "Decode";
+    public override string GetName() => "decode";
 
     private void Decode(IInputArguments arguments)
     {

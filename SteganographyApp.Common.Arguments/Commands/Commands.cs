@@ -27,6 +27,12 @@ public interface ICommand
     /// </summary>
     /// <returns>The command name.</returns>
     public string GetName();
+
+    /// <summary>
+    /// Gets a line of text describing the command.
+    /// </summary>
+    /// <returns>A line of text describing the command.</returns>
+    public string GetHelpDescription();
 }
 
 /// <summary>
@@ -88,6 +94,13 @@ where T : class
     /// </summary>
     /// <returns>The command name.</returns>
     public virtual string GetName() => GetType().Name.ToLowerInvariant();
+
+    /// <summary>
+    /// Returns the help text description pulled from the ProgramDescriptor attribute on the input
+    /// CLI model specified in the generic type argument T.
+    /// </summary>
+    /// <returns>The help text pulled from the ProgramDescriptor.</returns>
+    public virtual string GetHelpDescription() => Help.GetCommandDescription(typeof(T));
 }
 
 /// <summary>
@@ -145,6 +158,12 @@ public class AliasedCommand(string name, ICommand actual) : ICommand
     /// </summary>
     /// <returns>The command name.</returns>
     public string GetName() => name;
+
+    /// <summary>
+    /// Gets a line of text describing the command.
+    /// </summary>
+    /// <returns>A line of text describing the command.</returns>
+    public string GetHelpDescription() => actual.GetHelpDescription();
 }
 
 /// <summary>
@@ -178,4 +197,10 @@ where T : ICommand
     /// </summary>
     /// <returns>The command name.</returns>
     public string GetName() => Actual.GetName();
+
+    /// <summary>
+    /// Gets a line of text describing the command.
+    /// </summary>
+    /// <returns>A line of text describing the command.</returns>
+    public string GetHelpDescription() => Actual.GetHelpDescription();
 }

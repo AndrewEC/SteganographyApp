@@ -38,6 +38,15 @@ public static partial class Commands
     /// <param name="commands">The array of sub-commands to selectively execute.</param>
     /// <returns>A new GenericCommandGroup instance with the specified name and sub-commands.</returns>
     public static ICommand Group(string name, params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray(), name);
+
+    /// <summary>
+    /// Creates a GenericCommandGroup with a specified name and help text.
+    /// </summary>
+    /// <param name="name">The name of the group command.</param>
+    /// <param name="helpText">The help text description of the command.</param>
+    /// <param name="commands">The array of sub-commands to selectively execute.</param>
+    /// <returns>A new GenericCommandGroup instance with the specified name and sub-commands.</returns>
+    public static ICommand Group(string name, string helpText, params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray(), name, helpText);
 }
 
 /// <summary>
@@ -95,19 +104,22 @@ public abstract class BaseCommandGroup : ICommandGroup
     /// <returns>The name of the command.</returns>
     public abstract string GetName();
 
+    /// <summary>
+    /// Returns a default empty string.
+    /// </summary>
+    /// <returns>An empty string.</returns>
+    public virtual string GetHelpDescription() => string.Empty;
+
     private static string FormExpectedCommandNameList(ICommand[] subCommands) => string.Join(", ", subCommands.Select(command => command.GetName().ToLowerInvariant()));
+
+    private static bool WasHelpRequested(string nextCommandName) => nextCommandName == "-h" || nextCommandName == "--help";
 
     private ICommand GetNextCommand(string[] args)
     {
         string nextCommandName = args[0].ToLowerInvariant();
-        if (nextCommandName == "-h" || nextCommandName == "--help")
+        if (WasHelpRequested(nextCommandName))
         {
-            Console.WriteLine("Commands:");
-            foreach (ICommand command in subCommands)
-            {
-                Console.WriteLine($"\t{command.GetName()}");
-            }
-            Environment.Exit(0);
+            PrintHelpText();
         }
 
         ICommand? nextCommand = subCommands.Where(command => command.GetName().Equals(nextCommandName, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
@@ -119,12 +131,35 @@ public abstract class BaseCommandGroup : ICommandGroup
         return nextCommand!;
     }
 
+    private void PrintHelpText()
+    {
+        Console.WriteLine("Commands:");
+        foreach (ICommand command in subCommands)
+        {
+            string helpText = command.GetHelpDescription();
+            if (helpText == string.Empty)
+            {
+                Console.WriteLine($"  {command.GetName()}");
+            }
+            else
+            {
+                Console.WriteLine($"  {command.GetName()} - {command.GetHelpDescription()}");
+            }
+        }
+        Environment.Exit(0);
+    }
+
     private void ValidateCommandNames(ICommand[] commands)
     {
+        if (commands.Length == 0)
+        {
+            throw new CommandException($"At least one command must be registered in a command group. Group [{GetName()}] has no commands.");
+        }
+
         HashSet<string> names = [];
         foreach (ICommand command in commands)
         {
-            string name = command.GetName();
+            string name = command.GetName().ToLowerInvariant();
             if (!names.Add(name))
             {
                 throw new CommandException($"Two or more commands attempted to register with the same name within the command group: [{GetName()}]. Found at least two commands with the name: [{name}].");
@@ -139,6 +174,7 @@ public abstract class BaseCommandGroup : ICommandGroup
 public class GenericCommandGroup : BaseCommandGroup
 {
     private readonly string name;
+    private readonly string helpText;
 
     /// <summary>
     /// Initializes the GenericCommandGroup.
@@ -146,10 +182,11 @@ public class GenericCommandGroup : BaseCommandGroup
     /// <param name="commands">The array of commands to be grouped and accessed under this command.</param>
     /// <param name="name">An optional name to register this group command under. If no name is provided this will
     /// default to genericcommandgroup.</param>
-    public GenericCommandGroup(ImmutableArray<ICommand> commands, string? name = null)
+    public GenericCommandGroup(ImmutableArray<ICommand> commands, string? name = null, string? helpText = null)
     : base(commands.ToArray())
     {
         this.name = name ?? GetType().Name.ToLowerInvariant();
+        this.helpText = helpText ?? string.Empty;
     }
 
     /// <summary>
@@ -157,4 +194,10 @@ public class GenericCommandGroup : BaseCommandGroup
     /// </summary>
     /// <returns>The name of the group command provided during initialization.</returns>
     public override string GetName() => name;
+
+    /// <summary>
+    /// Gets a line of text describing the command.
+    /// </summary>
+    /// <returns>A line of text describing the command.</returns>
+    public override string GetHelpDescription() => helpText;
 }

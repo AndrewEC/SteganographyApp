@@ -20,6 +20,7 @@ public class Program
                 Commands.Lazy<VerifyImagesCommand>(),
                 Commands.Group(
                     "calculate",
+                    "Calculate the size of an encrypted file or the storage space of an image.",
                     Commands.Lazy<CalculateEncryptedSizeCommand>(),
                     Commands.Lazy<CalculateStorageSpaceCommand>()
                 )
