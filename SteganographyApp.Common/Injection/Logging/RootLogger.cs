@@ -22,6 +22,10 @@ public sealed class RootLogger
     private LogLevel logLevel = LogLevel.None;
     private IReadWriteStream? writeLogStream;
 
+    private RootLogger()
+    {
+    }
+
     /// <summary>
     /// Cleanup code to try and close an open stream to the log file upon application exit.
     /// </summary>
@@ -54,7 +58,17 @@ public sealed class RootLogger
         {
             return;
         }
-        logLevel = TryOpenLogFileForWrite() ? level : LogLevel.None;
+        lock (SyncLock)
+        {
+            if (writeLogStream != null)
+            {
+                logLevel = level;
+            }
+            else
+            {
+                logLevel = TryOpenLogFileForWrite() ? level : LogLevel.None;
+            }
+        }
     }
 
     /// <summary>

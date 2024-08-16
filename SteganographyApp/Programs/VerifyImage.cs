@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 using SteganographyApp.Common;
 using SteganographyApp.Common.Arguments;
@@ -74,10 +73,9 @@ internal sealed class TempFileBackup : AbstractDisposable
             return;
         }
         logger.Debug("Deleting modified file: [{0}]", originalFilePath);
-        logger.Debug("Restoring file [{0}] from [{1}]", originalFilePath, backupPath);
         File.Delete(originalFilePath);
-        File.Copy(backupPath, originalFilePath);
-        File.Delete(backupPath);
+        logger.Debug("Restoring file [{0}] from [{1}]", originalFilePath, backupPath);
+        File.Move(backupPath, originalFilePath);
     });
 }
 
@@ -107,17 +105,25 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
 
     private bool IsImageValid(string path, IInputArguments arguments)
     {
-        string binary = GenerateBinaryString(path);
-        using (var copy = new TempFileBackup(path))
+        try
         {
-            WriteToImage(binary, arguments);
-            string readBinary = ReadFromImage(binary, arguments);
-            if (binary != readBinary)
+            string binary = GenerateBinaryString(path);
+            using (var copy = new TempFileBackup(path))
             {
-                return false;
+                WriteToImage(binary, arguments);
+                string readBinary = ReadFromImage(binary, arguments);
+                if (binary != readBinary)
+                {
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
+        catch (Exception e)
+        {
+            logger.Error("Failed to validate image [{0}]. Cause: [{1}]", path, e.Message);
+            return false;
+        }
     }
 
     private void PrintFailed(List<string> failedValidation)

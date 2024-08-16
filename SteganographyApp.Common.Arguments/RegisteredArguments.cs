@@ -67,6 +67,11 @@ internal static class ArgumentRegistration
             }
         }
 
+        if (registered.Count == 0)
+        {
+            throw new ParseException($"No registered arguments found on input type: [{modelType.Name}]");
+        }
+
         VerifyArgumentPositions(registered);
         return registered.ToImmutableArray();
     }
