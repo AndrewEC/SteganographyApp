@@ -30,7 +30,7 @@ public static class InjectableLookup
         {
             var ctor = injectableType.GetConstructor(Type.EmptyTypes);
             var correlatedType = GetInjectableAttribute(injectableType)!.CorrelatesWith;
-            injectables[correlatedType] = ctor?.Invoke(Array.Empty<object>())
+            injectables[correlatedType] = ctor?.Invoke([])
                 ?? throw new ArgumentException("Injectable types must have a default empty construct. No matching constructor found for type: " + injectableType.Name);
         }
 
@@ -45,39 +45,13 @@ public static class InjectableLookup
 }
 
 /// <summary>
-/// For invoking any post construct methods registered on the things within the assembly that are injectable
-/// and have already been instantiated.
-/// </summary>
-public static partial class PostConstruct
-{
-    /// <summary>
-    /// Attempts to lookup a publicly accessible method from each of the input instances that also
-    /// has the PostConstruct attribute and invoke it. This expects the post construct method to be
-    /// parameterless.
-    /// </summary>
-    /// <param name="instances">The collection of instanced injectable objects to invoke the post
-    /// constructors of if they exist.</param>
-    internal static void InvokePostConstructMethods(IEnumerable<object> instances)
-    {
-        foreach (object instance in instances)
-        {
-            GetPostConstructMethod(instance)?.Invoke(instance, Array.Empty<object>());
-        }
-    }
-
-    private static MethodInfo? GetPostConstructMethod(object instance) => instance.GetType().GetMethods().Where(HasPostConstructAttribute).FirstOrDefault();
-
-    private static bool HasPostConstructAttribute(MethodInfo info) => info.GetCustomAttribute(typeof(PostConstructAttribute), false) != null;
-}
-
-/// <summary>
 /// An on request injection utility to help provide an implementation of a particular requested
 /// interface. It also provides the ability to replace an existing implementation in the injector
 /// with a mock of the interface.
 /// <para>With this utility most of the static method declarations should be replaced by
 /// calls to a method of a concrete instance that is injected via this utility.</para>
 /// </summary>
-public static partial class Injector
+public static class Injector
 {
     private static readonly ImmutableDictionary<Type, object> DefaultInjectionValues;
 
@@ -90,7 +64,6 @@ public static partial class Injector
         DefaultInjectionValues = InjectableLookup.LookupDefaultInjectableDictionary();
         injectionValues = new Dictionary<Type, object>();
         ResetInstances();
-        PostConstruct.InvokePostConstructMethods(DefaultInjectionValues.Values);
     }
 
     /// <summary>

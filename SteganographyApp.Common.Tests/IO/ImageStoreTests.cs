@@ -110,7 +110,7 @@ public class ImageStoreTests : FixtureWithRealObjects
         {
             for (int j = 0; j < height; j++)
             {
-                pixels[i, j] = new Rgba32((byte)8);
+                pixels[i, j] = new Rgba32(8);
             }
         }
 

@@ -30,11 +30,3 @@ public sealed class InjectableAttribute : Attribute
     /// </summary>
     public Type CorrelatesWith { get; private set; }
 }
-
-/// <summary>
-/// A method level attribute that indicates the attributed method should be invoked
-/// by the static Injector class after all injectable classes have been instantiated.
-/// The method being attributed must be parameterless.
-/// </summary>
-[AttributeUsage(AttributeTargets.Method)]
-public sealed class PostConstructAttribute : Attribute { }

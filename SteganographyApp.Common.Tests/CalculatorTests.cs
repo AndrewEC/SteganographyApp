@@ -13,6 +13,7 @@ public class CalculatorTests : FixtureWithTestObjects
 
     private const string TestFile = "Test001.png";
     private const int ChunkSize = 131_072;
+    private const int RequiredNumberOfWrites = 5;
 
     [Test]
     public void TestRequiredChunkSizeMatchesExpected()
@@ -28,12 +29,12 @@ public class CalculatorTests : FixtureWithTestObjects
     {
         int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(TestFile, ChunkSize);
 
-        Assert.That(requiredNumberOfWrites, Is.EqualTo(5));
+        Assert.That(requiredNumberOfWrites, Is.EqualTo(RequiredNumberOfWrites));
         mockFileIOProxy.Verify(fileProxy => fileProxy.GetFileSizeBytes(TestFile), Times.Once());
     }
 
     protected override void SetupMocks()
     {
-        mockFileIOProxy.Setup(fileProxy => fileProxy.GetFileSizeBytes(TestFile)).Returns(ChunkSize * 5);
+        mockFileIOProxy.Setup(fileProxy => fileProxy.GetFileSizeBytes(TestFile)).Returns(ChunkSize * RequiredNumberOfWrites);
     }
 }

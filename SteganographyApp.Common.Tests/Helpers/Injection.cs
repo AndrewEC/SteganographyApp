@@ -21,7 +21,7 @@ public static class MocksInjector
     {
         foreach (var field in GetFieldsRequiringMocks(testFixture))
         {
-            var mockableAttribute = GetMockupAttribute(field);
+            var mockableAttribute = GetMockupAttribute(field)!;
 
             object instance = CreateMockInstance(mockableAttribute);
             field.SetValue(testFixture, instance);
@@ -34,7 +34,7 @@ public static class MocksInjector
     private static void UseInstance(object instance, Mockup mockableAttribute)
     {
         typeof(Injector)
-            ?.GetMethod(nameof(Injector.UseInstance))
+            .GetMethod(nameof(Injector.UseInstance))
             ?.MakeGenericMethod(mockableAttribute.MockType)
             .Invoke(null, new object[] { instance });
     }
@@ -55,9 +55,8 @@ public static class MocksInjector
 
     private static bool HasMockupAttribute(FieldInfo info) => GetMockupAttribute(info) != null;
 
-    private static Mockup GetMockupAttribute(FieldInfo info)
-        => info.GetCustomAttributes(typeof(Mockup), false).FirstOrDefault() as Mockup
-        ?? throw new Exception($"Could not find mockup attribute on field [{info.Name}]");
+    private static Mockup? GetMockupAttribute(FieldInfo info)
+        => info.GetCustomAttributes(typeof(Mockup), false).FirstOrDefault() as Mockup;
 }
 
 /// <summary>
