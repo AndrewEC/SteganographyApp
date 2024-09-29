@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/SteganographyApp/bin/Debug/netcoreapp2.1/SteganographyApp.dll",
+            "program": "${workspaceFolder}/SteganographyApp/bin/Debug/net8.0/SteganographyApp.dll",
             "args": [],
             "cwd": "${workspaceFolder}/SteganographyApp",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

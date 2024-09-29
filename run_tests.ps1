@@ -56,7 +56,7 @@ Write-Host "`n---------- Running unit tests ----------`n"
 
 Write-Host "---------- Running SteganographyApp.Common.Tests tests ----------"
 dotnet tool run coverlet `
-    ./SteganographyApp.Common.Tests/bin/Debug/netcoreapp8.0/SteganographyApp.Common.Tests.dll `
+    ./SteganographyApp.Common.Tests/bin/Debug/net8.0/SteganographyApp.Common.Tests.dll `
     --target "dotnet" `
     --targetargs "test ./SteganographyApp.Common.Tests --no-build" `
     --exclude-by-file "**/RootLogger.cs" `
@@ -74,7 +74,7 @@ if($LastExitCode -ne 0) {
 
 Write-Host "---------- Running SteganographyApp.Common.Arguments.Tests tests ----------"
 dotnet tool run coverlet `
-    ./SteganographyApp.Common.Arguments.Tests/bin/Debug/netcoreapp8.0/SteganographyApp.Common.Arguments.Tests.dll `
+    ./SteganographyApp.Common.Arguments.Tests/bin/Debug/net8.0/SteganographyApp.Common.Arguments.Tests.dll `
     --target "dotnet" `
     --targetargs "test ./SteganographyApp.Common.Arguments.Tests --no-build" `
     --exclude-by-file "**/Help.cs" `
