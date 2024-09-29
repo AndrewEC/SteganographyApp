@@ -28,7 +28,7 @@ New-Item -Path ./testbed -ItemType Directory | Out-Null
 
 Write-Host "`n---------- Copying publish output ----------`n"
 Write-Host "Copying output from SteganographyApp publish"
-Get-ChildItem -Path ./SteganographyApp/bin/release/netcoreapp8.0/publish | Copy-Item -Recurse -Destination ./testbed
+Get-ChildItem -Path ./SteganographyApp/bin/release/net8.0/publish | Copy-Item -Recurse -Destination ./testbed
 
 
 Write-Host "`n---------- Copying test assets ----------`n"
