@@ -60,12 +60,13 @@ public static class ImagePathParser
     private static void VerifyAllImagesExist(ImmutableArray<string> imagePaths)
     {
         var fileProxy = Injector.Provide<IFileIOProxy>();
-        foreach (string path in imagePaths)
+
+        string? missingImagePath = imagePaths.Where(path => !fileProxy.IsExistingFile(path))
+            .FirstOrDefault();
+
+        if (missingImagePath != null)
         {
-            if (!fileProxy.IsExistingFile(path))
-            {
-                throw new ArgumentValueException($"The file specified could not be read: [{path}]");
-            }
+                throw new ArgumentValueException($"The file specified could not be read: [{missingImagePath}]");
         }
     }
 

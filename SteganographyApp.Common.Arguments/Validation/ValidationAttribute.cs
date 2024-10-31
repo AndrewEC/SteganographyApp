@@ -66,6 +66,6 @@ public abstract class ValidationAttribute : Attribute
     protected abstract void DoValidate(object value);
 
     private bool IsValidType(Type valueType) => validTypes
-        .Where(validType => valueType.IsInstanceOfType(valueType) || valueType == validType)
+        .Where(validType => valueType.IsInstanceOfType(validType) || valueType == validType)
         .FirstOrDefault() != null;
 }

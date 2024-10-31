@@ -75,7 +75,7 @@ public abstract class BaseCommandGroup : ICommandGroup
     /// Gets a list of available sub-commands to execute.
     /// </summary>
     /// <returns>The array of sub-commands to be executed.</returns>
-    public ICommand[] SubCommands() => subCommands;
+    public ICommand[] SubCommands() => (ICommand[])subCommands.Clone();
 
     /// <summary>
     /// Executes the command group. This will effectively lookup the SubCommands, determing which command needs to
@@ -182,6 +182,8 @@ public class GenericCommandGroup : BaseCommandGroup
     /// <param name="commands">The array of commands to be grouped and accessed under this command.</param>
     /// <param name="name">An optional name to register this group command under. If no name is provided this will
     /// default to genericcommandgroup.</param>
+    /// <param name="helpText">An option set of text to describe the functions contained within this group
+    /// of commands.</param>
     public GenericCommandGroup(ImmutableArray<ICommand> commands, string? name = null, string? helpText = null)
     : base(commands.ToArray())
     {

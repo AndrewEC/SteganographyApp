@@ -16,8 +16,12 @@ public class Program
                 Commands.Lazy<CleanCoverImagesCommand>(),
                 Commands.Lazy<DecodeCommand>(),
                 Commands.Lazy<EncodeCommand>(),
-                Commands.Lazy<ConvertImagesCommand>(),
-                Commands.Lazy<VerifyImagesCommand>(),
+                Commands.Group(
+                    "manage",
+                    "Convert and verify images so they support encoding and decoding data.",
+                    Commands.Lazy<ConvertImagesCommand>(),
+                    Commands.Lazy<VerifyImagesCommand>()
+                ),
                 Commands.Group(
                     "calculate",
                     "Calculate the size of an encrypted file or the storage space of an image.",
