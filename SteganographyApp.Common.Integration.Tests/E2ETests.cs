@@ -49,7 +49,7 @@ public class E2ETests
         // Store some data from the sample input file in the cover images.
         string content = string.Empty;
         var contentChunkSize = -1;
-        using (var wrapper = imageStore.CreateIOWrapper())
+        using (var wrapper = imageStore.OpenStream())
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
             wrapper.SeekToPixel(requiredBitsForTable);
@@ -72,7 +72,7 @@ public class E2ETests
         // Read the content previously written to the image and verify it matches the original input value.
         using (var tableReader = new ChunkTableReader(imageStore, args))
         {
-            using (var wrapper = imageStore.CreateIOWrapper())
+            using (var wrapper = imageStore.OpenStream())
             {
                 var readTable = tableReader.ReadContentChunkTable();
                 using (var writer = new ContentWriter(args))
@@ -101,7 +101,7 @@ public class E2ETests
         // writing file content to image
         string content = string.Empty;
         var contentChunkSize = -1;
-        using (var wrapper = imageStore.CreateIOWrapper())
+        using (var wrapper = imageStore.OpenStream())
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
             wrapper.SeekToPixel(requiredBitsForTable);
@@ -122,7 +122,7 @@ public class E2ETests
 
         // reading file content from image
         args.Password = "Wrong Password";
-        using (var wrapper = imageStore.CreateIOWrapper())
+        using (var wrapper = imageStore.OpenStream())
         {
             using (var tableReader = new ChunkTableReader(imageStore, args))
             {
@@ -141,7 +141,7 @@ public class E2ETests
     {
         // writing file content to image
         var contentChunkSize = -1;
-        using (var wrapper = imageStore.CreateIOWrapper())
+        using (var wrapper = imageStore.OpenStream())
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
             wrapper.SeekToPixel(requiredBitsForTable);
@@ -165,7 +165,7 @@ public class E2ETests
         args.DummyCount = 5;
         using (var tableReader = new ChunkTableReader(imageStore, args))
         {
-            using (var wrapper = imageStore.CreateIOWrapper())
+            using (var wrapper = imageStore.OpenStream())
             {
                 var readTable = tableReader.ReadContentChunkTable();
                 using (var writer = new ContentWriter(args))
@@ -185,7 +185,7 @@ public class E2ETests
         // writing file content to image
         var contentChunkSize = -1;
         string content = string.Empty;
-        using (var wrapper = imageStore.CreateIOWrapper())
+        using (var wrapper = imageStore.OpenStream())
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
             wrapper.SeekToPixel(requiredBitsForTable);
@@ -207,7 +207,7 @@ public class E2ETests
         args.UseCompression = false;
         using (var tableReader = new ChunkTableReader(imageStore, args))
         {
-            using (var wrapper = imageStore.CreateIOWrapper())
+            using (var wrapper = imageStore.OpenStream())
             {
                 var readTable = tableReader.ReadContentChunkTable();
                 using (var writer = new ContentWriter(args))
@@ -226,7 +226,7 @@ public class E2ETests
         // writing file content to image
         string content = string.Empty;
         var contentChunkSize = -1;
-        using (var wrapper = imageStore.CreateIOWrapper())
+        using (var wrapper = imageStore.OpenStream())
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
             wrapper.SeekToPixel(requiredBitsForTable);

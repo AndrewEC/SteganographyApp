@@ -98,7 +98,7 @@ internal sealed class DecodeCommand : Command<DecodeArguments>
         var store = new ImageStore(arguments);
         using (var chunkTableReader = new ChunkTableReader(store, arguments))
         {
-            using (var wrapper = store.CreateIOWrapper())
+            using (var stream = store.OpenStream())
             {
                 var contentChunkTable = chunkTableReader.ReadContentChunkTable();
                 var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
@@ -110,7 +110,7 @@ internal sealed class DecodeCommand : Command<DecodeArguments>
                     {
                         log.Debug("===== ===== ===== Begin Decoding Iteration ===== ===== =====");
                         log.Debug("Processing chunk of [{0}] bits.", chunkLength);
-                        string binary = wrapper.ReadContentChunkFromImage(chunkLength);
+                        string binary = stream.ReadContentChunkFromImage(chunkLength);
                         writer.WriteContentChunkToFile(binary);
                         tracker.UpdateAndDisplayProgress();
                         log.Debug("===== ===== ===== End Decoding Iteration ===== ===== =====");

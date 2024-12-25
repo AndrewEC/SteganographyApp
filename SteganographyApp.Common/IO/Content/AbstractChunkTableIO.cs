@@ -1,7 +1,5 @@
 namespace SteganographyApp.Common.IO;
 
-using SteganographyApp.Common.Arguments;
-
 /// <summary>
 /// The abstract base class for dealing with the content chunk table.
 /// </summary>
@@ -22,7 +20,7 @@ public abstract class AbstractChunkTableIO(ImageStore store, IInputArguments arg
     /// <summary>
     /// Gets the IO class for reading and writing binary data to/from the cover images.
     /// </summary>
-    protected ImageStoreIO ImageStoreIO { get; } = store.CreateIOWrapper();
+    protected ImageStoreStream ImageStoreStream { get; } = store.OpenStream();
 
     /// <summary>
     /// Gets the user provided arguments from which we will pull the random seed to determine if
@@ -41,6 +39,6 @@ public abstract class AbstractChunkTableIO(ImageStore store, IInputArguments arg
         {
             return;
         }
-        ImageStoreIO.Dispose();
+        ImageStoreStream.Dispose();
     });
 }

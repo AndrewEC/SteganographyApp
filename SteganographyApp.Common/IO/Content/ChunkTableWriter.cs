@@ -50,8 +50,8 @@ public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments
 
         string tableBinary = tableHeader + binaryString;
 
-        ImageStoreIO.WriteContentChunkToImage(tableBinary);
-        ImageStoreIO.EncodeComplete();
+        ImageStoreStream.WriteContentChunkToImage(tableBinary);
+        ImageStoreStream.EncodeComplete();
     });
 
     private static string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');

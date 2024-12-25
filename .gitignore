@@ -9,3 +9,4 @@ reports/
 publish/
 BenchmarkDotNet.Artifacts/
 testbed/
+StrykerOutput

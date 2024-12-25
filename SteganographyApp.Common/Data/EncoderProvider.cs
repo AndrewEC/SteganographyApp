@@ -4,7 +4,6 @@ using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
 
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Injection;
 
 /// <summary>

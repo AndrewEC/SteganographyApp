@@ -45,7 +45,7 @@ public class ImageStoreTests : FixtureWithRealObjects
 
         var imageStore = new ImageStore(Arguments);
 
-        using (var wrapper = imageStore.CreateIOWrapper())
+        using (var wrapper = imageStore.OpenStream())
         {
             var exception = Assert.Throws<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
             Assert.That(exception.Message, Is.EqualTo("Cannot load next image because there are no remaining cover images left to load."));

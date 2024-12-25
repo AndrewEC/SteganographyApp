@@ -66,7 +66,7 @@ public static class ImagePathParser
 
         if (missingImagePath != null)
         {
-                throw new ArgumentValueException($"The file specified could not be read: [{missingImagePath}]");
+            throw new ArgumentValueException($"The file specified could not be read: [{missingImagePath}]");
         }
     }
 

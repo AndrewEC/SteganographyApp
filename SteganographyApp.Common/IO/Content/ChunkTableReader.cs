@@ -41,7 +41,7 @@ public class ChunkTableReader(ImageStore store, IInputArguments arguments) : Abs
 
     private short ReadChunkCount(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil)
     {
-        string headerBinary = ImageStoreIO.ReadContentChunkFromImage(Calculator.ChunkTableHeaderSizeWithPadding);
+        string headerBinary = ImageStoreStream.ReadContentChunkFromImage(Calculator.ChunkTableHeaderSizeWithPadding);
         log.Debug("Chunk table header: [{0}]", headerBinary);
         if (!string.IsNullOrEmpty(Arguments.RandomSeed))
         {
@@ -54,7 +54,7 @@ public class ChunkTableReader(ImageStore store, IInputArguments arguments) : Abs
     private ImmutableArray<int> ReadTableChunkLengths(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil, short chunkCount)
     {
         int chunkSize = Calculator.ChunkDefinitionBitSizeWithPadding * chunkCount;
-        string tableBinary = ImageStoreIO.ReadContentChunkFromImage(chunkSize);
+        string tableBinary = ImageStoreStream.ReadContentChunkFromImage(chunkSize);
         log.Debug("Chunk table content: [{0}]", tableBinary);
         if (!string.IsNullOrEmpty(Arguments.RandomSeed))
         {

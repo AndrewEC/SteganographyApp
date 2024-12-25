@@ -74,13 +74,14 @@ internal sealed class BinaryStringBuilder(int capacity)
     /// <param name="bits">The bits to add to the queue.</param>
     public void Put(string bits)
     {
-        if (bitsCurrentlyStored >= capacity)
+        if (IsFull())
         {
             return;
         }
         if (bitsCurrentlyStored + bits.Length > capacity)
         {
-            int bitsToTake = bits.Length - (capacity - bitsCurrentlyStored);
+            int remainingCapacity = capacity - bitsCurrentlyStored;
+            int bitsToTake = bits.Length - remainingCapacity;
             string bitsTaken = bits.Substring(0, bitsToTake);
             binary.Append(bitsTaken);
             bitsCurrentlyStored += bitsTaken.Length;

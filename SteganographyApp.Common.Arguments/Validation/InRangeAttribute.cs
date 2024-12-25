@@ -1,6 +1,7 @@
 namespace SteganographyApp.Common.Arguments.Validation;
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -13,7 +14,7 @@ using System.Linq;
 /// <param name="name">An optional name for this validatin attribute instance. This can provide more
 /// informatiom if an exception is thrown an potentially help narrow down the source of an error
 /// if multiple InRangeAttributes are being used in a single program.</param>
-public class InRangeAttribute(double min, double max, string? name = null) : ValidationAttribute(name, WholeNumberTypes.Concat(DecimalNumberTypes))
+public class InRangeAttribute(double min, double max, string? name = null) : ValidationAttribute(name, AllNumberTypes)
 {
     private static readonly string ValidationFailedMessage = "Expected value to be between [{0}] and [{1}] but instead was [{2}].";
 
@@ -29,6 +30,8 @@ public class InRangeAttribute(double min, double max, string? name = null) : Val
         typeof(decimal),
         typeof(double)
     ];
+
+    private static readonly IEnumerable<Type> AllNumberTypes = WholeNumberTypes.Concat(DecimalNumberTypes);
 
     private readonly double min = min;
     private readonly double max = max;

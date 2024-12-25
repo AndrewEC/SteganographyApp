@@ -7,7 +7,7 @@ using SteganographyApp.Common.Data;
 /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
 /// more error prone IO operations.
 /// </summary>
-public class ImageStoreIO : AbstractDisposable
+public class ImageStoreStream : AbstractDisposable
 {
     private readonly ImageStore store;
 
@@ -17,7 +17,7 @@ public class ImageStoreIO : AbstractDisposable
     /// Initialize the wrapper using the image store that the IO method calls will be proxied to.
     /// </summary>
     /// <param name="store">The image store instance to be wrapped.</param>
-    public ImageStoreIO(ImageStore store)
+    public ImageStoreStream(ImageStore store)
     {
         this.store = store;
         store.SeekToImage(0);

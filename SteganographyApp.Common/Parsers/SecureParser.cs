@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.Arguments;
+namespace SteganographyApp.Common.Parsers;
 
 using System;
 using System.Text;

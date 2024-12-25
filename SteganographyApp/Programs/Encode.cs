@@ -100,12 +100,12 @@ internal sealed class EncodeCommand : Command<EncodeArguments>
 
     private void Encode(EncodingUtilities utilities, IInputArguments arguments)
     {
-        using (var wrapper = utilities.ImageStore.CreateIOWrapper())
+        using (var stream = utilities.ImageStore.OpenStream())
         {
             log.Debug("Encoding file: [{0}]", arguments.FileToEncode);
             int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
             log.Debug("Content chunk table requires [{0}] bits of space to store.", startingPixel);
-            wrapper.SeekToPixel(startingPixel);
+            stream.SeekToPixel(startingPixel);
 
             int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
             log.Debug("File requires [{0}] iterations to encode.", requiredNumberOfWrites);
@@ -123,12 +123,12 @@ internal sealed class EncodeCommand : Command<EncodeArguments>
                         break;
                     }
                     log.Debug("Processing chunk of [{0}] bits.", contentChunk.Length);
-                    wrapper.WriteContentChunkToImage(contentChunk);
+                    stream.WriteContentChunkToImage(contentChunk);
                     progressTracker.UpdateAndDisplayProgress();
                     log.Debug("===== ===== ===== End Encoding Iteration ===== ===== =====");
                 }
             }
-            wrapper.EncodeComplete();
+            stream.EncodeComplete();
         }
     }
 

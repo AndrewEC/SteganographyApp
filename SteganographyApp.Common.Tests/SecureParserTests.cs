@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Moq;
 using NUnit.Framework;
-using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common.Parsers;
 
 [TestFixture]
 public class SecureParserTests : FixtureWithMockConsoleReaderAndWriter

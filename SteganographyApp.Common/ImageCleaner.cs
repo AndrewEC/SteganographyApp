@@ -27,7 +27,7 @@ public sealed class ImageCleaner(IInputArguments arguments, ImageStore imageStor
     /// </summary>
     public void CleanImages()
     {
-        using (var cleaner = imageStore.CreateIOWrapper())
+        using (var cleaner = imageStore.OpenStream())
         {
             for (int i = 0; i < arguments.CoverImages.Length; i++)
             {

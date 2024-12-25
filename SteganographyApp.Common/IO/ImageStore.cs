@@ -4,7 +4,6 @@ using System;
 
 using SixLabors.ImageSharp.PixelFormats;
 
-using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
@@ -62,14 +61,14 @@ public sealed class ImageStore(IInputArguments args)
     public IBasicImageInfo? CurrentImage { get; private set; }
 
     /// <summary>
-    /// Utility method to create an <see cref="ImageStoreIO"/> instance to be used in conjunction with the
+    /// Utility method to create an <see cref="ImageStoreStream"/> instance to be used in conjunction with the
     /// read and write methods.
     /// <para>The ImageStoreWrapper instance provides proxies to the ImageStore IO methods as well as
     /// implementing the IDisposable interface to ensure that any currently open and loaded image
     /// will be properly disposed.</para>
     /// </summary>
     /// <returns>A new wrapper for safely using the image store IO methods.</returns>
-    public ImageStoreIO CreateIOWrapper() => new(this);
+    public ImageStoreStream OpenStream() => new(this);
 
     /// <summary>
     /// Moves the current index back to the index before the specified image
