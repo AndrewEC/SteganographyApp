@@ -158,7 +158,7 @@ public sealed class ImageStore(IInputArguments args)
         {
             return string.Empty;
         }
-        log.Debug("Reading [{0}] bits from image [{1}] starting from position [{2}]", bitsToRead, CurrentImage, pixelPosition.ToString());
+        log.Debug("Reading [{0}] bits from image [{1}] starting from position [{2}]", bitsToRead, CurrentImage.Path, pixelPosition.ToString());
         var binaryStringBuilder = new BinaryStringBuilder(bitsToRead);
         var pixelReader = new PixelReader(binaryStringBuilder, args.BitsToUse);
         while (!binaryStringBuilder.IsFull())
@@ -213,7 +213,7 @@ public sealed class ImageStore(IInputArguments args)
         {
             return;
         }
-        log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage);
+        log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage.Path);
         pixelPosition.Reset();
 
         int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (Calculator.MinimumBitsPerPixel * args.BitsToUse));

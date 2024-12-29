@@ -33,7 +33,7 @@ internal sealed class EncodeArguments : IArgumentConverter
     public string Password = string.Empty;
 
     [Argument("--file", "-f", true, helpText: "The path to the file to encode and write to the cover images.")]
-    [IsFile()]
+    [IsFile]
     public string InputFile = string.Empty;
 
     [Argument("--randomSeed", "-r", helpText: "The optional value to determine how the contents of the input file will be randomized before writing them. Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]

@@ -9,7 +9,7 @@ namespace SteganographyApp.Common.IO;
 /// </remarks>
 /// <param name="store">The image store instance.</param>
 /// <param name="arguments">The user provided arguments.</param>
-public abstract class AbstractChunkTableIO(ImageStore store, IInputArguments arguments) : AbstractDisposable
+public abstract class AbstractChunkTableIO(ImageStore store, IInputArguments arguments)
 {
     /// <summary>The number of iterations to be used when randomizing or reordering the chunk table binary.</summary>
     protected const int IterationMultiplier = 1000;
@@ -27,18 +27,4 @@ public abstract class AbstractChunkTableIO(ImageStore store, IInputArguments arg
     /// the chunk table needs to be randomized or not.
     /// </summary>
     protected IInputArguments Arguments { get; } = arguments;
-
-    /// <summary>
-    /// Disposes of the current instance. Any implementation of this method should check if disposing is true and,
-    /// if it is not, skip the execution of the remainder of the method.
-    /// </summary>
-    /// <param name="disposing">Indicates if this method was called from the base Dispose method.</param>
-    protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
-    {
-        if (!disposing)
-        {
-            return;
-        }
-        ImageStoreStream.Dispose();
-    });
 }

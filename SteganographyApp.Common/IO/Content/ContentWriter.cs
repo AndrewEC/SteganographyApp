@@ -11,8 +11,8 @@ using SteganographyApp.Common.Injection;
 /// Instantiates a new ContentWrite instance and sets the
 /// args field value.
 /// </remarks>
-/// <param name="args">The user provided input arguments.</param>
-public sealed class ContentWriter(IInputArguments args) : AbstractContentIO(args)
+/// <param name="arguments">The user provided input arguments.</param>
+public sealed class ContentWriter(IInputArguments arguments) : AbstractContentIO(arguments)
 {
     /// <summary>
     /// Takes in an encrypted binary string, decyrypts it using the DataEncoderUtil
@@ -21,7 +21,7 @@ public sealed class ContentWriter(IInputArguments args) : AbstractContentIO(args
     /// <param name="binary">The encrypted binary string read from the storage images.</param>
     public void WriteContentChunkToFile(string binary) => RunIfNotDisposed(() =>
     {
-        byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed, Args.AdditionalPasswordHashIterations);
+        byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Arguments.Password, Arguments.UseCompression, Arguments.DummyCount, Arguments.RandomSeed, Arguments.AdditionalPasswordHashIterations);
         Stream.Write(decoded, 0, decoded.Length);
         Stream.Flush();
     });
@@ -34,10 +34,10 @@ public sealed class ContentWriter(IInputArguments args) : AbstractContentIO(args
     protected override IReadWriteStream InitializeStream()
     {
         var fileIOProxy = Injector.Provide<IFileIOProxy>();
-        if (fileIOProxy.IsExistingFile(Args.DecodedOutputFile))
+        if (fileIOProxy.IsExistingFile(Arguments.DecodedOutputFile))
         {
-            fileIOProxy.Delete(Args.DecodedOutputFile);
+            fileIOProxy.Delete(Arguments.DecodedOutputFile);
         }
-        return fileIOProxy.OpenFileForWrite(Args.DecodedOutputFile);
+        return fileIOProxy.OpenFileForWrite(Arguments.DecodedOutputFile);
     }
 }

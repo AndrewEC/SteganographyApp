@@ -95,26 +95,22 @@ internal sealed class DecodeCommand : Command<DecodeArguments>
     private void Decode(IInputArguments arguments)
     {
         Console.WriteLine("Reading content chunk table.");
-        var store = new ImageStore(arguments);
-        using (var chunkTableReader = new ChunkTableReader(store, arguments))
+        using (var stream = new ImageStore(arguments).OpenStream())
         {
-            using (var stream = store.OpenStream())
-            {
-                var contentChunkTable = chunkTableReader.ReadContentChunkTable();
-                var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
-                log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
+            ImmutableArray<int> contentChunkTable = new ChunkTableReader(stream, arguments).ReadContentChunkTable();
+            var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
+            log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
 
-                using (var writer = new ContentWriter(arguments))
+            using (var writer = new ContentWriter(arguments))
+            {
+                foreach (int chunkLength in contentChunkTable)
                 {
-                    foreach (int chunkLength in contentChunkTable)
-                    {
-                        log.Debug("===== ===== ===== Begin Decoding Iteration ===== ===== =====");
-                        log.Debug("Processing chunk of [{0}] bits.", chunkLength);
-                        string binary = stream.ReadContentChunkFromImage(chunkLength);
-                        writer.WriteContentChunkToFile(binary);
-                        tracker.UpdateAndDisplayProgress();
-                        log.Debug("===== ===== ===== End Decoding Iteration ===== ===== =====");
-                    }
+                    log.Debug("===== ===== ===== Begin Decoding Iteration ===== ===== =====");
+                    log.Debug("Processing chunk of [{0}] bits.", chunkLength);
+                    string binary = stream.ReadContentChunkFromImage(chunkLength);
+                    writer.WriteContentChunkToFile(binary);
+                    tracker.UpdateAndDisplayProgress();
+                    log.Debug("===== ===== ===== End Decoding Iteration ===== ===== =====");
                 }
             }
         }

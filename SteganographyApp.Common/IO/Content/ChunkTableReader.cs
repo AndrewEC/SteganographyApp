@@ -11,18 +11,24 @@ using SteganographyApp.Common.Logging;
 /// <summary>
 /// Responsible for reading the content chunk table from the leading cover image.
 /// </summary>
-/// <param name="store">The image store instance.</param>
+/// <param name="stream">The stream opened from the image store.</param>
 /// <param name="arguments">The user provided arguments.</param>
-public class ChunkTableReader(ImageStore store, IInputArguments arguments) : AbstractChunkTableIO(store, arguments)
+public class ChunkTableReader(ImageStoreStream stream, IInputArguments arguments)
 {
     private readonly ILogger log = new LazyLogger<ChunkTableReader>();
 
+    private readonly ImageStoreStream stream = stream;
+
+    private readonly IInputArguments arguments = arguments;
+
     /// <summary>
-    /// Reads in and returns an array in which each element represents the number of bits in a chunk.
+    /// Reads in and returns an array in which each element represents the number of bits in a chunk. This will
+    /// advance the <see cref="ImageStoreStream"/> by the number of pixels required to read in the full
+    /// content chunk table.
     /// </summary>
     /// <returns>An immutable array in whcih each element specifies the number of bits per chunk saved in the
     /// cover images.</returns>
-    public ImmutableArray<int> ReadContentChunkTable() => RunIfNotDisposedWithResult(() =>
+    public ImmutableArray<int> ReadContentChunkTable()
     {
         log.Trace("Reading content chunk table.");
         var randomizeUtil = Injector.Provide<IRandomizeUtil>();
@@ -32,7 +38,7 @@ public class ChunkTableReader(ImageStore store, IInputArguments arguments) : Abs
         log.Debug("Chunk table contains [{0}] chunks.", chunkCount);
 
         return ReadTableChunkLengths(randomizeUtil, binaryUtil, chunkCount);
-    });
+    }
 
     private static string NextBinaryChunk(int index, string binaryString)
         => binaryString.Substring(index * Calculator.ChunkDefinitionBitSizeWithPadding, Calculator.ChunkDefinitionBitSizeWithPadding);
@@ -41,9 +47,9 @@ public class ChunkTableReader(ImageStore store, IInputArguments arguments) : Abs
 
     private short ReadChunkCount(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil)
     {
-        string headerBinary = ImageStoreStream.ReadContentChunkFromImage(Calculator.ChunkTableHeaderSizeWithPadding);
+        string headerBinary = stream.ReadContentChunkFromImage(Calculator.ChunkTableHeaderSizeWithPadding);
         log.Debug("Chunk table header: [{0}]", headerBinary);
-        if (!string.IsNullOrEmpty(Arguments.RandomSeed))
+        if (!string.IsNullOrEmpty(arguments.RandomSeed))
         {
             headerBinary = Reorder(randomizeUtil, binaryUtil, headerBinary);
             log.Debug("Reordered chunk table header: [{0}]", headerBinary);
@@ -53,10 +59,10 @@ public class ChunkTableReader(ImageStore store, IInputArguments arguments) : Abs
 
     private ImmutableArray<int> ReadTableChunkLengths(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil, short chunkCount)
     {
-        int chunkSize = Calculator.ChunkDefinitionBitSizeWithPadding * chunkCount;
-        string tableBinary = ImageStoreStream.ReadContentChunkFromImage(chunkSize);
+        int chunkTableSize = Calculator.ChunkDefinitionBitSizeWithPadding * chunkCount;
+        string tableBinary = stream.ReadContentChunkFromImage(chunkTableSize);
         log.Debug("Chunk table content: [{0}]", tableBinary);
-        if (!string.IsNullOrEmpty(Arguments.RandomSeed))
+        if (!string.IsNullOrEmpty(arguments.RandomSeed))
         {
             tableBinary = Reorder(randomizeUtil, binaryUtil, tableBinary);
             log.Debug("Reordered chunk table content: [{0}]", tableBinary);
@@ -71,7 +77,7 @@ public class ChunkTableReader(ImageStore store, IInputArguments arguments) : Abs
     private string Reorder(IRandomizeUtil randomize, IBinaryUtil binaryUtil, string binary)
     {
         byte[] binaryBytes = binaryUtil.ToBytesDirect(binary);
-        byte[] ordered = randomize.Reorder(binaryBytes, Arguments.RandomSeed, DummyCount, IterationMultiplier);
+        byte[] ordered = randomize.Reorder(binaryBytes, arguments.RandomSeed, ChunkTableConstants.DummyCount, ChunkTableConstants.IterationMultiplier);
         return binaryUtil.ToBinaryStringDirect(ordered);
     }
 }

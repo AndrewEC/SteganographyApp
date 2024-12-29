@@ -11,17 +11,17 @@ public abstract class AbstractContentIO : AbstractDisposable
     /// <summary>
     /// Initialize the abstract content IO instance with the user provided input arguments.
     /// </summary>
-    /// <param name="args">The user provided input arguments.</param>
-    public AbstractContentIO(IInputArguments args)
+    /// <param name="arguments">The user provided input arguments.</param>
+    public AbstractContentIO(IInputArguments arguments)
     {
-        Args = args;
+        Arguments = arguments;
         Stream = InitializeStream();
     }
 
     /// <summary>
     /// Gets the values parsed from the command line arguments.
     /// </summary>
-    protected IInputArguments Args { get; }
+    protected IInputArguments Arguments { get; }
 
     /// <summary>
     /// Gets the stream used by the underlying implementation to read
@@ -40,11 +40,8 @@ public abstract class AbstractContentIO : AbstractDisposable
         {
             return;
         }
-        if (Stream != null)
-        {
-            Stream.Flush();
-            Stream.Dispose();
-        }
+        Stream.Flush();
+        Stream.Dispose();
     });
 
     /// <summary>

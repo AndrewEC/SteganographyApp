@@ -13,9 +13,13 @@ using SteganographyApp.Common.Logging;
 /// </summary>
 /// <param name="store">The image store instance.</param>
 /// <param name="arguments">The user provided arguments.</param>
-public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments) : AbstractChunkTableIO(store, arguments)
+public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments) : AbstractDisposable
 {
     private readonly ILogger log = new LazyLogger<ChunkTableWriter>();
+
+    private readonly IInputArguments arguments = arguments;
+
+    private readonly ImageStoreStream stream = store.OpenStream();
 
     /// <summary>
     /// Writes the content chunk table to the cover images starting from the first.
@@ -36,7 +40,7 @@ public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments
         var binaryString = binary.ToString();
         log.Debug("Chunk table binary: [{0}]", binaryString);
 
-        if (!string.IsNullOrEmpty(Arguments.RandomSeed))
+        if (!string.IsNullOrEmpty(arguments.RandomSeed))
         {
             var randomizeUtil = Injector.Provide<IRandomizeUtil>();
             var binaryUtil = Injector.Provide<IBinaryUtil>();
@@ -50,8 +54,22 @@ public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments
 
         string tableBinary = tableHeader + binaryString;
 
-        ImageStoreStream.WriteContentChunkToImage(tableBinary);
-        ImageStoreStream.EncodeComplete();
+        stream.WriteContentChunkToImage(tableBinary);
+        stream.EncodeComplete();
+    });
+
+    /// <summary>
+    /// Disposes of the current instance. This will effectively call Dispose on the underlying
+    /// stream opened from the input <see cref="ImageStore"/> instance.
+    /// </summary>
+    /// <param name="disposing">If true this instance will be disposed.</param>
+    protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
+    {
+        if (!disposing)
+        {
+            return;
+        }
+        stream.Dispose();
     });
 
     private static string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');
@@ -61,7 +79,7 @@ public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments
     private string Randomize(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil, string value)
     {
         byte[] valueBytes = binaryUtil.ToBytesDirect(value);
-        byte[] randomized = randomizeUtil.Randomize(valueBytes, Arguments.RandomSeed, DummyCount, IterationMultiplier);
+        byte[] randomized = randomizeUtil.Randomize(valueBytes, arguments.RandomSeed, ChunkTableConstants.DummyCount, ChunkTableConstants.IterationMultiplier);
         return Injector.Provide<IBinaryUtil>().ToBinaryStringDirect(randomized);
     }
 }

@@ -107,12 +107,12 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
     {
         try
         {
-            string binary = GenerateBinaryString(path);
+            string writtenBinary = GenerateBinaryString(path);
             using (var copy = new TempFileBackup(path))
             {
-                WriteToImage(binary, arguments);
-                string readBinary = ReadFromImage(binary, arguments);
-                if (binary != readBinary)
+                WriteToImage(writtenBinary, arguments);
+                string readBinary = ReadFromImage(writtenBinary, arguments);
+                if (writtenBinary != readBinary)
                 {
                     return false;
                 }
@@ -159,18 +159,18 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
 
     private void WriteToImage(string binaryData, IInputArguments arguments)
     {
-        using (var wrapper = new ImageStore(arguments).OpenStream())
+        using (var stream = new ImageStore(arguments).OpenStream())
         {
-            wrapper.WriteContentChunkToImage(binaryData);
-            wrapper.EncodeComplete();
+            stream.WriteContentChunkToImage(binaryData);
+            stream.EncodeComplete();
         }
     }
 
     private string ReadFromImage(string expectedData, IInputArguments arguments)
     {
-        using (var wrapper = new ImageStore(arguments).OpenStream())
+        using (var stream = new ImageStore(arguments).OpenStream())
         {
-            return wrapper.ReadContentChunkFromImage(expectedData.Length);
+            return stream.ReadContentChunkFromImage(expectedData.Length);
         }
     }
 }

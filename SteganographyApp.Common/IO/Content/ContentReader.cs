@@ -21,25 +21,25 @@ public sealed class ContentReader(IInputArguments args) : AbstractContentIO(args
     /// <returns>A binary string representation of the next availabe ChunkByteSize from the input file.</returns>
     public string? ReadContentChunkFromFile() => RunIfNotDisposedWithResult(() =>
     {
-        byte[] buffer = new byte[Args.ChunkByteSize];
+        byte[] buffer = new byte[Arguments.ChunkByteSize];
         int read = Stream.Read(buffer, 0, buffer.Length);
         if (read == 0)
         {
             return null;
         }
-        else if (read < Args.ChunkByteSize)
+        else if (read < Arguments.ChunkByteSize)
         {
             byte[] actual = new byte[read];
             Array.Copy(buffer, actual, read);
             buffer = actual;
         }
 
-        return Injector.Provide<IDataEncoderUtil>().Encode(buffer, Args.Password, Args.UseCompression, Args.DummyCount, Args.RandomSeed, Args.AdditionalPasswordHashIterations);
+        return Injector.Provide<IDataEncoderUtil>().Encode(buffer, Arguments.Password, Arguments.UseCompression, Arguments.DummyCount, Arguments.RandomSeed, Arguments.AdditionalPasswordHashIterations);
     });
 
     /// <summary>
     /// Creates a new stream configured to read in the file that is to be encoded.
     /// </summary>
     /// <returns>A stream instance configured for reading from the FileToEncode.</returns>
-    protected override IReadWriteStream InitializeStream() => Injector.Provide<IFileIOProxy>().OpenFileForRead(Args.FileToEncode);
+    protected override IReadWriteStream InitializeStream() => Injector.Provide<IFileIOProxy>().OpenFileForRead(Arguments.FileToEncode);
 }

@@ -70,21 +70,18 @@ public class E2ETests
         }
 
         // Read the content previously written to the image and verify it matches the original input value.
-        using (var tableReader = new ChunkTableReader(imageStore, args))
+        using (var stream = imageStore.OpenStream())
         {
-            using (var wrapper = imageStore.OpenStream())
+            ImmutableArray<int> readTable = new ChunkTableReader(stream, args).ReadContentChunkTable();
+            using (var writer = new ContentWriter(args))
             {
-                var readTable = tableReader.ReadContentChunkTable();
-                using (var writer = new ContentWriter(args))
-                {
-                    string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                    Assert.That(binary, Is.EqualTo(content));
-                    writer.WriteContentChunkToFile(binary);
-                }
-                long target = new FileInfo(args.FileToEncode).Length;
-                long actual = new FileInfo(args.DecodedOutputFile).Length;
-                Assert.That(actual, Is.EqualTo(target));
+                string binary = stream.ReadContentChunkFromImage(readTable[0]);
+                Assert.That(binary, Is.EqualTo(content));
+                writer.WriteContentChunkToFile(binary);
             }
+            long target = new FileInfo(args.FileToEncode).Length;
+            long actual = new FileInfo(args.DecodedOutputFile).Length;
+            Assert.That(actual, Is.EqualTo(target));
         }
     }
 
@@ -122,16 +119,13 @@ public class E2ETests
 
         // reading file content from image
         args.Password = "Wrong Password";
-        using (var wrapper = imageStore.OpenStream())
+        using (var stream = imageStore.OpenStream())
         {
-            using (var tableReader = new ChunkTableReader(imageStore, args))
+            var readTable = new ChunkTableReader(stream, args).ReadContentChunkTable();
+            using (var writer = new ContentWriter(args))
             {
-                var readTable = tableReader.ReadContentChunkTable();
-                using (var writer = new ContentWriter(args))
-                {
-                    string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                    Assert.Throws<TransformationException>(() => writer.WriteContentChunkToFile(binary));
-                }
+                string binary = stream.ReadContentChunkFromImage(readTable[0]);
+                Assert.Throws<TransformationException>(() => writer.WriteContentChunkToFile(binary));
             }
         }
     }
@@ -163,18 +157,15 @@ public class E2ETests
 
         // reading file content from image
         args.DummyCount = 5;
-        using (var tableReader = new ChunkTableReader(imageStore, args))
+        using (var stream = imageStore.OpenStream())
         {
-            using (var wrapper = imageStore.OpenStream())
+            var readTable = new ChunkTableReader(stream, args).ReadContentChunkTable();
+            using (var writer = new ContentWriter(args))
             {
-                var readTable = tableReader.ReadContentChunkTable();
-                using (var writer = new ContentWriter(args))
-                {
-                    string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                    long target = new FileInfo(args.FileToEncode).Length;
-                    long actual = new FileInfo(args.DecodedOutputFile).Length;
-                    Assert.That(actual, Is.Not.EqualTo(target));
-                }
+                string binary = stream.ReadContentChunkFromImage(readTable[0]);
+                long target = new FileInfo(args.FileToEncode).Length;
+                long actual = new FileInfo(args.DecodedOutputFile).Length;
+                Assert.That(actual, Is.Not.EqualTo(target));
             }
         }
     }
@@ -185,18 +176,18 @@ public class E2ETests
         // writing file content to image
         var contentChunkSize = -1;
         string content = string.Empty;
-        using (var wrapper = imageStore.OpenStream())
+        using (var stream = imageStore.OpenStream())
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
-            wrapper.SeekToPixel(requiredBitsForTable);
+            stream.SeekToPixel(requiredBitsForTable);
             using (var reader = new ContentReader(args))
             {
                 content = reader.ReadContentChunkFromFile();
-                int written = wrapper.WriteContentChunkToImage(content);
+                int written = stream.WriteContentChunkToImage(content);
                 contentChunkSize = written;
                 Assert.That(written, Is.EqualTo(content.Length));
             }
-            wrapper.EncodeComplete();
+            stream.EncodeComplete();
         }
         using (var tableWriter = new ChunkTableWriter(imageStore, args))
         {
@@ -205,17 +196,14 @@ public class E2ETests
 
         // reading file content from image
         args.UseCompression = false;
-        using (var tableReader = new ChunkTableReader(imageStore, args))
+        using (var stream = imageStore.OpenStream())
         {
-            using (var wrapper = imageStore.OpenStream())
+            var readTable = new ChunkTableReader(stream, args).ReadContentChunkTable();
+            using (var writer = new ContentWriter(args))
             {
-                var readTable = tableReader.ReadContentChunkTable();
-                using (var writer = new ContentWriter(args))
-                {
-                    string binary = wrapper.ReadContentChunkFromImage(readTable[0]);
-                    Assert.That(binary, Is.EqualTo(content));
-                    Assert.Throws(typeof(TransformationException), () => writer.WriteContentChunkToFile(binary));
-                }
+                string binary = stream.ReadContentChunkFromImage(readTable[0]);
+                Assert.That(binary, Is.EqualTo(content));
+                Assert.Throws(typeof(TransformationException), () => writer.WriteContentChunkToFile(binary));
             }
         }
     }
@@ -226,18 +214,18 @@ public class E2ETests
         // writing file content to image
         string content = string.Empty;
         var contentChunkSize = -1;
-        using (var wrapper = imageStore.OpenStream())
+        using (var stream = imageStore.OpenStream())
         {
             int requiredBitsForTable = Calculator.CalculateRequiredBitsForContentTable(args.FileToEncode, args.ChunkByteSize);
-            wrapper.SeekToPixel(requiredBitsForTable);
+            stream.SeekToPixel(requiredBitsForTable);
             using (var reader = new ContentReader(args))
             {
                 content = reader.ReadContentChunkFromFile();
-                int written = wrapper.WriteContentChunkToImage(content);
+                int written = stream.WriteContentChunkToImage(content);
                 contentChunkSize = written;
                 Assert.That(written, Is.EqualTo(content.Length));
             }
-            wrapper.EncodeComplete();
+            stream.EncodeComplete();
         }
         using (var tableWriter = new ChunkTableWriter(imageStore, args))
         {
@@ -246,9 +234,9 @@ public class E2ETests
 
         // reading file content from image
         args.RandomSeed = string.Empty;
-        using (var tableReader = new ChunkTableReader(imageStore, args))
+        using (var stream = imageStore.OpenStream())
         {
-            Assert.Throws<OverflowException>(() => tableReader.ReadContentChunkTable());
+            Assert.Throws<OverflowException>(() => new ChunkTableReader(stream, args).ReadContentChunkTable());
         }
     }
 }

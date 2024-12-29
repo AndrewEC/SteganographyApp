@@ -48,7 +48,9 @@ public class ImageStoreTests : FixtureWithRealObjects
         using (var wrapper = imageStore.OpenStream())
         {
             var exception = Assert.Throws<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
-            Assert.That(exception.Message, Is.EqualTo("Cannot load next image because there are no remaining cover images left to load."));
+            Assert.That(
+                exception?.Message ?? "No Message",
+                Is.EqualTo("Cannot load next image because there are no remaining cover images left to load."));
         }
 
         Assert.That(mockImage.DisposeCalled, Is.True);
@@ -71,9 +73,9 @@ public class ImageStoreTests : FixtureWithRealObjects
         }
         imageStore.SeekToImage(0);
 
-        using (var reader = new ChunkTableReader(imageStore, Arguments))
+        using (var stream = imageStore.OpenStream())
         {
-            var chunkTableRead = reader.ReadContentChunkTable();
+            var chunkTableRead = new ChunkTableReader(stream, Arguments).ReadContentChunkTable();
             Assert.That(chunkTableRead, Has.Length.EqualTo(chunkTableWrite.Length));
             for (int i = 0; i < chunkTableWrite.Length; i++)
             {
