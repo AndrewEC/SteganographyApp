@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using SteganographyApp.Common.Data;
 
-[SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 3, targetCount: 3)]
+[SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 3)]
 [MeanColumn, MinColumn, MaxColumn]
 public class DecodeBench
 {

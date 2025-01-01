@@ -22,7 +22,7 @@ public class EncoderProviderTests : FixtureWithTestObjects
     [TestCase(ImageFormat.Webp, typeof(WebpEncoder))]
     public void TestProvideEncoder(ImageFormat imageFormat, Type encoderType)
     {
-        Assert.IsAssignableFrom(encoderType, new EncoderProvider().GetEncoder(imageFormat));
+        Assert.That(new EncoderProvider().GetEncoder(imageFormat), Is.AssignableFrom(encoderType));
     }
 
     [TestCase("image/png", typeof(PngEncoder))]
@@ -32,6 +32,6 @@ public class EncoderProviderTests : FixtureWithTestObjects
         string path = "/image/path";
         mockImageProxy.Setup(imageProxy => imageProxy.GetImageMimeType(path)).Returns(format);
 
-        Assert.IsAssignableFrom(encoder, new EncoderProvider().GetEncoder(path));
+        Assert.That(new EncoderProvider().GetEncoder(path), Is.AssignableFrom(encoder));
     }
 }

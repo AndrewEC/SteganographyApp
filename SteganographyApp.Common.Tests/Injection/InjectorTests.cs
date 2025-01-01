@@ -35,11 +35,9 @@ public class InjectorTests : FixtureWithRealObjects
         Injector.AllowOnlyMockObjects();
 
         var actual = Assert.Throws<InvalidOperationException>(() =>
-        {
-            Injector.Provide<IConsoleReader>();
-        });
+            Injector.Provide<IConsoleReader>());
 
-        Assert.True(actual.Message.Contains(typeof(IConsoleReader).Name));
+        Assert.That(actual!.Message, Does.Contain(typeof(IConsoleReader).Name));
     }
 
     [Test]

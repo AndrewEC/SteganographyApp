@@ -17,7 +17,7 @@ public static class Checks
     /// <param name="value">The immutable array to perform the null and empty checks against.</param>
     /// <typeparam name="T">The type of the input value array.</typeparam>
     /// <returns>True if the immutable array is null or contains no elements, otherwise false.</returns>
-    public static bool IsNullOrEmpty<T>(ImmutableArray<T> value) => value == null || value.Length == 0;
+    public static bool IsNullOrEmpty<T>(ImmutableArray<T>? value) => (value?.Length ?? 0) == 0;
 
     /// <summary>
     /// Checks to see if the help argument or the shortened help argument has been provided

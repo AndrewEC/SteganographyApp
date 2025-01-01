@@ -213,10 +213,11 @@ public sealed class ImageStore(IInputArguments args)
         {
             return;
         }
-        log.Debug("Seeking past [{0}] bits in image [{1}]", bitsToSkip, CurrentImage.Path);
+
         pixelPosition.Reset();
 
         int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (Calculator.MinimumBitsPerPixel * args.BitsToUse));
+        log.Debug("Seeking past [{0}] bits in image [{1}] to pixel index [{3}]", bitsToSkip, CurrentImage.Path, pixelIndex);
         for (int i = 0; i < pixelIndex; i++)
         {
             if (!pixelPosition.TryMoveToNext())
