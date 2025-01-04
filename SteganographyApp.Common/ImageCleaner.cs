@@ -36,7 +36,7 @@ public sealed class ImageCleaner(IInputArguments arguments, ImageStore imageStor
                 {
                     return;
                 }
-                string randomBinary = GenerateBinaryString(currentImage, ComputeModifier(currentImage));
+                string randomBinary = GenerateBinaryString(currentImage);
                 log.Trace("Generated random binary string of: [{0}]", randomBinary);
                 cleaner.WriteContentChunkToImage(randomBinary);
             }
@@ -56,8 +56,9 @@ public sealed class ImageCleaner(IInputArguments arguments, ImageStore imageStor
         return -1 * Calculator.MinimumBitsPerPixel * arguments.BitsToUse;
     }
 
-    private string GenerateBinaryString(IBasicImageInfo image, int modifier)
+    private string GenerateBinaryString(IBasicImageInfo image)
     {
+        int modifier = ComputeModifier(image);
         long bitCount = Calculator.CalculateStorageSpaceOfImage(image.Width, image.Height, arguments.BitsToUse) + modifier;
 
         log.Debug("Generating binary string with a length of [{0}] for image [{1}]", bitCount, image.Path);

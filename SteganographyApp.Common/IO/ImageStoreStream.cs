@@ -7,7 +7,7 @@ using SteganographyApp.Common.Data;
 /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
 /// more error prone IO operations.
 /// </summary>
-public class ImageStoreStream : AbstractDisposable
+public sealed class ImageStoreStream : AbstractDisposable
 {
     private readonly ImageStore store;
 
@@ -73,6 +73,7 @@ public class ImageStoreStream : AbstractDisposable
             return;
         }
         store.CloseOpenImage(save);
+        store.StreamClosed();
         GlobalCounter.Instance.Reset();
     });
 }

@@ -1,9 +1,9 @@
 Param(
-    [Switch]$Release
+    [Switch]$Debug
 )
 
-if ($Release) {
-    dotnet pack -c release
+if ($Debug) {
+    dotnet pack -c Debug
     Exit
 }
 dotnet pack

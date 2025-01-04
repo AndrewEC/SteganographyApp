@@ -19,18 +19,15 @@ using SteganographyApp.Common.Logging;
 /// <param name="args">The values parsed from the command line arguments.</param>
 public sealed class ImageStore(IInputArguments args)
 {
+    private readonly ILogger log = new LazyLogger<ImageStore>();
+
+    private readonly IInputArguments args = args;
+
     /// <summary>
     /// Stores the current x and y position of the pixel the image store is about to
     /// read from or write to.
     /// </summary>
     private readonly PixelPosition pixelPosition = new();
-
-    /// <summary>
-    /// The values parsed from the command line arguments.
-    /// </summary>
-    private readonly IInputArguments args = args;
-
-    private readonly ILogger log = new LazyLogger<ImageStore>();
 
     /// <summary>
     /// The index used to determine which image will be read/written to in the
@@ -68,7 +65,20 @@ public sealed class ImageStore(IInputArguments args)
     /// will be properly disposed.</para>
     /// </summary>
     /// <returns>A new wrapper for safely using the image store IO methods.</returns>
-    public ImageStoreStream OpenStream() => new(this);
+    public ImageStoreStream OpenStream()
+    {
+        if (currentStream != null)
+        {
+            throw new ImageProcessingException("Call to OpenStream was made but the stream is already open. "
+                + "Have you disposed of the previous stream?");
+        }
+
+        ImageStoreStream stream = new(this);
+        currentStream = stream;
+        return stream;
+    }
+
+    private ImageStoreStream? currentStream;
 
     /// <summary>
     /// Moves the current index back to the index before the specified image
@@ -84,6 +94,11 @@ public sealed class ImageStore(IInputArguments args)
         }
         currentImageIndex = coverImageIndex - 1;
         LoadNextImage();
+    }
+
+    internal void StreamClosed()
+    {
+        currentStream = null;
     }
 
     /// <summary>

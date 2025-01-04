@@ -41,10 +41,10 @@ For some performance benchmark execute `run_benchmarks.ps1`.
 
 This app takes advantage of the following third party nuget packages:
 
-* [ImageSharp](https://github.com/JimBobSquarePants/ImageSharp) - Loading, manipulating, saving, and converting images
-* [Coverlet](https://github.com/tonerdo/coverlet) - Measure, and subsequently generate reports for, unit test coverage
-* [StrykerNet](https://github.com/stryker-mutator/stryker-net) - Mutation testing framework
-* [ReportGenerator](https://github.com/danielpalme/ReportGenerator) - Generates an Html report from the mutation test results
-* [NUnit](https://github.com/nunit/nunit) - Unit testing framework
-* [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) - Benchmarking framework
-* [Mircosoft.Extensions.FileSystemGlobbing](https://docs.microsoft.com/en-us/dotnet/core/extensions/file-globbing) - File glob pattern matching
+* [ImageSharp](https://github.com/JimBobSquarePants/ImageSharp) - Loading, manipulating, saving, and converting images.
+* [Coverlet](https://github.com/tonerdo/coverlet) - Measure, and subsequently generate reports for, unit test coverage.
+* [StrykerNet](https://github.com/stryker-mutator/stryker-net) - Mutation testing framework.
+* [ReportGenerator](https://github.com/danielpalme/ReportGenerator) - Generates an Html report from the mutation test results.
+* [NUnit](https://github.com/nunit/nunit) - Unit testing framework.
+* [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) - Benchmarking framework.
+* [Mircosoft.Extensions.FileSystemGlobbing](https://docs.microsoft.com/en-us/dotnet/core/extensions/file-globbing) - File glob pattern matching.
