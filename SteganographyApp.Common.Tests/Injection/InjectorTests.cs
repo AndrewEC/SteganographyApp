@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 [TestFixture]
 public class InjectorTests : FixtureWithRealObjects

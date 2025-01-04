@@ -1,6 +1,6 @@
-namespace SteganographyApp.Common.IO;
+namespace SteganographyApp.Common.IO.Pixels;
 
-using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Handles the current pixel position for the currently loaded image in the ImageStore.

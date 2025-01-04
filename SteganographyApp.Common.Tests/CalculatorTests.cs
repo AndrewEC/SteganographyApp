@@ -3,7 +3,7 @@ namespace SteganographyApp.Common.Tests;
 using Moq;
 using NUnit.Framework;
 
-using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 [TestFixture]
 public class CalculatorTests : FixtureWithTestObjects

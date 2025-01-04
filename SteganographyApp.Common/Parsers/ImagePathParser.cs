@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.Extensions.FileSystemGlobbing;
 
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Static utility class to help parse out a list of paths to the images provided in the

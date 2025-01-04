@@ -8,6 +8,7 @@ using NUnit.Framework;
 
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.IO;
+using SteganographyApp.Common.IO.Content;
 
 [TestFixture]
 public class E2ETests

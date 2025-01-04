@@ -6,6 +6,8 @@ using SixLabors.ImageSharp.PixelFormats;
 
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
+using SteganographyApp.Common.IO.Pixels;
 using SteganographyApp.Common.Logging;
 
 /// <summary>

@@ -1,9 +1,10 @@
-﻿namespace SteganographyApp.Common.IO;
+﻿namespace SteganographyApp.Common.IO.Content;
 
 using System;
 
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Stream encapsulation class that reads and encodes data
@@ -34,12 +35,14 @@ public sealed class ContentReader(IInputArguments args) : AbstractContentIO(args
             buffer = actual;
         }
 
-        return Injector.Provide<IDataEncoderUtil>().Encode(buffer, Arguments.Password, Arguments.UseCompression, Arguments.DummyCount, Arguments.RandomSeed, Arguments.AdditionalPasswordHashIterations);
+        return Injector.Provide<IDataEncoderUtil>()
+            .Encode(buffer, Arguments.Password, Arguments.UseCompression, Arguments.DummyCount, Arguments.RandomSeed, Arguments.AdditionalPasswordHashIterations);
     });
 
     /// <summary>
     /// Creates a new stream configured to read in the file that is to be encoded.
     /// </summary>
     /// <returns>A stream instance configured for reading from the FileToEncode.</returns>
-    protected override IReadWriteStream InitializeStream() => Injector.Provide<IFileIOProxy>().OpenFileForRead(Arguments.FileToEncode);
+    protected override IReadWriteStream InitializeStream()
+        => Injector.Provide<IFileIOProxy>().OpenFileForRead(Arguments.FileToEncode);
 }

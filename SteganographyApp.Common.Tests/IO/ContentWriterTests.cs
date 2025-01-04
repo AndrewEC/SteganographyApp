@@ -5,8 +5,8 @@ using Moq;
 using NUnit.Framework;
 
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
-using SteganographyApp.Common.IO;
+using SteganographyApp.Common.Injection.Proxies;
+using SteganographyApp.Common.IO.Content;
 
 using static Moq.It;
 using static Moq.Times;

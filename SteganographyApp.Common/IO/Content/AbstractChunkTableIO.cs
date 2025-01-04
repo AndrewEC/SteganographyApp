@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.IO;
+namespace SteganographyApp.Common.IO.Content;
 
 /// <summary>
 /// The abstract base class for dealing with the content chunk table.

@@ -14,8 +14,9 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.IO;
+using SteganographyApp.Common.IO.Content;
 
 [TestFixture]
 public class ImageStoreTests : FixtureWithRealObjects

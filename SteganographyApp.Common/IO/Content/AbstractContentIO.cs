@@ -1,6 +1,6 @@
-﻿namespace SteganographyApp.Common.IO;
+﻿namespace SteganographyApp.Common.IO.Content;
 
-using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Base class for read and write IO. Implements the basic disposable logic to be shared

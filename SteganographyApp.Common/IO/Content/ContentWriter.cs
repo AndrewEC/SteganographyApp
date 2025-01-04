@@ -1,7 +1,8 @@
-﻿namespace SteganographyApp.Common.IO;
+﻿namespace SteganographyApp.Common.IO.Content;
 
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Stream encapsulating class that decodes binary data and writes it

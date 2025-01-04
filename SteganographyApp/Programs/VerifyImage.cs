@@ -11,6 +11,7 @@ using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Arguments.Commands;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.Logging;
 using System.Text;
 

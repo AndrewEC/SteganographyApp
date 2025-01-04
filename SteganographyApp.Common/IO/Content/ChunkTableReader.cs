@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.IO;
+namespace SteganographyApp.Common.IO.Content;
 
 using System;
 using System.Collections.Immutable;

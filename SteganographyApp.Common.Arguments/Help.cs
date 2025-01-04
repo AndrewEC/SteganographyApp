@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+using SteganographyApp.Common.Arguments.Matching;
+
 /// <summary>
 /// A static utility class to print help related information about the program being executed and its attributes.
 /// </summary>

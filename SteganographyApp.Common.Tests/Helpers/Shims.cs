@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.Logging;
 
 [TestFixture]

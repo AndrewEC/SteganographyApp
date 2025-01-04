@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.IO;
+namespace SteganographyApp.Common.IO.Pixels;
 
 using System;
 

@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
+using SteganographyApp.Common.Arguments.Parsers;
 
 [TestFixture]
 public class CliParserTests

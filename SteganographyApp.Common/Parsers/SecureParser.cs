@@ -4,6 +4,7 @@ using System;
 using System.Text;
 
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Static utility class to allow the user to enter in secure parameters in an interactive manner.

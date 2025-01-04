@@ -3,6 +3,9 @@ namespace SteganographyApp.Common.Arguments;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+
+using SteganographyApp.Common.Arguments.Matching;
+using SteganographyApp.Common.Arguments.Parsers;
 using SteganographyApp.Common.Arguments.Validation;
 
 /// <summary>

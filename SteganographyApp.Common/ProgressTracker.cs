@@ -1,6 +1,7 @@
 namespace SteganographyApp.Common;
 
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Utility class to help write messages to the console along with a

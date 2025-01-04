@@ -3,6 +3,7 @@ namespace SteganographyApp.Common;
 using System;
 
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Utility class for performing some basic calculations to help in reading and writing

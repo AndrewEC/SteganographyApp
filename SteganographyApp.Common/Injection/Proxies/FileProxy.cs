@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.Injection;
+namespace SteganographyApp.Common.Injection.Proxies;
 
 using System.IO;
 

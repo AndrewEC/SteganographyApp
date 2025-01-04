@@ -2,6 +2,8 @@ namespace SteganographyApp.Common.Arguments.Commands;
 
 using System;
 
+using SteganographyApp.Common.Arguments.Parsers;
+
 /// <summary>
 /// Create a cli program to execute a specific command or sub-program based on the user's input.
 /// </summary>

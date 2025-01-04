@@ -1,4 +1,4 @@
-namespace SteganographyApp.Common.IO;
+namespace SteganographyApp.Common.IO.Content;
 
 /// <summary>
 /// A shared constant class to be used between the various chunk table

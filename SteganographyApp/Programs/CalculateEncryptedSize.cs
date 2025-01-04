@@ -9,7 +9,7 @@ using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Arguments.Commands;
 using SteganographyApp.Common.Arguments.Validation;
 using SteganographyApp.Common.Injection;
-using SteganographyApp.Common.IO;
+using SteganographyApp.Common.IO.Content;
 using SteganographyApp.Common.Logging;
 
 [ProgramDescriptor("Calculates the approximate size of an input file if it were to be encrypted.")]

@@ -4,6 +4,7 @@ using System;
 using System.Text;
 
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// The singleon logger that all ILogger instances will invoke.

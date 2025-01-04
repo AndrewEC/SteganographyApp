@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 
 using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 [TestFixture]
 public class ProgressTrackerTests : FixtureWithTestObjects

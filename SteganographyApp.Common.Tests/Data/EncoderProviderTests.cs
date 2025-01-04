@@ -10,7 +10,7 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
 
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
+using SteganographyApp.Common.Injection.Proxies;
 
 [TestFixture]
 public class EncoderProviderTests : FixtureWithTestObjects
