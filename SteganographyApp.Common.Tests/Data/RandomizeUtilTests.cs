@@ -12,12 +12,11 @@ using SteganographyApp.Common.Data;
 [TestFixture]
 public class RandomizeUtilTests : FixtureWithTestObjects
 {
-    [Mockup(typeof(IEncryptionUtil))]
-    public Mock<IEncryptionUtil> MockEncryptionUtil = new();
+    [Mockup(typeof(IKeyUtil))]
+    public Mock<IKeyUtil> MockKeyUtil = new();
 
     private const string RandomSeed = "randomSeed";
     private const string BadRandomSeed = "badRandomSeed";
-    private const int DummyCount = 5;
     private const int IterationMultiplier = 2;
     private readonly byte[] originalBytes = [1, 34, 57, 31, 4, 7, 53, 78, 21, 9, 31];
 
@@ -32,13 +31,13 @@ public class RandomizeUtilTests : FixtureWithTestObjects
     [Test]
     public void TestRandomizeTwiceWithSameSeedProducesSameResult()
     {
-        MockEncryptionUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
+        MockKeyUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
 
         byte[] first = (byte[])originalBytes.Clone();
-        byte[] randomizedFirst = util.Randomize(first, RandomSeed, DummyCount, IterationMultiplier);
+        byte[] randomizedFirst = util.Randomize(first, RandomSeed, IterationMultiplier);
 
         byte[] second = (byte[])originalBytes.Clone();
-        byte[] randomizedSecond = util.Randomize(second, RandomSeed, DummyCount, IterationMultiplier);
+        byte[] randomizedSecond = util.Randomize(second, RandomSeed, IterationMultiplier);
 
         Assert.That(randomizedSecond, Is.EqualTo(randomizedFirst));
     }
@@ -46,28 +45,28 @@ public class RandomizeUtilTests : FixtureWithTestObjects
     [Test]
     public void TestRandomizeAndReorder()
     {
-        MockEncryptionUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
+        MockKeyUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
 
         byte[] copy = (byte[])originalBytes.Clone();
-        byte[] randomized = util.Randomize(copy, RandomSeed, DummyCount, IterationMultiplier);
+        byte[] randomized = util.Randomize(copy, RandomSeed, IterationMultiplier);
         Assert.That(randomized, Is.Not.EqualTo(originalBytes));
 
-        byte[] unrandomized = util.Reorder(randomized, RandomSeed, DummyCount, IterationMultiplier);
+        byte[] unrandomized = util.Reorder(randomized, RandomSeed, IterationMultiplier);
         Assert.That(unrandomized, Is.EqualTo(originalBytes));
     }
 
     [Test]
     public void TestRandomizeWithIncorrectRandomSeedReturnsBadResult()
     {
-        var keyByteQueue = new Queue<byte[]>(new[] { Encoding.UTF8.GetBytes("random_key"), Encoding.UTF8.GetBytes("encoding_key") });
-        MockEncryptionUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey(It.IsAny<string>(), It.IsAny<int>()))
+        var keyByteQueue = new Queue<byte[]>([Encoding.UTF8.GetBytes("random_key"), Encoding.UTF8.GetBytes("encoding_key")]);
+        MockKeyUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey(It.IsAny<string>(), It.IsAny<int>()))
             .Returns(() => keyByteQueue.Dequeue());
 
         byte[] copy = (byte[])originalBytes.Clone();
-        byte[] randomized = util.Randomize(copy, RandomSeed, DummyCount, IterationMultiplier);
+        byte[] randomized = util.Randomize(copy, RandomSeed, IterationMultiplier);
         Assert.That(randomized, Is.Not.EqualTo(originalBytes));
 
-        byte[] unrandomized = util.Reorder(randomized, BadRandomSeed, DummyCount, IterationMultiplier);
+        byte[] unrandomized = util.Reorder(randomized, BadRandomSeed, IterationMultiplier);
         Assert.That(unrandomized, Is.Not.EqualTo(originalBytes));
     }
 }

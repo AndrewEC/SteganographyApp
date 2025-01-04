@@ -22,7 +22,6 @@ public class DecodeBench
     public void DecodeWithPasswordSetup()
     {
         data = new DataEncoderUtil().Encode(GenerateRandomBytes(), Password, false, 0, "", AdditionalHashIterations);
-        GlobalCounter.Instance.Reset();
     }
 
     [Benchmark]
@@ -35,7 +34,6 @@ public class DecodeBench
     public void DecodeWithRandomizationSetup()
     {
         data = new DataEncoderUtil().Encode(GenerateRandomBytes(), Password, false, 0, "", AdditionalHashIterations);
-        GlobalCounter.Instance.Reset();
     }
 
     [Benchmark]
@@ -48,7 +46,6 @@ public class DecodeBench
     public void DecodeWithDummiesSetup()
     {
         data = new DataEncoderUtil().Encode(GenerateRandomBytes(), "", false, DummyCount, "", 0);
-        GlobalCounter.Instance.Reset();
     }
 
     [Benchmark]
@@ -61,7 +58,6 @@ public class DecodeBench
     public void DecodeWithCompressionSetup()
     {
         data = new DataEncoderUtil().Encode(GenerateRandomBytes(), "", true, 0, "", 0);
-        GlobalCounter.Instance.Reset();
     }
 
     [Benchmark]

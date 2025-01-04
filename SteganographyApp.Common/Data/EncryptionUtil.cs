@@ -3,7 +3,6 @@ namespace SteganographyApp.Common.Data;
 using System;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
 
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
@@ -18,9 +17,6 @@ public interface IEncryptionUtil
 
     /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
     byte[] Decrypt(byte[] value, string password, int additionalPasswordHashIterations);
-
-    /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/GenerateKey/*' />
-    byte[] GenerateKey(string value, int iterations);
 }
 
 /// <summary>
@@ -30,7 +26,7 @@ public interface IEncryptionUtil
 public sealed class EncryptionUtil : IEncryptionUtil
 {
     /// <summary>The default number of iterations that should be used when hashing a key.</summary>
-    public static readonly int DefaultIterations = 50_000;
+    public static readonly int DefaultIterations = 150_000;
 
     private const int KeySize = 256;
     private const int IvSize = 16;
@@ -40,9 +36,12 @@ public sealed class EncryptionUtil : IEncryptionUtil
     /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />
     public byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations)
     {
-        var keyBytes = GenerateKey(password, DefaultIterations + additionalPasswordHashIterations);
-        log.Debug("Encrypting value using key: [{0}]/[{1}]", () => new object[] { password, Convert.ToBase64String(keyBytes) });
-        var iv = GenerateRandomBytes(IvSize);
+        byte[] keyBytes = Injector.Provide<IKeyUtil>().GenerateKey(password, additionalPasswordHashIterations);
+        log.Debug("Encrypting value using key: [{0}]/[{1}]", () => [password, Convert.ToBase64String(keyBytes)]);
+        log.Trace("Encrypting value: [{0}]", () => [Convert.ToBase64String(value)]);
+
+        byte[] iv = GenerateRandomBytes(IvSize);
+
         using (var managed = Aes.Create())
         {
             var cryptor = managed.CreateEncryptor(keyBytes, iv);
@@ -64,9 +63,9 @@ public sealed class EncryptionUtil : IEncryptionUtil
     /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
     public byte[] Decrypt(byte[] value, string password, int additionalPasswordHashIterations)
     {
-        var keyBytes = GenerateKey(password, DefaultIterations + additionalPasswordHashIterations);
-        log.Debug("Decrypting value using key: [{0}]", () => new[] { Convert.ToBase64String(keyBytes) });
-        log.Trace("Decrypting: [{0}]", Convert.ToBase64String(value));
+        byte[] keyBytes = Injector.Provide<IKeyUtil>().GenerateKey(password, additionalPasswordHashIterations);
+        log.Debug("Decrypting value using key: [{0}]", () => [Convert.ToBase64String(keyBytes)]);
+        log.Trace("Decrypting value: [{0}]", () => [Convert.ToBase64String(value)]);
 
         using (var managed = Aes.Create())
         {
@@ -88,19 +87,6 @@ public sealed class EncryptionUtil : IEncryptionUtil
             }
         }
     }
-
-    /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/GenerateKey/*' />
-    public byte[] GenerateKey(string value, int iterations)
-    {
-        log.Debug("Generating key from value [{0}] over [{1}] iterations.", value, iterations);
-        var passwordBytes = Encoding.UTF8.GetBytes(value);
-        var salt = Pbkdf2(passwordBytes, Sha512(value + value.Length), iterations, KeySize);
-        return Pbkdf2(passwordBytes, salt, iterations, KeySize / 8);
-    }
-
-    private static byte[] Pbkdf2(byte[] data, byte[] salt, int iterations, int size) => new Rfc2898DeriveBytes(data, salt, iterations, HashAlgorithmName.SHA512).GetBytes(size);
-
-    private static byte[] Sha512(string data) => SHA512.HashData(Encoding.UTF8.GetBytes(data));
 
     private static byte[] GenerateRandomBytes(int size)
     {

@@ -239,10 +239,15 @@
             </param>
             <returns>A decrypted base64 encoded string.</returns>
         </Decrypt>
+    </members>
+    <members name="KeyUtil">
         <GenerateKey>
             <summary>Generates a salted and hashed key from the input value.</summary>
-            <param name="value">The value to be salted and hashed.</param>
-            <param name="iterations">The number of times the key will be hashed. Default value is 100,000.</param>
+            <param name="password">The value to be salted and hashed.</param>
+            <param name="additionalIterations">
+                The additional number of times the password will be hashed.
+                This is in addition to the default number of iterations of 450,000.
+            </param>
             <returns>A byte representation of the salted and hashed key derived from the value param.</returns>
         </GenerateKey>
     </members>
@@ -253,7 +258,6 @@
             </summary>
             <param name="value">The bytes to be randomized.</param>
             <param name="randomSeed">The user provided random seed that will be used to initialize the random number generator.</param>
-            <param name="dummyCount">The number of dummy entries used to help determine the complete random seed to be used.</param>
             <param name="iterationMultiplier">
                 A multiplier used in determining the number of bits to be swapped. The number of bits to be swapped is equal to the number
                 of bits in the binary string multiplied by the iterationMultipler.
@@ -266,7 +270,6 @@
             </summary>
             <param name="value">The encrypted and randomized bytes to be re-ordered.</param>
             <param name="randomSeed">The user provided randoom seed that will be used to initialize the random number generator.</param>
-            <param name="dummyCount">The number of dummy entries used to help determine the complete random seed to be used.</param>
             <param name="iterationMultiplier">
                 A multiplier used in determining the number of bits to be swapped. The number of bits to be swapped is equal to the number
                 of bits in the binary string multiplied by the iterationMultipler.

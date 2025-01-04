@@ -22,20 +22,9 @@ public sealed class ImageStore(IInputArguments args)
     private readonly ILogger log = new LazyLogger<ImageStore>();
 
     private readonly IInputArguments args = args;
-
-    /// <summary>
-    /// Stores the current x and y position of the pixel the image store is about to
-    /// read from or write to.
-    /// </summary>
     private readonly PixelPosition pixelPosition = new();
-
-    /// <summary>
-    /// The index used to determine which image will be read/written to in the
-    /// next read/write operation.
-    /// <para>The image name is retrieved by looking up the args.CoverImage value
-    /// using this field as the index.</para>
-    /// </summary>
     private int currentImageIndex = -1;
+    private ImageStoreStream? currentStream;
 
     /// <summary>
     /// Event handler that's invoked whenever the WriteContentChunkToImage method completes.
@@ -78,8 +67,6 @@ public sealed class ImageStore(IInputArguments args)
         return stream;
     }
 
-    private ImageStoreStream? currentStream;
-
     /// <summary>
     /// Moves the current index back to the index before the specified image
     /// then calls the Next method to advance to the specified image.
@@ -96,6 +83,10 @@ public sealed class ImageStore(IInputArguments args)
         LoadNextImage();
     }
 
+    /// <summary>
+    /// Used to indicate that a previously opened stream has been closed.
+    /// Has no affect if there is no open stream.
+    /// </summary>
     internal void StreamClosed()
     {
         currentStream = null;
@@ -232,7 +223,7 @@ public sealed class ImageStore(IInputArguments args)
         pixelPosition.Reset();
 
         int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (Calculator.MinimumBitsPerPixel * args.BitsToUse));
-        log.Debug("Seeking past [{0}] bits in image [{1}] to pixel index [{3}]", bitsToSkip, CurrentImage.Path, pixelIndex);
+        log.Debug("Seeking past [{0}] bits in image [{1}] to pixel index [{2}]", bitsToSkip, CurrentImage.Path, pixelIndex);
         for (int i = 0; i < pixelIndex; i++)
         {
             if (!pixelPosition.TryMoveToNext())

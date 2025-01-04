@@ -12,6 +12,9 @@ using SteganographyApp.Common.Data;
 [TestFixture]
 public class DataEncoderUtilTests : FixtureWithTestObjects
 {
+    [Mockup(typeof(IKeyUtil))]
+    public Mock<IKeyUtil> MockKeyUtil = new();
+
     [Mockup(typeof(IEncryptionUtil))]
     public Mock<IEncryptionUtil> MockEncryptionProxy = new();
 
@@ -34,14 +37,13 @@ public class DataEncoderUtilTests : FixtureWithTestObjects
     private const string StringToDecode = "stringToDecode";
     private const int AdditionalHashIterations = 20;
     private const int IterationMultiplier = 5;
-    private const int RandomSeedHashIterations = 415_000;
     private static readonly byte[] InputBytes = new byte[1];
 
     [Test]
     public void TestEncode()
     {
         byte[] randomKey = Encoding.UTF8.GetBytes("random_key");
-        MockEncryptionProxy.Setup(encryptionProxy => encryptionProxy.GenerateKey(RandomSeed, RandomSeedHashIterations + AdditionalHashIterations)).Returns(randomKey);
+        MockKeyUtil.Setup(keyUtil => keyUtil.GenerateKey(RandomSeed, AdditionalHashIterations)).Returns(randomKey);
         string randomKeyString = Convert.ToBase64String(randomKey);
 
         byte[] encryptedBytes = [1];
@@ -51,7 +53,7 @@ public class DataEncoderUtilTests : FixtureWithTestObjects
         MockDummyUtil.Setup(dummyUtil => dummyUtil.InsertDummies(DummyCount, encryptedBytes, randomKeyString)).Returns(dummyBytes);
 
         byte[] randomizedBytes = [3];
-        MockRandomUtil.Setup(randomUtil => randomUtil.Randomize(dummyBytes, randomKeyString, DummyCount, IterationMultiplier)).Returns(randomizedBytes);
+        MockRandomUtil.Setup(randomUtil => randomUtil.Randomize(dummyBytes, randomKeyString, IterationMultiplier)).Returns(randomizedBytes);
 
         byte[] compressedBytes = [4];
         MockCompressionUtil.Setup(compressionUtil => compressionUtil.Compress(randomizedBytes)).Returns(compressedBytes);
@@ -73,14 +75,14 @@ public class DataEncoderUtilTests : FixtureWithTestObjects
         MockBinaryUtil.Setup(binaryUtil => binaryUtil.ToBytes(StringToDecode)).Returns(stringToDecodeBytes);
 
         byte[] randomKey = Encoding.UTF8.GetBytes("random_key");
-        MockEncryptionProxy.Setup(encryption => encryption.GenerateKey(RandomSeed, RandomSeedHashIterations + AdditionalHashIterations)).Returns(randomKey);
+        MockKeyUtil.Setup(keyUtil => keyUtil.GenerateKey(RandomSeed, AdditionalHashIterations)).Returns(randomKey);
         string randomKeyString = Convert.ToBase64String(randomKey);
 
         byte[] decompressBytes = [1];
         MockCompressionUtil.Setup(compressionUtil => compressionUtil.Decompress(stringToDecodeBytes)).Returns(decompressBytes);
 
         byte[] orderedBytes = [2];
-        MockRandomUtil.Setup(randomUtil => randomUtil.Reorder(decompressBytes, randomKeyString, DummyCount, IterationMultiplier)).Returns(orderedBytes);
+        MockRandomUtil.Setup(randomUtil => randomUtil.Reorder(decompressBytes, randomKeyString, IterationMultiplier)).Returns(orderedBytes);
 
         byte[] undummiedBytes = [3];
         MockDummyUtil.Setup(dummyUtil => dummyUtil.RemoveDummies(DummyCount, orderedBytes, randomKeyString)).Returns(undummiedBytes);

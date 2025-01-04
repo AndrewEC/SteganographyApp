@@ -11,10 +11,10 @@ using SteganographyApp.Common.Logging;
 public interface IRandomizeUtil
 {
     /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Randomize/*' />
-    byte[] Randomize(byte[] value, string randomSeed, int dummyCount, int iterationMultiplier);
+    byte[] Randomize(byte[] value, string randomSeed, int iterationMultiplier);
 
     /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Reorder/*' />
-    byte[] Reorder(byte[] value, string randomSeed, int dummyCount, int iterationMultiplier);
+    byte[] Reorder(byte[] value, string randomSeed, int iterationMultiplier);
 }
 
 /// <summary>
@@ -24,20 +24,16 @@ public interface IRandomizeUtil
 [Injectable(typeof(IRandomizeUtil))]
 public sealed class RandomizeUtil : IRandomizeUtil
 {
-    private const int MaxHashIterations = 622_000;
-    private const int MinHashIterations = 422_000;
-
     private readonly ILogger log = new LazyLogger<RandomizeUtil>();
 
     /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Randomize/*' />
-    public byte[] Randomize(byte[] value, string randomSeed, int dummyCount, int iterationMultiplier)
+    public byte[] Randomize(byte[] value, string randomSeed, int iterationMultiplier)
     {
-        string seed = FormRandomSeed(randomSeed, dummyCount);
-        var generator = Xor128Prng.FromString(seed);
+        var generator = Xor128Prng.FromString(randomSeed);
 
         int iterations = value.Length * iterationMultiplier;
 
-        log.Debug("Randomizing byte array using seed [{0}] over [{1}] iterations", seed, iterations);
+        log.Debug("Randomizing byte array using seed [{0}] over [{1}] iterations", randomSeed, iterations);
 
         for (int i = 0; i < iterations; i++)
         {
@@ -53,14 +49,13 @@ public sealed class RandomizeUtil : IRandomizeUtil
     }
 
     /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Reorder/*' />
-    public byte[] Reorder(byte[] value, string randomSeed, int dummyCount, int iterationMultiplier)
+    public byte[] Reorder(byte[] value, string randomSeed, int iterationMultiplier)
     {
-        string seed = FormRandomSeed(randomSeed, dummyCount);
-        var generator = Xor128Prng.FromString(seed);
+        var generator = Xor128Prng.FromString(randomSeed);
 
         int iterations = value.Length * iterationMultiplier;
 
-        log.Debug("Reordering byte array using seed [{0}] over [{1}] iterations", seed, iterations);
+        log.Debug("Reordering byte array using seed [{0}] over [{1}] iterations", randomSeed, iterations);
 
         var pairs = new ValueTuple<int, int>[iterations];
         for (int i = iterations - 1; i >= 0; i--)
@@ -74,12 +69,5 @@ public sealed class RandomizeUtil : IRandomizeUtil
             (value[second], value[first]) = (value[first], value[second]);
         }
         return value;
-    }
-
-    private static string FormRandomSeed(string randomSeed, int dummyCount)
-    {
-        int iterations = (dummyCount == 0) ? MaxHashIterations : (int)(((dummyCount + GlobalCounter.Instance.Count) % (MaxHashIterations - MinHashIterations)) + MinHashIterations);
-        var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed + iterations, iterations);
-        return Convert.ToBase64String(randomKey);
     }
 }

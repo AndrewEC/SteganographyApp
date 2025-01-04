@@ -1,3 +1,9 @@
+namespace SteganographyApp.Common.IO;
+
+/// <summary>
+/// A shared constant class to be used between the various chunk table
+/// implementations.
+/// </summary>
 internal static class ChunkTableConstants
 {
     /// <summary>
@@ -5,11 +11,4 @@ internal static class ChunkTableConstants
     /// any random seeds or passwords.
     /// </summary>
     public static readonly int IterationMultiplier = 1000;
-
-    /// <summary>
-    /// The number of dummy entries to be inserted into the chunk table.
-    /// This value must always be 0 as it is expected that the chunk table header
-    /// be of a fixed size.
-    /// </summary>
-    public static readonly int DummyCount = 0;
 }

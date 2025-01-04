@@ -5,6 +5,12 @@ Steganography is the art of hiding data in plain view by hiding it inside of oth
 
 The apptly named SteganographyApp is a command line utility that hides data inside of one or more images by modifying the least significant bit (LSB) of the RGB values in each individual pixel.
 
+Warning
+=====
+This repo is simply a playground to examine how Steganography can work in a limited example but it is not recommended to use this tool to obfuscate data that is important to you. Changes might be made to this repo at any time, without notice, that may make the tool incompatible with previous versions or introduce unknown bugs that may make the encoding or decoding process error prone and possibly cause a loss of data.
+
+Please view the [License.txt](./License.txt) for further details.
+
 Important
 ---
 When you are hiding data inside in image it is important that the image uses a lossless format. This tool has support for PNG images and WEBP lossless images. Using a lossy format, like JPG, will cause data loss that can't be recovered by the program.

@@ -69,6 +69,5 @@ public sealed class ImageStoreStream : AbstractDisposable
         }
         store.CloseOpenImage(save);
         store.StreamClosed();
-        GlobalCounter.Instance.Reset();
     });
 }

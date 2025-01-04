@@ -18,8 +18,6 @@ public class E2ETests
     [SetUp]
     public void E2ESetUp()
     {
-        GlobalCounter.Instance.Reset();
-
         args = new CommonArguments()
         {
             FileToEncode = "TestAssets/test.zip",

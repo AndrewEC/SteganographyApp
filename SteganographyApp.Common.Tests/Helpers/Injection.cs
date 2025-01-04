@@ -36,13 +36,13 @@ public static class MocksInjector
         typeof(Injector)
             .GetMethod(nameof(Injector.UseInstance))
             ?.MakeGenericMethod(mockableAttribute.MockType)
-            .Invoke(null, new object[] { instance });
+            .Invoke(null, [instance]);
     }
 
     private static object CreateMockInstance(Mockup mockableAttribute)
     {
-        var mockType = typeof(Mock<>).MakeGenericType(new Type[] { mockableAttribute.MockType });
-        return Activator.CreateInstance(mockType, new object[] { MockBehavior.Strict })
+        var mockType = typeof(Mock<>).MakeGenericType([mockableAttribute.MockType]);
+        return Activator.CreateInstance(mockType, [MockBehavior.Strict])
             ?? throw new Exception($"Could not create mock instance for type: [{mockType.Name}]");
     }
 

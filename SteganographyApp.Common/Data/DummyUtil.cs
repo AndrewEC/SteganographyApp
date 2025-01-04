@@ -27,20 +27,17 @@ public sealed class DummyUtil : IDummyUtil
 {
     private const int MaxLengthPerDummy = 2500;
     private const int MinLengthPerDummy = 25;
-    private const int MaxHashIterationLimit = 500_000;
-    private const int MinHashIterationLimit = 350_000;
 
     private readonly ILogger log = new LazyLogger<DummyUtil>();
 
     /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
     public byte[] InsertDummies(int numDummies, byte[] value, string randomSeed)
     {
-        string seed = CreateRandomSeed(randomSeed);
-        var generator = Xor128Prng.FromString(seed);
+        var generator = Xor128Prng.FromString(randomSeed);
 
         int actualNumDummies = ComputeActualNumberOfDummies(generator, numDummies);
 
-        log.Debug("Inserting [{0}] dummies using seed [{1}]", actualNumDummies, seed);
+        log.Debug("Inserting [{0}] dummies using seed [{1}]", actualNumDummies, randomSeed);
         log.Debug("Byte count before inserting dummies: [{0}]", value.Length);
 
         // generate an array in which each element represents the length that an inserted dummy entry will have.
@@ -67,12 +64,11 @@ public sealed class DummyUtil : IDummyUtil
     /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
     public byte[] RemoveDummies(int numDummies, byte[] value, string randomSeed)
     {
-        string seed = CreateRandomSeed(randomSeed);
-        var generator = Xor128Prng.FromString(seed);
+        var generator = Xor128Prng.FromString(randomSeed);
 
         int actualNumDummies = ComputeActualNumberOfDummies(generator, numDummies);
 
-        log.Debug("Removing [{0}] dummies using seed [{1}]", actualNumDummies, seed);
+        log.Debug("Removing [{0}] dummies using seed [{1}]", actualNumDummies, randomSeed);
         log.Debug("Byte count before removing dummies: [{0}]", value.Length);
 
         // calculate the length of the dummies originally added to the string
@@ -104,13 +100,6 @@ public sealed class DummyUtil : IDummyUtil
 
         log.Debug("Bit count after removing dummies: [{0}]", result.Length);
         return result;
-    }
-
-    private static string CreateRandomSeed(string randomSeed)
-    {
-        int iterations = (int)((MinHashIterationLimit + GlobalCounter.Instance.Count) % MaxHashIterationLimit);
-        var randomKey = Injector.Provide<IEncryptionUtil>().GenerateKey(randomSeed + iterations, iterations);
-        return Convert.ToBase64String(randomKey);
     }
 
     private static int ComputeActualNumberOfDummies(Xor128Prng generator, int numDummies) => generator.Next(numDummies - (numDummies / 3)) + (numDummies / 3);

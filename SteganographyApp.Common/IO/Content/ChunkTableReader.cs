@@ -77,7 +77,7 @@ public class ChunkTableReader(ImageStoreStream stream, IInputArguments arguments
     private string Reorder(IRandomizeUtil randomize, IBinaryUtil binaryUtil, string binary)
     {
         byte[] binaryBytes = binaryUtil.ToBytesDirect(binary);
-        byte[] ordered = randomize.Reorder(binaryBytes, arguments.RandomSeed, ChunkTableConstants.DummyCount, ChunkTableConstants.IterationMultiplier);
+        byte[] ordered = randomize.Reorder(binaryBytes, arguments.RandomSeed, ChunkTableConstants.IterationMultiplier);
         return binaryUtil.ToBinaryStringDirect(ordered);
     }
 }

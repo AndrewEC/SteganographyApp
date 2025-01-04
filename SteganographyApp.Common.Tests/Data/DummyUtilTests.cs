@@ -1,7 +1,7 @@
 namespace SteganographyApp.Common.Tests;
 
 using System;
-
+using Moq;
 using NUnit.Framework;
 
 using SteganographyApp.Common.Data;
@@ -9,6 +9,9 @@ using SteganographyApp.Common.Data;
 [TestFixture]
 public class DummyUtilTests : FixtureWithTestObjects
 {
+    [Mockup(typeof(IKeyUtil))]
+    public Mock<IKeyUtil> mockKeyUtil = new();
+
     private const int NumberOfDummies = 10;
     private const int IncorrectNumberOfDummies = 3;
     private const string RandomSeed = "random_seed";
@@ -17,18 +20,6 @@ public class DummyUtilTests : FixtureWithTestObjects
     private readonly byte[] originalBytes = [8, 3, 4, 9, 53, 6, 3, 25, 78, 42, 56, 14, 74, 32, 63];
 
     private readonly DummyUtil util = new();
-
-    [SetUp]
-    public void Initialize()
-    {
-        GlobalCounter.Instance.Reset();
-    }
-
-    [TearDown]
-    public void Cleanup()
-    {
-        GlobalCounter.Instance.Reset();
-    }
 
     [Test]
     public void TestInsertAndRemoveDummies()
@@ -48,18 +39,15 @@ public class DummyUtilTests : FixtureWithTestObjects
 
         byte[] removed = util.RemoveDummies(IncorrectNumberOfDummies, inserted, RandomSeed);
         Assert.That(removed, Is.Not.EqualTo(originalBytes));
+        Assert.That(removed, Is.Not.EqualTo(inserted));
     }
 
     [Test]
     public void TestInsertAndRemoveWithIncorrectRandomSeedReturnsBadResult()
     {
-        try
-        {
-            byte[] inserted = util.InsertDummies(NumberOfDummies, originalBytes, RandomSeed);
-            Assert.That(util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed), Is.Not.EqualTo(originalBytes));
-        }
-        catch (Exception)
-        {
-        }
+        byte[] inserted = util.InsertDummies(NumberOfDummies, originalBytes, RandomSeed);
+        Assert.That(inserted, Is.Not.EqualTo(originalBytes));
+
+        Assert.That(util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed), Is.Not.EqualTo(originalBytes));
     }
 }

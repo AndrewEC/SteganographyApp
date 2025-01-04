@@ -78,7 +78,7 @@ public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments
     private string Randomize(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil, string value)
     {
         byte[] valueBytes = binaryUtil.ToBytesDirect(value);
-        byte[] randomized = randomizeUtil.Randomize(valueBytes, arguments.RandomSeed, ChunkTableConstants.DummyCount, ChunkTableConstants.IterationMultiplier);
+        byte[] randomized = randomizeUtil.Randomize(valueBytes, arguments.RandomSeed, ChunkTableConstants.IterationMultiplier);
         return Injector.Provide<IBinaryUtil>().ToBinaryStringDirect(randomized);
     }
 }

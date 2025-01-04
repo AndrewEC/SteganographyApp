@@ -35,8 +35,8 @@ public sealed class Xor128Prng
     /// <returns>A new initialized instance of teh random number generator.</returns>
     public static Xor128Prng FromString(string seed)
     {
-        int total = seed.Select(c => (int)c).Sum();
-        return new Xor128Prng(total, seed.Length);
+        int sum = Enumerable.Range(0, seed.Length).Select(i => seed[i] * i).Sum();
+        return new Xor128Prng(sum, seed.Length);
     }
 
     /// <summary>
