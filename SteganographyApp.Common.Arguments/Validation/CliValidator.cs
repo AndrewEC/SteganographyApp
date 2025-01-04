@@ -33,6 +33,7 @@ public static class CliValidator
         {
             return;
         }
+
         foreach (MemberInfo member in verifiable.Keys)
         {
             object? value = TypeHelper.GetValue(instance, member);
@@ -62,14 +63,14 @@ public static class CliValidator
 
     private static Dictionary<MemberInfo, (ArgumentAttribute Argument, ImmutableArray<ValidationAttribute> Validations)> FindValidatableMembers(object instance)
     {
-        ImmutableArray<MemberInfo> verifiableMembers = TypeHelper.GetAllFieldsAndProperties(instance.GetType());
-        Dictionary<MemberInfo, (ArgumentAttribute, ImmutableArray<ValidationAttribute>)> verifiable = [];
-        if (verifiableMembers.Length == 0)
+        ImmutableArray<MemberInfo> instanceMembers = TypeHelper.GetAllFieldsAndProperties(instance.GetType());
+        if (instanceMembers.Length == 0)
         {
-            return verifiable;
+            return [];
         }
 
-        foreach (MemberInfo member in verifiableMembers)
+        Dictionary<MemberInfo, (ArgumentAttribute, ImmutableArray<ValidationAttribute>)> verifiable = [];
+        foreach (MemberInfo member in instanceMembers)
         {
             if (member.GetCustomAttribute(typeof(ArgumentAttribute)) is not ArgumentAttribute argumentAttribute)
             {

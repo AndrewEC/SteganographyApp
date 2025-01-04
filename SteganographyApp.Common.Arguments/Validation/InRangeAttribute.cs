@@ -16,7 +16,7 @@ using System.Linq;
 /// if multiple InRangeAttributes are being used in a single program.</param>
 public class InRangeAttribute(double min, double max, string? name = null) : ValidationAttribute(name, AllNumberTypes)
 {
-    private static readonly string ValidationFailedMessage = "Expected value to be between [{0}] and [{1}] but instead was [{2}].";
+    private const string ValidationFailedMessage = "Expected value to be between [{0}] and [{1}] but instead was [{2}].";
 
     private static readonly ImmutableArray<Type> WholeNumberTypes = [
         typeof(byte),

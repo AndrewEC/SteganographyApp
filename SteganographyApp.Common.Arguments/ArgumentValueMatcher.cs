@@ -15,7 +15,7 @@ using System.Reflection;
 /// </remarks>
 /// <param name="registeredArgument">The registered argument containing the attribute, member, and parser information.</param>
 /// <param name="input">The user provided input to be parsed and set based on the info from the registered argumetn.</param>
-internal readonly struct ArgumentMatchResult(RegisteredArgument registeredArgument, string input)
+internal readonly struct MatchResult(RegisteredArgument registeredArgument, string input)
 {
     /// <summary>
     /// Gets the argument attribute.
@@ -41,20 +41,20 @@ internal readonly struct ArgumentMatchResult(RegisteredArgument registeredArgume
 /// <summary>
 /// Matches the arguments attributed on the target class with the values specified by the user's input.
 /// </summary>
-internal sealed class ArgumentMatcher : IEnumerable<ArgumentMatchResult>
+internal sealed class ArgumentValueMatcher : IEnumerable<MatchResult>
 {
     private const string TrueString = "true";
 
-    private readonly ImmutableArray<ArgumentMatchResult> matchedArguments;
+    private readonly ImmutableArray<MatchResult> matchedArguments;
 
     /// <summary>
     /// Initializes the argument matcher.
     /// </summary>
     /// <param name="arguments">The array of user provided arguments to be paired with the registered arguments.</param>
     /// <param name="registeredArguments">The array of attributed arguments from the class being parsed into.</param>
-    public ArgumentMatcher(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
+    public ArgumentValueMatcher(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
     {
-        matchedArguments = PairAttributedArgumentsWithValues(arguments, registeredArguments);
+        matchedArguments = PairRegisteredArgumentsWithValues(arguments, registeredArguments);
         VerifyNoRequiredArgumentsAreMissing(registeredArguments, matchedArguments);
     }
 
@@ -62,7 +62,7 @@ internal sealed class ArgumentMatcher : IEnumerable<ArgumentMatchResult>
     /// Get the enumerator for the argument match results.
     /// </summary>
     /// <returns>Enumerator for the argument match results.</returns>
-    public IEnumerator<ArgumentMatchResult> GetEnumerator() => matchedArguments.AsEnumerable().GetEnumerator();
+    public IEnumerator<MatchResult> GetEnumerator() => matchedArguments.AsEnumerable().GetEnumerator();
 
     /// <summary>
     /// Get the enumerator for the argument match results.
@@ -70,9 +70,10 @@ internal sealed class ArgumentMatcher : IEnumerable<ArgumentMatchResult>
     /// <returns>Enumerator for the argument match results.</returns>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private static void VerifyNoRequiredArgumentsAreMissing(ImmutableArray<RegisteredArgument> registeredArguments, ImmutableArray<ArgumentMatchResult> matchedArguments)
+    private static void VerifyNoRequiredArgumentsAreMissing(ImmutableArray<RegisteredArgument> registeredArguments, ImmutableArray<MatchResult> matchedArguments)
     {
-        ImmutableArray<string> matchedArgumentNames = matchedArguments.Select(argument => argument.Attribute.Name).ToImmutableArray();
+        ImmutableArray<string> matchedArgumentNames = matchedArguments.Select(argument => argument.Attribute.Name)
+            .ToImmutableArray();
 
         ImmutableArray<string> missingRequired = registeredArguments.Where(registered => registered.Attribute.Required)
             .Select(registered => registered.Attribute.Name)
@@ -86,23 +87,23 @@ internal sealed class ArgumentMatcher : IEnumerable<ArgumentMatchResult>
         }
     }
 
-    private static RegisteredArgument? FindMatchingArgument(string input, ImmutableArray<RegisteredArgument> registeredArguments)
+    private static RegisteredArgument? FindArgumentMatchingName(string input, ImmutableArray<RegisteredArgument> registeredArguments)
         => registeredArguments.Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input).FirstOrDefault();
 
-    private static RegisteredArgument? FindMatchingArgument(int position, ImmutableArray<RegisteredArgument> registeredArguments)
+    private static RegisteredArgument? FindArgumentWithPosition(int position, ImmutableArray<RegisteredArgument> registeredArguments)
         => registeredArguments.Where(registered => registered.Attribute.Position == position).FirstOrDefault();
 
-    private static ImmutableArray<ArgumentMatchResult> PairAttributedArgumentsWithValues(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
+    private static ImmutableArray<MatchResult> PairRegisteredArgumentsWithValues(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
     {
-        var paired = new List<ArgumentMatchResult>();
+        var paired = new List<MatchResult>();
         int currentPosition = 1;
         for (int i = 0; i < arguments.Length; i++)
         {
             var input = arguments[i];
-            RegisteredArgument? registered = FindMatchingArgument(input, registeredArguments);
+            RegisteredArgument? registered = FindArgumentMatchingName(input, registeredArguments);
             if (registered == null)
             {
-                registered = FindMatchingArgument(currentPosition, registeredArguments);
+                registered = FindArgumentWithPosition(currentPosition, registeredArguments);
                 if (registered == null)
                 {
                     throw new ParseException($"Received an unrecognized argument: [{input}]");
@@ -112,11 +113,11 @@ internal sealed class ArgumentMatcher : IEnumerable<ArgumentMatchResult>
 
             if (TypeHelper.GetDeclaredType(registered.Member) == typeof(bool))
             {
-                paired.Add(new ArgumentMatchResult(registered, TrueString));
+                paired.Add(new MatchResult(registered, TrueString));
             }
             else if (registered.Attribute.Position > 0)
             {
-                paired.Add(new ArgumentMatchResult(registered, input));
+                paired.Add(new MatchResult(registered, input));
             }
             else
             {
@@ -124,7 +125,7 @@ internal sealed class ArgumentMatcher : IEnumerable<ArgumentMatchResult>
                 {
                     throw new ParseException($"Received an invalid number of arguments. No value could be found corresponding to argument: [{input}]");
                 }
-                paired.Add(new ArgumentMatchResult(registered, arguments[i + 1]));
+                paired.Add(new MatchResult(registered, arguments[i + 1]));
                 i++;
             }
         }

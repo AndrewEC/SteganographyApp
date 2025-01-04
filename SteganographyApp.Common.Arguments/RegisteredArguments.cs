@@ -19,9 +19,9 @@ internal static class ArgumentRegistration
     /// <param name="modelType">The type of the class from which the attribute argument fields will be pulled from.</param>
     /// <param name="additionalParsers">An optional provider that can provide a set of custom parsers for custom argument types.</param>
     /// <returns>An array of the attributed members, the associated parsers, and the attribute info.</returns>
-    public static ImmutableArray<RegisteredArgument> FindAttributedArguments(Type modelType, IParserProvider? additionalParsers)
+    public static ImmutableArray<RegisteredArgument> FindAttributedArguments(Type modelType, IParserFunctionProvider? additionalParsers)
     {
-        var matcher = new ParserMatcher(additionalParsers);
+        var lookup = new ParserFunctionLookup(additionalParsers);
         var names = new List<string>();
         var registered = new List<RegisteredArgument>();
 
@@ -59,11 +59,11 @@ internal static class ArgumentRegistration
             names.Add(attribute.Name);
             if (attribute.Parser != null)
             {
-                registered.Add(new RegisteredArgument(attribute, member, ParserMatcher.CreateParserFromMethod(modelType, attribute.Parser)));
+                registered.Add(new RegisteredArgument(attribute, member, ParserFunctionLookup.CreateParserFromMethod(modelType, attribute.Parser)));
             }
             else
             {
-                registered.Add(new RegisteredArgument(attribute, member, matcher.FindParser(attribute, member)));
+                registered.Add(new RegisteredArgument(attribute, member, lookup.FindParser(attribute, member)));
             }
         }
 

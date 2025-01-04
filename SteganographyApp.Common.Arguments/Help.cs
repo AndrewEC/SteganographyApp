@@ -12,7 +12,7 @@ using System.Text;
 public static class Help
 {
     private const int MaxDescriptionWidth = 80;
-    private static readonly char Space = ' ';
+    private const char Space = ' ';
 
     /// <summary>
     /// Returns the HelpText property of the ProgramDescriptor attribute on the input
@@ -37,9 +37,16 @@ public static class Help
     /// identified.</param>
     internal static void PrintHelp(Type instanceType, object instance, ImmutableArray<RegisteredArgument> registeredArguments)
     {
-        var positionalArguments = registeredArguments.Where(argument => argument.Attribute.Position > 0).OrderBy(argument => argument.Attribute.Position).ToImmutableArray();
-        var nonPositionalRequiredArguments = registeredArguments.Where(argument => argument.Attribute.Required && argument.Attribute.Position <= 0).ToImmutableArray();
-        var optionalArguments = registeredArguments.Where(argument => !argument.Attribute.Required).ToImmutableArray();
+        var positionalArguments = registeredArguments.Where(argument => argument.Attribute.Position > 0)
+            .OrderBy(argument => argument.Attribute.Position)
+            .ToImmutableArray();
+
+        var nonPositionalRequiredArguments = registeredArguments
+            .Where(argument => argument.Attribute.Required && argument.Attribute.Position <= 0)
+            .ToImmutableArray();
+
+        var optionalArguments = registeredArguments.Where(argument => !argument.Attribute.Required)
+            .ToImmutableArray();
 
         Console.WriteLine(FormUsageString(instanceType, positionalArguments, nonPositionalRequiredArguments, optionalArguments));
         PrintArguments(positionalArguments, instance);
@@ -165,20 +172,20 @@ public static class Help
 
     private static string? DefaultValueOf(object instance, MemberInfo member, ArgumentAttribute argument)
     {
-        // Somce required parameters must be provided by the user there is no point in having a default value.
+        // Since required parameters must be provided by the user there is no point in having a default value.
         if (argument.Required)
-        {
-            return null;
-        }
-
-        object? value = TypeHelper.GetValue(instance, member);
-        if (value == null)
         {
             return null;
         }
 
         Type memberType = TypeHelper.GetDeclaredType(member);
         if (IsStruct(memberType))
+        {
+            return null;
+        }
+
+        object? value = TypeHelper.GetValue(instance, member);
+        if (value == null)
         {
             return null;
         }

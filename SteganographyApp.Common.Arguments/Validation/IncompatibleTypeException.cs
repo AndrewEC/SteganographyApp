@@ -16,5 +16,5 @@ using System.Collections.Generic;
 public class IncompatibleTypeException(ValidationAttribute attribute, IEnumerable<Type> validTypes, Type actualType)
 : Exception(string.Format(MessageTemplate, attribute.Name, string.Join(", ", validTypes), actualType))
 {
-    private static readonly string MessageTemplate = "Incompatible type provided to validator [{0}]. Valid types are [{1}] but instead received [{2}].";
+    private const string MessageTemplate = "Incompatible type provided to validator [{0}]. Valid types are [{1}] but instead received [{2}].";
 }

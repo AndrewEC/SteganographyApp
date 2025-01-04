@@ -81,7 +81,8 @@ where T : class
     /// </summary>
     /// <param name="program">The CliProgram being executed.</param>
     /// <param name="args">The array of user provided command line arguments.</param>
-    public void Execute(CliProgram program, string[] args) => Execute(CliParser.ParseArgs<T>(args, program.AdditionalParsers));
+    public void Execute(CliProgram program, string[] args)
+        => Execute(CliParser.ParseArgs<T>(args, program.AdditionalParsers));
 
     /// <summary>
     /// Execute the command providing some parsed argument object as input.
@@ -112,10 +113,13 @@ where T : class
 /// </remarks>
 /// <param name="name">The name of the command.</param>
 /// <param name="function">The function, associated with the command, to execute.</param>
-public class GenericCommand<T>(string name, CommandFunction<T> function) : Command<T>
+/// <param name="helpText">An optional parameter specifying a custom set of helpt text
+/// to describe the behaviour of this command.</param>
+public class GenericCommand<T>(string name, CommandFunction<T> function, string? helpText = null) : Command<T>
 where T : class
 {
     private readonly string name = name;
+    private readonly string? helpText = helpText;
     private readonly CommandFunction<T> function = function;
 
     /// <summary>
@@ -129,6 +133,13 @@ where T : class
     /// </summary>
     /// <returns>The command name.</returns>
     public override string GetName() => name;
+
+    /// <summary>
+    /// Returns either the custom help text specified during the creation of this command
+    /// or the default help text.
+    /// </summary>
+    /// <returns>The help description text.</returns>
+    public override string GetHelpDescription() => helpText ?? base.GetHelpDescription();
 }
 
 /// <summary>

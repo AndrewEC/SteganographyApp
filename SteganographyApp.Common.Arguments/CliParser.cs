@@ -17,7 +17,7 @@ public sealed class CliParser
     /// If TryParseArgs was invoked on an instance of the CliParser, which resulted in a failure, then this will
     /// be initialized to the exception that was raised.
     /// </summary>
-    public Exception LastError { get => lastError!; }
+    public Exception? LastError { get => lastError; }
 
     /// <summary>
     /// Attempts to parse the user provided arguments into the specified class model. If an exception is thrown during the parsing process
@@ -27,7 +27,7 @@ public sealed class CliParser
     /// <param name="additionalParsers">An optional parser provider to provide additional parsers for custom types.</param>
     /// <typeparam name="T">The class containing the argument attributes from which the arguments to parsed will be derived from.</typeparam>
     /// <returns>An instance of T.</returns>
-    public static T ParseArgs<T>(string[] arguments, IParserProvider? additionalParsers = null)
+    public static T ParseArgs<T>(string[] arguments, IParserFunctionProvider? additionalParsers = null)
     where T : class => ParseArgs(arguments, Initializer.Initialize<T>(), additionalParsers);
 
     /// <summary>
@@ -40,7 +40,7 @@ public sealed class CliParser
     /// <param name="additionalParsers">An optional parser provider to provide additional parsers for custom types.</param>
     /// <typeparam name="T">The class containing the argument attributes from which the arguments to parsed will be derived from.</typeparam>
     /// <returns>True if this was successful in parsing out the user provided arguments, otherwise returns false.</returns>
-    public bool TryParseArgs<T>(out T model, string[] arguments, IParserProvider? additionalParsers = null)
+    public bool TryParseArgs<T>(out T model, string[] arguments, IParserFunctionProvider? additionalParsers = null)
     where T : class
     {
         T instance = Initializer.Initialize<T>();
@@ -57,16 +57,19 @@ public sealed class CliParser
         }
     }
 
-    private static T ParseArgs<T>(string[] arguments, T instance, IParserProvider? additionalParsers = null)
+    private static T ParseArgs<T>(string[] arguments, T instance, IParserFunctionProvider? additionalParsers = null)
     where T : class
     {
-        ImmutableArray<RegisteredArgument> registeredArguments = ArgumentRegistration.FindAttributedArguments(typeof(T), additionalParsers);
+        ImmutableArray<RegisteredArgument> registeredArguments = ArgumentRegistration
+            .FindAttributedArguments(typeof(T), additionalParsers);
+
         if (WasHelpRequested(arguments))
         {
             Help.PrintHelp(typeof(T), instance, registeredArguments);
             Environment.Exit(0);
         }
-        foreach (ArgumentMatchResult match in new ArgumentMatcher(arguments, registeredArguments))
+
+        foreach (MatchResult match in new ArgumentValueMatcher(arguments, registeredArguments))
         {
             try
             {
@@ -78,9 +81,12 @@ public sealed class CliParser
                 throw new ParseException($"Could not read in argument [{match.Attribute.Name}] from value [{match.Input}] because: [{e.Message}].", e);
             }
         }
+
         CliValidator.Validate(instance);
+
         return instance;
     }
 
-    private static bool WasHelpRequested(string[] arguments) => arguments.Contains("--help") || arguments.Contains("-h");
+    private static bool WasHelpRequested(string[] arguments)
+        => arguments.Contains("--help") || arguments.Contains("-h");
 }

@@ -30,8 +30,8 @@ public class Program
                 )
             )
         )
-        .WithParsers(
-            AdditionalParsers.Builder()
+        .WithAdditionalParsers(
+            AdditionalParserFunctionsProvider.Builder()
                 .ForFieldNamed("CoverImages", (target, value) => ImagePathParser.ParseImages(value))
                 .ForFieldNamed("Password", CreateSecureParser("Password: "))
                 .ForFieldNamed("RandomSeed", CreateSecureParser("Random Seed: "))
@@ -43,7 +43,9 @@ public class Program
 #pragma warning restore SA1009
     }
 
-    private static Func<object, string, object> CreateSecureParser(string prompt) => (target, value) => SecureParser.ReadUserInput(prompt, value);
+    private static Func<object, string, object> CreateSecureParser(string prompt)
+        => (target, value) => SecureParser.ReadUserInput(prompt, value);
 
-    private static Func<object, string, object> CreateSecureIntParser(string prompt) => (target, value) => Convert.ToInt32(SecureParser.ReadUserInput(prompt, value));
+    private static Func<object, string, object> CreateSecureIntParser(string prompt)
+        => (target, value) => Convert.ToInt32(SecureParser.ReadUserInput(prompt, value));
 }

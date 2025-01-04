@@ -23,10 +23,10 @@ public interface IKeyUtil
 [Injectable(typeof(IKeyUtil))]
 public class KeyUtil : IKeyUtil
 {
-    private static readonly int DefaultIterations = 450_000;
-    private static readonly string CacheKeyTemplate = "{0}-{1}";
+    private const int DefaultIterations = 450_000;
+    private const string CacheKeyTemplate = "{0}-{1}";
+    private const int KeySize = 256;
     private static readonly object SyncLock = new();
-    private static readonly int KeySize = 256;
 
     private readonly Dictionary<string, byte[]> generatedKeys = [];
     private readonly ILogger log = new LazyLogger<KeyUtil>();

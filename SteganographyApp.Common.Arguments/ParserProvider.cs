@@ -9,7 +9,7 @@ using System.Reflection;
 /// <summary>
 /// A top level interface allowing one to augment the cli parser to use custom parsers for custom field types.
 /// </summary>
-public interface IParserProvider
+public interface IParserFunctionProvider
 {
     /// <summary>
     /// Lookup and return function for parsing a field of the type specified by the member parameter.
@@ -23,7 +23,7 @@ public interface IParserProvider
 /// <summary>
 /// A builder-like class to assist in the process of creating an IParserProvider instance.
 /// </summary>
-public class ParserBuilder
+public class ParserFunctionProviderBuilder
 {
     private readonly Dictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers = [];
 
@@ -33,7 +33,7 @@ public class ParserBuilder
     /// <param name="parser">The parser function to be executed to parse the member of type T.</param>
     /// <typeparam name="T">The type of the argument to be parsed by the input parser function.</typeparam>
     /// <returns>The current parser builder instance.</returns>
-    public ParserBuilder ForType<T>(Func<object, string, object> parser) => ForType(typeof(T), parser);
+    public ParserFunctionProviderBuilder ForType<T>(Func<object, string, object> parser) => ForType(typeof(T), parser);
 
     /// <summary>
     /// Register a new parser for the specified type of T.
@@ -41,7 +41,7 @@ public class ParserBuilder
     /// <param name="type">The type of the argument to be parsed by the input parser function.</param>
     /// <param name="parser">The parser function to be executed to parse the member argument of type T.</param>
     /// <returns>The current parser builder instance.</returns>
-    public ParserBuilder ForType(Type type, Func<object, string, object> parser)
+    public ParserFunctionProviderBuilder ForType(Type type, Func<object, string, object> parser)
     {
         parsers.Add((attribute, member) => TypeHelper.GetDeclaredType(member) == type, parser);
         return this;
@@ -53,7 +53,7 @@ public class ParserBuilder
     /// <param name="name">The name of the member to be parsed by the input parser function.</param>
     /// <param name="parser">The functiont to use to parse the member argument.</param>
     /// <returns>The current parser builder instance.</returns>
-    public ParserBuilder ForFieldNamed(string name, Func<object, string, object> parser)
+    public ParserFunctionProviderBuilder ForFieldNamed(string name, Func<object, string, object> parser)
     {
         parsers.Add((attribute, member) => member.Name == name, parser);
         return this;
@@ -65,7 +65,7 @@ public class ParserBuilder
     /// <param name="predicate">The predicate to check if the argument member should be parsed by the associated parser function.</param>
     /// <param name="parser">The parser function to parse the argument member that satisies the condition of the associated predicate.</param>
     /// <returns>The current parser build instance.</returns>
-    public ParserBuilder Parser(Func<ArgumentAttribute, MemberInfo, bool> predicate, Func<object, string, object> parser)
+    public ParserFunctionProviderBuilder Parser(Func<ArgumentAttribute, MemberInfo, bool> predicate, Func<object, string, object> parser)
     {
         parsers.Add(predicate, parser);
         return this;
@@ -75,7 +75,7 @@ public class ParserBuilder
     /// Returns the new IParserProvider instance.
     /// </summary>
     /// <returns>Returns a new IParserProvider instance containing the all the previously added predicates and parsers.</returns>
-    public IParserProvider Build() => new AdditionalParsers(parsers.ToImmutableDictionary());
+    public IParserFunctionProvider Build() => new AdditionalParserFunctionsProvider(parsers.ToImmutableDictionary());
 }
 
 /// <summary>
@@ -86,7 +86,7 @@ public class ParserBuilder
 /// </remarks>
 /// <param name="parsers">An immutable dictionary containing the predicate functions to determine which argument member should
 /// be parsed by which parser and the associated parser function to parse any argument member that satisfies the predicate.</param>
-public class AdditionalParsers(ImmutableDictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers) : IParserProvider
+public class AdditionalParserFunctionsProvider(ImmutableDictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers) : IParserFunctionProvider
 {
     private readonly ImmutableDictionary<Func<ArgumentAttribute, MemberInfo, bool>, Func<object, string, object>> parsers = parsers;
 
@@ -94,7 +94,7 @@ public class AdditionalParsers(ImmutableDictionary<Func<ArgumentAttribute, Membe
     /// Creates a new builder instance to assist in adding new custom parsers.
     /// </summary>
     /// <returns>A new ParserBuilder instance.</returns>
-    public static ParserBuilder Builder() => new();
+    public static ParserFunctionProviderBuilder Builder() => new();
 
     /// <summary>
     /// Creates a new IParserProvider instance that will provide one additional custom parser to parse a field with the specified name.
@@ -102,7 +102,7 @@ public class AdditionalParsers(ImmutableDictionary<Func<ArgumentAttribute, Membe
     /// <param name="fieldNamed">The name of the field to be parsed by the parser function.</param>
     /// <param name="parser">The function to parse out a value for the field with the specified fieldName.</param>
     /// <returns>A parser provide that can provide a single parser.</returns>
-    public static IParserProvider ForFieldName(string fieldNamed, Func<object, string, object> parser) => Builder().ForFieldNamed(fieldNamed, parser).Build();
+    public static IParserFunctionProvider ForFieldName(string fieldNamed, Func<object, string, object> parser) => Builder().ForFieldNamed(fieldNamed, parser).Build();
 
     /// <summary>
     /// Creates a new IParserProvider instance that will provide one additional custom parser to parse a field that corresponds
@@ -111,7 +111,7 @@ public class AdditionalParsers(ImmutableDictionary<Func<ArgumentAttribute, Membe
     /// <param name="parser">The function to parse a value out for the field with the specified type.</param>
     /// <typeparam name="T">The type to be parsed by the parser function.</typeparam>
     /// <returns>A parser provider that can provide a single parser for the specified type.</returns>
-    public static IParserProvider ForType<T>(Func<object, string, object> parser) => ForType(typeof(T), parser);
+    public static IParserFunctionProvider ForType<T>(Func<object, string, object> parser) => ForType(typeof(T), parser);
 
     /// <summary>
     /// Creates a new IParserProvider instance that will provide one additional custom parser to parse a field that corresponds
@@ -120,7 +120,7 @@ public class AdditionalParsers(ImmutableDictionary<Func<ArgumentAttribute, Membe
     /// <param name="type">The type to be parsed by the specified parser function.</param>
     /// <param name="parser">The function to parse a value out for the field with the specified type.</param>
     /// <returns>A parser provider that can provide a single parser for the specified type.</returns>
-    public static IParserProvider ForType(Type type, Func<object, string, object> parser) => Builder().ForType(type, parser).Build();
+    public static IParserFunctionProvider ForType(Type type, Func<object, string, object> parser) => Builder().ForType(type, parser).Build();
 
     /// <summary>
     /// Looks up a parser function to parse the attributed argument member. This will iterate through the entries of the
@@ -131,5 +131,7 @@ public class AdditionalParsers(ImmutableDictionary<Func<ArgumentAttribute, Membe
     /// <returns>The parser function corresponding to the to the predicate whose conditions are satisfied
     /// by the input attribute and member info.</returns>
     public Func<object, string, object>? Find(ArgumentAttribute attribute, MemberInfo member)
-        => parsers.Where(entry => entry.Key.Invoke(attribute, member)).Select(entry => entry.Value).FirstOrDefault();
+        => parsers.Where(entry => entry.Key.Invoke(attribute, member))
+            .Select(entry => entry.Value)
+            .FirstOrDefault();
 }

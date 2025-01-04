@@ -102,17 +102,20 @@ public abstract class BaseCommandGroup : ICommandGroup
     /// Gets the name of the command. Determines what entry the user must provide for this command group to be executed.
     /// </summary>
     /// <returns>The name of the command.</returns>
-    public abstract string GetName();
+    public virtual string GetName() => GetType().Name.ToLowerInvariant();
 
     /// <summary>
     /// Returns a default empty string.
     /// </summary>
     /// <returns>An empty string.</returns>
-    public virtual string GetHelpDescription() => string.Empty;
+    public virtual string GetHelpDescription()
+        => string.Format("Run one of the following commands: {0}", FormExpectedCommandNameList(subCommands));
 
-    private static string FormExpectedCommandNameList(ICommand[] subCommands) => string.Join(", ", subCommands.Select(command => command.GetName().ToLowerInvariant()));
+    private static string FormExpectedCommandNameList(ICommand[] subCommands)
+        => string.Join(", ", subCommands.Select(command => command.GetName().ToLowerInvariant()));
 
-    private static bool WasHelpRequested(string nextCommandName) => nextCommandName == "-h" || nextCommandName == "--help";
+    private static bool WasHelpRequested(string nextCommandName)
+        => nextCommandName == "-h" || nextCommandName == "--help";
 
     private ICommand GetNextCommand(string[] args)
     {
@@ -122,7 +125,9 @@ public abstract class BaseCommandGroup : ICommandGroup
             PrintHelpText();
         }
 
-        ICommand? nextCommand = subCommands.Where(command => command.GetName().Equals(nextCommandName, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+        ICommand? nextCommand = subCommands
+            .Where(command => command.GetName().Equals(nextCommandName, StringComparison.InvariantCultureIgnoreCase))
+            .FirstOrDefault();
         if (nextCommand == null)
         {
             string expectedList = FormExpectedCommandNameList(subCommands);
@@ -171,35 +176,28 @@ public abstract class BaseCommandGroup : ICommandGroup
 /// <summary>
 /// A generic ICommandGroup initialized fom a specified name and an array of the commands to potentially be executed.
 /// </summary>
-public class GenericCommandGroup : BaseCommandGroup
+/// <remarks>
+/// Initializes the GenericCommandGroup.
+/// </remarks>
+/// <param name="commands">The array of commands to be grouped and accessed under this command.</param>
+/// <param name="name">An optional name to register this group command under. If no name is provided this will
+/// default to genericcommandgroup.</param>
+/// <param name="helpText">An option set of text to describe the functions contained within this group
+/// of commands.</param>
+public class GenericCommandGroup(ImmutableArray<ICommand> commands, string? name = null, string? helpText = null) : BaseCommandGroup(commands.ToArray())
 {
-    private readonly string name;
-    private readonly string helpText;
-
-    /// <summary>
-    /// Initializes the GenericCommandGroup.
-    /// </summary>
-    /// <param name="commands">The array of commands to be grouped and accessed under this command.</param>
-    /// <param name="name">An optional name to register this group command under. If no name is provided this will
-    /// default to genericcommandgroup.</param>
-    /// <param name="helpText">An option set of text to describe the functions contained within this group
-    /// of commands.</param>
-    public GenericCommandGroup(ImmutableArray<ICommand> commands, string? name = null, string? helpText = null)
-    : base(commands.ToArray())
-    {
-        this.name = name ?? GetType().Name.ToLowerInvariant();
-        this.helpText = helpText ?? string.Empty;
-    }
+    private readonly string? name = name;
+    private readonly string? helpText = helpText;
 
     /// <summary>
     /// Returns the name provided during initialization.
     /// </summary>
     /// <returns>The name of the group command provided during initialization.</returns>
-    public override string GetName() => name;
+    public override string GetName() => name ?? base.GetName();
 
     /// <summary>
     /// Gets a line of text describing the command.
     /// </summary>
     /// <returns>A line of text describing the command.</returns>
-    public override string GetHelpDescription() => helpText;
+    public override string GetHelpDescription() => helpText ?? base.GetHelpDescription();
 }

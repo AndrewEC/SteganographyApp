@@ -84,7 +84,7 @@ public class CliParserTests
     [Test]
     public void TestAdditionalParsers()
     {
-        var parsers = AdditionalParsers.ForType<List<string>>((instance, value) => value.Split(",").ToList());
+        var parsers = AdditionalParserFunctionsProvider.ForType<List<string>>((instance, value) => value.Split(",").ToList());
         var arguments = new string[] { "--names", "Jane,John" };
         var parsed = CliParser.ParseArgs<CustomAdditionalParser>(arguments, parsers);
         Assert.That(parsed.Names, Has.Count.EqualTo(2));

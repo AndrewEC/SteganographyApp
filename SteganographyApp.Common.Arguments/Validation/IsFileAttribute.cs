@@ -11,7 +11,7 @@ using System.IO;
 /// if multiple InRangeAttributes are being used in a single program.</param>
 public class IsFileAttribute(string? name = null) : ValidationAttribute(name, [typeof(string)])
 {
-    private static readonly string Message = "Path {0} does not point to a file.";
+    private const string Message = "Path {0} does not point to a file.";
 
     /// <summary>
     /// Performs validation on the value of the attributed field or property to ensure the value

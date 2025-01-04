@@ -8,7 +8,7 @@ using System;
 public sealed class CliProgram
 {
     private readonly ICommand root;
-    private IParserProvider? additionalParsers;
+    private IParserFunctionProvider? additionalParsers;
 
     private CliProgram(ICommand root)
     {
@@ -18,7 +18,7 @@ public sealed class CliProgram
     /// <summary>
     /// Gets the optionally available list of additional parsers that can be configured to parse specific types.
     /// </summary>
-    public IParserProvider? AdditionalParsers
+    public IParserFunctionProvider? AdditionalParsers
     {
         get => additionalParsers;
     }
@@ -36,7 +36,7 @@ public sealed class CliProgram
     /// <param name="additionalParsers">The object that can provide an additional set of parsers for custom types beyond
     /// the default set of implicitly provided parsers.</param>
     /// <returns>The current CliProgram instance.</returns>
-    public CliProgram WithParsers(IParserProvider additionalParsers)
+    public CliProgram WithAdditionalParsers(IParserFunctionProvider additionalParsers)
     {
         this.additionalParsers = additionalParsers;
         return this;

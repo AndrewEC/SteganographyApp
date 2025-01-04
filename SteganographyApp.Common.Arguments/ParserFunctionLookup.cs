@@ -1,61 +1,9 @@
 namespace SteganographyApp.Common.Arguments;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
-/// <summary>
-/// A static class providing methods to lookup a default function to parser a field or property
-/// of the specified type.
-/// </summary>
-internal static class DefaultParsers
-{
-    /// <summary>
-    /// Attempts to find a parser function for the specified type.
-    /// </summary>
-    /// <param name="fieldType">The type of the field being parsed.</param>
-    /// <returns>Returns a parser function to parse the field of the specified type.</returns>
-    public static Func<object, string, object>? DefaultParserFor(Type fieldType)
-    {
-        if (fieldType == typeof(byte))
-        {
-            return (instance, value) => Convert.ToByte(value);
-        }
-        else if (fieldType == typeof(short))
-        {
-            return (instance, value) => Convert.ToInt16(value);
-        }
-        else if (fieldType == typeof(int))
-        {
-            return (instance, value) => Convert.ToInt32(value);
-        }
-        else if (fieldType == typeof(long))
-        {
-            return (instance, value) => Convert.ToInt64(value);
-        }
-        else if (fieldType == typeof(float))
-        {
-            return (instance, value) => float.Parse(value);
-        }
-        else if (fieldType == typeof(double))
-        {
-            return (instance, value) => Convert.ToDouble(value);
-        }
-        else if (fieldType == typeof(bool))
-        {
-            return (instance, value) => Convert.ToBoolean(value);
-        }
-        else if (fieldType == typeof(string))
-        {
-            return (instance, value) => value;
-        }
-        else if (fieldType.IsEnum)
-        {
-            return (instance, value) => Enum.Parse(fieldType, value, true);
-        }
-        return null;
-    }
-}
 
 /// <summary>
 /// Utility class to help lookup a parser for a specified argument.
@@ -64,9 +12,21 @@ internal static class DefaultParsers
 /// Initializes the parser matcher with an option parser provider.
 /// </remarks>
 /// <param name="additionalParsers">An optional provide of to provide additional parsers for custom types.</param>
-internal sealed class ParserMatcher(IParserProvider? additionalParsers)
+internal sealed class ParserFunctionLookup(IParserFunctionProvider? additionalParsers)
 {
-    private readonly IParserProvider? additionalParsers = additionalParsers;
+    private static readonly Dictionary<Type, Func<object, string, object>> DefaultParsers = new()
+    {
+        { typeof(byte), (instance, value) => Convert.ToByte(value) },
+        { typeof(short), (instance, value) => Convert.ToInt16(value) },
+        { typeof(int), (instance, value) => Convert.ToInt32(value) },
+        { typeof(long), (instance, value) => Convert.ToInt64(value) },
+        { typeof(float), (instance, value) => float.Parse(value) },
+        { typeof(double), (instance, value) => Convert.ToDouble(value) },
+        { typeof(bool), (instance, value) => Convert.ToBoolean(value) },
+        { typeof(string), (instance, value) => value },
+    };
+
+    private readonly IParserFunctionProvider? additionalParsers = additionalParsers;
 
     /// <summary>
     /// Creates a parser function from a specified method name. This requires the method, specified by methodName, has been declared by the
@@ -77,7 +37,9 @@ internal sealed class ParserMatcher(IParserProvider? additionalParsers)
     /// <returns>A parser function derived from the method from the provided type.</returns>
     public static Func<object, string, object> CreateParserFromMethod(Type modelType, string methodName)
     {
-        MethodInfo method = modelType.GetMethods().Where(info => info.Name == methodName && info.IsStatic).FirstOrDefault()
+        MethodInfo method = modelType.GetMethods()
+            .Where(info => info.Name == methodName && info.IsStatic)
+            .FirstOrDefault()
             ?? throw new ParseException($"Could not locate parser. No static method with the name [{methodName}] could be found on the type [{modelType.FullName}].");
         return (instance, value) => method.Invoke(null, [instance, value])!;
     }
@@ -91,9 +53,28 @@ internal sealed class ParserMatcher(IParserProvider? additionalParsers)
     /// <param name="memberInfo">The underlying member whose type will be used to lookup a parser function.</param>
     /// <returns>The parser function that can parsed the specified argument. If no parser is found this will throw an exception.</returns>
     public Func<object, string, object> FindParser(ArgumentAttribute argumentAttribute, MemberInfo memberInfo)
-        => additionalParsers?.Find(argumentAttribute, memberInfo) ?? FindDefaultParserForField(argumentAttribute.Name, TypeHelper.GetDeclaredType(memberInfo));
+        => additionalParsers?.Find(argumentAttribute, memberInfo)
+            ?? FindDefaultParserForField(argumentAttribute.Name, TypeHelper.GetDeclaredType(memberInfo));
 
     private static Func<object, string, object> FindDefaultParserForField(string name, Type fieldType)
-        => DefaultParsers.DefaultParserFor(fieldType)
+        => DefaultParserFor(fieldType)
             ?? throw new ParseException($"No parser available to parse argument: [{name}]. There is no registered parser supporting type: [{fieldType}]");
+
+    /// <summary>
+    /// Attempts to find a parser function for the specified type.
+    /// </summary>
+    /// <param name="fieldType">The type of the field being parsed.</param>
+    /// <returns>Returns a parser function to parse the field of the specified type.</returns>
+    private static Func<object, string, object>? DefaultParserFor(Type fieldType)
+    {
+        if (fieldType.IsEnum)
+        {
+            return (instance, value) => Enum.Parse(fieldType, value, true);
+        }
+        else if (DefaultParsers.TryGetValue(fieldType, out Func<object, string, object>? parser))
+        {
+            return parser;
+        }
+        return null;
+    }
 }

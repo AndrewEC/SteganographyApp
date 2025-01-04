@@ -27,7 +27,7 @@ internal sealed class EncodeArguments : IArgumentConverter
             + " This parameter can be a comma delimited list of globs with the current directory as the root directory from which files will be matched.",
         example: "*.png,*.webp"
     )]
-    public ImmutableArray<string> CoverImages = new ImmutableArray<string>();
+    public ImmutableArray<string> CoverImages = [];
 
     [Argument("--password", "-p", helpText: "The optional password used to encrypt the input file contents. Providing a question mark (?) as input allows this parameter to be entered in an interactive mode where the input will be captured but not displayed.")]
     public string Password = string.Empty;
