@@ -40,8 +40,6 @@ public sealed class ImageCleaner(IInputArguments arguments, ImageStore imageStor
                 log.Trace("Generated random binary string of: [{0}]", randomBinary);
                 cleaner.WriteContentChunkToImage(randomBinary);
             }
-
-            cleaner.EncodeComplete();
         }
     }
 

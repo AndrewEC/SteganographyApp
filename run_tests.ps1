@@ -7,13 +7,22 @@ Write-Host "`n---------- Cleaning out existing build artifacts ----------`n"
 function Remove-Folder {
     param([string] $FolderPath)
 
-    if (Test-Path $FolderPath) {
+    if (Test-Path $FolderPath -PathType Container) {
         Write-Host "Removing folder $FolderPath"
         Remove-Item -Recurse -Force $FolderPath | Out-Null
 
-        if (Test-Path $FolderPath) {
+        if (Test-Path $FolderPath -PathType Container) {
             throw "Could not delete folder $FolderPath"
         }
+    }
+}
+
+function Remove-File {
+    param([string] $ItemPath)
+
+    if (Test-Path $ItemPath -PathType Leaf) {
+        Write-Host "Removing item: $ItemPath"
+        Remove-Item $ItemPath
     }
 }
 
@@ -23,8 +32,9 @@ Remove-Folder ./SteganographyApp.Common.Arguments.Tests/bin
 Remove-Folder ./SteganographyApp.Common.Arguments.Tests/obj
 Remove-Folder ./SteganographyApp.Common.Integration.Tests/bin
 Remove-Folder ./SteganographyApp.Common.Integration.Tests/obj
-Remove-Item ./coverage.json
-Remove-Item ./coverage.opencover.xml
+
+Remove-File ./coverage.json
+Remove-File ./coverage.opencover.xml
 
 
 Write-Host "`n---------- Rebuilding Project ----------`n"
@@ -35,18 +45,11 @@ if ($LastExitCode -ne 0) {
 }
 
 $ReportsFolder = "./reports"
-if(Test-Path $ReportsFolder) {
-    Write-Host "Removing old report directory and contents"
-    Remove-Item -Recurse -Force $ReportsFolder | Out-Null
-    if(Test-Path $ReportsFolder) {
-        Write-Host "Unable to delete $ReportsFolder directory."
-        Exit
-    }
-}
+Remove-Folder $ReportsFolder
 
 Write-Host "Creating report directory"
-New-Item -ItemType directory -Path $ReportsFolder | Out-Null
-if(-Not (Test-Path $ReportsFolder)) {
+New-Item -ItemType Directory -Path $ReportsFolder | Out-Null
+if(-Not (Test-Path $ReportsFolder -PathType Container)) {
     Write-Host "Could not create $ReportsFolder directory"
     Exit
 }
@@ -67,7 +70,7 @@ dotnet tool run coverlet `
 
 if($LastExitCode -ne 0) {
     Write-Host "'coverlet' SteganographyApp.Common.Tests command failed with status: $LastExitCode"
-    if (-Not($reportOnFailure)) {
+    if (-Not $reportOnFailure) {
         Exit
     }
 }
@@ -87,7 +90,7 @@ dotnet tool run coverlet `
 
 if($LastExitCode -ne 0) {
     Write-Host "'coverlet' SteganographyApp.Common.Arguments.Tests command failed with status: $LastExitCode"
-    if (-Not($reportOnFailure)) {
+    if (-Not $reportOnFailure) {
         Exit
     }
 }

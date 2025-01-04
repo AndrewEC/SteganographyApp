@@ -60,7 +60,6 @@ public class E2ETests
                 contentChunkSize = written;
                 Assert.That(written, Is.EqualTo(content.Length));
             }
-            stream.EncodeComplete();
         }
 
         // Write the content chunk table to support the read operation.
@@ -109,7 +108,6 @@ public class E2ETests
                 contentChunkSize = written;
                 Assert.That(written, Is.EqualTo(content.Length));
             }
-            stream.EncodeComplete();
         }
 
         using (var tableWriter = new ChunkTableWriter(imageStore, args))
@@ -147,7 +145,6 @@ public class E2ETests
                 contentChunkSize = written;
                 Assert.That(written, Is.EqualTo(content.Length));
             }
-            stream.EncodeComplete();
         }
 
         using (var tableWriter = new ChunkTableWriter(imageStore, args))
@@ -187,7 +184,6 @@ public class E2ETests
                 contentChunkSize = written;
                 Assert.That(written, Is.EqualTo(content.Length));
             }
-            stream.EncodeComplete();
         }
         using (var tableWriter = new ChunkTableWriter(imageStore, args))
         {
@@ -225,7 +221,6 @@ public class E2ETests
                 contentChunkSize = written;
                 Assert.That(written, Is.EqualTo(content.Length));
             }
-            stream.EncodeComplete();
         }
         using (var tableWriter = new ChunkTableWriter(imageStore, args))
         {

@@ -24,21 +24,16 @@ public sealed class ImageStoreStream : AbstractDisposable
     }
 
     /// <summary>
-    /// Sets an internal save flag to true. When true this wrapper will attempt to save any changes made to any
-    /// images when Dispose is being called.
-    /// </summary>
-    public void EncodeComplete()
-    {
-        save = true;
-    }
-
-    /// <summary>
     /// Invokes the wrapped image store WriteBinaryString method passing in the provided <paramref name="binary"/> argument.
     /// </summary>
     /// <param name="binary">The binary chunk to write to the cover images.</param>
     /// <see cref="ImageStore.WriteBinaryString(string)"/>
     /// <returns>A count of the number of bits that were written to the image.</returns>
-    public int WriteContentChunkToImage(string binary) => RunIfNotDisposedWithResult(() => store.WriteBinaryString(binary));
+    public int WriteContentChunkToImage(string binary) => RunIfNotDisposedWithResult(() =>
+    {
+        save = true;
+        return store.WriteBinaryString(binary);
+    });
 
     /// <summary>
     /// Invokes the wrapped image store ReadBinaryString methods passing in the provided <paramref name="length"/> argument.

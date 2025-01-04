@@ -55,7 +55,6 @@ public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments
         string tableBinary = tableHeader + binaryString;
 
         stream.WriteContentChunkToImage(tableBinary);
-        stream.EncodeComplete();
     });
 
     /// <summary>

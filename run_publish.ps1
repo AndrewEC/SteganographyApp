@@ -1,5 +1,5 @@
 Param(
-    [Switch]$Release
+    [Switch] $Release
 )
 
 $BuildType = "debug"
@@ -11,11 +11,11 @@ Write-Host "`n---------- Removing old publish directories ----------`n"
 function Remove-Folder {
     param([string] $FolderPath)
 
-    if (Test-Path $FolderPath) {
+    if (Test-Path $FolderPath -PathType Container) {
         Write-Host "Removing folder $FolderPath"
         Remove-Item -Recurse -Force $FolderPath | Out-Null
 
-        if (Test-Path $FolderPath) {
+        if (Test-Path $FolderPath -PathType Container) {
             throw "Could not delete folder $FolderPath"
         }
     }

@@ -162,7 +162,6 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
         using (var stream = new ImageStore(arguments).OpenStream())
         {
             stream.WriteContentChunkToImage(binaryData);
-            stream.EncodeComplete();
         }
     }
 

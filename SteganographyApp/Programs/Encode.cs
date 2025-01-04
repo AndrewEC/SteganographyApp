@@ -128,7 +128,6 @@ internal sealed class EncodeCommand : Command<EncodeArguments>
                     log.Debug("===== ===== ===== End Encoding Iteration ===== ===== =====");
                 }
             }
-            stream.EncodeComplete();
         }
     }
 
