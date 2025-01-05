@@ -55,16 +55,18 @@ public sealed class ImageStore(IInputArguments args)
     /// implementing the IDisposable interface to ensure that any currently open and loaded image
     /// will be properly disposed.</para>
     /// </summary>
+    /// <param name="mode">The mode specifying which types of IO operations should
+    /// be permitted.</param>
     /// <returns>A new wrapper for safely using the image store IO methods.</returns>
-    public ImageStoreStream OpenStream()
+    public ImageStoreStream OpenStream(StreamMode mode)
     {
         if (currentStream != null)
         {
-            throw new ImageProcessingException("Call to OpenStream was made but the stream is already open. "
+            throw new ImageStoreException("Call to OpenStream was made but the stream is already open. "
                 + "Have you disposed of the previous stream?");
         }
 
-        ImageStoreStream stream = new(this);
+        ImageStoreStream stream = new(this, mode);
         currentStream = stream;
         return stream;
     }
@@ -74,12 +76,12 @@ public sealed class ImageStore(IInputArguments args)
     /// then calls the Next method to advance to the specified image.
     /// </summary>
     /// <param name="coverImageIndex">The index of the image to start reading and writing from.</param>
-    /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
-    public void SeekToImage(int coverImageIndex)
+    /// <exception cref="ImageStoreException">Rethrown from the Next method call.</exception>
+    internal void SeekToImage(int coverImageIndex)
     {
         if (coverImageIndex < 0 || coverImageIndex >= args.CoverImages.Length)
         {
-            throw new ImageProcessingException($"An invalid image index was provided in ResetTo. Expected value between [{0}] and [{args.CoverImages.Length - 1}], instead got [{coverImageIndex}].");
+            throw new ImageStoreException($"An invalid image index was provided in ResetTo. Expected value between [{0}] and [{args.CoverImages.Length - 1}], instead got [{coverImageIndex}].");
         }
         currentImageIndex = coverImageIndex - 1;
         LoadNextImage();
@@ -125,7 +127,7 @@ public sealed class ImageStore(IInputArguments args)
     /// <param name="binary">The encypted binary string to write to the image.</param>
     /// <returns>The number of bits written to the image. This is mostly important when
     /// writing the content chunk table to the start of the leading image.</returns>
-    /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
+    /// <exception cref="ImageStoreException">Rethrown from the Next method call.</exception>
     internal int WriteBinaryString(string binary)
     {
         if (CurrentImage == null)
@@ -159,7 +161,7 @@ public sealed class ImageStore(IInputArguments args)
     /// <param name="bitsToRead">Specifies the number of bits to be read from the current image.</param>
     /// <returns>A binary string whose length is equal to the length specified in the length
     /// parameter.</returns>
-    /// <exception cref="ImageProcessingException">Rethrown from the Next method call.</exception>
+    /// <exception cref="ImageStoreException">Rethrown from the Next method call.</exception>
     internal string ReadBinaryString(int bitsToRead)
     {
         if (CurrentImage == null)
@@ -188,7 +190,7 @@ public sealed class ImageStore(IInputArguments args)
     /// </summary>
     /// <param name="saveImageChanges">If true it will attempt to save any changes made to the currently open
     /// image before attempting to increment to the next available image.</param>
-    /// <exception cref="ImageProcessingException">If the increment of the current
+    /// <exception cref="ImageStoreException">If the increment of the current
     /// image index exeeds the available number of images an exception will be thrown.</exception>
     internal void LoadNextImage(bool saveImageChanges = false)
     {
@@ -198,7 +200,7 @@ public sealed class ImageStore(IInputArguments args)
         currentImageIndex++;
         if (currentImageIndex == args.CoverImages.Length)
         {
-            throw new ImageProcessingException("Cannot load next image because there are no remaining cover images left to load.");
+            throw new ImageStoreException("Cannot load next image because there are no remaining cover images left to load.");
         }
 
         CurrentImage = Injector.Provide<IImageProxy>().LoadImage(args.CoverImages[currentImageIndex]);
@@ -213,7 +215,7 @@ public sealed class ImageStore(IInputArguments args)
     /// of the number specified as the bitsToSkip arguments.
     /// </summary>
     /// <param name="bitsToSkip">The number of bits to skip over for the current over.</param>
-    /// <exception cref="ImageProcessingException">If the number of bits to skip puts the current position past
+    /// <exception cref="ImageStoreException">If the number of bits to skip puts the current position past
     /// the last bit of the currently loaded image then a processing exception will be thrown.</exception>
     internal void SeekToPixel(int bitsToSkip)
     {

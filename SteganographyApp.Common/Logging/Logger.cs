@@ -8,22 +8,22 @@ using SteganographyApp.Common.Injection;
 /// </summary>
 public interface ILogger
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
     void Trace(string message, params object[] arguments);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
     void Trace(string message, Func<object[]> provider);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
     void Debug(string message, params object[] arguments);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
     void Debug(string message, Func<object[]> provider);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
     void Error(string message, params object[] arguments);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
     void Error(string message, Func<object[]> provider);
 }
 
@@ -35,22 +35,22 @@ public sealed class LazyLogger<T> : ILogger
 {
     private ILogger? instance;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
     public void Trace(string message, params object[] arguments) => GetInstance().Trace(message, arguments);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
     public void Trace(string message, Func<object[]> provider) => GetInstance().Trace(message, provider);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
     public void Debug(string message, params object[] arguments) => GetInstance().Debug(message, arguments);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
     public void Debug(string message, Func<object[]> provider) => GetInstance().Debug(message, provider);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
     public void Error(string message, params object[] arguments) => GetInstance().Error(message, arguments);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
     public void Error(string message, Func<object[]> provider) => GetInstance().Error(message, provider);
 
     private ILogger GetInstance() => instance ??= Injector.LoggerFor<T>();
@@ -68,22 +68,22 @@ internal sealed class Logger(string typeName) : ILogger
 {
     private readonly string typeName = typeName;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
     public void Trace(string message, params object[] arguments) => Log(LogLevel.Trace, message, arguments);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
     public void Trace(string message, Func<object[]> provider) => Log(LogLevel.Trace, message, provider);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
     public void Debug(string message, params object[] arguments) => Log(LogLevel.Debug, message, arguments);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
     public void Debug(string message, Func<object[]> provider) => Log(LogLevel.Debug, message, provider);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
     public void Error(string message, params object[] arguments) => Log(LogLevel.Error, message, arguments);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
+    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
     public void Error(string message, Func<object[]> provider) => Log(LogLevel.Error, message, provider);
 
     private void Log(LogLevel level, string message, params object[] arguments) => RootLogger.Instance.LogToFile(typeName, level, message, arguments);

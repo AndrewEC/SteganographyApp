@@ -160,7 +160,7 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
 
     private void WriteToImage(string binaryData, IInputArguments arguments)
     {
-        using (var stream = new ImageStore(arguments).OpenStream())
+        using (var stream = new ImageStore(arguments).OpenStream(StreamMode.Write))
         {
             stream.WriteContentChunkToImage(binaryData);
         }
@@ -168,7 +168,7 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
 
     private string ReadFromImage(string expectedData, IInputArguments arguments)
     {
-        using (var stream = new ImageStore(arguments).OpenStream())
+        using (var stream = new ImageStore(arguments).OpenStream(StreamMode.Read))
         {
             return stream.ReadContentChunkFromImage(expectedData.Length);
         }

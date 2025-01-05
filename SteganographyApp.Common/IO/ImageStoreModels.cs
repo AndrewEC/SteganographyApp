@@ -45,11 +45,11 @@ public readonly struct ChunkWrittenArgs(int chunkLength)
 /// A general exception to represent a specific error occured
 /// while reading or writing data to the images.
 /// </summary>
-public sealed class ImageProcessingException : Exception
+public sealed class ImageStoreException : Exception
 {
     /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessage/*' />
-    public ImageProcessingException(string message) : base(message) { }
+    public ImageStoreException(string message) : base(message) { }
 
     /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessageInner/*' />
-    public ImageProcessingException(string message, Exception inner) : base(message, inner) { }
+    public ImageStoreException(string message, Exception inner) : base(message, inner) { }
 }

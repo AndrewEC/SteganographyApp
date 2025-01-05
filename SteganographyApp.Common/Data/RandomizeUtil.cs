@@ -1,7 +1,6 @@
 namespace SteganographyApp.Common.Data;
 
 using System;
-
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
 
@@ -11,10 +10,10 @@ using SteganographyApp.Common.Logging;
 public interface IRandomizeUtil
 {
     /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Randomize/*' />
-    byte[] Randomize(byte[] value, string randomSeed, int iterationMultiplier);
+    byte[] Randomize(byte[] value, string randomSeed);
 
     /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Reorder/*' />
-    byte[] Reorder(byte[] value, string randomSeed, int iterationMultiplier);
+    byte[] Reorder(byte[] value, string randomSeed);
 }
 
 /// <summary>
@@ -24,14 +23,15 @@ public interface IRandomizeUtil
 [Injectable(typeof(IRandomizeUtil))]
 public sealed class RandomizeUtil : IRandomizeUtil
 {
+    private const int IterationMultiplier = 5;
     private readonly ILogger log = new LazyLogger<RandomizeUtil>();
 
     /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Randomize/*' />
-    public byte[] Randomize(byte[] value, string randomSeed, int iterationMultiplier)
+    public byte[] Randomize(byte[] value, string randomSeed)
     {
         var generator = Xor128Prng.FromString(randomSeed);
 
-        int iterations = value.Length * iterationMultiplier;
+        int iterations = value.Length * IterationMultiplier;
 
         log.Debug("Randomizing byte array using seed [{0}] over [{1}] iterations", randomSeed, iterations);
 
@@ -49,11 +49,11 @@ public sealed class RandomizeUtil : IRandomizeUtil
     }
 
     /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Reorder/*' />
-    public byte[] Reorder(byte[] value, string randomSeed, int iterationMultiplier)
+    public byte[] Reorder(byte[] value, string randomSeed)
     {
         var generator = Xor128Prng.FromString(randomSeed);
 
-        int iterations = value.Length * iterationMultiplier;
+        int iterations = value.Length * IterationMultiplier;
 
         log.Debug("Reordering byte array using seed [{0}] over [{1}] iterations", randomSeed, iterations);
 

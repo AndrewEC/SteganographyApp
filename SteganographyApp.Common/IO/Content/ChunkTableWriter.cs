@@ -4,22 +4,17 @@ using System;
 using System.Collections.Immutable;
 using System.Text;
 
-using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
 /// Responsible for writing the content chunk table to the cover images.
 /// </summary>
 /// <param name="store">The image store instance.</param>
-/// <param name="arguments">The user provided arguments.</param>
-public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments) : AbstractDisposable
+public sealed class ChunkTableWriter(ImageStore store) : AbstractDisposable
 {
     private readonly ILogger log = new LazyLogger<ChunkTableWriter>();
 
-    private readonly IInputArguments arguments = arguments;
-
-    private readonly ImageStoreStream stream = store.OpenStream();
+    private readonly ImageStoreStream stream = store.OpenStream(StreamMode.Write);
 
     /// <summary>
     /// Writes the content chunk table to the cover images starting from the first.
@@ -40,18 +35,6 @@ public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments
         var binaryString = binary.ToString();
         log.Debug("Chunk table binary: [{0}]", binaryString);
 
-        if (!string.IsNullOrEmpty(arguments.RandomSeed))
-        {
-            var randomizeUtil = Injector.Provide<IRandomizeUtil>();
-            var binaryUtil = Injector.Provide<IBinaryUtil>();
-
-            tableHeader = Randomize(randomizeUtil, binaryUtil, tableHeader);
-            log.Debug("Randomized chunk table header to: [{0}]", tableHeader);
-
-            binaryString = Randomize(randomizeUtil, binaryUtil, binaryString);
-            log.Debug("Randomized remaining chunk table content to: [{0}]", binaryString);
-        }
-
         string tableBinary = tableHeader + binaryString;
 
         stream.WriteContentChunkToImage(tableBinary);
@@ -71,14 +54,9 @@ public sealed class ChunkTableWriter(ImageStore store, IInputArguments arguments
         stream.Dispose();
     });
 
-    private static string To33BitBinaryString(int value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');
+    private static string To33BitBinaryString(int value)
+        => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');
 
-    private static string To18BitBinaryString(short value) => Convert.ToString(value, 2).PadLeft(Calculator.ChunkTableHeaderSizeWithPadding, '0');
-
-    private string Randomize(IRandomizeUtil randomizeUtil, IBinaryUtil binaryUtil, string value)
-    {
-        byte[] valueBytes = binaryUtil.ToBytesDirect(value);
-        byte[] randomized = randomizeUtil.Randomize(valueBytes, arguments.RandomSeed, ChunkTableConstants.IterationMultiplier);
-        return Injector.Provide<IBinaryUtil>().ToBinaryStringDirect(randomized);
-    }
+    private static string To18BitBinaryString(short value)
+        => Convert.ToString(value, 2).PadLeft(Calculator.ChunkTableHeaderSizeWithPadding, '0');
 }

@@ -17,7 +17,6 @@ public class RandomizeUtilTests : FixtureWithTestObjects
 
     private const string RandomSeed = "randomSeed";
     private const string BadRandomSeed = "badRandomSeed";
-    private const int IterationMultiplier = 2;
     private readonly byte[] originalBytes = [1, 34, 57, 31, 4, 7, 53, 78, 21, 9, 31];
 
     private RandomizeUtil util;
@@ -34,10 +33,10 @@ public class RandomizeUtilTests : FixtureWithTestObjects
         MockKeyUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
 
         byte[] first = (byte[])originalBytes.Clone();
-        byte[] randomizedFirst = util.Randomize(first, RandomSeed, IterationMultiplier);
+        byte[] randomizedFirst = util.Randomize(first, RandomSeed);
 
         byte[] second = (byte[])originalBytes.Clone();
-        byte[] randomizedSecond = util.Randomize(second, RandomSeed, IterationMultiplier);
+        byte[] randomizedSecond = util.Randomize(second, RandomSeed);
 
         Assert.That(randomizedSecond, Is.EqualTo(randomizedFirst));
     }
@@ -48,10 +47,10 @@ public class RandomizeUtilTests : FixtureWithTestObjects
         MockKeyUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
 
         byte[] copy = (byte[])originalBytes.Clone();
-        byte[] randomized = util.Randomize(copy, RandomSeed, IterationMultiplier);
+        byte[] randomized = util.Randomize(copy, RandomSeed);
         Assert.That(randomized, Is.Not.EqualTo(originalBytes));
 
-        byte[] unrandomized = util.Reorder(randomized, RandomSeed, IterationMultiplier);
+        byte[] unrandomized = util.Reorder(randomized, RandomSeed);
         Assert.That(unrandomized, Is.EqualTo(originalBytes));
     }
 
@@ -63,10 +62,10 @@ public class RandomizeUtilTests : FixtureWithTestObjects
             .Returns(() => keyByteQueue.Dequeue());
 
         byte[] copy = (byte[])originalBytes.Clone();
-        byte[] randomized = util.Randomize(copy, RandomSeed, IterationMultiplier);
+        byte[] randomized = util.Randomize(copy, RandomSeed);
         Assert.That(randomized, Is.Not.EqualTo(originalBytes));
 
-        byte[] unrandomized = util.Reorder(randomized, BadRandomSeed, IterationMultiplier);
+        byte[] unrandomized = util.Reorder(randomized, BadRandomSeed);
         Assert.That(unrandomized, Is.Not.EqualTo(originalBytes));
     }
 }

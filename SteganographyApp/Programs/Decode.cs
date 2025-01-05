@@ -70,7 +70,8 @@ internal sealed class DecodeArguments : IArgumentConverter
             UseCompression = EnableCompression,
             BitsToUse = TwoBits ? 2 : 1,
         };
-        Injector.LoggerFor<DecodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
+        Injector.LoggerFor<DecodeArguments>().Debug("Using input arguments: [{0}]",
+            () => [JsonSerializer.Serialize(arguments)]);
         return arguments;
     }
 }
@@ -96,9 +97,9 @@ internal sealed class DecodeCommand : Command<DecodeArguments>
     private void Decode(IInputArguments arguments)
     {
         Console.WriteLine("Reading content chunk table.");
-        using (var stream = new ImageStore(arguments).OpenStream())
+        using (var stream = new ImageStore(arguments).OpenStream(StreamMode.Read))
         {
-            ImmutableArray<int> contentChunkTable = new ChunkTableReader(stream, arguments).ReadContentChunkTable();
+            ImmutableArray<int> contentChunkTable = new ChunkTableReader(stream).ReadContentChunkTable();
             var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
             log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
 

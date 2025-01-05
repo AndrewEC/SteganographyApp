@@ -36,7 +36,6 @@ public class DataEncoderUtilTests : FixtureWithTestObjects
     private const string RandomSeed = "randomSeed";
     private const string StringToDecode = "stringToDecode";
     private const int AdditionalHashIterations = 20;
-    private const int IterationMultiplier = 5;
     private static readonly byte[] InputBytes = new byte[1];
 
     [Test]
@@ -53,7 +52,7 @@ public class DataEncoderUtilTests : FixtureWithTestObjects
         MockDummyUtil.Setup(dummyUtil => dummyUtil.InsertDummies(DummyCount, encryptedBytes, randomKeyString)).Returns(dummyBytes);
 
         byte[] randomizedBytes = [3];
-        MockRandomUtil.Setup(randomUtil => randomUtil.Randomize(dummyBytes, randomKeyString, IterationMultiplier)).Returns(randomizedBytes);
+        MockRandomUtil.Setup(randomUtil => randomUtil.Randomize(dummyBytes, randomKeyString)).Returns(randomizedBytes);
 
         byte[] compressedBytes = [4];
         MockCompressionUtil.Setup(compressionUtil => compressionUtil.Compress(randomizedBytes)).Returns(compressedBytes);
@@ -82,7 +81,7 @@ public class DataEncoderUtilTests : FixtureWithTestObjects
         MockCompressionUtil.Setup(compressionUtil => compressionUtil.Decompress(stringToDecodeBytes)).Returns(decompressBytes);
 
         byte[] orderedBytes = [2];
-        MockRandomUtil.Setup(randomUtil => randomUtil.Reorder(decompressBytes, randomKeyString, IterationMultiplier)).Returns(orderedBytes);
+        MockRandomUtil.Setup(randomUtil => randomUtil.Reorder(decompressBytes, randomKeyString)).Returns(orderedBytes);
 
         byte[] undummiedBytes = [3];
         MockDummyUtil.Setup(dummyUtil => dummyUtil.RemoveDummies(DummyCount, orderedBytes, randomKeyString)).Returns(undummiedBytes);

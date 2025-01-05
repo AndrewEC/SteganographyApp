@@ -27,7 +27,7 @@ public sealed class ImageCleaner(IInputArguments arguments, ImageStore imageStor
     /// </summary>
     public void CleanImages()
     {
-        using (var cleaner = imageStore.OpenStream())
+        using (var stream = imageStore.OpenStream(StreamMode.Write))
         {
             for (int i = 0; i < arguments.CoverImages.Length; i++)
             {
@@ -38,7 +38,7 @@ public sealed class ImageCleaner(IInputArguments arguments, ImageStore imageStor
                 }
                 string randomBinary = GenerateBinaryString(currentImage);
                 log.Trace("Generated random binary string of: [{0}]", randomBinary);
-                cleaner.WriteContentChunkToImage(randomBinary);
+                stream.WriteContentChunkToImage(randomBinary);
             }
         }
     }

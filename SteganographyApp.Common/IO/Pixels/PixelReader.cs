@@ -19,8 +19,8 @@ internal sealed class PixelReader(BinaryStringBuilder bitAggregator, int readabl
     private readonly int readableBitsPerPixel = readableBitsPerPixel;
 
     /// <summary>
-    /// Reads the appropriate number of bits from the input pixel and writes them to the BitAggregator
-    /// providing during initialization of this reader.
+    /// Reads the appropriate number of bits from the input pixel and writes them to the
+    /// <see cref="BinaryStringBuilder"/> providing during initialization of this reader.
     /// </summary>
     /// <param name="source">The input pixel to read the binary from.</param>
     public void ReadBinaryFromPixel(Rgba32 source)
@@ -32,7 +32,7 @@ internal sealed class PixelReader(BinaryStringBuilder bitAggregator, int readabl
 
     private string ReadBits(byte sourceColour)
     {
-        var binary = Convert.ToString(sourceColour, 2).PadLeft(readableBitsPerPixel, '0');
+        var binary = Convert.ToString(sourceColour, 2).PadLeft(8, '0');
         return binary.Substring(binary.Length - readableBitsPerPixel);
     }
 }

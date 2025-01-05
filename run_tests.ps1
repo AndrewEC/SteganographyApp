@@ -1,5 +1,5 @@
 Param(
-    [Switch]$ReportOnFailure
+    [Switch] $ReportOnFailure
 )
 
 
@@ -49,7 +49,7 @@ Remove-Folder $ReportsFolder
 
 Write-Host "Creating report directory"
 New-Item -ItemType Directory -Path $ReportsFolder | Out-Null
-if(-Not (Test-Path $ReportsFolder -PathType Container)) {
+if (-Not (Test-Path $ReportsFolder -PathType Container)) {
     Write-Host "Could not create $ReportsFolder directory"
     Exit
 }
@@ -68,7 +68,7 @@ dotnet tool run coverlet `
     --threshold-type branch `
     --threshold-stat total
 
-if($LastExitCode -ne 0) {
+if ($LastExitCode -ne 0) {
     Write-Host "'coverlet' SteganographyApp.Common.Tests command failed with status: $LastExitCode"
     if (-Not $reportOnFailure) {
         Exit
@@ -88,7 +88,7 @@ dotnet tool run coverlet `
     --merge-with coverage.json `
     --format opencover
 
-if($LastExitCode -ne 0) {
+if ($LastExitCode -ne 0) {
     Write-Host "'coverlet' SteganographyApp.Common.Arguments.Tests command failed with status: $LastExitCode"
     if (-Not $reportOnFailure) {
         Exit
@@ -98,7 +98,7 @@ if($LastExitCode -ne 0) {
 
 Write-Host "`n---------- Running SteganographyApp.Common.Integration.Tests tests ----------`n"
 dotnet test ./SteganographyApp.Common.Integration.Tests
-if($LastExitCode -ne 0) {
+if ($LastExitCode -ne 0) {
     Write-Host "dotnet test ./SteganographyApp.Common.Integration.Tests command failed with status: $LastExitCode"
     Exit
 }

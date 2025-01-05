@@ -1,7 +1,5 @@
 namespace SteganographyApp.Common.IO;
 
-using SteganographyApp.Common.Data;
-
 /// <summary>
 /// A wrapper class that exposes the IO related methods of an ImageStore instance while implementing
 /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
@@ -10,16 +8,19 @@ using SteganographyApp.Common.Data;
 public sealed class ImageStoreStream : AbstractDisposable
 {
     private readonly ImageStore store;
-
+    private readonly StreamMode mode;
     private bool save = false;
 
     /// <summary>
     /// Initialize the wrapper using the image store that the IO method calls will be proxied to.
     /// </summary>
     /// <param name="store">The image store instance to be wrapped.</param>
-    public ImageStoreStream(ImageStore store)
+    /// <param name="mode">The mode specifying which types of IO operations should
+    /// be permitted.</param>
+    public ImageStoreStream(ImageStore store, StreamMode mode)
     {
         this.store = store;
+        this.mode = mode;
         store.SeekToImage(0);
     }
 
@@ -31,6 +32,10 @@ public sealed class ImageStoreStream : AbstractDisposable
     /// <returns>A count of the number of bits that were written to the image.</returns>
     public int WriteContentChunkToImage(string binary) => RunIfNotDisposedWithResult(() =>
     {
+        if (mode != StreamMode.Write)
+        {
+            throw new ImageStoreException("Stream cannot be used for writing as it was opened with the Read StreamMode.");
+        }
         save = true;
         return store.WriteBinaryString(binary);
     });
@@ -41,7 +46,14 @@ public sealed class ImageStoreStream : AbstractDisposable
     /// <param name="length">The number of bits to read from the cover images.</param>
     /// <returns>A binary string read from the cover images whose length is,
     /// at most, the length as specified by the input argument of the same name.</returns>
-    public string ReadContentChunkFromImage(int length) => RunIfNotDisposedWithResult(() => store.ReadBinaryString(length));
+    public string ReadContentChunkFromImage(int length) => RunIfNotDisposedWithResult(() =>
+    {
+        if (mode != StreamMode.Read)
+        {
+            throw new ImageStoreException("Stream cannot be used for reading as it was opened with the Write StreamMode.");
+        }
+        return store.ReadBinaryString(length);
+    });
 
     /// <summary>
     /// Invokes the wrapped image store SeekToPixel method passing in the provided <paramref name="bitsToSkip"/> argument.

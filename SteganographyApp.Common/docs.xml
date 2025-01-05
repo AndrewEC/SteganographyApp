@@ -152,9 +152,9 @@
             inserted if the dummy count is 0.</param>
             <param name="randomSeed">The random seed used to randomize the binary string being encoded. If the random seed is blank
             or null then no randmization will be done.</param>
-            <param name="additionalPasswordHashIterations">
-                The additional number of times the password should be hashed before being encrypting or decrypting content.
-                Has no effect if no password has been provided.
+            <param name="additionalHashIterations">
+                The additional number of times the passwordor random seed should be hashed before being encrypting or
+                decrypting content. Has no effect if neither of these values have been provided.
             </param>
             <returns>An binary string made up of the base64 bytes read from the file and possibly passed through an AES cipher.</returns>
             <exception cref="TransformationException">
@@ -173,9 +173,9 @@
             be removed.</param>
             <param name="randomSeed">The random seed to use in de-randomizing the binary string being decoded. If the random seed is null or blank then
             no randomization will be done.</param>
-            <param name="additionalPasswordHashIterations">
-                The additional number of times the password should be hashed before being encrypting or decrypting content.
-                Has no effect if no password has been provided.
+            <param name="additionalHashIterations">
+                The additional number of times the passwordor random seed should be hashed before being encrypting or
+                decrypting content. Has no effect if neither of these values have been provided.
             </param>
             <returns>A byte array containing the original decoded bytes of the file inputted during encoding.</returns>
             <exception cref="TransformationException">
@@ -258,10 +258,6 @@
             </summary>
             <param name="value">The bytes to be randomized.</param>
             <param name="randomSeed">The user provided random seed that will be used to initialize the random number generator.</param>
-            <param name="iterationMultiplier">
-                A multiplier used in determining the number of bits to be swapped. The number of bits to be swapped is equal to the number
-                of bits in the binary string multiplied by the iterationMultipler.
-            </param>
             <returns>A randomized binary string.</returns>
         </Randomize>
         <Reorder>
@@ -270,10 +266,6 @@
             </summary>
             <param name="value">The encrypted and randomized bytes to be re-ordered.</param>
             <param name="randomSeed">The user provided randoom seed that will be used to initialize the random number generator.</param>
-            <param name="iterationMultiplier">
-                A multiplier used in determining the number of bits to be swapped. The number of bits to be swapped is equal to the number
-                of bits in the binary string multiplied by the iterationMultipler.
-            </param>
             <returns>A non-randomized array of bytes matching the original input file.</returns>
         </Reorder>
     </members>

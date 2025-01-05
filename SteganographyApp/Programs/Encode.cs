@@ -101,7 +101,7 @@ internal sealed class EncodeCommand : Command<EncodeArguments>
 
     private void Encode(EncodingUtilities utilities, IInputArguments arguments)
     {
-        using (var stream = utilities.ImageStore.OpenStream())
+        using (var stream = utilities.ImageStore.OpenStream(StreamMode.Write))
         {
             log.Debug("Encoding file: [{0}]", arguments.FileToEncode);
             int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
@@ -135,7 +135,7 @@ internal sealed class EncodeCommand : Command<EncodeArguments>
     private void Cleanup(EncodingUtilities utilities, IInputArguments arguments)
     {
         Console.WriteLine("Writing content chunk table.");
-        using (var writer = new ChunkTableWriter(utilities.ImageStore, arguments))
+        using (var writer = new ChunkTableWriter(utilities.ImageStore))
         {
             writer.WriteContentChunkTable(utilities.TableTracker.GetContentTable());
         }

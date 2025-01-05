@@ -2,13 +2,11 @@ namespace SteganographyApp.Common.Tests;
 
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Text;
 
 using Moq;
 
 using NUnit.Framework;
-
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
@@ -16,10 +14,9 @@ using SixLabors.ImageSharp.PixelFormats;
 using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.IO;
-using SteganographyApp.Common.IO.Content;
 
 [TestFixture]
-public class ImageStoreTests : FixtureWithRealObjects
+public class ImageStoreTests : FixtureWithTestObjects
 {
     [Mockup(typeof(IImageProxy))]
     public Mock<IImageProxy> mockImageProxy = new();
@@ -35,7 +32,18 @@ public class ImageStoreTests : FixtureWithRealObjects
     };
 
     [Test]
-    public void TestWriteToImageWhenNotEnoughImageSpacesThrowsImageProcessingException()
+    public void TestOpenMultipleStreamsThrowsException()
+    {
+        var mockImage = GenerateMockImage(100, 100);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
+
+        var imageStore = new ImageStore(Arguments);
+        imageStore.OpenStream(StreamMode.Read);
+        Assert.Throws<ImageStoreException>(() => imageStore.OpenStream(StreamMode.Read));
+    }
+
+    [Test]
+    public void TestWriteToImageWhenNotEnoughImageSpaceAvailableThrowsImageStoreException()
     {
         var mockImage = GenerateMockImage(100, 100);
         mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
@@ -44,11 +52,9 @@ public class ImageStoreTests : FixtureWithRealObjects
 
         string binaryString = GenerateBinaryString(BinaryStringLength);
 
-        var imageStore = new ImageStore(Arguments);
-
-        using (var wrapper = imageStore.OpenStream())
+        using (var stream = new ImageStore(Arguments).OpenStream(StreamMode.Write))
         {
-            var exception = Assert.Throws<ImageProcessingException>(() => wrapper.WriteContentChunkToImage(binaryString));
+            var exception = Assert.Throws<ImageStoreException>(() => stream.WriteContentChunkToImage(binaryString));
             Assert.That(
                 exception?.Message ?? "No Message",
                 Is.EqualTo("Cannot load next image because there are no remaining cover images left to load."));
@@ -59,51 +65,47 @@ public class ImageStoreTests : FixtureWithRealObjects
     }
 
     [Test]
-    public void TestReadAndWriteContentChunkTable()
-    {
-        var mockImage = GenerateMockImage(1000, 1000);
-        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
-        mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImagePath)).Returns<IEncoderProvider>(null);
-
-        var chunkTableWrite = ImmutableArray.Create(new int[] { 100, 200, 300 });
-        var imageStore = new ImageStore(Arguments);
-        imageStore.SeekToImage(0);
-        using (var tableWriter = new ChunkTableWriter(imageStore, Arguments))
-        {
-            tableWriter.WriteContentChunkTable(chunkTableWrite);
-        }
-        imageStore.SeekToImage(0);
-
-        using (var stream = imageStore.OpenStream())
-        {
-            var chunkTableRead = new ChunkTableReader(stream, Arguments).ReadContentChunkTable();
-            Assert.That(chunkTableRead, Has.Length.EqualTo(chunkTableWrite.Length));
-            for (int i = 0; i < chunkTableWrite.Length; i++)
-            {
-                Assert.That(chunkTableRead[i], Is.EqualTo(chunkTableWrite[i]));
-            }
-        }
-    }
-
-    [Test]
-    public void TestWriteContentChunkTableWithNotEnoughSpaceInImageThrowsImageProcessingException()
+    public void TestReadFromImageWhenNotEnoughImageSpaceAvailableThrowsImageStoreException()
     {
         var mockImage = GenerateMockImage(1, 1);
         mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
 
-        mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImagePath)).Returns(new PngEncoder());
-
-        var imageStore = new ImageStore(Arguments);
-        var chunkTable = Enumerable.Range(0, 100).ToImmutableArray();
-
-        imageStore.SeekToImage(0);
-        using (var writer = new ChunkTableWriter(imageStore, Arguments))
+        using (var stream = new ImageStore(Arguments).OpenStream(StreamMode.Read))
         {
-            Assert.Throws<ImageProcessingException>(() => writer.WriteContentChunkTable(chunkTable));
+            var exception = Assert.Throws<ImageStoreException>(() => stream.ReadContentChunkFromImage(1000));
+            Assert.That(
+                exception?.Message ?? "No Message",
+                Is.EqualTo("Cannot load next image because there are no remaining cover images left to load."));
         }
 
         Assert.That(mockImage.DisposeCalled, Is.True);
-        Assert.That(mockImage.SaveCalledWith, Is.EqualTo(Arguments.CoverImages[0]));
+    }
+
+    [Test]
+    public void TestSeekToImage()
+    {
+        var mockImage = GenerateMockImage(100, 100);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
+
+        var store = new ImageStore(Arguments);
+        using (var stream = store.OpenStream(StreamMode.Read))
+        {
+            stream.SeekToImage(0);
+            Assert.Throws<ImageStoreException>(() => stream.SeekToImage(2));
+            Assert.Throws<ImageStoreException>(() => stream.SeekToImage(-1));
+        }
+    }
+
+    [Test]
+    public void TestSeekToPixelOutsideAvailablePixelRangeThrowsException()
+    {
+        var mockImage = GenerateMockImage(1, 1);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
+
+        using (var stream = new ImageStore(Arguments).OpenStream(StreamMode.Read))
+        {
+            Assert.Throws<ImageStoreException>(() => stream.SeekToPixel(100_000));
+        }
     }
 
     private static MockBasicImageInfo GenerateMockImage(int width, int height)
