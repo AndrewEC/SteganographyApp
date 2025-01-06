@@ -15,10 +15,10 @@ using SteganographyApp.Common.Logging;
 /// to overwrite and which images are to be cleaned.</param>
 /// <param name="imageStore">The image store instance initialized with the same arguments
 /// parameter as provided in this constructor.</param>
-public sealed class ImageCleaner(IInputArguments arguments, ImageStore imageStore)
+public sealed class ImageCleaner(IInputArguments arguments, IImageStore imageStore)
 {
     private readonly IInputArguments arguments = arguments;
-    private readonly ImageStore imageStore = imageStore;
+    private readonly IImageStore imageStore = imageStore;
 
     private readonly ILogger log = new LazyLogger<ImageCleaner>();
 
@@ -43,8 +43,20 @@ public sealed class ImageCleaner(IInputArguments arguments, ImageStore imageStor
         }
     }
 
-    private bool IsLastImage(IBasicImageInfo image) => arguments.CoverImages.IndexOf(image.Path) == arguments.CoverImages.Length - 1;
+    private bool IsLastImage(IBasicImageInfo image)
+        => arguments.CoverImages.IndexOf(image.Path) == arguments.CoverImages.Length - 1;
 
+    /// <summary>
+    /// The modifier is computed to ensure that the last pixel of the last image is not written to.
+    /// This is to prevent a potential issue in which if all the pixels of the last image are written
+    /// to the stream will try to advance to the next image which will produce an error because there
+    /// are no more remaining images to advance to.
+    /// </summary>
+    /// <param name="image">The image that is currently being written to. The path of this image
+    /// will be compared to the last path specified in the <see cref="IInputArguments.CoverImages"/>.
+    /// </param>
+    /// <returns>0 if this is not the last image or the number of bits needed to subtract from the total
+    /// bits the image can store to ensure the last pixel in the image is not writtent to.</returns>
     private int ComputeModifier(IBasicImageInfo image)
     {
         if (!IsLastImage(image))

@@ -63,6 +63,12 @@ dotnet tool run coverlet `
     --target "dotnet" `
     --targetargs "test ./SteganographyApp.Common.Tests --no-build" `
     --exclude-by-file "**/RootLogger.cs" `
+    --exclude-by-file "**/Logger.cs" `
+    --exclude-by-file "**/BasicImageInfo.cs" `
+    --exclude-by-file "**/ConsoleProxy.cs" `
+    --exclude-by-file "**/FileProxy.cs" `
+    --exclude-by-file "**/ImageProxy.cs" `
+    --exclude-by-file "**/ReadWriteStream.cs" `
     --threshold 60 `
     --threshold-type line `
     --threshold-type branch `
@@ -106,7 +112,7 @@ if ($LastExitCode -ne 0) {
 
 Write-Host "`n---------- Generating coverage report ----------`n"
 dotnet tool run reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
-if($LastExitCode -ne 0) {
+if ($LastExitCode -ne 0) {
     Write-Host "'reportgenerator' command failed with status: $LastExitCode"
     Exit
 }

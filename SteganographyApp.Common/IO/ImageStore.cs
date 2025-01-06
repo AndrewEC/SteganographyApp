@@ -11,15 +11,26 @@ using SteganographyApp.Common.IO.Pixels;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
-/// Class that handles positioning a make shift write stream in the proper position so
-/// data can be reliably read and written to the storage images.
+/// Handles the act of reading and writing from a series of images. The internal methods of this
+/// instance should not be directly invoked. Instead, they should be accessed via the interface
+/// return by the <see cref="OpenStream(StreamMode)"/> method.
 /// </summary>
-/// <remarks>
-/// Creates a new instance of the ImageStore and calculates the RequiredContentChunkTableBitSize
-/// value.
-/// </remarks>
+public interface IImageStore
+{
+    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/OpenStream/*' />
+    IImageStoreStream OpenStream(StreamMode mode);
+
+    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/CurrentImage/*' />
+    public IBasicImageInfo? CurrentImage { get; }
+}
+
+/// <summary>
+/// Handles the act of reading and writing from a series of images. The internal methods of this
+/// instance should not be directly invoked. Instead, they should be accessed via the interface
+/// return by the <see cref="OpenStream(StreamMode)"/> method.
+/// </summary>
 /// <param name="args">The values parsed from the command line arguments.</param>
-public sealed class ImageStore(IInputArguments args)
+public sealed class ImageStore(IInputArguments args) : IImageStore
 {
     private readonly ILogger log = new LazyLogger<ImageStore>();
 
@@ -42,23 +53,11 @@ public sealed class ImageStore(IInputArguments args)
     /// </summary>
     public event EventHandler<NextImageLoadedEventArgs>? OnNextImageLoaded;
 
-    /// <summary>
-    /// Gets the currently loaded image. The image is loaded whenever the Next
-    /// method is called and the currentImageIndex has been incremented.
-    /// </summary>
+    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/CurrentImage/*' />
     public IBasicImageInfo? CurrentImage { get; private set; }
 
-    /// <summary>
-    /// Utility method to create an <see cref="ImageStoreStream"/> instance to be used in conjunction with the
-    /// read and write methods.
-    /// <para>The ImageStoreWrapper instance provides proxies to the ImageStore IO methods as well as
-    /// implementing the IDisposable interface to ensure that any currently open and loaded image
-    /// will be properly disposed.</para>
-    /// </summary>
-    /// <param name="mode">The mode specifying which types of IO operations should
-    /// be permitted.</param>
-    /// <returns>A new wrapper for safely using the image store IO methods.</returns>
-    public ImageStoreStream OpenStream(StreamMode mode)
+    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/OpenStream/*' />
+    public IImageStoreStream OpenStream(StreamMode mode)
     {
         if (currentStream != null)
         {

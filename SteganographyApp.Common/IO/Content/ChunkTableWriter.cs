@@ -10,11 +10,11 @@ using SteganographyApp.Common.Logging;
 /// Responsible for writing the content chunk table to the cover images.
 /// </summary>
 /// <param name="store">The image store instance.</param>
-public sealed class ChunkTableWriter(ImageStore store) : AbstractDisposable
+public sealed class ChunkTableWriter(IImageStore store) : AbstractDisposable
 {
     private readonly ILogger log = new LazyLogger<ChunkTableWriter>();
 
-    private readonly ImageStoreStream stream = store.OpenStream(StreamMode.Write);
+    private readonly IImageStoreStream stream = store.OpenStream(StreamMode.Write);
 
     /// <summary>
     /// Writes the content chunk table to the cover images starting from the first.

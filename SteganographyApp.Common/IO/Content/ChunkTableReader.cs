@@ -10,11 +10,11 @@ using SteganographyApp.Common.Logging;
 /// Responsible for reading the content chunk table from the leading cover image.
 /// </summary>
 /// <param name="stream">The stream opened from the image store.</param>
-public class ChunkTableReader(ImageStoreStream stream)
+public class ChunkTableReader(IImageStoreStream stream)
 {
     private readonly ILogger log = new LazyLogger<ChunkTableReader>();
 
-    private readonly ImageStoreStream stream = stream;
+    private readonly IImageStoreStream stream = stream;
 
     /// <summary>
     /// Reads in and returns an array in which each element represents the number of bits in a chunk. This will

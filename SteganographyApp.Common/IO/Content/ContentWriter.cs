@@ -8,10 +8,6 @@ using SteganographyApp.Common.Injection.Proxies;
 /// Stream encapsulating class that decodes binary data and writes it
 /// to an output file.
 /// </summary>
-/// <remarks>
-/// Instantiates a new ContentWrite instance and sets the
-/// args field value.
-/// </remarks>
 /// <param name="arguments">The user provided input arguments.</param>
 public sealed class ContentWriter(IInputArguments arguments) : AbstractContentIO(arguments)
 {
@@ -22,7 +18,8 @@ public sealed class ContentWriter(IInputArguments arguments) : AbstractContentIO
     /// <param name="binary">The encrypted binary string read from the storage images.</param>
     public void WriteContentChunkToFile(string binary) => RunIfNotDisposed(() =>
     {
-        byte[] decoded = Injector.Provide<IDataEncoderUtil>().Decode(binary, Arguments.Password, Arguments.UseCompression, Arguments.DummyCount, Arguments.RandomSeed, Arguments.AdditionalPasswordHashIterations);
+        byte[] decoded = Injector.Provide<IDataEncoderUtil>()
+            .Decode(binary, Arguments.Password, Arguments.UseCompression, Arguments.DummyCount, Arguments.RandomSeed, Arguments.AdditionalPasswordHashIterations);
         Stream.Write(decoded, 0, decoded.Length);
         Stream.Flush();
     });
