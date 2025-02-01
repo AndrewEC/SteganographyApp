@@ -1,6 +1,6 @@
 namespace SteganographyApp.Common.Arguments.Commands;
 
-using System;
+using System.Collections.Immutable;
 
 /// <summary>
 /// The command to be executed as part of the GenericCommand.
@@ -10,35 +10,9 @@ using System;
 public delegate void CommandFunction<T>(T args);
 
 /// <summary>
-/// The top level command interface.
-/// </summary>
-public interface ICommand
-{
-    /// <summary>
-    /// Execute the current command.
-    /// </summary>
-    /// <param name="program">The CliProgram instance being executed. Using this allows a command to access
-    /// additional parsers if they have been made available.</param>
-    /// <param name="args">The list of user provided command line arguments to execute.</param>
-    public void Execute(CliProgram program, string[] args);
-
-    /// <summary>
-    /// The name of the command. The name specified the input the user must provide to trigger the command.
-    /// </summary>
-    /// <returns>The command name.</returns>
-    public string GetName();
-
-    /// <summary>
-    /// Gets a line of text describing the command.
-    /// </summary>
-    /// <returns>A line of text describing the command.</returns>
-    public string GetHelpDescription();
-}
-
-/// <summary>
 /// Provides some utility methods to allow you to more easily and concisely initialize a CliProgram.
 /// </summary>
-public static partial class Commands
+public static class Commands
 {
     /// <summary>
     /// Initializes a GenericCommand instance from the specified name and CommandFunction.
@@ -66,152 +40,30 @@ public static partial class Commands
     /// <returns>A new LazyCommand instance.</returns>
     public static ICommand Lazy<T>()
     where T : ICommand => new LazyCommand<T>();
-}
-
-/// <summary>
-/// A high level abstract command that provides some reasonable default logic to execute a single command.
-/// </summary>
-/// <typeparam name="T">The type which the args from the root Execute command will be parsed to using the CliParser.</typeparam>
-public abstract class Command<T> : ICommand
-where T : class
-{
-    /// <summary>
-    /// Parses the user provided arguments into an object of type T and passes it to the abstract
-    /// Execute function.
-    /// </summary>
-    /// <param name="program">The CliProgram being executed.</param>
-    /// <param name="args">The array of user provided command line arguments.</param>
-    public void Execute(CliProgram program, string[] args)
-        => Execute(CliParser.ParseArgs<T>(args, program.AdditionalParsers));
 
     /// <summary>
-    /// Execute the command providing some parsed argument object as input.
+    /// Creates a generic GenericCommandGroup with a default name of genericcommandgroup. Useful if using a command
+    /// group as the root command of a CliProgram.
     /// </summary>
-    /// <param name="args">An object containing the parsed user provided command line arguments.</param>
-    public abstract void Execute(T args);
+    /// <param name="commands">The array of sub-commands to be selectively executed by the GenericCommandGroup command.</param>
+    /// <returns>A new GenericCommandGroup instance with the default name.</returns>
+    public static ICommand Group(params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray());
 
     /// <summary>
-    /// A default implementation for the GetName function that will return the lower-case class name.
+    /// Creates a GenericCommandGroup with a specified name.
     /// </summary>
-    /// <returns>The command name.</returns>
-    public virtual string GetName() => GetType().Name.ToLowerInvariant();
+    /// <param name="name">The name of the group command.</param>
+    /// <param name="commands">The array of sub-commands to selectively execute.</param>
+    /// <returns>A new GenericCommandGroup instance with the specified name and sub-commands.</returns>
+    public static ICommand Group(string name, params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray(), name);
 
     /// <summary>
-    /// Returns the help text description pulled from the ProgramDescriptor attribute on the input
-    /// CLI model specified in the generic type argument T.
+    /// Creates a GenericCommandGroup with a specified name and help text.
     /// </summary>
-    /// <returns>The help text pulled from the ProgramDescriptor.</returns>
-    public virtual string GetHelpDescription() => Help.GetCommandDescription(typeof(T));
-}
-
-/// <summary>
-/// A high level generic command instantiated using a name and a function.
-/// </summary>
-/// <typeparam name="T">Specifies the type of the arguments to be passed into the Execute method.</typeparam>
-/// <remarks>
-/// Initializes the generic command.
-/// </remarks>
-/// <param name="name">The name of the command.</param>
-/// <param name="function">The function, associated with the command, to execute.</param>
-/// <param name="helpText">An optional parameter specifying a custom set of helpt text
-/// to describe the behaviour of this command.</param>
-public class GenericCommand<T>(string name, CommandFunction<T> function, string? helpText = null) : Command<T>
-where T : class
-{
-    private readonly string name = name;
-    private readonly string? helpText = helpText;
-    private readonly CommandFunction<T> function = function;
-
-    /// <summary>
-    /// Invokes the command function provided during initialization.
-    /// </summary>
-    /// <param name="args">The arguments being executed.</param>
-    public override void Execute(T args) => function(args);
-
-    /// <summary>
-    /// Returns the name of the command provided during initialization.
-    /// </summary>
-    /// <returns>The command name.</returns>
-    public override string GetName() => name;
-
-    /// <summary>
-    /// Returns either the custom help text specified during the creation of this command
-    /// or the default help text.
-    /// </summary>
-    /// <returns>The help description text.</returns>
-    public override string GetHelpDescription() => helpText ?? base.GetHelpDescription();
-}
-
-/// <summary>
-/// Allows an underlying command to be aliased allowing said command to be executed or referenced
-/// using a different name other than the one it was originally initialized with.
-/// </summary>
-/// <remarks>
-/// Initializes the aliased command.
-/// </remarks>
-/// <param name="name">The new name of the command that will override the name of the original command.</param>
-/// <param name="actual">The actual command that is being aliased.</param>
-public class AliasedCommand(string name, ICommand actual) : ICommand
-{
-    private readonly string name = name;
-    private readonly ICommand actual = actual;
-
-    /// <summary>
-    /// Acts as a proxy to the underlying commands Execute function.
-    /// </summary>
-    /// <param name="program">The CliProgram instance being executed. Using this allows a command to access
-    /// additional parsers if they have been made available.</param>
-    /// <param name="args">The list of user provided command line arguments to execute.</param>
-    public void Execute(CliProgram program, string[] args) => actual.Execute(program, args);
-
-    /// <summary>
-    /// Gets the alias provided during initialization.
-    /// </summary>
-    /// <returns>The command name.</returns>
-    public string GetName() => name;
-
-    /// <summary>
-    /// Gets a line of text describing the command.
-    /// </summary>
-    /// <returns>A line of text describing the command.</returns>
-    public string GetHelpDescription() => actual.GetHelpDescription();
-}
-
-/// <summary>
-/// A command that will lazily instantiate and proxy all method calls to an underlying command type.
-/// This allows one to provide a command to a CliProgram for execution without needing to initialize the
-/// command up-front.
-/// </summary>
-/// <typeparam name="T">The type of the underlying command being lazily proxies.</typeparam>
-public class LazyCommand<T> : ICommand
-where T : ICommand
-{
-    private ICommand? actual;
-
-    // Stryker disable all
-    private ICommand Actual
-    {
-        get => (actual ??= Activator.CreateInstance(typeof(T)) as ICommand)!;
-    }
-
-    // Stryker restore all
-
-    /// <summary>
-    /// Proxies the call to the underlying command instance.
-    /// </summary>
-    /// <param name="program">The CliProgram instance being executed.</param>
-    /// <param name="args">The array of user provided command line arguments.</param>
-    public void Execute(CliProgram program, string[] args) => Actual.Execute(program, args);
-
-    /// <summary>
-    /// Returns the name from the underlying command being proxies.
-    /// </summary>
-    /// <returns>The command name.</returns>
-    public string GetName() => Actual.GetName();
-
-    /// <summary>
-    /// Gets a line of text describing the command.
-    /// </summary>
-    /// <returns>A line of text describing the command.</returns>
-    public string GetHelpDescription() => Actual.GetHelpDescription();
+    /// <param name="name">The name of the group command.</param>
+    /// <param name="helpText">The help text description of the command.</param>
+    /// <param name="commands">The array of sub-commands to selectively execute.</param>
+    /// <returns>A new GenericCommandGroup instance with the specified name and sub-commands.</returns>
+    public static ICommand Group(string name, string helpText, params ICommand[] commands)
+        => new GenericCommandGroup(commands.ToImmutableArray(), name, helpText);
 }

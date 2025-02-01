@@ -119,7 +119,4 @@ public sealed class DummyUtil : IDummyUtil
     => Enumerable.Range(0, numberOfDummies)
         .Select(i => generator.Next(maxPosition))
         .ToArray();
-
-    private static IEnumerable<int> GenerateEnumerablePositions(Xor128Prng generator, int numberOfDummies, int maxPosition) => Enumerable.Range(0, numberOfDummies)
-        .Select(i => generator.Next(maxPosition));
 }

@@ -28,7 +28,8 @@ public static class CliValidator
     /// on the model failed validation.</exception>
     public static void Validate(object instance)
     {
-        Dictionary<MemberInfo, (ArgumentAttribute Argument, ImmutableArray<ValidationAttribute> Validations)> verifiable = FindValidatableMembers(instance);
+        ImmutableDictionary<MemberInfo, (ArgumentAttribute Argument, ImmutableArray<ValidationAttribute> Validations)> verifiable
+            = FindValidatableMembers(instance);
         if (verifiable.Count == 0)
         {
             return;
@@ -61,15 +62,16 @@ public static class CliValidator
         return string.Format(ArgumentIdentifierTemplate, argument.Name, argument.ShortName);
     }
 
-    private static Dictionary<MemberInfo, (ArgumentAttribute Argument, ImmutableArray<ValidationAttribute> Validations)> FindValidatableMembers(object instance)
+    private static ImmutableDictionary<MemberInfo, (ArgumentAttribute Argument, ImmutableArray<ValidationAttribute> Validations)> FindValidatableMembers(object instance)
     {
+        Dictionary<MemberInfo, (ArgumentAttribute, ImmutableArray<ValidationAttribute>)> verifiable = [];
+
         ImmutableArray<MemberInfo> instanceMembers = TypeHelper.GetAllFieldsAndProperties(instance.GetType());
         if (instanceMembers.Length == 0)
         {
-            return [];
+            return verifiable.ToImmutableDictionary();
         }
 
-        Dictionary<MemberInfo, (ArgumentAttribute, ImmutableArray<ValidationAttribute>)> verifiable = [];
         foreach (MemberInfo member in instanceMembers)
         {
             if (member.GetCustomAttribute(typeof(ArgumentAttribute)) is not ArgumentAttribute argumentAttribute)
@@ -87,6 +89,6 @@ public static class CliValidator
 
             verifiable.Add(member, (argumentAttribute, validationAttributes));
         }
-        return verifiable;
+        return verifiable.ToImmutableDictionary();
     }
 }

@@ -34,24 +34,33 @@ internal static class InjectableLookup
                     + $"attributed type [{correlatedType.FullName}] is not an interface.");
             }
 
+            var instance = injectableType.GetConstructor(Type.EmptyTypes)?.Invoke([])
+                ?? throw new ArgumentException("Injectable types must have a default empty construct. No matching constructor found for type: " + injectableType.Name);
+
+            if (!instance.GetType().IsAssignableTo(correlatedType))
+            {
+                throw new ArgumentException($"Injectable type [{instance.GetType().FullName}] is not an instance of the correlated type [{correlatedType.FullName}].");
+            }
+
             if (injectables.TryGetValue(correlatedType, out object? value))
             {
                 string? existingTypeName = value.GetType().FullName;
                 throw new ArgumentException($"Attempt to register two injectables with the same correlated type. "
-                    + $"[{existingTypeName}] and [{correlatedType.FullName}]");
+                    + $"[{existingTypeName}] and [{instance.GetType().FullName}] under type [{correlatedType.FullName}]");
             }
 
-            var ctor = injectableType.GetConstructor(Type.EmptyTypes);
-            injectables[correlatedType] = ctor?.Invoke([])
-                ?? throw new ArgumentException("Injectable types must have a default empty construct. No matching constructor found for type: " + injectableType.Name);
+            injectables[correlatedType] = instance;
         }
 
         return injectables.ToImmutableDictionary();
     }
 
-    private static IEnumerable<Type> FindInjectableTypesInAssembly() => typeof(Injector).Assembly.GetTypes().Where(IsInjectableType);
+    private static IEnumerable<Type> FindInjectableTypesInAssembly()
+        => typeof(Injector).Assembly.GetTypes().Where(IsInjectableType);
 
-    private static bool IsInjectableType(Type type) => type.IsClass && GetInjectableAttribute(type) != null;
+    private static bool IsInjectableType(Type type)
+        => type.IsClass && GetInjectableAttribute(type) != null;
 
-    private static InjectableAttribute? GetInjectableAttribute(Type type) => type.GetCustomAttribute(typeof(InjectableAttribute), false) as InjectableAttribute;
+    private static InjectableAttribute? GetInjectableAttribute(Type type)
+        => type.GetCustomAttribute(typeof(InjectableAttribute), false) as InjectableAttribute;
 }

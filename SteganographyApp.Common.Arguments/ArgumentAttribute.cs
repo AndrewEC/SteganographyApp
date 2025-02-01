@@ -22,8 +22,8 @@ public sealed class ArgumentAttribute : Attribute
     /// <param name="example">Provides an example of how to use the argument within the context of the current program.</param>
     public ArgumentAttribute(string name, string? shortName = null, bool required = false, int position = -1, string helpText = "", string? parser = null, string? example = null)
     {
-        Name = name;
-        ShortName = shortName;
+        Name = name.Trim();
+        ShortName = shortName?.Trim();
         Required = required;
         HelpText = helpText;
         Position = position;

@@ -55,10 +55,13 @@ internal sealed class ArgumentValueMatcher : IEnumerable<MatchResult>
     }
 
     private static RegisteredArgument? FindArgumentMatchingName(string input, ImmutableArray<RegisteredArgument> registeredArguments)
-        => registeredArguments.Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input).FirstOrDefault();
+        => registeredArguments
+            .Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input)
+            .FirstOrDefault();
 
     private static RegisteredArgument? FindArgumentWithPosition(int position, ImmutableArray<RegisteredArgument> registeredArguments)
-        => registeredArguments.Where(registered => registered.Attribute.Position == position).FirstOrDefault();
+        => registeredArguments.Where(registered => registered.Attribute.Position == position)
+            .FirstOrDefault();
 
     private static ImmutableArray<MatchResult> PairRegisteredArgumentsWithValues(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
     {

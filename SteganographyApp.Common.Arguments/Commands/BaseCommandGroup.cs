@@ -2,52 +2,7 @@ namespace SteganographyApp.Common.Arguments.Commands;
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-
-/// <summary>
-/// An ICommand that is responsible for looking up and executing a single name pulled
-/// from a list of available sub-commands.
-/// </summary>
-public interface ICommandGroup : ICommand
-{
-    /// <summary>
-    /// Gets a list of available sub-commands to execute.
-    /// </summary>
-    /// <returns>The array of sub-commands to be executed.</returns>
-    public ICommand[] SubCommands();
-}
-
-/// <summary>
-/// Provides some utility methods to allow you to more easily and concisely initialize a CliProgram.
-/// </summary>
-public static partial class Commands
-{
-    /// <summary>
-    /// Creates a generic GenericCommandGroup with a default name of genericcommandgroup. Useful if using a command
-    /// group as the root command of a CliProgram.
-    /// </summary>
-    /// <param name="commands">The array of sub-commands to be selectively executed by the GenericCommandGroup command.</param>
-    /// <returns>A new GenericCommandGroup instance with the default name.</returns>
-    public static ICommand Group(params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray());
-
-    /// <summary>
-    /// Creates a GenericCommandGroup with a specified name.
-    /// </summary>
-    /// <param name="name">The name of the group command.</param>
-    /// <param name="commands">The array of sub-commands to selectively execute.</param>
-    /// <returns>A new GenericCommandGroup instance with the specified name and sub-commands.</returns>
-    public static ICommand Group(string name, params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray(), name);
-
-    /// <summary>
-    /// Creates a GenericCommandGroup with a specified name and help text.
-    /// </summary>
-    /// <param name="name">The name of the group command.</param>
-    /// <param name="helpText">The help text description of the command.</param>
-    /// <param name="commands">The array of sub-commands to selectively execute.</param>
-    /// <returns>A new GenericCommandGroup instance with the specified name and sub-commands.</returns>
-    public static ICommand Group(string name, string helpText, params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray(), name, helpText);
-}
 
 /// <summary>
 /// The basic abstract ICommandGroup definition that provides some reasonable default logic for validating and
@@ -171,33 +126,4 @@ public abstract class BaseCommandGroup : ICommandGroup
             }
         }
     }
-}
-
-/// <summary>
-/// A generic ICommandGroup initialized fom a specified name and an array of the commands to potentially be executed.
-/// </summary>
-/// <remarks>
-/// Initializes the GenericCommandGroup.
-/// </remarks>
-/// <param name="commands">The array of commands to be grouped and accessed under this command.</param>
-/// <param name="name">An optional name to register this group command under. If no name is provided this will
-/// default to genericcommandgroup.</param>
-/// <param name="helpText">An option set of text to describe the functions contained within this group
-/// of commands.</param>
-public class GenericCommandGroup(ImmutableArray<ICommand> commands, string? name = null, string? helpText = null) : BaseCommandGroup(commands.ToArray())
-{
-    private readonly string? name = name;
-    private readonly string? helpText = helpText;
-
-    /// <summary>
-    /// Returns the name provided during initialization.
-    /// </summary>
-    /// <returns>The name of the group command provided during initialization.</returns>
-    public override string GetName() => name ?? base.GetName();
-
-    /// <summary>
-    /// Gets a line of text describing the command.
-    /// </summary>
-    /// <returns>A line of text describing the command.</returns>
-    public override string GetHelpDescription() => helpText ?? base.GetHelpDescription();
 }

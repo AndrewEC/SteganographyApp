@@ -24,7 +24,7 @@ internal static class ArgumentRegistration
     public static ImmutableArray<RegisteredArgument> FindAttributedArguments(Type modelType, IParserFunctionProvider? additionalParsers)
     {
         var lookup = new ParserFunctionLookup(additionalParsers);
-        var names = new List<string>();
+        var names = new HashSet<string>();
         var registered = new List<RegisteredArgument>();
 
         foreach (MemberInfo member in TypeHelper.GetAllFieldsAndProperties(modelType))
@@ -39,18 +39,14 @@ internal static class ArgumentRegistration
                 throw new ParseException($"An invalid argument was provided. No name was provided for the member: [{member.Name}]");
             }
 
-            if (names.Contains(attribute.Name))
+            if (!names.Add(attribute.Name))
             {
                 throw new ParseException($"Two or more arguments attempted to register using the same name of: [{attribute.Name}]");
             }
 
-            if (attribute.ShortName != null)
+            if (!string.IsNullOrEmpty(attribute.ShortName) && !names.Add(attribute.ShortName))
             {
-                if (names.Contains(attribute.ShortName))
-                {
-                    throw new ParseException($"Two or more arguments attempted to register using the same name of: [{attribute.ShortName}]");
-                }
-                names.Add(attribute.ShortName);
+                throw new ParseException($"Two or more arguments attempted to register using the same name of: [{attribute.ShortName}]");
             }
 
             if (TypeHelper.GetDeclaredType(member) == typeof(bool) && attribute.Position > 0)
@@ -58,7 +54,6 @@ internal static class ArgumentRegistration
                 throw new ParseException($"Argument [{attribute.Name}] is invalid. An argument cannot be a boolean and have a position.");
             }
 
-            names.Add(attribute.Name);
             if (attribute.Parser != null)
             {
                 registered.Add(new RegisteredArgument(attribute, member, ParserFunctionLookup.CreateParserFromMethod(modelType, attribute.Parser)));
