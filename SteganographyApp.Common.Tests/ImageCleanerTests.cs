@@ -17,20 +17,21 @@ public class ImageCleanerTests
         Mock<IImageStore> mockStore = new(MockBehavior.Strict);
         Mock<IImageStoreStream> mockStream = new(MockBehavior.Strict);
 
+        mockStream.Setup(stream => stream.WriteContentChunkToImage(It.IsAny<string>()))
+            .Returns(1);
+
         mockStore.Setup(store => store.OpenStream(StreamMode.Write))
             .Returns(mockStream.Object);
 
         mockStore.Setup(store => store.CurrentImage)
             .Returns(BuildMockImage());
 
-        mockStream.Setup(stream => stream.WriteContentChunkToImage(It.Is<string>(value => value.Length == 714)))
-            .Returns(1);
-
         mockStream.Setup(stream => stream.Dispose()).Verifiable();
 
         new ImageCleaner(arguments, mockStore.Object).CleanImages();
 
-        mockStream.Verify(stream => stream.Dispose(), Times.Exactly(1));
+        mockStream.Verify(stream => stream.WriteContentChunkToImage(It.IsAny<string>()), Times.Exactly(2));
+        mockStream.Verify(stream => stream.Dispose(), Times.Exactly(2));
     }
 
     private static IBasicImageInfo BuildMockImage()

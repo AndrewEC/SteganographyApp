@@ -1,9 +1,12 @@
 namespace SteganographyApp.Common;
 
 using System;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Text;
 using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.IO;
+using SteganographyApp.Common.IO.Content;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
@@ -17,6 +20,11 @@ using SteganographyApp.Common.Logging;
 /// parameter as provided in this constructor.</param>
 public sealed class ImageCleaner(IInputArguments arguments, IImageStore imageStore)
 {
+    private const int MaxTableEntries = 5;
+    private const int MinTableEntries = 1;
+    private const int MaxEntryLength = 10_000;
+    private const int MinEntryLength = 100;
+
     private readonly IInputArguments arguments = arguments;
     private readonly IImageStore imageStore = imageStore;
 
@@ -26,6 +34,12 @@ public sealed class ImageCleaner(IInputArguments arguments, IImageStore imageSto
     /// Cleans all the cover images specified in the cover images array of the input arguments.
     /// </summary>
     public void CleanImages()
+    {
+        FillImagesWithRandomData();
+        WriteDummyTable();
+    }
+
+    private void FillImagesWithRandomData()
     {
         using (var stream = imageStore.OpenStream(StreamMode.Write))
         {
@@ -40,6 +54,21 @@ public sealed class ImageCleaner(IInputArguments arguments, IImageStore imageSto
                 log.Trace("Generated random binary string of: [{0}]", randomBinary);
                 stream.WriteContentChunkToImage(randomBinary);
             }
+        }
+    }
+
+    private void WriteDummyTable()
+    {
+        var random = new Random();
+
+        int tableEntries = (int)random.NextInt64(MinTableEntries, MaxTableEntries);
+        ImmutableArray<int> entries = Enumerable.Range(0, tableEntries)
+            .Select(i => (int)random.NextInt64(MinEntryLength, MaxEntryLength))
+            .ToImmutableArray();
+
+        using (var writer = new ChunkTableWriter(imageStore))
+        {
+            writer.WriteContentChunkTable(entries);
         }
     }
 

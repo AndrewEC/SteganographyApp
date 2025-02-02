@@ -72,7 +72,8 @@ public static class Calculator
     /// <param name="numberOfChunks">The number of chunks that will need to be written to the content chunk table
     /// less the chunk table header.</param>
     /// <returns>A count of the total number of bits that will be required to store the content chunk table.</returns>
-    public static int CalculateRequiredBitsForContentTable(int numberOfChunks) => (numberOfChunks * ChunkDefinitionBitSizeWithPadding) + ChunkTableHeaderSizeWithPadding;
+    public static int CalculateRequiredBitsForContentTable(int numberOfChunks)
+        => (numberOfChunks * ChunkDefinitionBitSizeWithPadding) + ChunkTableHeaderSizeWithPadding;
 
     /// <summary>
     /// Computes the number of bits that can be stored in a given pixel. This effectively equals the prduct
@@ -89,5 +90,6 @@ public static class Calculator
     /// <param name="height">The height of the image.</param>
     /// <param name="bitsToUse">The number of bits to store in each RGB channel of each pixel.</param>
     /// <returns>The total number of bits that can be stored in an image of the given width and height.</returns>
-    public static long CalculateStorageSpaceOfImage(int width, int height, int bitsToUse) => width * height * CalculateBitsPerPixel(bitsToUse);
+    public static long CalculateStorageSpaceOfImage(int width, int height, int bitsToUse)
+        => width * height * CalculateBitsPerPixel(bitsToUse);
 }

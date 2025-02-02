@@ -17,11 +17,11 @@ using SteganographyApp.Common.Logging;
 /// </summary>
 public interface IImageStore
 {
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/OpenStream/*' />
-    IImageStoreStream OpenStream(StreamMode mode);
-
     /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/CurrentImage/*' />
     public IBasicImageInfo? CurrentImage { get; }
+
+    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/OpenStream/*' />
+    IImageStoreStream OpenStream(StreamMode mode);
 }
 
 /// <summary>

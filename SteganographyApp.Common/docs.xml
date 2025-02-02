@@ -88,11 +88,11 @@
     <members name="ImageStore">
         <OpenStream>
             <summary>
-                Utility method to create an <see cref="ImageStoreStream"/> instance to be used in conjunction with the
-                read and write methods.
-                <para>The ImageStoreWrapper instance provides proxies to the ImageStore IO methods as well as
-                implementing the IDisposable interface to ensure that any currently open and loaded image
-                will be properly disposed.</para>
+                Creates an <see cref="IImageStoreStream"/> instance to access the read and write
+                methods of this <see cref="ImageStore"/>.
+                <para>Additionally the returned stream is disposable and must be disposed of
+                to ensure that all data is fully written and read and that the underlying images
+                are properly disposed of.</para>
             </summary>
             <param name="mode">The mode specifying which types of IO operations should
             be permitted.</param>
