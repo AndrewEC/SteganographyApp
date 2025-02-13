@@ -23,7 +23,7 @@ internal static class Initializer
             T? instance = Activator.CreateInstance(typeToInitialize) as T;
             return instance ?? throw new ParseException(FormErrorMessage(typeToInitialize.FullName));
         }
-        catch (Exception e)
+        catch (Exception e) when (e is not ParseException)
         {
             throw new ParseException(FormErrorMessage(typeToInitialize.FullName), e);
         }

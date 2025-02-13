@@ -1,3 +1,5 @@
+$ProgressPreference = "SilentlyContinue"
+
 $CommonOutputFolder = "./SteganographyApp.Common.Tests/StrykerOutput"
 $CommonProject = "./SteganographyApp.Common.Tests"
 $ArgumentsOutputFolder = "./SteganographyApp.Common.Arguments.Tests/StrykerOutput"

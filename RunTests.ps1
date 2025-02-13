@@ -2,6 +2,8 @@ Param(
     [Switch] $ReportOnFailure
 )
 
+$ProgressPreference = "SilentlyContinue"
+
 
 Write-Host "`n---------- Cleaning out existing build artifacts ----------`n"
 function Remove-Folder {

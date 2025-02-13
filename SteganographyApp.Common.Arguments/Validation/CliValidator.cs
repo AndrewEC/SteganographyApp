@@ -45,7 +45,7 @@ public static class CliValidator
                     validationAttribute.Validate(member, value);
                 }
             }
-            catch (Exception e) when (e is ValidationFailedException || e is IncompatibleTypeException)
+            catch (Exception e)
             {
                 string argumentName = FormName(verifiable[member].Argument);
                 throw new ValidationFailedException(string.Format(ValidationFailedTemlate, argumentName, e.Message), e);
