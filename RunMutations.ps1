@@ -1,3 +1,4 @@
+. ./_Common.ps1
 $ProgressPreference = "SilentlyContinue"
 
 $CommonOutputFolder = "./SteganographyApp.Common.Tests/StrykerOutput"
@@ -5,40 +6,27 @@ $CommonProject = "./SteganographyApp.Common.Tests"
 $ArgumentsOutputFolder = "./SteganographyApp.Common.Arguments.Tests/StrykerOutput"
 $ArgumentsProject = "./SteganographyApp.Common.Arguments.Tests"
 
-Write-Host "`n---------- Removing Previous Output Folders ----------`n"
-function Remove-Folder {
-    param([string] $FolderPath)
-
-    if (Test-Path $FolderPath -PathType Container) {
-        Write-Host "Removing folder $FolderPath"
-        Remove-Item -Recurse -Force $FolderPath | Out-Null
-
-        if (Test-Path $FolderPath -PathType Container) {
-            throw "Could not delete folder $FolderPath"
-        }
-    }
-}
-
+Write-Divider "Removing Previous Output Folders"
 Remove-Folder $CommonOutputFolder
 Remove-Folder $ArgumentsOutputFolder
 
 
-Write-Host "`n---------- Executing mutation tests ----------`n"
+Write-Divider "Executing mutation tests"
 function Run-Mutations {
     param(
         [string] $Project,
         [string] $Output
     )
-    Write-Host "---------- Running $Project mutation tests ----------"
-    cd $Project
+    Write-Divider "Running $Project mutation tests"
+    Set-Location $Project
     dotnet tool run dotnet-stryker --config-file stryker-config.json
     if($LastExitCode -ne 0){
-        Write-Host("'stryker' failed with status: $LastExitCode")
-        cd ..
+        Write-Output("'stryker' failed with status: $LastExitCode")
+        Set-Location ..
         Exit
     }
-    Write-Host "Report available at $Output"
-    cd ..
+    Write-Output "Report available at $Output"
+    Set-Location ..
 }
 
 Run-Mutations $CommonProject $CommonOutputFolder

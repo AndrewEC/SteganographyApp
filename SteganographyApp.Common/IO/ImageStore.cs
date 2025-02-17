@@ -64,10 +64,7 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
             throw new ImageStoreException("Call to OpenStream was made but the stream is already open. "
                 + "Have you disposed of the previous stream?");
         }
-
-        ImageStoreStream stream = new(this, mode);
-        currentStream = stream;
-        return stream;
+        return currentStream = new(this, mode);
     }
 
     /// <summary>

@@ -34,19 +34,21 @@ internal static class ArgumentRegistration
                 continue;
             }
 
-            if (string.IsNullOrEmpty(attribute.Name))
+            string name = attribute.Name.Trim();
+            if (string.IsNullOrEmpty(name))
             {
-                throw new ParseException($"An invalid argument was provided. No name was provided for the member: [{member.Name}]");
+                throw new ParseException($"Argument with field named [{member.Name}] is invalid. No name was provided in argument attribute.");
             }
 
-            if (!names.Add(attribute.Name))
+            if (!names.Add(name))
             {
-                throw new ParseException($"Two or more arguments attempted to register using the same name of: [{attribute.Name}]");
+                throw new ParseException($"An invalid configuration was provided. Two or more arguments have the same name of: [{attribute.Name}]");
             }
 
-            if (!string.IsNullOrEmpty(attribute.ShortName) && !names.Add(attribute.ShortName))
+            string shortName = attribute.ShortName?.Trim() ?? string.Empty;
+            if (!string.IsNullOrEmpty(shortName) && !names.Add(shortName))
             {
-                throw new ParseException($"Two or more arguments attempted to register using the same name of: [{attribute.ShortName}]");
+                throw new ParseException($"An invalid configuration was provided. Two or more arguments have the same short name of: [{shortName}]");
             }
 
             if (TypeHelper.GetDeclaredType(member) == typeof(bool) && attribute.Position > 0)

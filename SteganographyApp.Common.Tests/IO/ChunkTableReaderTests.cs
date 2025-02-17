@@ -24,7 +24,7 @@ public class ChunkTableReaderTests
         mockStream.Setup(stream => stream.ReadContentChunkFromImage(33))
             .Returns(HeaderBinaryChunk);
 
-        ImmutableArray<int> actual = new ChunkTableReader(mockStream.Object).ReadContentChunkTable();
+        ImmutableArray<int> actual = ChunkTableReader.ReadContentChunkTable(mockStream.Object);
 
         Assert.That(actual, Has.Length.EqualTo(1));
         Assert.That(actual, Has.ItemAt(0).EqualTo(2));

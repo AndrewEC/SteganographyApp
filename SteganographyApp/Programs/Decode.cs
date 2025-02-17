@@ -99,7 +99,7 @@ internal sealed class DecodeCommand : Command<DecodeArguments>
         Console.WriteLine("Reading content chunk table.");
         using (var stream = new ImageStore(arguments).OpenStream(StreamMode.Read))
         {
-            ImmutableArray<int> contentChunkTable = new ChunkTableReader(stream).ReadContentChunkTable();
+            ImmutableArray<int> contentChunkTable = ChunkTableReader.ReadContentChunkTable(stream);
             var tracker = ProgressTracker.CreateAndDisplay(contentChunkTable.Length, "Decoding file contents", "All input file contents have been decoded, completing last write to output file.");
             log.Debug("Content chunk table contains [{0}] entries.", contentChunkTable.Length);
 

@@ -1,7 +1,7 @@
 namespace SteganographyApp.Common.Logging;
 
 using System;
-
+using System.Collections.Generic;
 using SteganographyApp.Common.Injection;
 
 /// <summary>
@@ -26,6 +26,8 @@ public class LoggerFactory : ILoggerFactory
 {
     private const string TypeNameTemplate = "{0}.{1}";
 
+    private readonly Dictionary<string, ILogger> loggerCache = [];
+
     /// <summary>
     /// Creates an ILogger instance for the specified type. The type should specify the class that will
     /// house and make use of the ILogger instance.
@@ -35,6 +37,12 @@ public class LoggerFactory : ILoggerFactory
     public ILogger LoggerFor(Type type)
     {
         string name = string.Format(TypeNameTemplate, type.Namespace, type.Name);
-        return new Logger(name);
+        if (loggerCache.TryGetValue(name, out ILogger? value))
+        {
+            return value;
+        }
+        var logger = new Logger(name);
+        loggerCache[name] = logger;
+        return logger;
     }
 }

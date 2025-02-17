@@ -34,7 +34,15 @@ public static class Injector
     /// </summary>
     /// <typeparam name="T">The type of the class that will make use of the logger instance being provided.</typeparam>
     /// <returns>A new ILogger instance configured for the specified type T.</returns>
-    public static ILogger LoggerFor<T>() => Provide<ILoggerFactory>().LoggerFor(typeof(T));
+    public static ILogger LoggerFor<T>() => LoggerFor(typeof(T));
+
+    /// <summary>
+    /// Proxy method that invokes the ILoggerFactory instance to return an ILogger instance
+    /// for the specified type T.
+    /// </summary>
+    /// <param name="type">The type of the class that will make use of the logger instance being provided.</param>
+    /// <returns>A new ILogger instance configured for the specified type T.</returns>
+    public static ILogger LoggerFor(Type type) => Provide<ILoggerFactory>().LoggerFor(type);
 
     /// <summary>
     /// Returns an instance from the dictionary of injectable values using the type of generic

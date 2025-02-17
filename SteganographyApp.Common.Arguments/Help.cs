@@ -45,9 +45,11 @@ public static class Help
 
         var nonPositionalRequiredArguments = registeredArguments
             .Where(argument => argument.Attribute.Required && argument.Attribute.Position <= 0)
+            .OrderBy(argument => argument.Attribute.Name)
             .ToImmutableArray();
 
         var optionalArguments = registeredArguments.Where(argument => !argument.Attribute.Required)
+            .OrderBy(argument => argument.Attribute.Name)
             .ToImmutableArray();
 
         Console.WriteLine(FormUsageString(instanceType, positionalArguments, nonPositionalRequiredArguments, optionalArguments));
@@ -180,20 +182,14 @@ public static class Help
             return null;
         }
 
-        Type memberType = TypeHelper.GetDeclaredType(member);
-        if (IsStruct(memberType))
+        if (IsStruct(TypeHelper.GetDeclaredType(member)))
         {
             return null;
         }
 
-        object? value = TypeHelper.GetValue(instance, member);
-        if (value == null)
-        {
-            return null;
-        }
-
-        return value.ToString();
+        return TypeHelper.GetValue(instance, member)?.ToString() ?? null;
     }
 
-    private static bool IsStruct(Type memberType) => memberType.IsValueType && !memberType.IsEnum && !memberType.IsPrimitive;
+    private static bool IsStruct(Type memberType)
+        => memberType.IsValueType && !memberType.IsEnum && !memberType.IsPrimitive;
 }

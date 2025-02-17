@@ -1,35 +1,24 @@
-Write-Host "`n---------- Removing testbed directories ----------`n"
-function Remove-Folder {
-    param([string] $FolderPath)
+. ./_Common.ps1
 
-    if (Test-Path $FolderPath) {
-        Write-Host "Removing folder $FolderPath"
-        Remove-Item -Recurse -Force $FolderPath | Out-Null
-
-        if (Test-Path $FolderPath) {
-            throw "Could not delete folder $FolderPath"
-        }
-    }
-}
-
+Write-Output "`n---------- Removing testbed directories ----------`n"
 Remove-Folder ./testbed
 Remove-Folder ./SteganographyApp/bin/release
 
 
-Write-Host "`n---------- Publishing release build ----------`n"
+Write-Output "`n---------- Publishing release build ----------`n"
 dotnet publish -c release
 if($LastExitCode -ne 0){
-    Write-Host "publish failed with status: $LastExitCode"
+    Write-Output "publish failed with status: $LastExitCode"
     Exit
 }
 
 New-Item -Path ./testbed -ItemType Directory | Out-Null
 
 
-Write-Host "`n---------- Copying publish output ----------`n"
-Write-Host "Copying output from SteganographyApp publish"
+Write-Output "`n---------- Copying publish output ----------`n"
+Write-Output "Copying output from SteganographyApp publish"
 Get-ChildItem -Path ./SteganographyApp/bin/release/netcoreapp8.0/publish | Copy-Item -Recurse -Destination ./testbed
 
 
-Write-Host "`n---------- Copying test assets ----------`n"
+Write-Output "`n---------- Copying test assets ----------`n"
 Get-ChildItem -Path ./SteganographyApp.Common.Tests/TestAssets | Where-Object Name -Like "*.png" | Copy-Item -Force -Destination ./testbed

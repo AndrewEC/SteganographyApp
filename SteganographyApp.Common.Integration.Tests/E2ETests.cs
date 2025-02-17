@@ -70,7 +70,7 @@ public class E2ETests
         // Read the content previously written to the image and verify it matches the original input value.
         using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
-            ImmutableArray<int> readTable = new ChunkTableReader(stream).ReadContentChunkTable();
+            ImmutableArray<int> readTable = ChunkTableReader.ReadContentChunkTable(stream);
             using (var writer = new ContentWriter(args))
             {
                 string binary = stream.ReadContentChunkFromImage(readTable[0]);
@@ -118,7 +118,7 @@ public class E2ETests
         args.Password = "Wrong Password";
         using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
-            var readTable = new ChunkTableReader(stream).ReadContentChunkTable();
+            var readTable = ChunkTableReader.ReadContentChunkTable(stream);
             using (var writer = new ContentWriter(args))
             {
                 string binary = stream.ReadContentChunkFromImage(readTable[0]);
@@ -155,7 +155,7 @@ public class E2ETests
         args.DummyCount = 5;
         using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
-            var readTable = new ChunkTableReader(stream).ReadContentChunkTable();
+            var readTable = ChunkTableReader.ReadContentChunkTable(stream);
             using (var writer = new ContentWriter(args))
             {
                 string binary = stream.ReadContentChunkFromImage(readTable[0]);
@@ -193,7 +193,7 @@ public class E2ETests
         args.UseCompression = false;
         using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
-            var readTable = new ChunkTableReader(stream).ReadContentChunkTable();
+            var readTable = ChunkTableReader.ReadContentChunkTable(stream);
             using (var writer = new ContentWriter(args))
             {
                 string binary = stream.ReadContentChunkFromImage(readTable[0]);
@@ -231,7 +231,7 @@ public class E2ETests
         args.RandomSeed = "Wrong RandomSeed";
         using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
-            var readTable = new ChunkTableReader(stream).ReadContentChunkTable();
+            var readTable = ChunkTableReader.ReadContentChunkTable(stream);
             using (var writer = new ContentWriter(args))
             {
                 string binary = stream.ReadContentChunkFromImage(readTable[0]);
