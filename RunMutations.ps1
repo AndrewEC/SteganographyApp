@@ -1,33 +1,34 @@
 . ./_Common.ps1
 $ProgressPreference = "SilentlyContinue"
 
-$CommonOutputFolder = "./SteganographyApp.Common.Tests/StrykerOutput"
-$CommonProject = "./SteganographyApp.Common.Tests"
-$ArgumentsOutputFolder = "./SteganographyApp.Common.Arguments.Tests/StrykerOutput"
-$ArgumentsProject = "./SteganographyApp.Common.Arguments.Tests"
-
-Write-Divider "Removing Previous Output Folders"
-Remove-Folder $CommonOutputFolder
-Remove-Folder $ArgumentsOutputFolder
-
+$Projects = @(
+    "./SteganographyApp.Common.Tests",
+    "./SteganographyApp.Common.Arguments.Tests"
+)
 
 Write-Divider "Executing mutation tests"
-function Run-Mutations {
+function Invoke-Stryker {
     param(
-        [string] $Project,
-        [string] $Output
+        [string] $Project
     )
+
+    $Output = Join-Path -Path $Project -ChildPath "StrykerOutput"
+
+    Remove-Folder $Output
+
     Write-Divider "Running $Project mutation tests"
+
     Set-Location $Project
-    dotnet tool run dotnet-stryker --config-file stryker-config.json
-    if($LastExitCode -ne 0){
-        Write-Output("'stryker' failed with status: $LastExitCode")
+    try {
+        dotnet tool run dotnet-stryker --config-file stryker-config.json
+        if ($LastExitCode -ne 0) {
+            Write-Output("'stryker' failed with status: $LastExitCode")
+            Exit
+        }
+        Write-Output "Report available at $Output"
+    } finally {
         Set-Location ..
-        Exit
     }
-    Write-Output "Report available at $Output"
-    Set-Location ..
 }
 
-Run-Mutations $CommonProject $CommonOutputFolder
-Run-Mutations $ArgumentsProject $ArgumentsOutputFolder
+$Projects | ForEach-Object { Invoke-Stryker $_ }

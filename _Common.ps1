@@ -3,11 +3,7 @@ function Remove-Folder {
 
     if (Test-Path $FolderPath -PathType Container) {
         Write-Output "Removing folder $FolderPath"
-        Remove-Item -Recurse -Force $FolderPath | Out-Null
-
-        if (Test-Path $FolderPath -PathType Container) {
-            throw "Could not delete folder $FolderPath"
-        }
+        Remove-Item $FolderPath -Recurse -Force | Out-Null
     }
 }
 

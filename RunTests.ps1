@@ -16,18 +16,18 @@ Remove-File ./coverage.opencover.xml
 Write-Divider "Rebuilding Project"
 dotnet build SteganographyApp.sln --no-incremental
 if ($LastExitCode -ne 0) {
-    Write-Output "Build failed with status code: $LastExitCode"
-    Exit
+    Write-Output "Build failed with status code: [$LastExitCode]"
+    exit
 }
 
 $ReportsFolder = "./reports"
 Remove-Folder $ReportsFolder
 
 Write-Output "Creating report directory"
-New-Item -ItemType Directory -Path $ReportsFolder | Out-Null
-if (-Not (Test-Path $ReportsFolder -PathType Container)) {
-    Write-Output "Could not create $ReportsFolder directory"
-    Exit
+New-Item $ReportsFolder -ItemType Directory | Out-Null
+if (-not (Test-Path $ReportsFolder -PathType Container)) {
+    Write-Output "Could not create [$ReportsFolder] directory"
+    exit
 }
 
 
@@ -51,7 +51,7 @@ dotnet tool run coverlet `
     --threshold-stat total
 
 if ($LastExitCode -ne 0) {
-    Write-Output "'coverlet' SteganographyApp.Common.Tests command failed with status: $LastExitCode"
+    Write-Output "'coverlet' SteganographyApp.Common.Tests command failed with status: [$LastExitCode]"
 }
 
 Write-Divider "Running SteganographyApp.Common.Arguments.Tests tests"
@@ -68,21 +68,21 @@ dotnet tool run coverlet `
     --format opencover
 
 if ($LastExitCode -ne 0) {
-    Write-Output "'coverlet' SteganographyApp.Common.Arguments.Tests command failed with status: $LastExitCode"
+    Write-Output "'coverlet' SteganographyApp.Common.Arguments.Tests command failed with status: [$LastExitCode]"
 }
 
 
 Write-Divider "Running SteganographyApp.Common.Integration.Tests tests"
 dotnet test ./SteganographyApp.Common.Integration.Tests
 if ($LastExitCode -ne 0) {
-    Write-Output "dotnet test ./SteganographyApp.Common.Integration.Tests command failed with status: $LastExitCode"
-    Exit
+    Write-Output "dotnet test ./SteganographyApp.Common.Integration.Tests command failed with status: [$LastExitCode]"
+    exit
 }
 
 
 Write-Divider "Generating coverage report"
 dotnet tool run reportgenerator "-reports:coverage.opencover.xml" "-targetDir:reports"
 if ($LastExitCode -ne 0) {
-    Write-Output "'reportgenerator' command failed with status: $LastExitCode"
-    Exit
+    Write-Output "'reportgenerator' command failed with status: [$LastExitCode]"
+    exit
 }
