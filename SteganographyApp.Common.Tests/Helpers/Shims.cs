@@ -21,16 +21,6 @@ public class Init
 }
 
 [TestFixture]
-public abstract class FixtureWithMockConsoleReaderAndWriter : FixtureWithTestObjects
-{
-    [Mockup(typeof(IConsoleReader))]
-    public Mock<IConsoleReader> mockConsoleReader = new();
-
-    [Mockup(typeof(IConsoleWriter))]
-    public Mock<IConsoleWriter> mockConsoleWriter = new();
-}
-
-[TestFixture]
 public abstract class FixtureWithTestObjects
 {
     [SetUp]
@@ -48,6 +38,16 @@ public abstract class FixtureWithTestObjects
     }
 
     protected virtual void SetupMocks() { }
+}
+
+[TestFixture]
+public abstract class FixtureWithMockConsoleReaderAndWriter : FixtureWithTestObjects
+{
+    [Mockup(typeof(IConsoleReader))]
+    public Mock<IConsoleReader> mockConsoleReader = new();
+
+    [Mockup(typeof(IConsoleWriter))]
+    public Mock<IConsoleWriter> mockConsoleWriter = new();
 }
 
 [TestFixture]

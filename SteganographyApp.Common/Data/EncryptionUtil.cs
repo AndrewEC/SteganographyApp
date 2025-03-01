@@ -28,7 +28,6 @@ public sealed class EncryptionUtil : IEncryptionUtil
     /// <summary>The default number of iterations that should be used when hashing a key.</summary>
     public static readonly int DefaultIterations = 150_000;
 
-    private const int KeySize = 256;
     private const int IvSize = 16;
 
     private readonly ILogger log = new LazyLogger<EncryptionUtil>();

@@ -75,7 +75,11 @@ public static class Injector
         var type = typeof(T);
         if (!type.IsInterface)
         {
-            throw new ArgumentException("Cannot UseInstance when correlated type is not an interface. The provided generic argument type is not an interface: " + type.FullName);
+            throw new ArgumentException($"Correlated type must be an interface. The following type is not an interface: [{type.FullName}]");
+        }
+        if (!injectionValues.ContainsKey(type))
+        {
+            throw new ArgumentException($"Cannot UseInstance for type [{type.FullName}] since type is not available in default injection dictionary.");
         }
         injectionValues[type] = instance;
     }

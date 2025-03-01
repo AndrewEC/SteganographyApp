@@ -19,41 +19,36 @@ public static class MocksInjector
 {
     public static void InjectMocks(object testFixture)
     {
-        foreach (var field in GetFieldsRequiringMocks(testFixture))
+        foreach (FieldInfo field in GetFieldsRequiringMocks(testFixture))
         {
-            var mockableAttribute = GetMockupAttribute(field)!;
+            Mockup mockableAttribute = GetMockupAttribute(field)!;
 
             object instance = CreateMockInstance(mockableAttribute);
             field.SetValue(testFixture, instance);
 
-            object proxyInstance = GetProxyInstance(instance);
-            UseInstance(proxyInstance, mockableAttribute);
+            if (!mockableAttribute.SkipInjection)
+            {
+                UseInstance(((Mock)instance).Object, mockableAttribute);
+            }
         }
     }
 
     private static void UseInstance(object instance, Mockup mockableAttribute)
-    {
-        typeof(Injector)
+        => typeof(Injector)
             .GetMethod(nameof(Injector.UseInstance))
             ?.MakeGenericMethod(mockableAttribute.MockType)
             .Invoke(null, [instance]);
-    }
 
     private static object CreateMockInstance(Mockup mockableAttribute)
     {
-        var mockType = typeof(Mock<>).MakeGenericType([mockableAttribute.MockType]);
+        Type mockType = typeof(Mock<>).MakeGenericType([mockableAttribute.MockType]);
         return Activator.CreateInstance(mockType, [MockBehavior.Strict])
             ?? throw new Exception($"Could not create mock instance for type: [{mockType.Name}]");
     }
 
-    private static object GetProxyInstance(object mock)
-        => mock.GetType().GetProperty("Object", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)?.GetValue(mock)
-        ?? throw new Exception("Could not find Object property on proxy instance.");
-
     private static IEnumerable<FieldInfo> GetFieldsRequiringMocks(object testFixture)
-        => testFixture.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).Where(HasMockupAttribute);
-
-    private static bool HasMockupAttribute(FieldInfo info) => GetMockupAttribute(info) != null;
+        => testFixture.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public)
+            .Where(fieldInfo => GetMockupAttribute(fieldInfo) != null);
 
     private static Mockup? GetMockupAttribute(FieldInfo info)
         => info.GetCustomAttributes(typeof(Mockup), false).FirstOrDefault() as Mockup;
@@ -66,7 +61,9 @@ public static class MocksInjector
 /// SetUp phase of the test fixture.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field)]
-public class Mockup(Type mockType) : Attribute
+public class Mockup(Type mockType, bool skipInjection = false) : Attribute
 {
-    public Type MockType { get; private set; } = mockType;
+    public Type MockType { get; } = mockType;
+
+    public bool SkipInjection { get; } = skipInjection;
 }

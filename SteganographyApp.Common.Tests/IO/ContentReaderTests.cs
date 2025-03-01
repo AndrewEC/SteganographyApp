@@ -16,7 +16,7 @@ public class ContentReaderTests : FixtureWithTestObjects
     [Mockup(typeof(IFileIOProxy))]
     public Mock<IFileIOProxy> MockFileIOProxy = new();
 
-    [Mockup(typeof(IReadWriteStream))]
+    [Mockup(typeof(IReadWriteStream), true)]
     public Mock<IReadWriteStream> MockReadWriteStream = new();
 
     [Mockup(typeof(IDataEncoderUtil))]

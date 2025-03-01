@@ -1,8 +1,9 @@
-. ./_Common.ps1
-
-Param(
+param(
     [Switch] $Release
 )
+
+. ./_Common.ps1
+$ProgressPreference = "SilentlyContinue"
 
 $BuildType = "debug"
 if ($Release) {
@@ -14,10 +15,9 @@ Remove-Folder ./SteganographyApp/bin/$BuildType/netcoreapp8.0/publish
 Remove-Folder ./SteganographyApp.Common/bin/$BuildType/netcoreapp8.0/publish
 Remove-Folder ./SteganographyApp.Common.Arguments/bin/$BuildType/netcoreapp8.0/publish
 
-
 Write-Divider "Publishing $BuildType build"
 dotnet publish -c $BuildType
 if ($LastExitCode -ne 0) {
-    Write-Output "publish failed with status: $LastExitCode"
+    Write-Host "publish failed with status: $LastExitCode"
     Exit
 }

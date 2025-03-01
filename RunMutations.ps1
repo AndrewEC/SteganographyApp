@@ -1,5 +1,6 @@
 . ./_Common.ps1
 $ProgressPreference = "SilentlyContinue"
+$ErrorActionPreference = "Stop"
 
 $Projects = @(
     "./SteganographyApp.Common.Tests",
@@ -7,6 +8,7 @@ $Projects = @(
 )
 
 Write-Divider "Executing mutation tests"
+
 function Invoke-Stryker {
     param(
         [string] $Project
@@ -22,10 +24,10 @@ function Invoke-Stryker {
     try {
         dotnet tool run dotnet-stryker --config-file stryker-config.json
         if ($LastExitCode -ne 0) {
-            Write-Output("'stryker' failed with status: $LastExitCode")
+            Write-Host("'stryker' failed with status: $LastExitCode")
             Exit
         }
-        Write-Output "Report available at $Output"
+        Write-Host "Report available at $Output"
     } finally {
         Set-Location ..
     }
