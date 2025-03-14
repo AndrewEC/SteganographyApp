@@ -93,6 +93,7 @@ public sealed class DummyUtil : IDummyUtil
                 log.Trace("Removing dummy at position [{0}] with length [{1}].", positions[i], lengths[i]);
                 valueList.RemoveRange(positions[i], lengths[i]);
             }
+
             result = valueList.ToArray();
         }
         catch (ArgumentOutOfRangeException e)

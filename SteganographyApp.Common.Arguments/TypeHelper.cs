@@ -45,6 +45,7 @@ public static class TypeHelper
             property.SetValue(instance, value);
             return;
         }
+
         throw new TypeException(ErrorMessage);
     }
 
@@ -69,13 +70,17 @@ public static class TypeHelper
     /// <returns>An immutable array of all field and property members.</returns>
     public static ImmutableArray<MemberInfo> GetAllFieldsAndProperties(Type modelType)
         => new List<MemberInfo>(modelType.GetFields()).Concat(modelType.GetProperties()).ToImmutableArray();
-}
 
-/// <summary>
-/// An exception indicating the underlying type of the MemberInfo is not one of either FieldInfo or PropertyInfo.
-/// </summary>
-/// <remarks>
-/// Initializes the exception.
-/// </remarks>
-/// <param name="message">The exception message.</param>
-public sealed class TypeException(string message) : Exception(message) { }
+    /// <summary>
+    /// Gets a bool indicating if the argument is required. I.e. the user must provide a cli
+    /// value for the argument. Arguments that are positional are automatically considered
+    /// required.
+    /// </summary>
+    /// <param name="attribute">The argument attribute. Required to get the position of the
+    /// argument.</param>
+    /// <param name="member">The reflective member that has the argument attribute.</param>
+    /// <returns>True if the argument is positional or if the member has the Required
+    /// attribute. Otherwise, false.</returns>
+    public static bool IsArgumentRequired(ArgumentAttribute attribute, MemberInfo member)
+        => attribute.Position > -1 || member.GetCustomAttribute(typeof(RequiredAttribute)) != null;
+}

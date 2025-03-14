@@ -37,12 +37,12 @@ internal static class ArgumentRegistration
             string name = attribute.Name.Trim();
             if (string.IsNullOrEmpty(name))
             {
-                throw new ParseException($"Argument with field named [{member.Name}] is invalid. No name was provided in argument attribute.");
+                throw new ParseException($"Argument of field named [{member.Name}] is invalid. No name was provided in argument attribute.");
             }
 
             if (!names.Add(name))
             {
-                throw new ParseException($"An invalid configuration was provided. Two or more arguments have the same name of: [{attribute.Name}]");
+                throw new ParseException($"An invalid configuration was provided. Two or more arguments on type [{modelType.FullName}] have the same name of: [{attribute.Name}]");
             }
 
             string shortName = attribute.ShortName?.Trim() ?? string.Empty;

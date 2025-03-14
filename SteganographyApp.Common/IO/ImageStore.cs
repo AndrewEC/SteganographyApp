@@ -10,6 +10,8 @@ using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.IO.Pixels;
 using SteganographyApp.Common.Logging;
 
+#pragma warning disable SA1402
+
 /// <summary>
 /// Handles the act of reading and writing from a series of images. The internal methods of this
 /// instance should not be directly invoked. Instead, they should be accessed via the interface
@@ -64,6 +66,7 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
             throw new ImageStoreException("Call to OpenStream was made but the stream is already open. "
                 + "Have you disposed of the previous stream?");
         }
+
         return currentStream = new(this, mode);
     }
 
@@ -79,6 +82,7 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
         {
             throw new ImageStoreException($"An invalid image index was provided in ResetTo. Expected value between [{0}] and [{args.CoverImages.Length - 1}], instead got [{coverImageIndex}].");
         }
+
         currentImageIndex = coverImageIndex - 1;
         LoadNextImage();
     }
@@ -103,12 +107,14 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
         {
             return;
         }
+
         if (saveImageChanges)
         {
             log.Debug("Saving changes to image [{0}]", CurrentImage.Path);
             var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(CurrentImage.Path);
             CurrentImage.Save(CurrentImage.Path, encoder);
         }
+
         CurrentImage.Dispose();
         CurrentImage = null;
     }
@@ -130,6 +136,7 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
         {
             return -1;
         }
+
         log.Debug("Writing [{0}] bits to image [{1}] starting at position [{2}]", binary.Length, CurrentImage.Path, pixelPosition.ToString());
         var queue = new ReadBitQueue(binary);
         var pixelWriter = new PixelWriter(queue, args.BitsToUse);
@@ -144,6 +151,7 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
                 LoadNextImage(true);
             }
         }
+
         OnChunkWritten?.Invoke(this, new ChunkWrittenArgs(binary.Length));
         return binary.Length;
     }
@@ -164,6 +172,7 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
         {
             return string.Empty;
         }
+
         log.Debug("Reading [{0}] bits from image [{1}] starting from position [{2}]", bitsToRead, CurrentImage.Path, pixelPosition.ToString());
         var binaryStringBuilder = new BinaryStringBuilder(bitsToRead);
         var pixelReader = new PixelReader(binaryStringBuilder, args.BitsToUse);
@@ -176,6 +185,7 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
                 LoadNextImage();
             }
         }
+
         return binaryStringBuilder.ToBinaryString();
     }
 
@@ -233,3 +243,5 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
         }
     }
 }
+
+#pragma warning restore SA1402

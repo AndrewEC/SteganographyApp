@@ -23,10 +23,7 @@ public delegate T UnmanagedResourceFunctionWithResult<T>();
 /// </summary>
 public abstract class AbstractDisposable : IDisposable
 {
-    /// <summary>
-    /// Gets a value indicating whether the Dispose method has completed execution.
-    /// </summary>
-    protected bool WasDisposed { get; private set; } = false;
+    private bool wasDisposed = false;
 
     /// <summary>
     /// Disposes of the current instance. This can only be executed once as once the first execution completes it will set the
@@ -34,19 +31,21 @@ public abstract class AbstractDisposable : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (WasDisposed)
+        if (wasDisposed)
         {
             return;
         }
+
         try
         {
-            Dispose(true);
+            DoDispose();
         }
         catch (Exception)
         {
         }
+
+        wasDisposed = true;
         GC.SuppressFinalize(this);
-        WasDisposed = true;
     }
 
     /// <summary>
@@ -57,10 +56,11 @@ public abstract class AbstractDisposable : IDisposable
     /// <exception cref="ObjectDisposedException">Thrown if the Dispose method has already completed execution.</exception>
     protected void RunIfNotDisposed(UnmanagedResourceFunction function)
     {
-        if (WasDisposed)
+        if (wasDisposed)
         {
             throw new ObjectDisposedException(GetType().Name);
         }
+
         function();
     }
 
@@ -74,17 +74,17 @@ public abstract class AbstractDisposable : IDisposable
     /// <exception cref="ObjectDisposedException">Thrown if the Dispose method has already completed execution.</exception>
     protected T RunIfNotDisposedWithResult<T>(UnmanagedResourceFunctionWithResult<T> function)
     {
-        if (WasDisposed)
+        if (wasDisposed)
         {
             throw new ObjectDisposedException(GetType().Name);
         }
+
         return function();
     }
 
     /// <summary>
-    /// Disposes of the current instance. Any implementation of this method should check if disposing is true and,
-    /// if it is not, skip the execution of the remainder of the method.
+    /// A hook to allow any unmanaged resources to be disposed of by the
+    /// inheriting class.
     /// </summary>
-    /// <param name="disposing">Indicates if this method was called from the base Dispose method.</param>
-    protected abstract void Dispose(bool disposing);
+    protected abstract void DoDispose();
 }

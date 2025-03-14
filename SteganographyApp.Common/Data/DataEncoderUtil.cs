@@ -5,6 +5,8 @@ using System;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
 
+#pragma warning disable SA1402
+
 /// <summary>
 /// The contract for interacting with the DataEncoderUtil instance.
 /// </summary>
@@ -15,19 +17,6 @@ public interface IDataEncoderUtil
 
     /// <include file='../docs.xml' path='docs/members[@name="DataEncoderUtil"]/Decode/*' />
     byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed, int additionalHashIterations);
-}
-
-/// <summary>
-/// A case class inheriting from Exception that specifies an error occured
-/// when an IFileCoder instance attempted to transform input data.
-/// </summary>
-public class TransformationException : Exception
-{
-    /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessage/*' />
-    public TransformationException(string message) : base(message) { }
-
-    /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessageInner/*' />
-    public TransformationException(string message, Exception inner) : base(message, inner) { }
 }
 
 /// <summary>
@@ -66,6 +55,7 @@ public sealed class DataEncoderUtil : IDataEncoderUtil
             {
                 throw new TransformationException("An exception occured while encrypting content.", e);
             }
+
             log.Trace("After encryption: [{0}]", () => [Convert.ToBase64String(bytes)]);
         }
 
@@ -151,3 +141,5 @@ public sealed class DataEncoderUtil : IDataEncoderUtil
         return bytes;
     }
 }
+
+#pragma warning restore SA1402

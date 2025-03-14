@@ -15,22 +15,16 @@ public sealed class ArgumentAttribute : Attribute
     /// </summary>
     /// <param name="name">The name of the argument.</param>
     /// <param name="shortName">The shortened name of the argument.</param>
-    /// <param name="required">Whether the argument must be provided.</param>
     /// <param name="position">Makes the argument positional if a value above -1 is provided.</param>
     /// <param name="helpText">The text to display describing this argument when the user provides the -h or --help arguments.</param>
     /// <param name="parser">The name of a parser function to use to parse the value for this argument.</param>
     /// <param name="example">Provides an example of how to use the argument within the context of the current program.</param>
-    public ArgumentAttribute(string name, string? shortName = null, bool required = false, int position = -1, string helpText = "", string? parser = null, string? example = null)
+    public ArgumentAttribute(string name, string? shortName = null, int position = -1, string helpText = "", string? parser = null, string? example = null)
     {
         Name = name.Trim();
         ShortName = shortName?.Trim();
-        Required = required;
         HelpText = helpText;
         Position = position;
-        if (Position > -1)
-        {
-            Required = true;
-        }
         Parser = parser;
         Example = example;
     }
@@ -45,13 +39,6 @@ public sealed class ArgumentAttribute : Attribute
     /// For example --request could be shortened to -r.
     /// </summary>
     public string? ShortName { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether a value for the argument must be provided by the user. If an argument is
-    /// positional then it is also required. This cannot be set to true when the attributed field or property type
-    /// is a boolean.
-    /// </summary>
-    public bool Required { get; private set; }
 
     /// <summary>
     /// Gets the text to be displayed when the user provides the -h or --help argument.

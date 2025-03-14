@@ -49,6 +49,7 @@ public sealed class ProgressTracker(double maxProgress, string progressMessage, 
             {
                 return;
             }
+
             hasCompleted = true;
             outputWriter.WriteLine(completeMessage);
         }

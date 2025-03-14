@@ -14,7 +14,8 @@ using System.Linq;
 /// default to genericcommandgroup.</param>
 /// <param name="helpText">An option set of text to describe the functions contained within this group
 /// of commands.</param>
-public class GenericCommandGroup(ImmutableArray<ICommand> commands, string? name = null, string? helpText = null) : BaseCommandGroup(commands.ToArray())
+public class GenericCommandGroup(ImmutableArray<ICommand> commands, string? name = null, string? helpText = null)
+: BaseCommandGroup(commands.ToArray())
 {
     private readonly string? name = name;
     private readonly string? helpText = helpText;

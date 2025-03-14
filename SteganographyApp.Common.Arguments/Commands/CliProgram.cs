@@ -65,6 +65,7 @@ public sealed class CliProgram
         {
             return e;
         }
+
         return null;
     }
 }

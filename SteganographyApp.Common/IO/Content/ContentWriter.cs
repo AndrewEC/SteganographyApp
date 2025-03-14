@@ -36,6 +36,7 @@ public sealed class ContentWriter(IInputArguments arguments) : AbstractContentIO
         {
             fileIOProxy.Delete(Arguments.DecodedOutputFile);
         }
+
         return fileIOProxy.OpenFileForWrite(Arguments.DecodedOutputFile);
     }
 }

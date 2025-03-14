@@ -18,6 +18,7 @@ internal sealed class SingleBitColourChannelUpdateStrategy : IColourChannelUpdat
         {
             return sourceColour;
         }
+
         return Bitwise.SwapLeastSigificantBit(sourceColour, bitQueue.Next());
     }
 }

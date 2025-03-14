@@ -64,10 +64,12 @@ public sealed class RandomizeUtil : IRandomizeUtil
             int second = generator.Next(value.Length);
             pairs[i] = (first, second);
         }
+
         foreach ((int first, int second) in pairs)
         {
             (value[second], value[first]) = (value[first], value[second]);
         }
+
         return value;
     }
 }

@@ -3,6 +3,8 @@ namespace SteganographyApp.Common;
 using System;
 using System.Collections.Immutable;
 
+#pragma warning disable SA1402
+
 /// <summary>
 /// Generic interface containing all the getter methods required for retrieving
 /// all the parsed input argument values.
@@ -112,3 +114,5 @@ public sealed class CommonArguments : IInputArguments
 /// </remarks>
 /// <param name="message">The message to initialize the exception with.</param>
 public sealed class ArgumentValueException(string message) : Exception(message) { }
+
+#pragma warning restore SA1402

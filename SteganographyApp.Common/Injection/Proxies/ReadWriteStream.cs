@@ -58,13 +58,5 @@ public class ReadWriteStream : AbstractDisposable, IReadWriteStream
     /// <summary>
     /// Disposes of the currently opened stream represented by this instance.
     /// </summary>
-    /// <param name="disposing">Specifies if this method is being invoked from the main Dispose method or the finalizer.</param>
-    protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
-    {
-        if (!disposing)
-        {
-            return;
-        }
-        stream.Dispose();
-    });
+    protected override void DoDispose() => RunIfNotDisposed(() => stream.Dispose());
 }

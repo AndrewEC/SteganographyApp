@@ -11,6 +11,7 @@ Write-Divider "Executing mutation tests"
 
 function Invoke-Stryker {
     param(
+        [Parameter(Mandatory)]
         [string] $Project
     )
 

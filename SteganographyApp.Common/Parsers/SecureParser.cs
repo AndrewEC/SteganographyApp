@@ -46,6 +46,7 @@ public static class SecureParser
                 {
                     continue;
                 }
+
                 builder.Remove(builder.Length - 1, 1);
                 writer.Write("\b \b");
             }
@@ -59,6 +60,7 @@ public static class SecureParser
                 writer.Write("*");
             }
         }
+
         writer.WriteLine(string.Empty);
         return builder.ToString();
     }

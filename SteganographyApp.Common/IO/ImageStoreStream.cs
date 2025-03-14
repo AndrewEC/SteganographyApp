@@ -2,6 +2,8 @@ namespace SteganographyApp.Common.IO;
 
 using System;
 
+#pragma warning disable SA1402
+
 /// <summary>
 /// A wrapper that exposes the IO related methods of an ImageStore instance while implementing
 /// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
@@ -53,6 +55,7 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
         {
             throw new ImageStoreException("Stream cannot be used for writing as it was opened with the Read StreamMode.");
         }
+
         save = true;
         return store.WriteBinaryString(binary);
     });
@@ -64,6 +67,7 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
         {
             throw new ImageStoreException("Stream cannot be used for reading as it was opened with the Write StreamMode.");
         }
+
         return store.ReadBinaryString(length);
     });
 
@@ -77,14 +81,11 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
     /// Disposes of the current instance. Any implementation of this method should check if disposing is true and,
     /// if it is not, skip the execution of the remainder of the method.
     /// </summary>
-    /// <param name="disposing">Indicates if this method was called from the base Dispose method.</param>
-    protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
+    protected override void DoDispose() => RunIfNotDisposed(() =>
     {
-        if (!disposing)
-        {
-            return;
-        }
         store.CloseOpenImage(save);
         store.StreamClosed();
     });
 }
+
+#pragma warning restore SA1402

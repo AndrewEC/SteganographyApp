@@ -2,6 +2,7 @@ namespace SteganographyApp.Common.Arguments.Parsers;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -14,7 +15,7 @@ using System.Reflection;
 /// <param name="additionalParsers">An optional provide of to provide additional parsers for custom types.</param>
 internal sealed class ParserFunctionLookup(IParserFunctionProvider? additionalParsers)
 {
-    private static readonly Dictionary<Type, Func<object, string, object>> DefaultParsers = new()
+    private static readonly ImmutableDictionary<Type, Func<object, string, object>> DefaultParsers = new Dictionary<Type, Func<object, string, object>>()
     {
         { typeof(byte), (instance, value) => Convert.ToByte(value) },
         { typeof(short), (instance, value) => Convert.ToInt16(value) },
@@ -24,7 +25,7 @@ internal sealed class ParserFunctionLookup(IParserFunctionProvider? additionalPa
         { typeof(double), (instance, value) => Convert.ToDouble(value) },
         { typeof(bool), (instance, value) => Convert.ToBoolean(value) },
         { typeof(string), (instance, value) => value },
-    };
+    }.ToImmutableDictionary();
 
     private readonly IParserFunctionProvider? additionalParsers = additionalParsers;
 
@@ -40,7 +41,7 @@ internal sealed class ParserFunctionLookup(IParserFunctionProvider? additionalPa
         MethodInfo method = modelType.GetMethods()
             .Where(info => info.Name == methodName && info.IsStatic)
             .FirstOrDefault()
-            ?? throw new ParseException($"Could not locate parser. No static method with the name [{methodName}] could be found on the type [{modelType.FullName}].");
+            ?? throw new ParseException($"Could not locate parser. No static method with the name [{methodName}] could be found on type [{modelType.FullName}].");
         return (instance, value) => method.Invoke(null, [instance, value])!;
     }
 
@@ -75,6 +76,7 @@ internal sealed class ParserFunctionLookup(IParserFunctionProvider? additionalPa
         {
             return parser;
         }
+
         return null;
     }
 }

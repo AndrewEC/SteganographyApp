@@ -3,6 +3,8 @@ namespace SteganographyApp.Common.Logging;
 using System;
 using SteganographyApp.Common.Injection;
 
+#pragma warning disable SA1402
+
 /// <summary>
 /// The interface to the standard logger.
 /// </summary>
@@ -90,3 +92,5 @@ internal sealed class Logger(string typeName) : ILogger
 
     private void Log(LogLevel level, string message, Func<object[]> provider) => RootLogger.Instance.LogToFile(typeName, level, message, provider);
 }
+
+#pragma warning restore SA1402

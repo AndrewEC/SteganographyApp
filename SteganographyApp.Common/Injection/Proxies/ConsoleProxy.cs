@@ -2,6 +2,8 @@ namespace SteganographyApp.Common.Injection.Proxies;
 
 using System;
 
+#pragma warning disable SA1402
+
 /// <summary>
 /// Inteface that exists for testing the <see cref="ProgressTracker"/> class.
 /// <para>The interface will be stubbed and provided as a constructor
@@ -52,3 +54,5 @@ public class ConsoleKeyReader : IConsoleReader
     /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/ReadKey/*' />
     public ConsoleKeyInfo ReadKey(bool intercept) => Console.ReadKey(intercept);
 }
+
+#pragma warning restore SA1402

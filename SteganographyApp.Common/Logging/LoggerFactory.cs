@@ -41,6 +41,7 @@ public class LoggerFactory : ILoggerFactory
         {
             return value;
         }
+
         var logger = new Logger(name);
         loggerCache[name] = logger;
         return logger;

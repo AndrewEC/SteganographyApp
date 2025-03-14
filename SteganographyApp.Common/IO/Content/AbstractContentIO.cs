@@ -30,16 +30,10 @@ public abstract class AbstractContentIO : AbstractDisposable
     protected IReadWriteStream Stream { get; private set; }
 
     /// <summary>
-    /// Disposes of the current instance. Any implementation of this method should check if disposing is true and,
-    /// if it is not, skip the execution of the remainder of the method.
+    /// Disposes of the currently open stream.
     /// </summary>
-    /// <param name="disposing">Indicates if this method was called from the base Dispose method.</param>
-    protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
+    protected override void DoDispose() => RunIfNotDisposed(() =>
     {
-        if (!disposing)
-        {
-            return;
-        }
         Stream.Flush();
         Stream.Dispose();
     });

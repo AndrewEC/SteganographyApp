@@ -1,5 +1,8 @@
 function Remove-Folder {
-    param([string] $FolderPath)
+    param(
+        [Parameter(Mandatory)]
+        [string] $FolderPath
+    )
 
     if (Test-Path $FolderPath -PathType Container) {
         Write-Host "Removing folder $FolderPath"
@@ -8,7 +11,10 @@ function Remove-Folder {
 }
 
 function Remove-File {
-    param([string] $ItemPath)
+    param(
+        [Parameter(Mandatory)]
+        [string] $ItemPath
+    )
 
     if (Test-Path $ItemPath -PathType Leaf) {
         Write-Host "Removing item: $ItemPath"
@@ -17,7 +23,10 @@ function Remove-File {
 }
 
 function Write-Divider {
-    param([string] $Label)
+    param(
+        [Parameter(Mandatory)]
+        [string] $Label
+    )
 
     $UpperCaseLabel = $(Get-Culture).TextInfo.ToTitleCase($Label)
 

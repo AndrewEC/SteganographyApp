@@ -38,6 +38,7 @@ public class KeyUtil : IKeyUtil
         {
             return cachedKey;
         }
+
         return generatedKeys[cacheKeyName] = DoGenerateNewKey(password, additionalIterations);
     }
 

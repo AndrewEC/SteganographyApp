@@ -72,7 +72,7 @@ public sealed class CliParser
             Environment.Exit(0);
         }
 
-        foreach (MatchResult match in new ArgumentValueMatcher(arguments, registeredArguments))
+        foreach (MatchResult match in ArgumentValueMatcher.Match(arguments, registeredArguments))
         {
             try
             {

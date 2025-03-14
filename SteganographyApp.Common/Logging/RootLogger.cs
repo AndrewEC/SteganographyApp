@@ -6,6 +6,8 @@ using System.Text;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 
+#pragma warning disable SA1402
+
 /// <summary>
 /// The singleon logger that all ILogger instances will invoke.
 /// </summary>
@@ -59,6 +61,7 @@ public sealed class RootLogger
         {
             return;
         }
+
         lock (SyncLock)
         {
             if (writeLogStream != null)
@@ -85,6 +88,7 @@ public sealed class RootLogger
         {
             return;
         }
+
         LogToFile(FormLogMessage(typeName, level, message, arguments));
     }
 
@@ -105,6 +109,7 @@ public sealed class RootLogger
         {
             return;
         }
+
         try
         {
             object[] arguments = provider();
@@ -144,6 +149,7 @@ public sealed class RootLogger
             {
                 fileIOProxy.Delete(LogFileName);
             }
+
             writeLogStream = fileIOProxy.OpenFileForWrite(LogFileName);
             return true;
         }
@@ -154,3 +160,5 @@ public sealed class RootLogger
         }
     }
 }
+
+#pragma warning restore SA1402

@@ -66,6 +66,7 @@ public class IndexGeneratorTest
             {
                 generated.Add(generator.Next(generations));
             }
+
             Assert.That(generations * 0.8, Is.GreaterThanOrEqualTo(generated.Count));
         }
     }
@@ -82,6 +83,7 @@ public class IndexGeneratorTest
                 return false;
             }
         }
+
         return true;
     }
 
@@ -94,6 +96,7 @@ public class IndexGeneratorTest
                 return false;
             }
         }
+
         return true;
     }
 }

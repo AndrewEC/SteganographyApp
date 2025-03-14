@@ -88,6 +88,7 @@ public abstract class BaseCommandGroup : ICommandGroup
             string expectedList = FormExpectedCommandNameList(subCommands);
             throw new CommandException($"Could not find command with name [{nextCommandName}] to execute. Expected command to be one of: [{expectedList}]");
         }
+
         return nextCommand!;
     }
 
@@ -106,6 +107,7 @@ public abstract class BaseCommandGroup : ICommandGroup
                 Console.WriteLine($"  {command.GetName()} - {command.GetHelpDescription()}");
             }
         }
+
         Environment.Exit(0);
     }
 
@@ -122,7 +124,7 @@ public abstract class BaseCommandGroup : ICommandGroup
             string name = command.GetName().ToLowerInvariant();
             if (!names.Add(name))
             {
-                throw new CommandException($"Two or more commands attempted to register with the same name within the command group: [{GetName()}]. Found at least two commands with the name: [{name}].");
+                throw new CommandException($"All commands in a group must have a unique name. Group [{GetName()}] has multiple commands named: [{name}].");
             }
         }
     }

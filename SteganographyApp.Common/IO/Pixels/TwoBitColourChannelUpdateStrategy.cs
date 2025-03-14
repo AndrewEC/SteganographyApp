@@ -18,6 +18,7 @@ internal sealed class TwoBitColourChannelUpdateStrategy : IColourChannelUpdateSt
         {
             return sourceColour;
         }
+
         byte destinationColour = Bitwise.SwapSecondLeastSignificantBit(sourceColour, bitQueue.Next('0'));
         destinationColour = Bitwise.SwapLeastSigificantBit(destinationColour, bitQueue.Next('0'));
         return destinationColour;

@@ -28,6 +28,7 @@ internal sealed class BinaryStringBuilder(int capacity)
         {
             return;
         }
+
         if (bitsCurrentlyStored + bits.Length > capacity)
         {
             int remainingCapacity = capacity - bitsCurrentlyStored;

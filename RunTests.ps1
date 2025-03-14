@@ -27,7 +27,9 @@ Write-Divider "Running unit tests"
 
 function Invoke-UnitTest {
     param(
+        [Parameter(Mandatory)]
         [string]$ProjectName,
+        [Parameter(Mandatory)]
         [scriptblock]$RunCommand
     )
 

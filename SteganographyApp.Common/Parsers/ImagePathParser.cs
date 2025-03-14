@@ -39,6 +39,7 @@ public static class ImagePathParser
         {
             return [];
         }
+
         var matcher = new Matcher();
         matcher.AddIncludePatterns(globs);
         return matcher.GetResultsInFullPath(Directory.GetCurrentDirectory()).ToArray();

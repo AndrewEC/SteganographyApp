@@ -44,11 +44,11 @@ public static class Help
             .ToImmutableArray();
 
         var nonPositionalRequiredArguments = registeredArguments
-            .Where(argument => argument.Attribute.Required && argument.Attribute.Position <= 0)
+            .Where(argument => TypeHelper.IsArgumentRequired(argument.Attribute, argument.Member))
             .OrderBy(argument => argument.Attribute.Name)
             .ToImmutableArray();
 
-        var optionalArguments = registeredArguments.Where(argument => !argument.Attribute.Required)
+        var optionalArguments = registeredArguments.Where(argument => !TypeHelper.IsArgumentRequired(argument.Attribute, argument.Member))
             .OrderBy(argument => argument.Attribute.Name)
             .ToImmutableArray();
 
@@ -78,6 +78,7 @@ public static class Help
         {
             builder.Append(SplitHelpText(descriptor.HelpText)).Append('\n');
         }
+
         builder.Append("Usage: ")
             .AppendJoin(" ", positionArguments.Select(argument => argument.Attribute.Name))
             .Append(' ')
@@ -85,10 +86,12 @@ public static class Help
             .Append(' ')
             .AppendJoin(" ", optionalArguments.Select(argument => $"[{argument.Attribute.Name}]"))
             .Append('\n');
+
         if (descriptor != null && descriptor.Example != null)
         {
             builder.Append("Example Usage: ").Append(descriptor.Example).Append('\n');
         }
+
         return builder.ToString();
     }
 
@@ -113,14 +116,17 @@ public static class Help
                 {
                     currentLine.Append("\n\t");
                 }
+
                 entireDescription.Append(currentLine);
                 currentLine.Clear();
             }
         }
+
         if (currentLine.Length > 0)
         {
             entireDescription.Append(currentLine);
         }
+
         return entireDescription.ToString();
     }
 
@@ -131,7 +137,7 @@ public static class Help
     {
         var builder = new StringBuilder();
 
-        if (argument.Required)
+        if (TypeHelper.IsArgumentRequired(argument, member))
         {
             builder.Append("[Required] ");
         }
@@ -177,7 +183,7 @@ public static class Help
     private static string? DefaultValueOf(object instance, MemberInfo member, ArgumentAttribute argument)
     {
         // Since required parameters must be provided by the user there is no point in having a default value.
-        if (argument.Required)
+        if (TypeHelper.IsArgumentRequired(argument, member))
         {
             return null;
         }

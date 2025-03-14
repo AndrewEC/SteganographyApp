@@ -41,6 +41,7 @@ public sealed class BinaryUtil : IBinaryUtil
         {
             builder.Append(To8BitBinaryString(bit));
         }
+
         return builder.ToString();
     }
 
@@ -52,6 +53,7 @@ public sealed class BinaryUtil : IBinaryUtil
         {
             builder.Append(b);
         }
+
         return builder.ToString();
     }
 
@@ -64,6 +66,7 @@ public sealed class BinaryUtil : IBinaryUtil
         {
             binaryBytes[i] = Convert.ToByte(binary.Substring(BitsPerByte * i, BitsPerByte), 2);
         }
+
         return binaryBytes;
     }
 

@@ -44,15 +44,7 @@ public sealed class ChunkTableWriter(IImageStore store) : AbstractDisposable
     /// Disposes of the current instance. This will effectively call Dispose on the underlying
     /// stream opened from the input <see cref="ImageStore"/> instance.
     /// </summary>
-    /// <param name="disposing">If true this instance will be disposed.</param>
-    protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
-    {
-        if (!disposing)
-        {
-            return;
-        }
-        stream.Dispose();
-    });
+    protected override void DoDispose() => RunIfNotDisposed(() => stream.Dispose());
 
     private static string To33BitBinaryString(int value)
         => Convert.ToString(value, 2).PadLeft(Calculator.ChunkDefinitionBitSizeWithPadding, '0');

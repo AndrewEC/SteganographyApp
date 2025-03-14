@@ -76,13 +76,5 @@ public class BasicImageInfo(string path, Image<Rgba32> image) : AbstractDisposab
     /// <summary>
     /// Proxies the call to the Dispose method of the image managed by this class.
     /// </summary>
-    /// <param name="disposing">Specifies if this method is being invoked from the main Dispose method or the finalizer.</param>
-    protected override void Dispose(bool disposing) => RunIfNotDisposed(() =>
-    {
-        if (!disposing)
-        {
-            return;
-        }
-        image.Dispose();
-    });
+    protected override void DoDispose() => RunIfNotDisposed(() => image.Dispose());
 }

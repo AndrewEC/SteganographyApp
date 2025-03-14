@@ -59,6 +59,7 @@ public class InRangeAttribute(double min, double max, string? name = null) : Val
             long longValue = Convert.ToInt64(value);
             return longValue >= min && longValue <= max;
         }
+
         double doubleValue = Convert.ToDouble(value);
         return doubleValue >= min && doubleValue <= max;
     }

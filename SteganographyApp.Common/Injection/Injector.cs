@@ -58,6 +58,7 @@ public static class Injector
             string message = string.Format("Injector is in a test state but tried to provide a non-mocked object for type: [{0}]", type.Name);
             throw new InvalidOperationException(message);
         }
+
         return (T)injectionValues[type];
     }
 
@@ -77,10 +78,12 @@ public static class Injector
         {
             throw new ArgumentException($"Correlated type must be an interface. The following type is not an interface: [{type.FullName}]");
         }
+
         if (!injectionValues.ContainsKey(type))
         {
             throw new ArgumentException($"Cannot UseInstance for type [{type.FullName}] since type is not available in default injection dictionary.");
         }
+
         injectionValues[type] = instance;
     }
 

@@ -50,6 +50,7 @@ public sealed class ImageCleaner(IInputArguments arguments, IImageStore imageSto
                 {
                     return;
                 }
+
                 string randomBinary = GenerateBinaryString(currentImage);
                 log.Trace("Generated random binary string of: [{0}]", randomBinary);
                 stream.WriteContentChunkToImage(randomBinary);
@@ -92,6 +93,7 @@ public sealed class ImageCleaner(IInputArguments arguments, IImageStore imageSto
         {
             return 0;
         }
+
         return -1 * Calculator.MinimumBitsPerPixel * arguments.BitsToUse;
     }
 
@@ -108,6 +110,7 @@ public sealed class ImageCleaner(IInputArguments arguments, IImageStore imageSto
         {
             builder.Append(random.Next(10) % 2 == 0 ? '0' : '1');
         }
+
         return builder.ToString();
     }
 }

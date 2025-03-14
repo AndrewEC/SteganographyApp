@@ -52,10 +52,12 @@ public abstract class ValidationAttribute : Attribute
         {
             throw new IncompatibleTypeException(this, validTypes, valueType);
         }
+
         if (value == null)
         {
             return;
         }
+
         DoValidate(value);
     }
 

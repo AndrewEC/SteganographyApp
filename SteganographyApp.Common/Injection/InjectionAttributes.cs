@@ -19,8 +19,9 @@ public sealed class InjectableAttribute : Attribute
     {
         if (!correlatesWith.IsInterface)
         {
-            throw new ArgumentException("The correlatesWith Type argument of the InjectableAttribute constructor must be a type of interface. The provided type is not an interface: " + correlatesWith.FullName);
+            throw new ArgumentException("The correlatesWith Type argument of the InjectableAttribute constructor must be an interface. The provided type is not an interface: " + correlatesWith.FullName);
         }
+
         CorrelatesWith = correlatesWith;
     }
 

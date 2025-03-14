@@ -142,7 +142,8 @@ internal sealed class TestDuplicateArguments
 
 internal sealed class TestDefaultParsersArguments
 {
-    [Argument("--byteNumber", "-b", required: true)]
+    [Argument("--byteNumber", "-b")]
+    [Required]
     public byte ByteNumber;
 
     [Argument("--shortNumber", "-s")]

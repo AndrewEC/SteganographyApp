@@ -40,6 +40,7 @@ internal sealed class ReadBitQueue(string binaryString)
         {
             return defaultTo;
         }
+
         return Next();
     }
 

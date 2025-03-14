@@ -1,4 +1,5 @@
 . ./_Common.ps1
+
 $ProgressPreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop"
 
@@ -27,3 +28,6 @@ Write-Divider "Copying test assets"
 Get-ChildItem ./SteganographyApp.Common.Tests/TestAssets `
     | Where-Object Name -like "*.png" `
     | Copy-Item -Force -Destination ./testbed
+
+$AbsoluteTestbedPath = Join-Path $PSScriptRoot testbed
+Write-Host "Testbed directory has been created at [$AbsoluteTestbedPath]."

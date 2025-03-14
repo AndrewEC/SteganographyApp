@@ -12,12 +12,14 @@ public class ValidationFailedException : Exception
     /// Initializes a new instance of the <see cref="ValidationFailedException"/> class.
     /// </summary>
     /// <param name="message">The error message.</param>
-    public ValidationFailedException(string message) : base(message) { }
+    public ValidationFailedException(string message)
+    : base(message) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationFailedException"/> class.
     /// </summary>
     /// <param name="message">The error message.</param>
     /// <param name="cause">The root cause of the validation exception.</param>
-    public ValidationFailedException(string message, Exception cause) : base(message, cause) { }
+    public ValidationFailedException(string message, Exception cause)
+    : base(message, cause) { }
 }
