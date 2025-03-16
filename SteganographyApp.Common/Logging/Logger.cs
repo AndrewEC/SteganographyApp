@@ -1,62 +1,6 @@
 namespace SteganographyApp.Common.Logging;
 
 using System;
-using SteganographyApp.Common.Injection;
-
-#pragma warning disable SA1402
-
-/// <summary>
-/// The interface to the standard logger.
-/// </summary>
-public interface ILogger
-{
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
-    void Trace(string message, params object[] arguments);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
-    void Trace(string message, Func<object[]> provider);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
-    void Debug(string message, params object[] arguments);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
-    void Debug(string message, Func<object[]> provider);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
-    void Error(string message, params object[] arguments);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
-    void Error(string message, Func<object[]> provider);
-}
-
-/// <summary>
-/// A logger class that allows a logger instance to be lazily initialized.
-/// </summary>
-/// <typeparam name="T">The type of the class that will be consuming the underlying ILogger instance.</typeparam>
-public sealed class LazyLogger<T> : ILogger
-{
-    private ILogger? instance;
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
-    public void Trace(string message, params object[] arguments) => GetInstance().Trace(message, arguments);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
-    public void Trace(string message, Func<object[]> provider) => GetInstance().Trace(message, provider);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
-    public void Debug(string message, params object[] arguments) => GetInstance().Debug(message, arguments);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
-    public void Debug(string message, Func<object[]> provider) => GetInstance().Debug(message, provider);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
-    public void Error(string message, params object[] arguments) => GetInstance().Error(message, arguments);
-
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
-    public void Error(string message, Func<object[]> provider) => GetInstance().Error(message, provider);
-
-    private ILogger GetInstance() => instance ??= ServiceContainer.GetLogger<T>();
-}
 
 /// <summary>
 /// The concrete ILogger implementation that provides some proxy methods to help fill out values
@@ -92,5 +36,3 @@ internal sealed class Logger(string typeName) : ILogger
 
     private void Log(LogLevel level, string message, Func<object[]> provider) => RootLogger.Instance.LogToFile(typeName, level, message, provider);
 }
-
-#pragma warning restore SA1402

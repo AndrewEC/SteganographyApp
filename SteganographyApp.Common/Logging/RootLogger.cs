@@ -69,7 +69,11 @@ public sealed class RootLogger
             }
             else
             {
-                logLevel = TryOpenLogFileForWrite() ? level : LogLevel.None;
+                writeLogStream = OpenLogFileStream();
+                if (writeLogStream == null)
+                {
+                    logLevel = LogLevel.None;
+                }
             }
         }
     }
@@ -112,7 +116,7 @@ public sealed class RootLogger
         try
         {
             object[] arguments = provider();
-            LogToFile(FormLogMessage(typeName, level, message, arguments));
+            LogToFile(typeName, level, message, arguments);
         }
         catch (Exception e)
         {
@@ -139,7 +143,7 @@ public sealed class RootLogger
         }
     }
 
-    private bool TryOpenLogFileForWrite()
+    private IReadWriteStream? OpenLogFileStream()
     {
         try
         {
@@ -149,13 +153,12 @@ public sealed class RootLogger
                 fileIOProxy.Delete(LogFileName);
             }
 
-            writeLogStream = fileIOProxy.OpenFileForWrite(LogFileName);
-            return true;
+            return fileIOProxy.OpenFileForWrite(LogFileName);
         }
         catch (Exception e)
         {
             Console.WriteLine("Warning: Could not open log file for write. Logging will be disabled. Caused by: [{0}]", e.Message);
-            return false;
+            return null;
         }
     }
 }
