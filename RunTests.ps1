@@ -9,7 +9,7 @@ Remove-Folder ./SteganographyApp.Common.Arguments.Tests/bin
 Remove-Folder ./SteganographyApp.Common.Arguments.Tests/obj
 Remove-Folder ./SteganographyApp.Common.Integration.Tests/bin
 Remove-Folder ./SteganographyApp.Common.Integration.Tests/obj
-Remove-Folder ./reports
+Remove-Folder ./reports/unit-tests
 
 Remove-File ./coverage.json
 Remove-File ./coverage.opencover.xml
@@ -42,7 +42,7 @@ function Invoke-UnitTest {
         exit
     }
 
-    $ReportDir = Join-Path "reports" $ProjectName
+    $ReportDir = Join-Path ./reports/unit-tests $ProjectName
 
     if (-not (Test-Path $ReportDir -PathType Container)) {
         New-Item $ReportDir -ItemType Directory | Out-Null

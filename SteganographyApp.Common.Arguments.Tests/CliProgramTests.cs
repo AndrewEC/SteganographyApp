@@ -67,9 +67,7 @@ public class CliProgramTests
             () => Commands.Group(
                 "duplicate",
                 Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function),
-                Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function)
-            )
-        );
+                Commands.From<GenericArguments>("function", (args) => LastRun.Instance.Name = LastRunName.Function)));
     }
 
     [Test]
@@ -81,6 +79,16 @@ public class CliProgramTests
     }
 }
 
+#pragma warning disable SA1201, SA1602
+internal enum LastRunName
+{
+    None,
+    Function,
+    BaseCommand,
+    Aliased,
+}
+#pragma warning restore SA1201, SA1602
+
 internal sealed class LastRun
 {
     public static readonly LastRun Instance = new();
@@ -88,14 +96,6 @@ internal sealed class LastRun
     private LastRun() { }
 
     public LastRunName Name { get; set; }
-}
-
-internal enum LastRunName
-{
-    None,
-    Function,
-    BaseCommand,
-    Aliased,
 }
 
 internal sealed class GenericArguments
