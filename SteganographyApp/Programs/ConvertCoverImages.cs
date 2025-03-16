@@ -63,11 +63,14 @@ internal sealed class ConvertImagesCommand : Command<ConvertArguments>
         var arguments = args.ToCommonArguments();
 
         Console.WriteLine("Converting [{0}] images.", arguments.CoverImages.Length);
-        var tracker = ProgressTracker.CreateAndDisplay(arguments.CoverImages.Length, "Converting images", "Finished converting all images");
+        var tracker = ServiceContainer.CreateProgressTracker(arguments.CoverImages.Length, "Converting images", "Finished converting all images")
+            .Display();
 
         var failures = new List<string>();
 
-        var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(arguments.ImageFormat);
+        var encoder = ServiceContainer.GetService<IEncoderProvider>()
+            .GetEncoder(arguments.ImageFormat);
+
         foreach (string sourceImage in arguments.CoverImages)
         {
             string destinationImage = ReplaceFileExtension(sourceImage, arguments);
@@ -131,7 +134,7 @@ internal sealed class ConvertImagesCommand : Command<ConvertArguments>
 
     private static void RenameFile(string path)
     {
-        string parent = Directory.GetParent(path).FullName;
+        string parent = Directory.GetParent(path)?.FullName ?? string.Empty;
         string fileName = Path.GetFileNameWithoutExtension(path);
         int index = fileName.LastIndexOf('.');
         string withoutConverted = fileName.Substring(0, index);

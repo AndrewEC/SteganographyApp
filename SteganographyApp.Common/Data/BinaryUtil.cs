@@ -4,8 +4,6 @@ using System;
 using System.Linq;
 using System.Text;
 
-using SteganographyApp.Common.Injection;
-
 /// <summary>
 /// Contract for interacting with the concrete BinaryUtil implementation.
 /// </summary>
@@ -27,7 +25,6 @@ public interface IBinaryUtil
 /// <summary>
 /// Injectable Utility class for encoding a binary string to base64 and from base64 to binary.
 /// </summary>
-[Injectable(typeof(IBinaryUtil))]
 public sealed class BinaryUtil : IBinaryUtil
 {
     private const int BitsPerByte = 8;

@@ -34,7 +34,6 @@ public interface IConsoleReader
 /// <para>Simply proxies the Write and WriteLine methods of the
 /// console class.</para>
 /// </summary>
-[Injectable(typeof(IConsoleWriter))]
 public class ConsoleWriter : IConsoleWriter
 {
     /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/Write/*' />
@@ -48,7 +47,6 @@ public class ConsoleWriter : IConsoleWriter
 /// The default IInputReader instance that acts as a proxy to the <see cref="Console.ReadKey(bool)"/>
 /// method.
 /// </summary>
-[Injectable(typeof(IConsoleReader))]
 public class ConsoleKeyReader : IConsoleReader
 {
     /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/ReadKey/*' />

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
@@ -22,7 +21,6 @@ public interface IDummyUtil
 /// <summary>
 /// Utility class for inserting and removing dummy entries in the original byte array.
 /// </summary>
-[Injectable(typeof(IDummyUtil))]
 public sealed class DummyUtil : IDummyUtil
 {
     private const int MaxLengthPerDummy = 2500;

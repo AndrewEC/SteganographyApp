@@ -78,7 +78,8 @@ internal sealed class EncodeArguments : IArgumentConverter
             UseCompression = EnableCompression,
             BitsToUse = TwoBits ? 2 : 1,
         };
-        Injector.LoggerFor<EncodeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
+        ServiceContainer.GetLogger<EncodeArguments>()
+            .Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
         return arguments;
     }
 }
@@ -103,18 +104,20 @@ internal sealed class EncodeCommand : Command<EncodeArguments>
 
     private void Encode(EncodingUtilities utilities, IInputArguments arguments)
     {
+        ICalculator calculator = ServiceContainer.GetService<ICalculator>();
         using (var stream = utilities.ImageStore.OpenStream(StreamMode.Write))
         {
             log.Debug("Encoding file: [{0}]", arguments.FileToEncode);
-            int startingPixel = Calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
+            int startingPixel = calculator.CalculateRequiredBitsForContentTable(arguments.FileToEncode, arguments.ChunkByteSize);
             log.Debug("Content chunk table requires [{0}] bits of space to store.", startingPixel);
             stream.SeekToPixel(startingPixel);
 
-            int requiredNumberOfWrites = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
+            int requiredNumberOfWrites = calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
             log.Debug("File requires [{0}] iterations to encode.", requiredNumberOfWrites);
-            var progressTracker = ProgressTracker.CreateAndDisplay(requiredNumberOfWrites, "Encoding file contents", "All input file contents have been encoded.");
+            var progressTracker = ServiceContainer.CreateProgressTracker(requiredNumberOfWrites, "Encoding file contents", "All input file contents have been encoded.")
+                .Display();
 
-            using (var reader = new ContentReader(arguments))
+            using (var reader = ServiceContainer.CreateContentReader(arguments))
             {
                 string? contentChunk = string.Empty;
                 while (true)
@@ -151,7 +154,7 @@ internal sealed class EncodingUtilities
 {
     public EncodingUtilities(IInputArguments args)
     {
-        ImageStore = new ImageStore(args);
+        ImageStore = ServiceContainer.CreateImageStore(args);
         TableTracker = new TableChunkTracker(ImageStore);
         ImageTracker = new ImageTracker(args, ImageStore);
     }

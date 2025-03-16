@@ -1,17 +1,12 @@
 namespace SteganographyApp.Common.Tests;
 
-using System;
-using Moq;
 using NUnit.Framework;
 
 using SteganographyApp.Common.Data;
 
 [TestFixture]
-public class DummyUtilTests : FixtureWithTestObjects
+public class DummyUtilTests
 {
-    [Mockup(typeof(IKeyUtil))]
-    public Mock<IKeyUtil> mockKeyUtil = new();
-
     private const int NumberOfDummies = 10;
     private const int IncorrectNumberOfDummies = 3;
     private const string RandomSeed = "random_seed";

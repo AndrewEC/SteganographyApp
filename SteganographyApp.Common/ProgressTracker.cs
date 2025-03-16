@@ -14,40 +14,33 @@ using SteganographyApp.Common.Injection.Proxies;
 /// <param name="maxProgress">The maximum progress.</param>
 /// <param name="progressMessage">The message to print while progress has not yet reached 100.</param>
 /// <param name="completeMessage">The message to print after the progress has reached 100.</param>
-public sealed class ProgressTracker(double maxProgress, string progressMessage, string completeMessage)
+/// <param name="consoleWriter">Represents the output stream where the output of this class
+/// will be piped to.</param>
+public sealed class ProgressTracker(
+    double maxProgress,
+    string progressMessage,
+    string completeMessage,
+    IConsoleWriter consoleWriter)
 {
     private readonly double maxProgress = maxProgress;
     private readonly string progressMessage = progressMessage;
     private readonly string completeMessage = completeMessage;
-    private readonly IConsoleWriter outputWriter = Injector.Provide<IConsoleWriter>();
+    private readonly IConsoleWriter outputWriter = consoleWriter ?? ServiceContainer.GetService<IConsoleWriter>();
     private double currentProgress;
     private bool hasCompleted = false;
 
     /// <summary>
-    /// Initializes a ProgressTracker instance and prints the first progress message with a percentage of 0.
-    /// </summary>
-    /// <param name="maxProgress">The maximum progress.</param>
-    /// <param name="progressMessage">The message to print while progress has not yet reached 100.</param>
-    /// <param name="completeMessage">The message to print after the progress has reached 100.</param>
-    /// <returns>Returns a new ProgressTracker instance instantiated with the provided values.</returns>
-    public static ProgressTracker CreateAndDisplay(double maxProgress, string progressMessage, string completeMessage)
-    {
-        var tracker = new ProgressTracker(maxProgress, progressMessage, completeMessage);
-        tracker.Display();
-        return tracker;
-    }
-
-    /// <summary>
     /// Displays the progress message with a progress of 0.
     /// </summary>
-    public void Display()
+    /// <returns>This instance.</returns>
+    public ProgressTracker Display()
     {
         double percent = currentProgress / maxProgress * 100.0;
         if (percent >= 100.0)
         {
             if (hasCompleted)
             {
-                return;
+                return this;
             }
 
             hasCompleted = true;
@@ -57,6 +50,8 @@ public sealed class ProgressTracker(double maxProgress, string progressMessage, 
         {
             outputWriter.Write($"{progressMessage} :: {(int)percent}%\r");
         }
+
+        return this;
     }
 
     /// <summary>

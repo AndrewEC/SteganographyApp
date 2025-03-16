@@ -1,16 +1,22 @@
 ﻿namespace SteganographyApp.Common.IO.Content;
 
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Stream encapsulating class that decodes binary data and writes it
 /// to an output file.
 /// </summary>
-/// <param name="arguments">The user provided input arguments.</param>
-public sealed class ContentWriter(IInputArguments arguments) : AbstractContentIO(arguments)
+public sealed class ContentWriter : AbstractContentIO
 {
+#pragma warning disable CS1591, SA1600
+    public ContentWriter(
+        IInputArguments arguments,
+        IDataEncoderUtil dataEncoderUtil,
+        IFileIOProxy fileIOProxy)
+    : base(arguments, dataEncoderUtil, fileIOProxy) { }
+#pragma warning restore CS1591, SA1600
+
     /// <summary>
     /// Takes in an encrypted binary string, decyrypts it using the DataEncoderUtil
     /// and writes the resulting bytes to the output file.
@@ -18,8 +24,14 @@ public sealed class ContentWriter(IInputArguments arguments) : AbstractContentIO
     /// <param name="binary">The encrypted binary string read from the storage images.</param>
     public void WriteContentChunkToFile(string binary) => RunIfNotDisposed(() =>
     {
-        byte[] decoded = Injector.Provide<IDataEncoderUtil>()
-            .Decode(binary, Arguments.Password, Arguments.UseCompression, Arguments.DummyCount, Arguments.RandomSeed, Arguments.AdditionalPasswordHashIterations);
+        byte[] decoded = DataEncoderUtil.Decode(
+            binary,
+            Arguments.Password,
+            Arguments.UseCompression,
+            Arguments.DummyCount,
+            Arguments.RandomSeed,
+            Arguments.AdditionalPasswordHashIterations);
+
         Stream.Write(decoded, 0, decoded.Length);
         Stream.Flush();
     });
@@ -31,12 +43,11 @@ public sealed class ContentWriter(IInputArguments arguments) : AbstractContentIO
     /// <returns>A read write stream configured to write to the DecodedOutputFile.</returns>
     protected override IReadWriteStream InitializeStream()
     {
-        var fileIOProxy = Injector.Provide<IFileIOProxy>();
-        if (fileIOProxy.IsExistingFile(Arguments.DecodedOutputFile))
+        if (FileIOProxy.IsExistingFile(Arguments.DecodedOutputFile))
         {
-            fileIOProxy.Delete(Arguments.DecodedOutputFile);
+            FileIOProxy.Delete(Arguments.DecodedOutputFile);
         }
 
-        return fileIOProxy.OpenFileForWrite(Arguments.DecodedOutputFile);
+        return FileIOProxy.OpenFileForWrite(Arguments.DecodedOutputFile);
     }
 }

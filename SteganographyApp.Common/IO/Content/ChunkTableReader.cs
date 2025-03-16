@@ -24,7 +24,7 @@ public static class ChunkTableReader
     /// cover images.</returns>
     public static ImmutableArray<int> ReadContentChunkTable(IImageStoreStream stream)
     {
-        var log = Injector.LoggerFor(typeof(ChunkTableReader));
+        var log = ServiceContainer.GetLogger(typeof(ChunkTableReader));
         log.Trace("Reading content chunk table.");
 
         short chunkCount = ReadChunkCount(stream, log);

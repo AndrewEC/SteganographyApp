@@ -22,7 +22,6 @@ public interface IEncryptionUtil
 /// <summary>
 /// Utility class for encrypting and decrypting content.
 /// </summary>
-[Injectable(typeof(IEncryptionUtil))]
 public sealed class EncryptionUtil : IEncryptionUtil
 {
     /// <summary>The default number of iterations that should be used when hashing a key.</summary>
@@ -32,10 +31,20 @@ public sealed class EncryptionUtil : IEncryptionUtil
 
     private readonly ILogger log = new LazyLogger<EncryptionUtil>();
 
+    private readonly IKeyUtil keyUtil;
+
+#pragma warning disable CS1591, SA1600
+    public EncryptionUtil(IKeyUtil keyUtil)
+    {
+        this.keyUtil = keyUtil;
+    }
+
+#pragma warning restore CS1591, SA1600
+
     /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />
     public byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations)
     {
-        byte[] keyBytes = Injector.Provide<IKeyUtil>().GenerateKey(password, additionalPasswordHashIterations);
+        byte[] keyBytes = ServiceContainer.GetService<IKeyUtil>().GenerateKey(password, additionalPasswordHashIterations);
         log.Debug("Encrypting value using key: [{0}]/[{1}]", () => [password, Convert.ToBase64String(keyBytes)]);
         log.Trace("Encrypting value: [{0}]", () => [Convert.ToBase64String(value)]);
 
@@ -62,7 +71,7 @@ public sealed class EncryptionUtil : IEncryptionUtil
     /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
     public byte[] Decrypt(byte[] value, string password, int additionalPasswordHashIterations)
     {
-        byte[] keyBytes = Injector.Provide<IKeyUtil>().GenerateKey(password, additionalPasswordHashIterations);
+        byte[] keyBytes = keyUtil.GenerateKey(password, additionalPasswordHashIterations);
         log.Debug("Decrypting value using key: [{0}]", () => [Convert.ToBase64String(keyBytes)]);
         log.Trace("Decrypting value: [{0}]", () => [Convert.ToBase64String(value)]);
 

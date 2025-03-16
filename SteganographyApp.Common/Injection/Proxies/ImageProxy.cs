@@ -22,7 +22,6 @@ public interface IImageProxy
 /// The concrete implementation to allow proxying calls to the static Image.Load provided
 /// in the image sharp API.
 /// </summary>
-[Injectable(typeof(IImageProxy))]
 public class ImageProxy : IImageProxy
 {
     /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/LoadImage/*' />

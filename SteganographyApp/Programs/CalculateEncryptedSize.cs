@@ -62,13 +62,20 @@ internal sealed class CalculateEncryptedSizeArguments : IArgumentConverter
             UseCompression = EnableCompression,
             BitsToUse = TwoBits ? 2 : 1,
         };
-        Injector.LoggerFor<CalculateEncryptedSizeArguments>().Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
+        ServiceContainer.GetLogger<CalculateEncryptedSizeArguments>()
+            .Debug("Using input arguments: [{0}]", () => new[] { JsonSerializer.Serialize(arguments) });
         return arguments;
     }
 }
 
 internal sealed class CalculateEncryptedSizeCommand : Command<CalculateEncryptedSizeArguments>
 {
+    private readonly ICalculator calculator;
+
+    public CalculateEncryptedSizeCommand()
+    {
+        calculator = ServiceContainer.GetService<ICalculator>();
+    }
     public override string GetName() => "encrypted-size";
 
     public override void Execute(CalculateEncryptedSizeArguments args)
@@ -78,9 +85,9 @@ internal sealed class CalculateEncryptedSizeCommand : Command<CalculateEncrypted
         try
         {
             int singleChunkSize = CalculateChunkLength(arguments);
-            int numberOfChunks = Calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
+            int numberOfChunks = calculator.CalculateRequiredNumberOfWrites(arguments.FileToEncode, arguments.ChunkByteSize);
 
-            int chunkTableSize = Calculator.CalculateRequiredBitsForContentTable(numberOfChunks);
+            int chunkTableSize = calculator.CalculateRequiredBitsForContentTable(numberOfChunks);
             double size = ((double)singleChunkSize * (double)numberOfChunks) + (double)chunkTableSize;
 
             Console.WriteLine("Encrypted file size is:");
@@ -95,9 +102,19 @@ internal sealed class CalculateEncryptedSizeCommand : Command<CalculateEncrypted
         }
     }
 
+    private void PrintComparison(double size, int bitsToUse)
+    {
+        foreach (CommonResolutions resolution in Enum.GetValues(typeof(CommonResolutions)))
+        {
+            string name = Resolution.ToDisplayName(resolution);
+            (int width, int height) = Resolution.Dimensions[resolution];
+            Console.WriteLine("\tAt {0}: \t{1}", size / calculator.CalculateStorageSpaceOfImage(width, height, bitsToUse));    
+        }
+    }
+
     private static int CalculateChunkLength(IInputArguments arguments)
     {
-        using (var contentReader = new ContentReader(arguments))
+        using (var contentReader = ServiceContainer.CreateContentReader(arguments))
         {
             return contentReader.ReadContentChunkFromFile()!.Length;
         }
@@ -109,15 +126,5 @@ internal sealed class CalculateEncryptedSizeCommand : Command<CalculateEncrypted
         Console.WriteLine("\t{0} bytes", size / 8);
         Console.WriteLine("\t{0} KB", size / 8 / 1024);
         Console.WriteLine("\t{0} MB", size / 8 / 1024 / 1024);
-    }
-
-    private static void PrintComparison(double size, int bitsToUse)
-    {
-        foreach (CommonResolutions resolution in Enum.GetValues(typeof(CommonResolutions)))
-        {
-            string name = Resolution.ToDisplayName(resolution);
-            (int width, int height) = Resolution.Dimensions[resolution];
-            Console.WriteLine("\tAt {0}: \t{1}", size / Calculator.CalculateStorageSpaceOfImage(width, height, bitsToUse));    
-        }
     }
 }

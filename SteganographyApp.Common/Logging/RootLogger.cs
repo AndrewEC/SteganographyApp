@@ -2,7 +2,6 @@ namespace SteganographyApp.Common.Logging;
 
 using System;
 using System.Text;
-
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 
@@ -144,7 +143,7 @@ public sealed class RootLogger
     {
         try
         {
-            var fileIOProxy = Injector.Provide<IFileIOProxy>();
+            var fileIOProxy = ServiceContainer.GetService<IFileIOProxy>();
             if (fileIOProxy.IsExistingFile(LogFileName))
             {
                 fileIOProxy.Delete(LogFileName);

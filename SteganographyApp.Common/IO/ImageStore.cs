@@ -5,7 +5,6 @@ using System;
 using SixLabors.ImageSharp.PixelFormats;
 
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.IO.Pixels;
 using SteganographyApp.Common.Logging;
@@ -31,15 +30,25 @@ public interface IImageStore
 /// instance should not be directly invoked. Instead, they should be accessed via the interface
 /// return by the <see cref="OpenStream(StreamMode)"/> method.
 /// </summary>
-/// <param name="args">The values parsed from the command line arguments.</param>
-public sealed class ImageStore(IInputArguments args) : IImageStore
+public sealed class ImageStore : IImageStore
 {
     private readonly ILogger log = new LazyLogger<ImageStore>();
 
-    private readonly IInputArguments args = args;
+    private readonly IEncoderProvider encoderProvider;
+    private readonly IImageProxy imageProxy;
+    private readonly IInputArguments args;
     private readonly PixelPosition pixelPosition = new();
     private int currentImageIndex = -1;
     private ImageStoreStream? currentStream;
+
+#pragma warning disable CS1591, SA1600
+    public ImageStore(IInputArguments args, IEncoderProvider encoderProvider, IImageProxy imageProxy)
+    {
+        this.args = args;
+        this.encoderProvider = encoderProvider;
+        this.imageProxy = imageProxy;
+    }
+#pragma warning restore CS1591, SA1600
 
     /// <summary>
     /// Event handler that's invoked whenever the WriteContentChunkToImage method completes.
@@ -111,7 +120,7 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
         if (saveImageChanges)
         {
             log.Debug("Saving changes to image [{0}]", CurrentImage.Path);
-            var encoder = Injector.Provide<IEncoderProvider>().GetEncoder(CurrentImage.Path);
+            var encoder = encoderProvider.GetEncoder(CurrentImage.Path);
             CurrentImage.Save(CurrentImage.Path, encoder);
         }
 
@@ -209,7 +218,7 @@ public sealed class ImageStore(IInputArguments args) : IImageStore
             throw new ImageStoreException("Cannot load next image because there are no remaining cover images left to load.");
         }
 
-        CurrentImage = Injector.Provide<IImageProxy>().LoadImage(args.CoverImages[currentImageIndex]);
+        CurrentImage = imageProxy.LoadImage(args.CoverImages[currentImageIndex]);
         pixelPosition.TrackImage(CurrentImage);
         log.Debug("Loaded image [{0}]", CurrentImage.Path);
 

@@ -2,7 +2,6 @@ namespace SteganographyApp.Common.Logging;
 
 using System;
 using System.Collections.Generic;
-using SteganographyApp.Common.Injection;
 
 /// <summary>
 /// The contract for interacting with the LoggerFactory instance.
@@ -21,7 +20,6 @@ public interface ILoggerFactory
 /// <summary>
 /// The concrete logger factory responsible for supplying ILogger instances.
 /// </summary>
-[Injectable(typeof(ILoggerFactory))]
 public class LoggerFactory : ILoggerFactory
 {
     private const string TypeNameTemplate = "{0}.{1}";

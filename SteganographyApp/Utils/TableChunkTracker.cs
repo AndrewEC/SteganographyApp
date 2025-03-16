@@ -45,6 +45,7 @@ public class TableChunkTracker
         {
             contentChunks.AddAfter(lastNode, node);
         }
+
         lastNode = node;
     }
 }

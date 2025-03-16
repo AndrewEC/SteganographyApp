@@ -4,7 +4,6 @@ using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
 
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
@@ -23,14 +22,22 @@ public interface IEncoderProvider
 /// Provides a few method overloads with the end goal of retrieving the appropriate IImageEncoder instance
 /// based on the desired image type or file type.
 /// </summary>
-[Injectable(typeof(IEncoderProvider))]
 public class EncoderProvider : IEncoderProvider
 {
     private const string PngMimeType = "image/png";
     private const string WebpMimeType = "image/webp";
 
+    private readonly IImageProxy imageProxy;
+
+#pragma warning disable CS1591, SA1600
+    public EncoderProvider(IImageProxy imageProxy)
+    {
+        this.imageProxy = imageProxy;
+    }
+#pragma warning restore CS1591, SA1600
+
     /// <include file='../docs.xml' path='docs/members[@name="EncoderProvider"]/GetEncoder2/*' />
-    public IImageEncoder GetEncoder(string imagePath) => Injector.Provide<IImageProxy>().GetImageMimeType(imagePath) switch
+    public IImageEncoder GetEncoder(string imagePath) => imageProxy.GetImageMimeType(imagePath) switch
     {
         PngMimeType => GetEncoder(ImageFormat.Png),
         WebpMimeType => GetEncoder(ImageFormat.Webp),

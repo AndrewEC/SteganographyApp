@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
@@ -20,7 +19,6 @@ public interface IKeyUtil
 /// The IKeyUtil implementation. This implements the logic for generating and caching
 /// various salted keys.
 /// </summary>
-[Injectable(typeof(IKeyUtil))]
 public class KeyUtil : IKeyUtil
 {
     private const int DefaultIterations = 450_000;

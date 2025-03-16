@@ -13,16 +13,23 @@ using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection.Proxies;
 
 [TestFixture]
-public class EncoderProviderTests : FixtureWithTestObjects
+public class EncoderProviderTests
 {
-    [Mockup(typeof(IImageProxy))]
-    public Mock<IImageProxy> mockImageProxy = new();
+    private readonly Mock<IImageProxy> mockImageProxy = new(MockBehavior.Strict);
+
+    private EncoderProvider encoderProvider;
+
+    [SetUp]
+    public void SetUp()
+    {
+        encoderProvider = new(mockImageProxy.Object);
+    }
 
     [TestCase(ImageFormat.Png, typeof(PngEncoder))]
     [TestCase(ImageFormat.Webp, typeof(WebpEncoder))]
     public void TestProvideEncoder(ImageFormat imageFormat, Type encoderType)
     {
-        Assert.That(new EncoderProvider().GetEncoder(imageFormat), Is.AssignableFrom(encoderType));
+        Assert.That(encoderProvider.GetEncoder(imageFormat), Is.AssignableFrom(encoderType));
     }
 
     [TestCase("image/png", typeof(PngEncoder))]
@@ -32,6 +39,6 @@ public class EncoderProviderTests : FixtureWithTestObjects
         string path = "/image/path";
         mockImageProxy.Setup(imageProxy => imageProxy.GetImageMimeType(path)).Returns(format);
 
-        Assert.That(new EncoderProvider().GetEncoder(path), Is.AssignableFrom(encoder));
+        Assert.That(encoderProvider.GetEncoder(path), Is.AssignableFrom(encoder));
     }
 }

@@ -46,8 +46,6 @@ internal sealed class CleanCoverImagesCommand : Command<CleanArguments>
 {
     public override void Execute(CleanArguments args)
     {
-        Injector.LoggerFor<CleanCoverImagesCommand>().Trace("Cleaning image LSBs");
-
         Console.WriteLine("Cleaning data from the following images:");
         foreach (string path in args.CoverImages)
         {
@@ -55,8 +53,9 @@ internal sealed class CleanCoverImagesCommand : Command<CleanArguments>
         }
 
         IInputArguments arguments = args.ToCommonArguments();
-        var tracker = ProgressTracker.CreateAndDisplay(args.CoverImages.Length, "Cleaning image LSB data", "Finished cleaning all images.");
-        var store = new ImageStore(arguments);
+        var tracker = ServiceContainer.CreateProgressTracker(args.CoverImages.Length, "Cleaning image LSB data", "Finished cleaning all images.")
+            .Display();
+        var store = ServiceContainer.CreateImageStore(arguments);
         store.OnNextImageLoaded += (object? sender, NextImageLoadedEventArgs eventArg) =>
         {
             tracker.UpdateAndDisplayProgress();

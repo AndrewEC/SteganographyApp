@@ -4,11 +4,10 @@ using System.Collections.Generic;
 
 using NUnit.Framework;
 
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 
 [TestFixture]
-public class ProgressTrackerTests : FixtureWithTestObjects
+public class ProgressTrackerTests
 {
     private const int DesiredWriteCount = 10;
     private const int DesiredWriteLineCount = 1;
@@ -23,8 +22,7 @@ public class ProgressTrackerTests : FixtureWithTestObjects
     public void BeforeEach()
     {
         mockWriter = new MockWriter();
-        Injector.UseInstance<IConsoleWriter>(mockWriter);
-        tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage);
+        tracker = new ProgressTracker(DesiredWriteCount, Message, CompleteMessage, mockWriter);
     }
 
     [Test]

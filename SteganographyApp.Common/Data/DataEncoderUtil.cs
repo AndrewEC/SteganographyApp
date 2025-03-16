@@ -2,7 +2,6 @@
 
 using System;
 
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
 
 #pragma warning disable SA1402
@@ -23,10 +22,34 @@ public interface IDataEncoderUtil
 /// Utility class to encode a file to encrypted binary data or decode the encrypted binary string to the
 /// original file bytes.
 /// </summary>
-[Injectable(typeof(IDataEncoderUtil))]
 public sealed class DataEncoderUtil : IDataEncoderUtil
 {
     private readonly ILogger log = new LazyLogger<DataEncoderUtil>();
+
+    private readonly IKeyUtil keyUtil;
+    private readonly IEncryptionUtil encryptionUtil;
+    private readonly IDummyUtil dummyUtil;
+    private readonly IRandomizeUtil randomizeUtil;
+    private readonly ICompressionUtil compressionUtil;
+    private readonly IBinaryUtil binaryUtil;
+
+#pragma warning disable CS1591, SA1600
+    public DataEncoderUtil(
+        IKeyUtil keyUtil,
+        IEncryptionUtil encryptionUtil,
+        IDummyUtil dummyUtil,
+        IRandomizeUtil randomizeUtil,
+        ICompressionUtil compressionUtil,
+        IBinaryUtil binaryUtil)
+    {
+        this.keyUtil = keyUtil;
+        this.encryptionUtil = encryptionUtil;
+        this.dummyUtil = dummyUtil;
+        this.randomizeUtil = randomizeUtil;
+        this.compressionUtil = compressionUtil;
+        this.binaryUtil = binaryUtil;
+    }
+#pragma warning restore CS1591, SA1600
 
     /// <include file='../docs.xml' path='docs/members[@name="DataEncoderUtil"]/Encode/*' />
     public string Encode(
@@ -41,7 +64,7 @@ public sealed class DataEncoderUtil : IDataEncoderUtil
 
         if (randomSeed != string.Empty)
         {
-            byte[] randomKey = Injector.Provide<IKeyUtil>().GenerateKey(randomSeed, additionalHashIterations);
+            byte[] randomKey = keyUtil.GenerateKey(randomSeed, additionalHashIterations);
             randomSeed = Convert.ToBase64String(randomKey);
         }
 
@@ -49,7 +72,7 @@ public sealed class DataEncoderUtil : IDataEncoderUtil
         {
             try
             {
-                bytes = Injector.Provide<IEncryptionUtil>().Encrypt(bytes, password, additionalHashIterations);
+                bytes = encryptionUtil.Encrypt(bytes, password, additionalHashIterations);
             }
             catch (Exception e)
             {
@@ -61,23 +84,23 @@ public sealed class DataEncoderUtil : IDataEncoderUtil
 
         if (dummyCount > 0 && randomSeed != string.Empty)
         {
-            bytes = Injector.Provide<IDummyUtil>().InsertDummies(dummyCount, bytes, randomSeed);
+            bytes = dummyUtil.InsertDummies(dummyCount, bytes, randomSeed);
             log.Trace("After inserting dummies: [{0}]", () => [Convert.ToBase64String(bytes)]);
         }
 
         if (randomSeed != string.Empty)
         {
-            bytes = Injector.Provide<IRandomizeUtil>().Randomize(bytes, randomSeed);
+            bytes = randomizeUtil.Randomize(bytes, randomSeed);
             log.Trace("After randomizing: [{0}]", () => [Convert.ToBase64String(bytes)]);
         }
 
         if (useCompression)
         {
-            bytes = Injector.Provide<ICompressionUtil>().Compress(bytes);
+            bytes = compressionUtil.Compress(bytes);
             log.Trace("After compression: [{0}]", () => [Convert.ToBase64String(bytes)]);
         }
 
-        return Injector.Provide<IBinaryUtil>().ToBinaryString(bytes);
+        return binaryUtil.ToBinaryString(bytes);
     }
 
     /// <include file='../docs.xml' path='docs/members[@name="DataEncoderUtil"]/Decode/*' />
@@ -89,14 +112,14 @@ public sealed class DataEncoderUtil : IDataEncoderUtil
         string randomSeed,
         int additionalHashIterations)
     {
-        byte[] bytes = Injector.Provide<IBinaryUtil>().ToBytes(binary);
+        byte[] bytes = binaryUtil.ToBytes(binary);
 
         log.Trace("Original binary: [{0}]", binary);
         log.Trace("Before decoding: [{0}]", () => [Convert.ToBase64String(bytes)]);
 
         if (randomSeed != string.Empty)
         {
-            byte[] randomKey = Injector.Provide<IKeyUtil>().GenerateKey(randomSeed, additionalHashIterations);
+            byte[] randomKey = keyUtil.GenerateKey(randomSeed, additionalHashIterations);
             randomSeed = Convert.ToBase64String(randomKey);
         }
 
@@ -104,7 +127,7 @@ public sealed class DataEncoderUtil : IDataEncoderUtil
         {
             try
             {
-                bytes = Injector.Provide<ICompressionUtil>().Decompress(bytes);
+                bytes = compressionUtil.Decompress(bytes);
                 log.Trace("After decompressing: [{0}]", () => [Convert.ToBase64String(bytes)]);
             }
             catch (Exception e)
@@ -115,13 +138,13 @@ public sealed class DataEncoderUtil : IDataEncoderUtil
 
         if (randomSeed != string.Empty)
         {
-            bytes = Injector.Provide<IRandomizeUtil>().Reorder(bytes, randomSeed);
+            bytes = randomizeUtil.Reorder(bytes, randomSeed);
             log.Trace("After reordering: [{0}]", () => [Convert.ToBase64String(bytes)]);
         }
 
         if (dummyCount > 0 && randomSeed != string.Empty)
         {
-            bytes = Injector.Provide<IDummyUtil>().RemoveDummies(dummyCount, bytes, randomSeed);
+            bytes = dummyUtil.RemoveDummies(dummyCount, bytes, randomSeed);
             log.Trace("After removing dummies: [{0}]", () => [Convert.ToBase64String(bytes)]);
         }
 
@@ -129,7 +152,7 @@ public sealed class DataEncoderUtil : IDataEncoderUtil
         {
             try
             {
-                bytes = Injector.Provide<IEncryptionUtil>().Decrypt(bytes, password, additionalHashIterations);
+                bytes = encryptionUtil.Decrypt(bytes, password, additionalHashIterations);
                 log.Trace("After decrypting: [{0}]", () => [Convert.ToBase64String(bytes)]);
             }
             catch (Exception e)

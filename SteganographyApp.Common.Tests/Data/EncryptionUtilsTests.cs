@@ -7,7 +7,7 @@ using NUnit.Framework;
 using SteganographyApp.Common.Data;
 
 [TestFixture]
-public class EncryptionUtilTests : FixtureWithTestObjects
+public class EncryptionUtilTests
 {
     private const string InputString = "Testing123!@#";
     private const string Password = "Pass1";
@@ -18,7 +18,7 @@ public class EncryptionUtilTests : FixtureWithTestObjects
     [Test]
     public void TestEncryptAndDecrypt()
     {
-        var util = new EncryptionUtil();
+        var util = new EncryptionUtil(new KeyUtil());
 
         byte[] encrypted = util.Encrypt(inputStringBytes, Password, AdditionalHashIterations);
         Assert.That(encrypted, Is.Not.EqualTo(inputStringBytes));

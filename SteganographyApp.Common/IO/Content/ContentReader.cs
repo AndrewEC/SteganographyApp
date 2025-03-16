@@ -1,18 +1,23 @@
 ﻿namespace SteganographyApp.Common.IO.Content;
 
 using System;
-
 using SteganographyApp.Common.Data;
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
 /// Stream encapsulation class that reads and encodes data
 /// from the input file.
 /// </summary>
-/// <param name="args">The values parsed from the command line values.</param>
-public sealed class ContentReader(IInputArguments args) : AbstractContentIO(args)
+public sealed class ContentReader : AbstractContentIO
 {
+#pragma warning disable CS1591, SA1600
+    public ContentReader(
+        IInputArguments args,
+        IDataEncoderUtil dataEncoderUtil,
+        IFileIOProxy fileIOProxy)
+    : base(args, dataEncoderUtil, fileIOProxy) { }
+#pragma warning restore CS1591, SA1600
+
     /// <summary>
     /// Reads in the next unread chunk of data from the input file, encodes it,
     /// and returns the encoded value.
@@ -35,8 +40,13 @@ public sealed class ContentReader(IInputArguments args) : AbstractContentIO(args
             buffer = actual;
         }
 
-        return Injector.Provide<IDataEncoderUtil>()
-            .Encode(buffer, Arguments.Password, Arguments.UseCompression, Arguments.DummyCount, Arguments.RandomSeed, Arguments.AdditionalPasswordHashIterations);
+        return DataEncoderUtil.Encode(
+            buffer,
+            Arguments.Password,
+            Arguments.UseCompression,
+            Arguments.DummyCount,
+            Arguments.RandomSeed,
+            Arguments.AdditionalPasswordHashIterations);
     });
 
     /// <summary>
@@ -44,5 +54,5 @@ public sealed class ContentReader(IInputArguments args) : AbstractContentIO(args
     /// </summary>
     /// <returns>A stream instance configured for reading from the FileToEncode.</returns>
     protected override IReadWriteStream InitializeStream()
-        => Injector.Provide<IFileIOProxy>().OpenFileForRead(Arguments.FileToEncode);
+        => FileIOProxy.OpenFileForRead(Arguments.FileToEncode);
 }

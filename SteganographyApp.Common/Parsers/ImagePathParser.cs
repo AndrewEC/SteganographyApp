@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 
 using Microsoft.Extensions.FileSystemGlobbing;
-
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 
@@ -61,7 +60,7 @@ public static class ImagePathParser
 
     private static void VerifyAllImagesExist(ImmutableArray<string> imagePaths)
     {
-        var fileProxy = Injector.Provide<IFileIOProxy>();
+        var fileProxy = ServiceContainer.GetService<IFileIOProxy>();
 
         string? missingImagePath = imagePaths.Where(path => !fileProxy.IsExistingFile(path))
             .FirstOrDefault();

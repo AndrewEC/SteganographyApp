@@ -11,6 +11,7 @@ using SixLabors.ImageSharp;
 using SteganographyApp.Common;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Arguments.Commands;
+using SteganographyApp.Common.Injection;
 
 [ProgramDescriptor("Calculate the amount of storage space a set of cover images will provide.")]
 internal sealed class CalculateStorageSpaceArguments : IArgumentConverter
@@ -61,7 +62,9 @@ internal sealed class CalculateStorageSpaceCommand : Command<CalculateStorageSpa
 
     private static BigInteger CalculateNumberOfPixelsForImages(ImmutableArray<string> coverImages, IInputArguments arguments)
     {
-        var progressTracker = ProgressTracker.CreateAndDisplay(coverImages.Length, "Calculating image storage space", "Completed calculating image storage space.");
+        ICalculator calculator = ServiceContainer.GetService<ICalculator>();
+        var progressTracker = ServiceContainer.CreateProgressTracker(coverImages.Length, "Calculating image storage space", "Completed calculating image storage space.")
+            .Display();
         var count = new BigInteger(0);
         foreach (string imagePath in coverImages)
         {
@@ -69,7 +72,7 @@ internal sealed class CalculateStorageSpaceCommand : Command<CalculateStorageSpa
             {
                 using (var image = Image.Load(imagePath))
                 {
-                    count += Calculator.CalculateStorageSpaceOfImage(image.Width, image.Height, arguments.BitsToUse);
+                    count += calculator.CalculateStorageSpaceOfImage(image.Width, image.Height, arguments.BitsToUse);
                 }
             }
             catch (Exception e)

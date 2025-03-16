@@ -87,7 +87,8 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
     {
         var arguments = args.ToCommonArguments();
         Console.WriteLine($"Identified [{args.CoverImages.Length}] images to verify.");
-        var tracker = ProgressTracker.CreateAndDisplay(arguments.CoverImages.Length, "Verifying image.", "Finished verifying all images.");
+        var tracker = ServiceContainer.CreateProgressTracker(arguments.CoverImages.Length, "Verifying image.", "Finished verifying all images.")
+            .Display();
         var failedValidation = new List<string>();
         foreach (string path in args.CoverImages)
         {
@@ -140,9 +141,11 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
 
     private string GenerateBinaryString(string path)
     {
-        using (var image = Injector.Provide<IImageProxy>().LoadImage(path))
+
+        using (var image = ServiceContainer.GetService<IImageProxy>().LoadImage(path))
         {
-            long bitCount = Calculator.CalculateStorageSpaceOfImage(image.Width, image.Height, 1) / 2;
+            long bitCount = ServiceContainer.GetService<ICalculator>()
+                .CalculateStorageSpaceOfImage(image.Width, image.Height, 1) / 2;
             logger.Trace("Generating binary string with a length of: [{0}]", bitCount);
 
             var random = new Random();
@@ -157,7 +160,7 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
 
     private void WriteToImage(string binaryData, IInputArguments arguments)
     {
-        using (var stream = new ImageStore(arguments).OpenStream(StreamMode.Write))
+        using (var stream = ServiceContainer.CreateImageStore(arguments).OpenStream(StreamMode.Write))
         {
             stream.WriteContentChunkToImage(binaryData);
         }
@@ -165,7 +168,7 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
 
     private string ReadFromImage(string expectedData, IInputArguments arguments)
     {
-        using (var stream = new ImageStore(arguments).OpenStream(StreamMode.Read))
+        using (var stream = ServiceContainer.CreateImageStore(arguments).OpenStream(StreamMode.Read))
         {
             return stream.ReadContentChunkFromImage(expectedData.Length);
         }

@@ -1,5 +1,6 @@
 ﻿namespace SteganographyApp.Common.IO.Content;
 
+using SteganographyApp.Common.Data;
 using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
@@ -8,15 +9,18 @@ using SteganographyApp.Common.Injection.Proxies;
 /// </summary>
 public abstract class AbstractContentIO : AbstractDisposable
 {
-    /// <summary>
-    /// Initialize the abstract content IO instance with the user provided input arguments.
-    /// </summary>
-    /// <param name="arguments">The user provided input arguments.</param>
-    public AbstractContentIO(IInputArguments arguments)
+#pragma warning disable CS1591, SA1600
+    public AbstractContentIO(
+        IInputArguments arguments,
+        IDataEncoderUtil dataEncoderUtil,
+        IFileIOProxy fileIOProxy)
     {
         Arguments = arguments;
+        DataEncoderUtil = dataEncoderUtil;
+        FileIOProxy = fileIOProxy;
         Stream = InitializeStream();
     }
+#pragma warning restore CS1591, SA1600
 
     /// <summary>
     /// Gets the values parsed from the command line arguments.
@@ -28,6 +32,16 @@ public abstract class AbstractContentIO : AbstractDisposable
     /// or write data to a specified file.
     /// </summary>
     protected IReadWriteStream Stream { get; private set; }
+
+    /// <summary>
+    /// Gets the data encoder util to encode/decode the file contents.
+    /// </summary>
+    protected IDataEncoderUtil DataEncoderUtil { get; private set; }
+
+    /// <summary>
+    /// Gets the file proxy used to open the read or write file stream.
+    /// </summary>
+    protected IFileIOProxy FileIOProxy { get; private set; }
 
     /// <summary>
     /// Disposes of the currently open stream.

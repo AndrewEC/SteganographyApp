@@ -4,6 +4,7 @@ using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using SteganographyApp.Common.Data;
+using SteganographyApp.Common.Injection;
 
 [SimpleJob(RunStrategy.Monitoring, launchCount: 3, warmupCount: 3)]
 [MeanColumn, MinColumn, MaxColumn]
@@ -23,37 +24,43 @@ public class EncodeBench
     [Benchmark]
     public string Encode()
     {
-        return new DataEncoderUtil().Encode(data, "", false, 0, "", 0);
+        return ServiceContainer.GetService<IDataEncoderUtil>()
+            .Encode(data, "", false, 0, "", 0);
     }
 
     [Benchmark]
     public string EncodeWithPassword()
     {
-        return new DataEncoderUtil().Encode(data, "Password123!@#", false, 0, "", AdditionalHashIterations);
+        return ServiceContainer.GetService<IDataEncoderUtil>()
+            .Encode(data, "Password123!@#", false, 0, "", AdditionalHashIterations);
     }
 
     [Benchmark]
     public string EncodeWithCompression()
     {
-        return new DataEncoderUtil().Encode(data, "", true, 0, "", 0);
+        return ServiceContainer.GetService<IDataEncoderUtil>()
+            .Encode(data, "", true, 0, "", 0);
     }
 
     [Benchmark]
     public string EncodeWithDummies()
     {
-        return new DataEncoderUtil().Encode(data, "", false, 375, "", 0);
+        return ServiceContainer.GetService<IDataEncoderUtil>()
+            .Encode(data, "", false, 375, "", 0);
     }
 
     [Benchmark]
     public string EncodeWithRandomization()
     {
-        return new DataEncoderUtil().Encode(data, "", false, 0, "12345", 0);
+        return ServiceContainer.GetService<IDataEncoderUtil>()
+            .Encode(data, "", false, 0, "12345", 0);
     }
 
     [Benchmark]
     public string EncodeWithPasswordAndCompressionAndDummiesAndRandomization()
     {
-        return new DataEncoderUtil().Encode(data, "Password123!@#", true, 375, "randomSeed", AdditionalHashIterations);
+        return ServiceContainer.GetService<IDataEncoderUtil>()
+            .Encode(data, "Password123!@#", true, 375, "randomSeed", AdditionalHashIterations);
     }
 
 }

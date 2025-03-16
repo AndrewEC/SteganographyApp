@@ -10,26 +10,8 @@ using NUnit.Framework;
 using SteganographyApp.Common.Data;
 
 [TestFixture]
-public class DataEncoderUtilTests : FixtureWithTestObjects
+public class DataEncoderUtilTests
 {
-    [Mockup(typeof(IKeyUtil))]
-    public Mock<IKeyUtil> MockKeyUtil = new();
-
-    [Mockup(typeof(IEncryptionUtil))]
-    public Mock<IEncryptionUtil> MockEncryptionProxy = new();
-
-    [Mockup(typeof(IBinaryUtil))]
-    public Mock<IBinaryUtil> MockBinaryUtil = new();
-
-    [Mockup(typeof(IDummyUtil))]
-    public Mock<IDummyUtil> MockDummyUtil = new();
-
-    [Mockup(typeof(IRandomizeUtil))]
-    public Mock<IRandomizeUtil> MockRandomUtil = new();
-
-    [Mockup(typeof(ICompressionUtil))]
-    public Mock<ICompressionUtil> MockCompressionUtil = new();
-
     private const string Password = "password";
     private const bool UseCompression = true;
     private const int DummyCount = 10;
@@ -38,31 +20,50 @@ public class DataEncoderUtilTests : FixtureWithTestObjects
     private const int AdditionalHashIterations = 20;
     private static readonly byte[] InputBytes = new byte[1];
 
+    private readonly Mock<IKeyUtil> mockKeyUtil = new(MockBehavior.Strict);
+    private readonly Mock<IEncryptionUtil> mockEncryptionProxy = new(MockBehavior.Strict);
+    private readonly Mock<IBinaryUtil> mockBinaryUtil = new(MockBehavior.Strict);
+    private readonly Mock<IDummyUtil> mockDummyUtil = new(MockBehavior.Strict);
+    private readonly Mock<IRandomizeUtil> mockRandomUtil = new(MockBehavior.Strict);
+    private readonly Mock<ICompressionUtil> mockCompressionUtil = new(MockBehavior.Strict);
+
+    private DataEncoderUtil dataEncoderUtil;
+
+    [SetUp]
+    public void SetUp()
+    {
+        dataEncoderUtil = new(
+            mockKeyUtil.Object,
+            mockEncryptionProxy.Object,
+            mockDummyUtil.Object,
+            mockRandomUtil.Object,
+            mockCompressionUtil.Object,
+            mockBinaryUtil.Object);
+    }
+
     [Test]
     public void TestEncode()
     {
         byte[] randomKey = Encoding.UTF8.GetBytes("random_key");
-        MockKeyUtil.Setup(keyUtil => keyUtil.GenerateKey(RandomSeed, AdditionalHashIterations)).Returns(randomKey);
+        mockKeyUtil.Setup(keyUtil => keyUtil.GenerateKey(RandomSeed, AdditionalHashIterations)).Returns(randomKey);
         string randomKeyString = Convert.ToBase64String(randomKey);
 
         byte[] encryptedBytes = [1];
-        MockEncryptionProxy.Setup(encryptionProxy => encryptionProxy.Encrypt(InputBytes, Password, AdditionalHashIterations)).Returns(encryptedBytes);
+        mockEncryptionProxy.Setup(encryptionProxy => encryptionProxy.Encrypt(InputBytes, Password, AdditionalHashIterations)).Returns(encryptedBytes);
 
         byte[] dummyBytes = [2];
-        MockDummyUtil.Setup(dummyUtil => dummyUtil.InsertDummies(DummyCount, encryptedBytes, randomKeyString)).Returns(dummyBytes);
+        mockDummyUtil.Setup(dummyUtil => dummyUtil.InsertDummies(DummyCount, encryptedBytes, randomKeyString)).Returns(dummyBytes);
 
         byte[] randomizedBytes = [3];
-        MockRandomUtil.Setup(randomUtil => randomUtil.Randomize(dummyBytes, randomKeyString)).Returns(randomizedBytes);
+        mockRandomUtil.Setup(randomUtil => randomUtil.Randomize(dummyBytes, randomKeyString)).Returns(randomizedBytes);
 
         byte[] compressedBytes = [4];
-        MockCompressionUtil.Setup(compressionUtil => compressionUtil.Compress(randomizedBytes)).Returns(compressedBytes);
+        mockCompressionUtil.Setup(compressionUtil => compressionUtil.Compress(randomizedBytes)).Returns(compressedBytes);
 
         string binaryString = "binary_string";
-        MockBinaryUtil.Setup(binaryUtil => binaryUtil.ToBinaryString(compressedBytes)).Returns(binaryString);
+        mockBinaryUtil.Setup(binaryUtil => binaryUtil.ToBinaryString(compressedBytes)).Returns(binaryString);
 
-        var util = new DataEncoderUtil();
-
-        string result = util.Encode(InputBytes, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations);
+        string result = dataEncoderUtil.Encode(InputBytes, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations);
 
         Assert.That(result, Is.EqualTo(binaryString));
     }
@@ -71,27 +72,25 @@ public class DataEncoderUtilTests : FixtureWithTestObjects
     public void TestDecode()
     {
         byte[] stringToDecodeBytes = [11];
-        MockBinaryUtil.Setup(binaryUtil => binaryUtil.ToBytes(StringToDecode)).Returns(stringToDecodeBytes);
+        mockBinaryUtil.Setup(binaryUtil => binaryUtil.ToBytes(StringToDecode)).Returns(stringToDecodeBytes);
 
         byte[] randomKey = Encoding.UTF8.GetBytes("random_key");
-        MockKeyUtil.Setup(keyUtil => keyUtil.GenerateKey(RandomSeed, AdditionalHashIterations)).Returns(randomKey);
+        mockKeyUtil.Setup(keyUtil => keyUtil.GenerateKey(RandomSeed, AdditionalHashIterations)).Returns(randomKey);
         string randomKeyString = Convert.ToBase64String(randomKey);
 
         byte[] decompressBytes = [1];
-        MockCompressionUtil.Setup(compressionUtil => compressionUtil.Decompress(stringToDecodeBytes)).Returns(decompressBytes);
+        mockCompressionUtil.Setup(compressionUtil => compressionUtil.Decompress(stringToDecodeBytes)).Returns(decompressBytes);
 
         byte[] orderedBytes = [2];
-        MockRandomUtil.Setup(randomUtil => randomUtil.Reorder(decompressBytes, randomKeyString)).Returns(orderedBytes);
+        mockRandomUtil.Setup(randomUtil => randomUtil.Reorder(decompressBytes, randomKeyString)).Returns(orderedBytes);
 
         byte[] undummiedBytes = [3];
-        MockDummyUtil.Setup(dummyUtil => dummyUtil.RemoveDummies(DummyCount, orderedBytes, randomKeyString)).Returns(undummiedBytes);
+        mockDummyUtil.Setup(dummyUtil => dummyUtil.RemoveDummies(DummyCount, orderedBytes, randomKeyString)).Returns(undummiedBytes);
 
         byte[] decryptedBytes = [4];
-        MockEncryptionProxy.Setup(encryption => encryption.Decrypt(undummiedBytes, Password, AdditionalHashIterations)).Returns(decryptedBytes);
+        mockEncryptionProxy.Setup(encryption => encryption.Decrypt(undummiedBytes, Password, AdditionalHashIterations)).Returns(decryptedBytes);
 
-        var util = new DataEncoderUtil();
-
-        byte[] result = util.Decode(StringToDecode, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations);
+        byte[] result = dataEncoderUtil.Decode(StringToDecode, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations);
 
         Assert.That(result, Is.EqualTo(decryptedBytes));
     }

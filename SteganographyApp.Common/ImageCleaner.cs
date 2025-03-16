@@ -4,6 +4,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.IO.Content;
@@ -100,7 +101,8 @@ public sealed class ImageCleaner(IInputArguments arguments, IImageStore imageSto
     private string GenerateBinaryString(IBasicImageInfo image)
     {
         int modifier = ComputeModifier(image);
-        long bitCount = Calculator.CalculateStorageSpaceOfImage(image.Width, image.Height, arguments.BitsToUse) + modifier;
+        long bitCount = ServiceContainer.GetService<ICalculator>()
+            .CalculateStorageSpaceOfImage(image.Width, image.Height, arguments.BitsToUse) + modifier;
 
         log.Debug("Generating binary string with a length of [{0}] for image [{1}]", bitCount, image.Path);
 

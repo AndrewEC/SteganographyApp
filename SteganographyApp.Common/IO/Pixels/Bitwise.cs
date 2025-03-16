@@ -11,7 +11,8 @@ internal static class Bitwise
     /// <param name="value">The input byte whose least significant bit will be swapped with the input bit.</param>
     /// <param name="lastBit">The character specifiying a bit like value, 0 or 1, to swap in.</param>
     /// <returns>The newly formed byte.</returns>
-    internal static byte SwapLeastSigificantBit(byte value, char lastBit) => Shift(value, 1, lastBit);
+    internal static byte SwapLeastSigificantBit(byte value, char lastBit)
+        => Swap(value, 1, lastBit);
 
     /// <summary>
     /// Swaps the second least significant bit in the input value byte with the input binary character.
@@ -19,9 +20,10 @@ internal static class Bitwise
     /// <param name="value">The input byte whose second least significant bit will be swapped with the input bit.</param>
     /// <param name="lastBit">The character specifying a bit like value, 0 or 1, to swap in.</param>
     /// <returns>The newly formed byte.</returns>
-    internal static byte SwapSecondLeastSignificantBit(byte value, char lastBit) => Shift(value, 2, lastBit);
+    internal static byte SwapSecondLeastSignificantBit(byte value, char lastBit)
+        => Swap(value, 2, lastBit);
 
-    private static byte Shift(byte value, byte shift, char lastBit) => (lastBit == '0')
+    private static byte Swap(byte value, byte shift, char lastBit) => (lastBit == '0')
         ? (byte)(value & ~shift)
         : (byte)(value | shift);
 }

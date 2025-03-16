@@ -16,20 +16,26 @@ using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.IO;
 
 [TestFixture]
-public class ImageStoreTests : FixtureWithTestObjects
+public class ImageStoreTests
 {
-    [Mockup(typeof(IImageProxy))]
-    public Mock<IImageProxy> mockImageProxy = new();
-
-    [Mockup(typeof(IEncoderProvider))]
-    public Mock<IEncoderProvider> mockEncoderProvider = new();
-
     private const int BinaryStringLength = 100_000;
     private const string ImagePath = "./test001.png";
+
     private static readonly IInputArguments Arguments = new CommonArguments
     {
         CoverImages = ImmutableArray.Create(new string[] { ImagePath }),
     };
+
+    private readonly Mock<IImageProxy> mockImageProxy = new(MockBehavior.Strict);
+    private readonly Mock<IEncoderProvider> mockEncoderProvider = new(MockBehavior.Strict);
+
+    private ImageStore imageStore;
+
+    [SetUp]
+    public void SetUp()
+    {
+        imageStore = new(Arguments, mockEncoderProvider.Object, mockImageProxy.Object);
+    }
 
     [Test]
     public void TestOpenMultipleStreamsThrowsException()
@@ -37,7 +43,6 @@ public class ImageStoreTests : FixtureWithTestObjects
         var mockImage = GenerateMockImage(100, 100);
         mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
 
-        var imageStore = new ImageStore(Arguments);
         imageStore.OpenStream(StreamMode.Read);
         Assert.Throws<ImageStoreException>(() => imageStore.OpenStream(StreamMode.Read));
     }
@@ -52,7 +57,7 @@ public class ImageStoreTests : FixtureWithTestObjects
 
         string binaryString = GenerateBinaryString(BinaryStringLength);
 
-        using (var stream = new ImageStore(Arguments).OpenStream(StreamMode.Write))
+        using (var stream = imageStore.OpenStream(StreamMode.Write))
         {
             var exception = Assert.Throws<ImageStoreException>(() => stream.WriteContentChunkToImage(binaryString));
             Assert.That(
@@ -70,7 +75,7 @@ public class ImageStoreTests : FixtureWithTestObjects
         var mockImage = GenerateMockImage(1, 1);
         mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
 
-        using (var stream = new ImageStore(Arguments).OpenStream(StreamMode.Read))
+        using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
             var exception = Assert.Throws<ImageStoreException>(() => stream.ReadContentChunkFromImage(1000));
             Assert.That(
@@ -87,8 +92,7 @@ public class ImageStoreTests : FixtureWithTestObjects
         var mockImage = GenerateMockImage(100, 100);
         mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
 
-        var store = new ImageStore(Arguments);
-        using (var stream = store.OpenStream(StreamMode.Read))
+        using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
             stream.SeekToImage(0);
             Assert.Throws<ImageStoreException>(() => stream.SeekToImage(2));
@@ -102,7 +106,7 @@ public class ImageStoreTests : FixtureWithTestObjects
         var mockImage = GenerateMockImage(1, 1);
         mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
 
-        using (var stream = new ImageStore(Arguments).OpenStream(StreamMode.Read))
+        using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
             Assert.Throws<ImageStoreException>(() => stream.SeekToPixel(100_000));
         }
@@ -131,6 +135,7 @@ public class ImageStoreTests : FixtureWithTestObjects
             string nextBit = ((int)Math.Round(random.NextDouble())).ToString();
             builder.Append(nextBit);
         }
+
         return builder.ToString();
     }
 }

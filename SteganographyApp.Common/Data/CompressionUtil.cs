@@ -3,7 +3,6 @@ namespace SteganographyApp.Common.Data;
 using System.IO;
 using System.IO.Compression;
 
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
@@ -21,7 +20,6 @@ public interface ICompressionUtil
 /// <summary>
 /// Utility class for compressing and decrompressing content using GZip compression.
 /// </summary>
-[Injectable(typeof(ICompressionUtil))]
 public sealed class CompressionUtil : ICompressionUtil
 {
     private readonly ILogger log = new LazyLogger<CompressionUtil>();

@@ -27,7 +27,6 @@ public interface IFileIOProxy
 /// Concrete implementation of the file IO proxy. Used to proxy calls to static IO based methods
 /// so that such calls can be better mocked in unit tests.
 /// </summary>
-[Injectable(typeof(IFileIOProxy))]
 public class FileIOProxy : IFileIOProxy
 {
     /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/GetFileSizeBytes/*' />

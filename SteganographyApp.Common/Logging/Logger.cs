@@ -55,7 +55,7 @@ public sealed class LazyLogger<T> : ILogger
     /// <include file='../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
     public void Error(string message, Func<object[]> provider) => GetInstance().Error(message, provider);
 
-    private ILogger GetInstance() => instance ??= Injector.LoggerFor<T>();
+    private ILogger GetInstance() => instance ??= ServiceContainer.GetLogger<T>();
 }
 
 /// <summary>

@@ -1,7 +1,6 @@
 namespace SteganographyApp.Common.Data;
 
 using System;
-using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
@@ -20,7 +19,6 @@ public interface IRandomizeUtil
 /// The injectable utility class to randomize and re-order a binary string during the encode
 /// and decode process.
 /// </summary>
-[Injectable(typeof(IRandomizeUtil))]
 public sealed class RandomizeUtil : IRandomizeUtil
 {
     private const int IterationMultiplier = 5;
