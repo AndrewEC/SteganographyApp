@@ -11,10 +11,18 @@ using SixLabors.ImageSharp.PixelFormats;
 /// </summary>
 public interface IImageProxy
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/LoadImage/*' />
+    /// <summary>
+    /// Invokes the Image.Load from the image sharp API to load an image from the provided path.
+    /// </summary>
+    /// <param name="pathToImage">The absolute or relative path to the image to load.</param>
+    /// <returns>A new IBasicImageInfo instance loaded from the specified path.</returns>
     IBasicImageInfo LoadImage(string pathToImage);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/GetImageMimeType/*' />
+    /// <summary>
+    /// Retrieves the format of the image located at the provided path.
+    /// </summary>
+    /// <param name="pathToImage">The absolute or relative path to the image.</param>
+    /// <returns>The format of the image located at the input path.</returns>
     string GetImageMimeType(string pathToImage);
 }
 
@@ -24,9 +32,9 @@ public interface IImageProxy
 /// </summary>
 public class ImageProxy : IImageProxy
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/LoadImage/*' />
+    /// <inheritdoc/>
     public IBasicImageInfo LoadImage(string pathToImage) => new BasicImageInfo(pathToImage, Image.Load<Rgba32>(pathToImage));
 
-    /// <include file='../../docs.xml' path='docs/members[@name="ImageProxy"]/GetImageMimeType/*' />
+    /// <inheritdoc/>
     public string GetImageMimeType(string pathToImage) => Image.DetectFormat(pathToImage).DefaultMimeType;
 }

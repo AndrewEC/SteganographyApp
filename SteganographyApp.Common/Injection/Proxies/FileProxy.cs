@@ -7,19 +7,38 @@ using System.IO;
 /// </summary>
 public interface IFileIOProxy
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/GetFileSizeBytes/*' />
+    /// <summary>
+    /// Attempts to get the size of the file, specified by input path, in bytes.
+    /// </summary>
+    /// <param name="pathToFile">The absolute or relative path to the file.</param>
+    /// <returns>The size of the file in bytes.</returns>
     long GetFileSizeBytes(string pathToFile);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/IsExistingFile/*' />
+    /// <summary>
+    /// Checks if the file at the specified path exists and is a file and not a directory.
+    /// </summary>
+    /// <param name="pathToFile">The absolute or relative path to the file.</param>
+    /// <returns>True if the file exists, otherwise false.</returns>
     bool IsExistingFile(string pathToFile);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/OpenFileForRead/*' />
+    /// <summary>
+    /// Opens an IO stream to read from a specified file.
+    /// </summary>
+    /// <param name="pathToFile">The path to the file to open the read stream to.</param>
+    /// <returns>A stream made to read from the specified file.</returns>
     IReadWriteStream OpenFileForRead(string pathToFile);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/OpenFileForWrite/*' />
+    /// <summary>
+    /// Opens an IO stream to the target destination for write.
+    /// </summary>
+    /// <param name="pathToFile">The path to the file to write to.</param>
+    /// <returns>A stream made to write to the specified destination.</returns>
     IReadWriteStream OpenFileForWrite(string pathToFile);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/Delete/*' />
+    /// <summary>
+    /// Deletes the specified file.
+    /// </summary>
+    /// <param name="pathToFile">The relative or absolute path to the file to delete.</param>
     void Delete(string pathToFile);
 }
 
@@ -29,18 +48,18 @@ public interface IFileIOProxy
 /// </summary>
 public class FileIOProxy : IFileIOProxy
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/GetFileSizeBytes/*' />
+    /// <inheritdoc/>
     public long GetFileSizeBytes(string pathToFile) => new FileInfo(pathToFile).Length;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/IsExistingFile/*' />
+    /// <inheritdoc/>
     public bool IsExistingFile(string pathToFile) => File.Exists(pathToFile) && !File.GetAttributes(pathToFile).HasFlag(FileAttributes.Directory);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/OpenFileForRead/*' />
+    /// <inheritdoc/>
     public IReadWriteStream OpenFileForRead(string pathToFile) => ReadWriteStream.CreateStreamForRead(pathToFile);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/OpenFileForWrite/*' />
+    /// <inheritdoc/>
     public IReadWriteStream OpenFileForWrite(string pathToFile) => ReadWriteStream.CreateStreamForWrite(pathToFile);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="FileIOProxy"]/Delete/*' />
+    /// <inheritdoc/>
     public void Delete(string pathToFile) => File.Delete(pathToFile);
 }

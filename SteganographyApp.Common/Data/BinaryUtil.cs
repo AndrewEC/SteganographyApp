@@ -9,16 +9,38 @@ using System.Text;
 /// </summary>
 public interface IBinaryUtil
 {
-    /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBinaryString/*' />
+    /// <summary>
+    /// Converts a byte array into a binary string representation. This will convert each byte into a padded 8 bit string
+    /// and concatenate all values into a single string.
+    /// </summary>
+    /// <param name="bytes">The array of bytes to be converted into a binary string.</param>
+    /// <returns>A binary representation of the input byte array.</returns>
     string ToBinaryString(byte[] bytes);
 
-    /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBinaryStringDirect/*' />
+    /// <summary>
+    /// Converts a byte array into a binary string representation. This expects each byte in the array to
+    /// have a decimal value of 0 or 1. Each by will thus be added to the binary string using their
+    /// direct decimal representation.
+    /// </summary>
+    /// <param name="bytes">The array of bytes to be converted into a binary string.</param>
+    /// <returns>A binary representation of the input byte array.</returns>
     string ToBinaryStringDirect(byte[] bytes);
 
-    /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBytes/*' />
+    /// <summary>
+    /// Converts a given binary string into an array of bytes. This break the binary string down and take 8 characters, 8 bits
+    /// at a time and convert that set of 8 bits to a byte value before aggregating the values in the byte array.
+    /// This method expecs the binary string to have a length equally divisible by 8.
+    /// </summary>
+    /// <param name="binary">The binary string to be converted to a byte array.</param>
+    /// <returns>A byte array representation of the original input binary string.</returns>
     byte[] ToBytes(string binary);
 
-    /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBytesDirect/*' />
+    /// <summary>
+    /// Converts a given binary string into an array of bytes. This will take each bit in the binary string and convert that bit
+    /// directly into a byte. This means the resulting byte array will only have values of 0 or 1.
+    /// </summary>
+    /// <param name="binary">The binary string to be converted to a byte array.</param>
+    /// <returns>A byte array representation of the roiginal input binary string.</returns>
     byte[] ToBytesDirect(string binary);
 }
 
@@ -29,7 +51,7 @@ public sealed class BinaryUtil : IBinaryUtil
 {
     private const int BitsPerByte = 8;
 
-    /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBinaryString/*' />
+    /// <inheritdoc/>
     public string ToBinaryString(byte[] bytes)
     {
         int numberOfBits = bytes.Length * BitsPerByte;
@@ -42,7 +64,7 @@ public sealed class BinaryUtil : IBinaryUtil
         return builder.ToString();
     }
 
-    /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBinaryStringDirect/*' />
+    /// <inheritdoc/>
     public string ToBinaryStringDirect(byte[] bytes)
     {
         var builder = new StringBuilder();
@@ -54,7 +76,7 @@ public sealed class BinaryUtil : IBinaryUtil
         return builder.ToString();
     }
 
-    /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBytes/*' />
+    /// <inheritdoc/>
     public byte[] ToBytes(string binary)
     {
         int byteCount = binary.Length / BitsPerByte;
@@ -67,7 +89,7 @@ public sealed class BinaryUtil : IBinaryUtil
         return binaryBytes;
     }
 
-    /// <include file='../docs.xml' path='docs/members[@name="BinaryUtil"]/ToBytesDirect/*' />
+    /// <inheritdoc/>
     public byte[] ToBytesDirect(string binary) => binary.Select(c => (byte)char.GetNumericValue(c)).ToArray();
 
     private static string To8BitBinaryString(byte input) => Convert.ToString(input, 2).PadLeft(BitsPerByte, '0');

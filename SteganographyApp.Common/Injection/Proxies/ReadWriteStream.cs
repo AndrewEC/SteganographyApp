@@ -9,13 +9,26 @@ using System.IO;
 /// </summary>
 public interface IReadWriteStream : IDisposable
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Read/*' />
+    /// <summary>
+    /// Reads a number of bytes from the current file stream.
+    /// </summary>
+    /// <param name="array">The array of bytes for values to be read into.</param>
+    /// <param name="offset">The byte offset to start reading from.</param>
+    /// <param name="count">The number of bytes to read from the file.</param>
+    /// <returns>The number of bytes read from the file stream.</returns>
     int Read(byte[] array, int offset, int count);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Write/*' />
+    /// <summary>
+    /// Writes a number of bytes to the current file stream.
+    /// </summary>
+    /// <param name="array">The array of bytes to write to the stream.</param>
+    /// <param name="offset">The byte offset to start writing from.</param>
+    /// <param name="count">The number of bytes to write to the file.</param>
     void Write(byte[] array, int offset, int count);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Flush/*' />
+    /// <summary>
+    /// Calls flush on the current file stream.
+    /// </summary>
     void Flush();
 }
 
@@ -48,15 +61,15 @@ public class ReadWriteStream : AbstractDisposable, IReadWriteStream
     public static ReadWriteStream CreateStreamForWrite(string pathToFile)
         => new(File.Open(pathToFile, FileMode.OpenOrCreate));
 
-    /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Read/*' />
+    /// <inheritdoc/>
     public int Read(byte[] array, int offset, int count)
         => RunIfNotDisposedWithResult(() => stream.Read(array, offset, count));
 
-    /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Write/*' />
+    /// <inheritdoc/>
     public void Write(byte[] array, int offset, int count)
         => RunIfNotDisposed(() => stream.Write(array, offset, count));
 
-    /// <include file='../../docs.xml' path='docs/members[@name="ReadWriteStream"]/Flush/*' />
+    /// <inheritdoc/>
     public void Flush() => RunIfNotDisposed(stream.Flush);
 
     /// <summary>

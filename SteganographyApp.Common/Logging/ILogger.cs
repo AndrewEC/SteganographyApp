@@ -7,21 +7,51 @@ using System;
 /// </summary>
 public interface ILogger
 {
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
+    /// <summary>
+    /// Logs a message to the log file with the level of Trace.
+    /// </summary>
+    /// <param name="message">The template string to log to file.</param>
+    /// <param name="arguments">The arguments to be spliced into the template message string.</param>
     void Trace(string message, params object[] arguments);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
+    /// <summary>
+    /// Logs a message to the log file with the level of Trace.
+    /// </summary>
+    /// <param name="message">The template string to log to file.</param>
+    /// <param name="provider">The producer function to provide the arguments to be spliced into the template message string.
+    /// This will only be invoked if it is determine that the message, at the current log level, should
+    /// be logged at all.</param>
     void Trace(string message, Func<object[]> provider);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
+    /// <summary>
+    /// Logs a message to the log file with the level of Debug.
+    /// </summary>
+    /// <param name="message">The template string to log to file.</param>
+    /// <param name="arguments">The arguments to be spliced into the template message string.</param>
     void Debug(string message, params object[] arguments);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
+    /// <summary>
+    /// Logs a message to the log file with the level of Debug.
+    /// </summary>
+    /// <param name="message">The template string to log to file.</param>
+    /// <param name="provider">The producer function to provide the arguments to be spliced into the template message string.
+    /// This will only be invoked if it is determine that the message, at the current log level, should
+    /// be logged at all.</param>
     void Debug(string message, Func<object[]> provider);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
+    /// <summary>
+    /// Logs a message to the log file with the level of Error.
+    /// </summary>
+    /// <param name="message">The template string to log to file.</param>
+    /// <param name="arguments">The arguments to be spliced into the template message string.</param>
     void Error(string message, params object[] arguments);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
+    /// <summary>
+    /// Logs a message to the log file with the level of Error.
+    /// </summary>
+    /// <param name="message">The template string to log to file.</param>
+    /// <param name="provider">The producer function to provide the arguments to be spliced into the template message string.
+    /// This will only be invoked if it is determine that the message, at the current log level, should
+    /// be logged at all.</param>
     void Error(string message, Func<object[]> provider);
 }

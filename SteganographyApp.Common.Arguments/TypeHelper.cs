@@ -1,9 +1,7 @@
 namespace SteganographyApp.Common.Arguments;
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Reflection;
 
 /// <summary>
@@ -69,7 +67,7 @@ public static class TypeHelper
     /// <param name="modelType">The to get all the fields and properties of.</param>
     /// <returns>An immutable array of all field and property members.</returns>
     public static ImmutableArray<MemberInfo> GetAllFieldsAndProperties(Type modelType)
-        => new List<MemberInfo>(modelType.GetFields()).Concat(modelType.GetProperties()).ToImmutableArray();
+        => [.. modelType.GetFields(), .. modelType.GetProperties()];
 
     /// <summary>
     /// Gets a bool indicating if the argument is required. I.e. the user must provide a cli

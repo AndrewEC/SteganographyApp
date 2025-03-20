@@ -29,7 +29,8 @@ internal static class ArgumentValueMatcher
         ImmutableArray<string> matchedArgumentNames = matchedArguments.Select(argument => argument.Attribute.Name)
             .ToImmutableArray();
 
-        ImmutableArray<string> missingRequired = registeredArguments.Where(registered => TypeHelper.IsArgumentRequired(registered.Attribute, registered.Member))
+        ImmutableArray<string> missingRequired = registeredArguments
+            .Where(registered => TypeHelper.IsArgumentRequired(registered.Attribute, registered.Member))
             .Select(registered => registered.Attribute.Name)
             .Where(name => !matchedArgumentNames.Contains(name))
             .ToImmutableArray();

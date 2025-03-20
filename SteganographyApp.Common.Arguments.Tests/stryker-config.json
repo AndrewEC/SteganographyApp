@@ -11,9 +11,9 @@
         "additional-timeout": 30000,
 
         "thresholds": {
-            "high": 30,
-            "low": 30,
-            "break": 30
+            "high": 35,
+            "low": 35,
+            "break": 35
         }
     }
 }

@@ -12,10 +12,25 @@ using SteganographyApp.Common.Logging;
 /// </summary>
 public interface IEncryptionUtil
 {
-    /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />
+    /// <summary>
+    /// Encrypts the provided base64 encoded string using the input password.
+    /// </summary>
+    /// <param name="value">The base64 encoded string to encrypt.</param>
+    /// <param name="password">The password to use in the AES cypher.</param>
+    /// <param name="additionalPasswordHashIterations">The additional number of times the password should be hashed before being encrypting or decrypting content.
+    /// Has no effect if no password has been provided.</param>
+    /// <returns>An encrypted base64 encoded string.</returns>
     byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations);
 
-    /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
+    /// <summary>
+    /// Decrypts the provided base64 encoded string using the input password.
+    /// </summary>
+    /// <param name="value">The base64 encoded string to decrypt.</param>
+    /// <param name="password">The password to use in the AES cypher.</param>
+    /// <param name="additionalPasswordHashIterations">
+    /// The additional number of times the password should be hashed before being encrypting or decrypting content.
+    /// Has no effect if no password has been provided.</param>
+    /// <returns>A decrypted base64 encoded string.</returns>
     byte[] Decrypt(byte[] value, string password, int additionalPasswordHashIterations);
 }
 
@@ -41,7 +56,7 @@ public sealed class EncryptionUtil : IEncryptionUtil
 
 #pragma warning restore CS1591, SA1600
 
-    /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Encrypt/*' />
+    /// <inheritdoc/>
     public byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations)
     {
         byte[] keyBytes = ServiceContainer.GetService<IKeyUtil>().GenerateKey(password, additionalPasswordHashIterations);
@@ -68,7 +83,7 @@ public sealed class EncryptionUtil : IEncryptionUtil
         }
     }
 
-    /// <include file='../docs.xml' path='docs/members[@name="EncryptionUtil"]/Decrypt/*' />
+    /// <inheritdoc/>
     public byte[] Decrypt(byte[] value, string password, int additionalPasswordHashIterations)
     {
         byte[] keyBytes = keyUtil.GenerateKey(password, additionalPasswordHashIterations);

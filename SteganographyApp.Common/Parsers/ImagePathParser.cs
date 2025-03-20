@@ -33,7 +33,7 @@ public static class ImagePathParser
 
     private static string[] RetrievePathsByGlobs(string value)
     {
-        var globs = value.Split(",").Where(path => !Path.IsPathFullyQualified(path)).ToArray();
+        string[] globs = [.. value.Split(",").Where(path => !Path.IsPathFullyQualified(path))];
         if (globs.Length == 0)
         {
             return [];
@@ -41,10 +41,11 @@ public static class ImagePathParser
 
         var matcher = new Matcher();
         matcher.AddIncludePatterns(globs);
-        return matcher.GetResultsInFullPath(Directory.GetCurrentDirectory()).ToArray();
+        return [.. matcher.GetResultsInFullPath(Directory.GetCurrentDirectory())];
     }
 
-    private static string[] GetAbsolutePaths(string value) => value.Split(",").Where(Path.IsPathFullyQualified).ToArray();
+    private static string[] GetAbsolutePaths(string value)
+        => [.. value.Split(",").Where(Path.IsPathFullyQualified)];
 
     private static void ValidateImagePaths(ImmutableArray<string> imagePaths)
     {

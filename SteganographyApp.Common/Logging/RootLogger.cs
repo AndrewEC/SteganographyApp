@@ -56,24 +56,21 @@ public sealed class RootLogger
     /// to be written to the log file.</param>
     public void EnableLoggingAtLevel(LogLevel level)
     {
-        if (level == LogLevel.None)
+        if (level == LogLevel.None || logLevel != LogLevel.None)
         {
             return;
         }
 
-        lock (SyncLock)
+        if (writeLogStream != null)
         {
-            if (writeLogStream != null)
+            logLevel = level;
+        }
+        else
+        {
+            writeLogStream = OpenLogFileStream();
+            if (writeLogStream == null)
             {
-                logLevel = level;
-            }
-            else
-            {
-                writeLogStream = OpenLogFileStream();
-                if (writeLogStream == null)
-                {
-                    logLevel = LogLevel.None;
-                }
+                logLevel = LogLevel.None;
             }
         }
     }
@@ -86,14 +83,7 @@ public sealed class RootLogger
     /// <param name="message">The message to log.</param>
     /// <param name="arguments">The option array of arguments to substitute into the message value before logging.</param>
     public void LogToFile(string typeName, LogLevel level, string message, params object[] arguments)
-    {
-        if (!CanLog(level))
-        {
-            return;
-        }
-
-        LogToFile(FormLogMessage(typeName, level, message, arguments));
-    }
+        => LogToFile(typeName, level, message, () => arguments);
 
     /// <summary>
     /// Attempts to write the specified message to the log file.
@@ -116,12 +106,31 @@ public sealed class RootLogger
         try
         {
             object[] arguments = provider();
-            LogToFile(typeName, level, message, arguments);
+            LogToFile(FormLogMessage(typeName, level, message, arguments));
         }
         catch (Exception e)
         {
             LogToFile(FormLogMessage(typeName, LogLevel.Error, "Error forming log messsage: [{0}]", e.Message));
             LogToFile(FormLogMessage(typeName, LogLevel.Error, "Original message: [{0}]", message));
+        }
+    }
+
+    private static IReadWriteStream? OpenLogFileStream()
+    {
+        try
+        {
+            var fileIOProxy = ServiceContainer.GetService<IFileIOProxy>();
+            if (fileIOProxy.IsExistingFile(LogFileName))
+            {
+                fileIOProxy.Delete(LogFileName);
+            }
+
+            return fileIOProxy.OpenFileForWrite(LogFileName);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Warning: Could not open log file for write. Logging will be disabled. Caused by: [{0}]", e.Message);
+            return null;
         }
     }
 
@@ -140,25 +149,6 @@ public sealed class RootLogger
             byte[] messageBytes = Encoding.ASCII.GetBytes(message);
             writeLogStream!.Write(messageBytes, 0, messageBytes.Length);
             writeLogStream.Flush();
-        }
-    }
-
-    private IReadWriteStream? OpenLogFileStream()
-    {
-        try
-        {
-            var fileIOProxy = ServiceContainer.GetService<IFileIOProxy>();
-            if (fileIOProxy.IsExistingFile(LogFileName))
-            {
-                fileIOProxy.Delete(LogFileName);
-            }
-
-            return fileIOProxy.OpenFileForWrite(LogFileName);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Warning: Could not open log file for write. Logging will be disabled. Caused by: [{0}]", e.Message);
-            return null;
         }
     }
 }

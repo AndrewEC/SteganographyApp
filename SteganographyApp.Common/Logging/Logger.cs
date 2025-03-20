@@ -14,22 +14,22 @@ internal sealed class Logger(string typeName) : ILogger
 {
     private readonly string typeName = typeName;
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Trace/*' />
+    /// <inheritdoc/>
     public void Trace(string message, params object[] arguments) => Log(LogLevel.Trace, message, arguments);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/TraceProvider/*' />
+    /// <inheritdoc/>
     public void Trace(string message, Func<object[]> provider) => Log(LogLevel.Trace, message, provider);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Debug/*' />
+    /// <inheritdoc/>
     public void Debug(string message, params object[] arguments) => Log(LogLevel.Debug, message, arguments);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/DebugProvider/*' />
+    /// <inheritdoc/>
     public void Debug(string message, Func<object[]> provider) => Log(LogLevel.Debug, message, provider);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/Error/*' />
+    /// <inheritdoc/>
     public void Error(string message, params object[] arguments) => Log(LogLevel.Error, message, arguments);
 
-    /// <include file='../docs.xml' path='docs/members[@name="Logger"]/ErrorProvider/*' />
+    /// <inheritdoc/>
     public void Error(string message, Func<object[]> provider) => Log(LogLevel.Error, message, provider);
 
     private void Log(LogLevel level, string message, params object[] arguments) => RootLogger.Instance.LogToFile(typeName, level, message, arguments);

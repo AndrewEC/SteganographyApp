@@ -14,7 +14,7 @@ where T : class
     /// <param name="program">The CliProgram being executed.</param>
     /// <param name="args">The array of user provided command line arguments.</param>
     public void Execute(CliProgram program, string[] args)
-        => Execute(CliParser.ParseArgs<T>(args, program.AdditionalParsers));
+        => Execute(CliParser.ParseArgs<T>(args));
 
     /// <summary>
     /// Execute the command providing some parsed argument object as input.

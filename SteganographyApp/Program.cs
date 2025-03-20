@@ -3,14 +3,15 @@
 using System;
 
 using SteganographyApp.Common.Arguments.Commands;
-using SteganographyApp.Common.Arguments.Parsers;
 using SteganographyApp.Common.Parsers;
+using SteganographyApp.Programs;
+
+#pragma warning disable SA1600, SA1402, SA1009
 
 public class Program
 {
     public static void Main(string[] args)
     {
-#pragma warning disable SA1009
         CliProgram.Create(
             Commands.Group(
                 Commands.Lazy<CleanCoverImagesCommand>(),
@@ -30,17 +31,7 @@ public class Program
                 )
             )
         )
-        .WithAdditionalParsers(
-            AdditionalParserFunctionsProvider.Builder()
-                .ForFieldNamed("CoverImages", (target, value) => ImagePathParser.ParseImages(value))
-                .ForFieldNamed("Password", CreateSecureParser("Password: "))
-                .ForFieldNamed("RandomSeed", CreateSecureParser("Random Seed: "))
-                .ForFieldNamed("AdditionalPasswordHashIterations", CreateSecureIntParser("Additional Hashes: "))
-                .ForFieldNamed("DummyCount", CreateSecureIntParser("Dummy Count: "))
-                .Build()
-        )
         .Execute(args);
-#pragma warning restore SA1009
     }
 
     private static Func<object, string, object> CreateSecureParser(string prompt)
@@ -49,3 +40,5 @@ public class Program
     private static Func<object, string, object> CreateSecureIntParser(string prompt)
         => (target, value) => Convert.ToInt32(SecureParser.ReadUserInput(prompt, value));
 }
+
+#pragma warning restore SA1600, SA1402, SA1009

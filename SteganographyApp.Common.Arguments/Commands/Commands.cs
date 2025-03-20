@@ -30,13 +30,15 @@ public static class Commands
     /// <param name="name">The name of the command.</param>
     /// <param name="command">The underlying command to execute.</param>
     /// <returns>A new AliasedCommand instance.</returns>
-    public static ICommand Alias(string name, ICommand command) => new AliasedCommand(name, command);
+    public static ICommand Alias(string name, ICommand command)
+        => new AliasedCommand(name, command);
 
     /// <summary>
-    /// Creates a new LazyCommand instance that allows the underlying command to be lazily initialized when it is first accessed by the CliProgram.
+    /// Creates a new LazyCommand instance that allows the underlying command to be
+    /// lazily initialized when it is first accessed by the CliProgram.
     /// </summary>
-    /// <typeparam name="T">The underlying ICommand type to reflectively instantiate. Requires the command type to provide
-    /// a default constructor.</typeparam>
+    /// <typeparam name="T">The underlying ICommand type to reflectively instantiate. Requires the
+    /// command type to provide a default constructor.</typeparam>
     /// <returns>A new LazyCommand instance.</returns>
     public static ICommand Lazy<T>()
     where T : ICommand => new LazyCommand<T>();
@@ -47,7 +49,8 @@ public static class Commands
     /// </summary>
     /// <param name="commands">The array of sub-commands to be selectively executed by the GenericCommandGroup command.</param>
     /// <returns>A new GenericCommandGroup instance with the default name.</returns>
-    public static ICommand Group(params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray());
+    public static ICommand Group(params ICommand[] commands)
+        => new GenericCommandGroup(commands.ToImmutableArray());
 
     /// <summary>
     /// Creates a GenericCommandGroup with a specified name.
@@ -55,7 +58,8 @@ public static class Commands
     /// <param name="name">The name of the group command.</param>
     /// <param name="commands">The array of sub-commands to selectively execute.</param>
     /// <returns>A new GenericCommandGroup instance with the specified name and sub-commands.</returns>
-    public static ICommand Group(string name, params ICommand[] commands) => new GenericCommandGroup(commands.ToImmutableArray(), name);
+    public static ICommand Group(string name, params ICommand[] commands)
+        => new GenericCommandGroup(commands.ToImmutableArray(), name);
 
     /// <summary>
     /// Creates a GenericCommandGroup with a specified name and help text.

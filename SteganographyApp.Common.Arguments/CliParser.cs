@@ -5,7 +5,6 @@ using System.Collections.Immutable;
 using System.Linq;
 
 using SteganographyApp.Common.Arguments.Matching;
-using SteganographyApp.Common.Arguments.Parsers;
 using SteganographyApp.Common.Arguments.Validation;
 
 /// <summary>
@@ -26,12 +25,11 @@ public sealed class CliParser
     /// Attempts to parse the user provided arguments into the specified class model. If an exception is thrown during the parsing process
     /// this will allow the exception to propogate up.
     /// </summary>
-    /// <param name="arguments">The list of user provided arguments to be parsed.</param>
-    /// <param name="additionalParsers">An optional parser provider to provide additional parsers for custom types.</param>
+    /// <param name="arguments">The list of user provided arguments to be parsed.</param>   
     /// <typeparam name="T">The class containing the argument attributes from which the arguments to parsed will be derived from.</typeparam>
     /// <returns>An instance of T.</returns>
-    public static T ParseArgs<T>(string[] arguments, IParserFunctionProvider? additionalParsers = null)
-    where T : class => ParseArgs(arguments, Initializer.Initialize<T>(), additionalParsers);
+    public static T ParseArgs<T>(string[] arguments)
+    where T : class => ParseArgs(arguments, Initializer.Initialize<T>());
 
     /// <summary>
     /// Attempts to parse the user provided arguments into the specified class model. If an exception occurs during the parsing process
@@ -40,16 +38,15 @@ public sealed class CliParser
     /// </summary>
     /// <param name="model">The model, whose type matches the type of type parameter T, to be initialized.</param>
     /// <param name="arguments">The list of user provided arguments to be parsed.</param>
-    /// <param name="additionalParsers">An optional parser provider to provide additional parsers for custom types.</param>
     /// <typeparam name="T">The class containing the argument attributes from which the arguments to parsed will be derived from.</typeparam>
     /// <returns>True if this was successful in parsing out the user provided arguments, otherwise returns false.</returns>
-    public bool TryParseArgs<T>(out T model, string[] arguments, IParserFunctionProvider? additionalParsers = null)
+    public bool TryParseArgs<T>(out T model, string[] arguments)
     where T : class
     {
         T instance = Initializer.Initialize<T>();
         try
         {
-            model = ParseArgs(arguments, instance, additionalParsers);
+            model = ParseArgs(arguments, instance);
             return true;
         }
         catch (Exception e)
@@ -60,11 +57,11 @@ public sealed class CliParser
         }
     }
 
-    private static T ParseArgs<T>(string[] arguments, T instance, IParserFunctionProvider? additionalParsers = null)
+    private static T ParseArgs<T>(string[] arguments, T instance)
     where T : class
     {
         ImmutableArray<RegisteredArgument> registeredArguments = ArgumentRegistration
-            .FindAttributedArguments(typeof(T), additionalParsers);
+            .FindAttributedArguments(typeof(T));
 
         if (WasHelpRequested(arguments))
         {

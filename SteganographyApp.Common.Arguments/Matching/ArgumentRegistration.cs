@@ -6,8 +6,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
-using SteganographyApp.Common.Arguments.Parsers;
-
 /// <summary>
 /// Static class to help identify all the field and properties of a given type that are attributed
 /// with the argument attribute.
@@ -19,11 +17,9 @@ internal static class ArgumentRegistration
     /// the associated parsers, and the attribute info.
     /// </summary>
     /// <param name="modelType">The type of the class from which the attribute argument fields will be pulled from.</param>
-    /// <param name="additionalParsers">An optional provider that can provide a set of custom parsers for custom argument types.</param>
     /// <returns>An array of the attributed members, the associated parsers, and the attribute info.</returns>
-    public static ImmutableArray<RegisteredArgument> FindAttributedArguments(Type modelType, IParserFunctionProvider? additionalParsers)
+    public static ImmutableArray<RegisteredArgument> FindAttributedArguments(Type modelType)
     {
-        var lookup = new ParserFunctionLookup(additionalParsers);
         var names = new HashSet<string>();
         var registered = new List<RegisteredArgument>();
 
@@ -37,33 +33,31 @@ internal static class ArgumentRegistration
             string name = attribute.Name.Trim();
             if (string.IsNullOrEmpty(name))
             {
-                throw new ParseException($"Argument of field named [{member.Name}] is invalid. No name was provided in argument attribute.");
+                throw new ParseException($"Argument of field named [{member.Name}] is invalid. No name "
+                    + "was provided in argument attribute.");
             }
 
             if (!names.Add(name))
             {
-                throw new ParseException($"An invalid configuration was provided. Two or more arguments on type [{modelType.FullName}] have the same name of: [{attribute.Name}]");
+                throw new ParseException("An invalid configuration was provided. "
+                    + $"Two or more arguments on type [{modelType.FullName}] have the same name of: [{attribute.Name}]");
             }
 
             string shortName = attribute.ShortName?.Trim() ?? string.Empty;
             if (!string.IsNullOrEmpty(shortName) && !names.Add(shortName))
             {
-                throw new ParseException($"An invalid configuration was provided. Two or more arguments have the same short name of: [{shortName}]");
+                throw new ParseException("An invalid configuration was provided. Two or "
+                    + $"more arguments have the same short name of: [{shortName}]");
             }
 
             if (TypeHelper.GetDeclaredType(member) == typeof(bool) && attribute.Position > 0)
             {
-                throw new ParseException($"Argument [{attribute.Name}] is invalid. An argument cannot be a boolean and have a position.");
+                throw new ParseException($"Argument [{attribute.Name}] is invalid. "
+                    + "An argument cannot be a boolean and have a position.");
             }
 
-            if (attribute.Parser != null)
-            {
-                registered.Add(new RegisteredArgument(attribute, member, ParserFunctionLookup.CreateParserFromMethod(modelType, attribute.Parser)));
-            }
-            else
-            {
-                registered.Add(new RegisteredArgument(attribute, member, lookup.FindParser(attribute, member)));
-            }
+            registered.Add(new RegisteredArgument(attribute, member, ParserFunctionLookup
+                .FindParser(modelType, attribute, member)));
         }
 
         if (registered.Count == 0)
@@ -72,7 +66,7 @@ internal static class ArgumentRegistration
         }
 
         VerifyArgumentPositions(registered);
-        return registered.ToImmutableArray();
+        return [.. registered];
     }
 
     private static void VerifyArgumentPositions(List<RegisteredArgument> registeredArguments)
@@ -93,7 +87,8 @@ internal static class ArgumentRegistration
             int position = argument.Attribute.Position;
             if (position != i)
             {
-                throw new ParseException($"Expected argument [{argument.Attribute.Name}] to have a position of [{i}]. Instead it had a position of [{position}]");
+                throw new ParseException($"Expected argument [{argument.Attribute.Name}] to have "
+                    + $"a position of [{i}]. Instead it had a position of [{position}]");
             }
         }
     }

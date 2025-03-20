@@ -8,11 +8,18 @@ using System;
 /// </summary>
 public sealed class ImageStoreException : Exception
 {
-    /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessage/*' />
+    /// <summary>
+    /// Initializes the exception with a message.
+    /// </summary>
+    /// <param name="message">The error message.</param>
     public ImageStoreException(string message)
     : base(message) { }
 
-    /// <include file='../docs.xml' path='docs/members[@name="Exceptions"]/GeneralMessageInner/*' />
+    /// <summary>
+    /// Initializes the exception with a message and an inner cause.
+    /// </summary>
+    /// <param name="message">The error message.</param>
+    /// <param name="inner">The root cause of this exception.</param>
     public ImageStoreException(string message, Exception inner)
     : base(message, inner) { }
 }

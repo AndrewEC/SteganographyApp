@@ -11,10 +11,26 @@ using SteganographyApp.Common.Logging;
 /// </summary>
 public interface IDummyUtil
 {
-    /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
+    /// <summary>
+    /// Inserts the specified number of dummy entries into the current byte array.
+    /// This will result in the creation of a new byte array.
+    /// </summary>
+    /// <param name="numDummies">The number of dummy entries to insert into the byte array.</param>
+    /// <param name="value">The original byte array to be modified with the dummy entries.</param>
+    /// <param name="randomSeed">A random seed used to seed the random number generator used when generating the dummy entries.</param>
+    /// <returns>Returns a new byte array with the inserted dummy values.</returns>
     byte[] InsertDummies(int numDummies, byte[] value, string randomSeed);
 
-    /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
+    /// <summary>
+    /// Attempts to remove dummy entries from the byte array equal to the number of entries specified in the numDummies parameter.
+    /// This will create and return a new byte array.
+    /// </summary>
+    /// <param name="numDummies">The number of dummy entries to remove from the byte array.</param>
+    /// <param name="value">The byte array to remove the dummy entries from.</param>
+    /// <param name="randomSeed">A random seed used to seed the random number generator used when generating the dummy entries.</param>
+    /// <returns>If numDummies == 0 then it will return the original byte array otherwise will return the byte array with
+    /// the dummy entries removed.</returns>
+    /// <exception cref="TransformationException">Thrown if an out of range exception is caught while trying to remove the dummy entries from the chunk.</exception>
     byte[] RemoveDummies(int numDummies, byte[] value, string randomSeed);
 }
 
@@ -28,7 +44,7 @@ public sealed class DummyUtil : IDummyUtil
 
     private readonly ILogger log = new LazyLogger<DummyUtil>();
 
-    /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/InsertDummies/*' />
+    /// <inheritdoc/>
     public byte[] InsertDummies(int numDummies, byte[] value, string randomSeed)
     {
         var generator = Xor128Prng.FromString(randomSeed);
@@ -59,7 +75,7 @@ public sealed class DummyUtil : IDummyUtil
         return result;
     }
 
-    /// <include file='../docs.xml' path='docs/members[@name="DummyUtil"]/RemoveDummies/*' />
+    /// <inheritdoc/>
     public byte[] RemoveDummies(int numDummies, byte[] value, string randomSeed)
     {
         var generator = Xor128Prng.FromString(randomSeed);

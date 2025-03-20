@@ -11,23 +11,32 @@ using SixLabors.ImageSharp.PixelFormats;
 /// </summary>
 public interface IBasicImageInfo : IDisposable
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Width/*' />
+    /// <summary>Gets the width of the currently loaded image.</summary>
     int Width { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Height/*' />
+    /// <summary>Gets the height of the currently loaded image.</summary>
     int Height { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Path/*' />
+    /// <summary>Gets the absolute path to the image file at the time it was loaded.</summary>
     string Path { get; }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Accessor/*' />
+    /// <summary>
+    /// Accessor to lookup the colour of a pixel at the specified position.
+    /// </summary>
+    /// <param name="x">The x position of the pixel.</param>
+    /// <param name="y">The y position of the pixel.</param>
+    /// <returns>The <see cref="Rgba32"/> pixel at the specified position</returns>
     Rgba32 this[int x, int y]
     {
         get;
         set;
     }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
+    /// <summary>
+    /// Save the currently loaded image to the specified location.
+    /// </summary>
+    /// <param name="pathToImage">The absolute or relative file path where the image should be written to.</param>
+    /// <param name="encoder">The encoding options to save the image with.</param>
     void Save(string pathToImage, IImageEncoder encoder);
 }
 
@@ -44,25 +53,25 @@ public class BasicImageInfo(string path, Image<Rgba32> image) : AbstractDisposab
 {
     private readonly Image<Rgba32> image = image;
 
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Width/*' />
+    /// <inheritdoc/>
     public int Width
     {
         get => RunIfNotDisposedWithResult(() => image.Width);
     }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Height/*' />
+    /// <inheritdoc/>
     public int Height
     {
         get => RunIfNotDisposedWithResult(() => image.Height);
     }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Path/*' />
+    /// <inheritdoc/>
     public string Path
     {
         get => path;
     }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Accessor/*' />
+    /// <inheritdoc/>
     public Rgba32 this[int x, int y]
     {
         get => RunIfNotDisposedWithResult(() => image[x, y]);
@@ -70,7 +79,7 @@ public class BasicImageInfo(string path, Image<Rgba32> image) : AbstractDisposab
         set => RunIfNotDisposed(() => image[x, y] = value);
     }
 
-    /// <include file='../../docs.xml' path='docs/members[@name="BasicImageInfo"]/Save/*' />
+    /// <inheritdoc/>
     public void Save(string pathToImage, IImageEncoder encoder) => RunIfNotDisposed(() => image.Save(pathToImage, encoder));
 
     /// <summary>

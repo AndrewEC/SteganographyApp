@@ -11,56 +11,78 @@ using System.Collections.Immutable;
 /// </summary>
 public interface IInputArguments
 {
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
+    /// <summary>
+    /// Gets the password used to encrypt or decrypt the contents of a file.
+    /// Only used when encoding or decoding a file.
+    /// </summary>
     string Password { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
+    /// <summary>
+    /// Gets the relative or absolute path to the file to encode. Only used when encoding a file.
+    /// </summary>
     string FileToEncode { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
+    /// <summary>
+    /// Gets the path the decoded file contents will be written to. Only used when decoding a file.
+    /// </summary>
     string DecodedOutputFile { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
+    /// <summary>
+    /// Gets the paths to the images to read from or write to. This may be used when encoding a file,
+    /// decoding a file, cleaning the images, or calculating the storage space of a series of images.
+    /// </summary>
     ImmutableArray<string> CoverImages { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
+    /// <summary>
+    /// Gets a value indicating whether or not the contents being encoded, decoded, or calculate,
+    /// should be compressed using a standard GZip compression algorithm.
+    /// </summary>
     bool UseCompression { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
+    /// <summary>
+    /// Gets a starting seed for the random number generator used when encoding, decoding, and calculating encrypted
+    /// size of a file.
+    /// </summary>
     string RandomSeed { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
+    /// <summary>
+    /// Gets the number of dummies to insert or remove from the contents of a file when encoding, decoding,
+    /// and calculating the encrypted size of a file.
+    /// </summary>
     int DummyCount { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
+    /// <summary>
+    /// Gets a value indicating whether or not the original image should be deleted after being converted
+    /// to a PNG image. Only used by the Converter.
+    /// </summary>
     bool DeleteAfterConversion { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
+    /// <summary>
+    /// Gets the chunk size. I.e. the number of bytes to read, encode, and write at any given time.
+    /// <para>Higher values will improve the time to encode a larger file and reduce
+    /// the overall encoded file size though values too high run the risk of having memory related errors.</para>
+    /// <para>Default value of 131,072.</para>
+    /// </summary>
     int ChunkByteSize { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+    /// <summary>
+    /// Gets the desired output file type. Can be either png or webp.
+    /// <para>Webp is a smaller format but takes much longer to process than a png.</para>
+    /// <para>Can only be used with the converter.</para>
+    /// </summary>
     ImageFormat ImageFormat { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/AdditionalPasswordHashIterations/*' />
+    /// <summary>
+    /// Gets the additional number of times the password should be hashed before being encrypting or decrypting content.
+    /// <para>Has no effect if no password has been provided.</para>
+    /// </summary>
     int AdditionalPasswordHashIterations { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/BitsToUse/*' />
-    int BitsToUse { get; }
-}
-
-/// <summary>
-/// Convert a given set of user provided arguments into an IInputArguments instance containing values
-/// required at various places in the application.
-/// </summary>
-public interface IArgumentConverter
-{
     /// <summary>
-    /// Convert a given set of user provided arguments into an IInputArguments instance containing a collection
-    /// of the arguments required throughout various parts of the application.
+    /// Gets the number of bits to read or write, starting the least significant bit, from each RGB value in
+    /// each pixel from the cover images.
     /// </summary>
-    /// <returns>A fully formed IInputArguments instance containing definitions for the common arguments
-    /// use throughout the application.</returns>
-    IInputArguments ToCommonArguments();
+    int BitsToUse { get; }
 }
 
 /// <summary>
@@ -69,40 +91,40 @@ public interface IArgumentConverter
 /// </summary>
 public sealed class CommonArguments : IInputArguments
 {
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/Password/*' />
+    /// <inheritdoc/>
     public string Password { get; set; } = string.Empty;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/FileToEncode/*' />
+    /// <inheritdoc/>
     public string FileToEncode { get; set; } = string.Empty;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DecodedOutputFile/*' />
+    /// <inheritdoc/>
     public string DecodedOutputFile { get; set; } = string.Empty;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/CoverImages/*' />
+    /// <inheritdoc/>
     public ImmutableArray<string> CoverImages { get; set; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/UseCompression/*' />
+    /// <inheritdoc/>
     public bool UseCompression { get; set; } = false;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/RandomSeed/*' />
+    /// <inheritdoc/>
     public string RandomSeed { get; set; } = string.Empty;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DummyCount/*' />
+    /// <inheritdoc/>
     public int DummyCount { get; set; } = 0;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/DeleteAfterConversion/*' />
+    /// <inheritdoc/>
     public bool DeleteAfterConversion { get; set; } = false;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/ChunkByteSize/*' />
+    /// <inheritdoc/>
     public int ChunkByteSize { get; set; } = 131_072;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/ImageFormat/*' />
+    /// <inheritdoc/>
     public ImageFormat ImageFormat { get; set; } = ImageFormat.Png;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/AdditionalPasswordHashIterations/*' />
+    /// <inheritdoc/>
     public int AdditionalPasswordHashIterations { get; set; } = 0;
 
-    /// <include file='./docs.xml' path='docs/members[@name="InputArguments"]/BitsToUse/*' />
+    /// <inheritdoc/>
     public int BitsToUse { get; set; } = 1;
 }
 

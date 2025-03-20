@@ -11,16 +11,33 @@ using System;
 /// </summary>
 public interface IImageStoreStream : IDisposable
 {
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStoreStream"]/WriteContentChunkToImage/*' />
+    /// <summary>
+    /// Invokes the wrapped image store WriteBinaryString method passing in the provided
+    /// <paramref name="binary"/> argument.
+    /// </summary>
+    /// <param name="binary">The binary chunk to write to the cover images.</param>
+    /// <returns>A count of the number of bits that were written to the image.</returns>
     int WriteContentChunkToImage(string binary);
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStoreStream"]/ReadContentChunkFromImage/*' />
+    /// <summary>
+    /// Invokes the wrapped image store ReadBinaryString methods passing in the provided <paramref name="length"/> argument.
+    /// </summary>
+    /// <param name="length">The number of bits to read from the cover images.</param>
+    /// <returns>A binary string read from the cover images whose length is, at most,
+    /// the length as specified by the input argument of the same name.</returns>
     string ReadContentChunkFromImage(int length);
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStoreStream"]/SeekToPixel/*' />
+    /// <summary>
+    /// Invokes the wrapped image store SeekToPixel method passing in the provided <paramref name="bitsToSkip"/> argument.
+    /// This will first move to the first pixel in the currently loaded image before skipping to the specified pixel.
+    /// </summary>
+    /// <param name="bitsToSkip">The number of bigs to seek past.</param>
     void SeekToPixel(int bitsToSkip);
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStoreStream"]/SeekToImage/*' />
+    /// <summary>
+    /// Invokes the wrapped image store ResetToImage method passing in the provided <paramref name="index"/> argument.
+    /// </summary>
+    /// <param name="index">The index of the cover image to start reading and writing from.</param>
     void SeekToImage(int index);
 }
 
@@ -48,7 +65,7 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
         store.SeekToImage(0);
     }
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStoreStream"]/WriteContentChunkToImage/*' />
+    /// <inheritdoc/>
     public int WriteContentChunkToImage(string binary) => RunIfNotDisposedWithResult(() =>
     {
         if (mode != StreamMode.Write)
@@ -60,7 +77,7 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
         return store.WriteBinaryString(binary);
     });
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStoreStream"]/ReadContentChunkFromImage/*' />
+    /// <inheritdoc/>
     public string ReadContentChunkFromImage(int length) => RunIfNotDisposedWithResult(() =>
     {
         if (mode != StreamMode.Read)
@@ -71,10 +88,10 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
         return store.ReadBinaryString(length);
     });
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStoreStream"]/SeekToPixel/*' />
+    /// <inheritdoc/>
     public void SeekToPixel(int bitsToSkip) => RunIfNotDisposed(() => store.SeekToPixel(bitsToSkip));
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStoreStream"]/SeekToImage/*' />
+    /// <inheritdoc/>
     public void SeekToImage(int index) => RunIfNotDisposed(() => store.SeekToImage(index));
 
     /// <summary>

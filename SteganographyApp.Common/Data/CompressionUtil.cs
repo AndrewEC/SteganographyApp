@@ -10,10 +10,19 @@ using SteganographyApp.Common.Logging;
 /// </summary>
 public interface ICompressionUtil
 {
-    /// <include file='../docs.xml' path='docs/members[@name="CompressionUtil"]/Compress/*' />
+    /// <summary>
+    /// Compresses the raw file bytes using standard gzip compression.
+    /// </summary>
+    /// <param name="fileBytes">The array of bytes read from the input file.</param>
+    /// <returns>The gzip compressed array of bytes.</returns>
     byte[] Compress(byte[] fileBytes);
 
-    /// <include file='../docs.xml' path='docs/members[@name="CompressionUtil"]/Decompress/*' />
+    /// <summary>
+    /// Decompresses the bytes read and decoded from the cover image(s) using standard
+    /// gzip compression.
+    /// </summary>
+    /// <param name="readBytes">The array of bytes read and decoded from the cover images.</param>
+    /// <returns>A byte array after being decompressed using standard gzip compression.</returns>
     byte[] Decompress(byte[] readBytes);
 }
 
@@ -24,7 +33,7 @@ public sealed class CompressionUtil : ICompressionUtil
 {
     private readonly ILogger log = new LazyLogger<CompressionUtil>();
 
-    /// <include file='../docs.xml' path='docs/members[@name="CompressionUtil"]/Compress/*' />
+    /// <inheritdoc/>
     public byte[] Compress(byte[] fileBytes)
     {
         log.Debug("Compressing [{0}] bytes", fileBytes.Length);
@@ -42,7 +51,7 @@ public sealed class CompressionUtil : ICompressionUtil
         }
     }
 
-    /// <include file='../docs.xml' path='docs/members[@name="CompressionUtil"]/Decompress/*' />
+    /// <inheritdoc/>
     public byte[] Decompress(byte[] readBytes)
     {
         log.Debug("Decompressing [{0}] bytes.", readBytes.Length);

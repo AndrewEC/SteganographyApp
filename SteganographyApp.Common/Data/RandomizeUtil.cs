@@ -8,10 +8,20 @@ using SteganographyApp.Common.Logging;
 /// </summary>
 public interface IRandomizeUtil
 {
-    /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Randomize/*' />
+    /// <summary>
+    /// Randomizes the already encrypted array of bytes.
+    /// </summary>
+    /// <param name="value">The bytes to be randomized.</param>
+    /// <param name="randomSeed">The user provided random seed that will be used to initialize the random number generator.</param>
+    /// <returns>A randomized binary string.</returns>
     byte[] Randomize(byte[] value, string randomSeed);
 
-    /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Reorder/*' />
+    /// <summary>
+    /// Reverses the effect of the Randomize method when writing to file.
+    /// </summary>
+    /// <param name="value">The encrypted and randomized bytes to be re-ordered.</param>
+    /// <param name="randomSeed">The user provided randoom seed that will be used to initialize the random number generator.</param>
+    /// <returns>A non-randomized array of bytes matching the original input file.</returns>
     byte[] Reorder(byte[] value, string randomSeed);
 }
 
@@ -24,7 +34,7 @@ public sealed class RandomizeUtil : IRandomizeUtil
     private const int IterationMultiplier = 5;
     private readonly ILogger log = new LazyLogger<RandomizeUtil>();
 
-    /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Randomize/*' />
+    /// <inheritdoc/>
     public byte[] Randomize(byte[] value, string randomSeed)
     {
         var generator = Xor128Prng.FromString(randomSeed);
@@ -46,7 +56,7 @@ public sealed class RandomizeUtil : IRandomizeUtil
         return value;
     }
 
-    /// <include file='../docs.xml' path='docs/members[@name="RandomizeUtil"]/Reorder/*' />
+    /// <inheritdoc/>
     public byte[] Reorder(byte[] value, string randomSeed)
     {
         var generator = Xor128Prng.FromString(randomSeed);

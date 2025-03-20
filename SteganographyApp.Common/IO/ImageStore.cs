@@ -18,10 +18,22 @@ using SteganographyApp.Common.Logging;
 /// </summary>
 public interface IImageStore
 {
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/CurrentImage/*' />
+    /// <summary>
+    /// Gets the currently loaded image. The image is loaded whenever the Next
+    /// method is called and the currentImageIndex has been incremented.
+    /// </summary>
     public IBasicImageInfo? CurrentImage { get; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/OpenStream/*' />
+    /// <summary>
+    /// Creates an <see cref="IImageStoreStream"/> instance to access the read and write
+    /// methods of this <see cref="ImageStore"/>.
+    /// <para>Additionally the returned stream is disposable and must be disposed of
+    /// to ensure that all data is fully written and read and that the underlying images
+    /// are properly disposed of.</para>
+    /// </summary>
+    /// <param name="mode">The mode specifying which types of IO operations should
+    /// be permitted.</param>
+    /// <returns>A new wrapper for safely using the image store IO methods.</returns>
     IImageStoreStream OpenStream(StreamMode mode);
 }
 
@@ -64,10 +76,10 @@ public sealed class ImageStore : IImageStore
     /// </summary>
     public event EventHandler<NextImageLoadedEventArgs>? OnNextImageLoaded;
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/CurrentImage/*' />
+    /// <inheritdoc/>
     public IBasicImageInfo? CurrentImage { get; private set; }
 
-    /// <include file='./docs.xml' path='docs/members[@name="ImageStore"]/OpenStream/*' />
+    /// <inheritdoc/>
     public IImageStoreStream OpenStream(StreamMode mode)
     {
         if (currentStream != null)

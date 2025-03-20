@@ -11,10 +11,22 @@ using SteganographyApp.Common.Injection.Proxies;
 /// </summary>
 public interface IEncoderProvider
 {
-    /// <include file='../docs.xml' path='docs/members[@name="EncoderProvider"]/GetEncoder/*' />
+    /// <summary>
+    /// Attempts to instantiate and return an IImageEncoder instance associated with the desired image format.
+    /// </summary>
+    /// <param name="imageFormat">The desired image format.</param>
+    /// <returns>An IImageEncoder instance that corresponds to the requested image format.</returns>
+    /// <exception cref="ArgumentValueException">Thrown if there is no encoder associated
+    /// with the input image format.</exception>
     public IImageEncoder GetEncoder(ImageFormat imageFormat);
 
-    /// <include file='../docs.xml' path='docs/members[@name="EncoderProvider"]/GetEncoder2/*' />
+    /// <summary>
+    /// Attempts to instantiate and return an IImageEncoder instance associated with the image format.
+    /// </summary>
+    /// <param name="imagePath">The path to the image from which the extension will be pulled and used to determine the correct
+    /// encoder instance.</param>
+    /// <returns>An IImageEncoder instance that corresponds to the requested image format.</returns>
+    /// <exception cref="ArgumentValueException">Thrown if there is no encoder associated with the input image format.</exception>
     public IImageEncoder GetEncoder(string imagePath);
 }
 
@@ -36,7 +48,7 @@ public class EncoderProvider : IEncoderProvider
     }
 #pragma warning restore CS1591, SA1600
 
-    /// <include file='../docs.xml' path='docs/members[@name="EncoderProvider"]/GetEncoder2/*' />
+    /// <inheritdoc/>
     public IImageEncoder GetEncoder(string imagePath) => imageProxy.GetImageMimeType(imagePath) switch
     {
         PngMimeType => GetEncoder(ImageFormat.Png),
@@ -44,7 +56,7 @@ public class EncoderProvider : IEncoderProvider
         _ => throw new ArgumentValueException($"Could not find appropriate encoder for file: [{imagePath}]"),
     };
 
-    /// <include file='../docs.xml' path='docs/members[@name="EncoderProvider"]/GetEncoder/*' />
+    /// <inheritdoc/>
     public IImageEncoder GetEncoder(ImageFormat imageFormat) => imageFormat switch
     {
         ImageFormat.Png => new PngEncoder() { CompressionLevel = PngCompressionLevel.Level5, },

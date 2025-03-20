@@ -7,7 +7,6 @@ using System.Linq;
 using NUnit.Framework;
 
 using SteganographyApp.Common.Arguments;
-using SteganographyApp.Common.Arguments.Parsers;
 
 [TestFixture]
 public class CliParserTests
@@ -77,17 +76,6 @@ public class CliParserTests
     {
         var arguments = new string[] { "--names", "Jane,John" };
         var parsed = CliParser.ParseArgs<CustomInlineParser>(arguments);
-        Assert.That(parsed.Names, Has.Count.EqualTo(2));
-        Assert.That(parsed.Names[0], Is.EqualTo("Jane"));
-        Assert.That(parsed.Names[1], Is.EqualTo("John"));
-    }
-
-    [Test]
-    public void TestAdditionalParsers()
-    {
-        var parsers = AdditionalParserFunctionsProvider.ForType<List<string>>((instance, value) => value.Split(",").ToList());
-        var arguments = new string[] { "--names", "Jane,John" };
-        var parsed = CliParser.ParseArgs<CustomAdditionalParser>(arguments, parsers);
         Assert.That(parsed.Names, Has.Count.EqualTo(2));
         Assert.That(parsed.Names[0], Is.EqualTo("Jane"));
         Assert.That(parsed.Names[1], Is.EqualTo("John"));

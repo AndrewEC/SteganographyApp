@@ -11,7 +11,13 @@ using SteganographyApp.Common.Logging;
 /// </summary>
 public interface IKeyUtil
 {
-    /// <include file='../docs.xml' path='docs/members[@name="KeyUtil"]/GenerateKey/*' />
+    /// <summary>
+    /// Generates a salted and hashed key from the input value.
+    /// </summary>
+    /// <param name="password">The value to be salted and hashed.</param>
+    /// <param name="additionalIterations">The additional number of times the password will be hashed.
+    /// This is in addition to the default number of iterations of 450,000.</param>
+    /// <returns>A byte representation of the salted and hashed key derived from the value param.</returns>
     byte[] GenerateKey(string password, int additionalIterations);
 }
 
@@ -28,7 +34,7 @@ public class KeyUtil : IKeyUtil
     private readonly Dictionary<string, byte[]> generatedKeys = [];
     private readonly ILogger log = new LazyLogger<KeyUtil>();
 
-    /// <include file='../docs.xml' path='docs/members[@name="KeyUtil"]/GenerateKey/*' />
+    /// <inheritdoc/>
     public byte[] GenerateKey(string password, int additionalIterations)
     {
         string cacheKeyName = string.Format(CacheKeyTemplate, password, additionalIterations);

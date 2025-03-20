@@ -12,10 +12,16 @@ using System;
 /// </summary>
 public interface IConsoleWriter
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/Write/*' />
+    /// <summary>
+    /// Writes the specified string to output using Console.Write.
+    /// </summary>
+    /// <param name="line">The string to write to the console without an added new line ending.</param>
     void Write(string line);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/WriteLine/*' />
+    /// <summary>
+    /// Writes the specified string to output using Console.WriteLine.
+    /// </summary>
+    /// <param name="line">The string to write to the console with an attached new line break.</param>
     void WriteLine(string line);
 }
 
@@ -25,7 +31,11 @@ public interface IConsoleWriter
 /// </summary>
 public interface IConsoleReader
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/ReadKey/*' />
+    /// <summary>
+    /// Reads a key press from the console using Console.ReadKey.
+    /// </summary>
+    /// <param name="intercept">Intecept.</param>
+    /// <returns>The info of the key that was pressed.</returns>
     ConsoleKeyInfo ReadKey(bool intercept);
 }
 
@@ -36,10 +46,10 @@ public interface IConsoleReader
 /// </summary>
 public class ConsoleWriter : IConsoleWriter
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/Write/*' />
+    /// <inheritdoc/>
     public void Write(string line) => Console.Write(line);
 
-    /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/WriteLine/*' />
+    /// <inheritdoc/>
     public void WriteLine(string line) => Console.WriteLine(line);
 }
 
@@ -49,7 +59,7 @@ public class ConsoleWriter : IConsoleWriter
 /// </summary>
 public class ConsoleKeyReader : IConsoleReader
 {
-    /// <include file='../../docs.xml' path='docs/members[@name="ConsoleProxy"]/ReadKey/*' />
+    /// <inheritdoc/>
     public ConsoleKeyInfo ReadKey(bool intercept) => Console.ReadKey(intercept);
 }
 
