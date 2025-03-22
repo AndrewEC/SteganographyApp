@@ -10,26 +10,24 @@ using SteganographyApp.Common.Arguments.Validation;
 /// <summary>
 /// Provides the functionality to parse the user provided arguments into a concrete class instance.
 /// </summary>
-public sealed class CliParser
+public interface ICliParser
 {
-    private Exception? lastError;
-
     /// <summary>
     /// Gets the last error that occurred while trying to parse the user's command line arguments.
     /// If TryParseArgs was invoked on an instance of the CliParser, which resulted in a failure, then this will
     /// be initialized to the exception that was raised.
     /// </summary>
-    public Exception? LastError { get => lastError; }
+    public Exception? LastError { get; }
 
     /// <summary>
     /// Attempts to parse the user provided arguments into the specified class model. If an exception is thrown during the parsing process
     /// this will allow the exception to propogate up.
     /// </summary>
-    /// <param name="arguments">The list of user provided arguments to be parsed.</param>   
+    /// <param name="arguments">The list of user provided arguments to be parsed.</param>
     /// <typeparam name="T">The class containing the argument attributes from which the arguments to parsed will be derived from.</typeparam>
     /// <returns>An instance of T.</returns>
-    public static T ParseArgs<T>(string[] arguments)
-    where T : class => ParseArgs(arguments, Initializer.Initialize<T>());
+    public T ParseArgs<T>(string[] arguments)
+    where T : class;
 
     /// <summary>
     /// Attempts to parse the user provided arguments into the specified class model. If an exception occurs during the parsing process
@@ -41,9 +39,33 @@ public sealed class CliParser
     /// <typeparam name="T">The class containing the argument attributes from which the arguments to parsed will be derived from.</typeparam>
     /// <returns>True if this was successful in parsing out the user provided arguments, otherwise returns false.</returns>
     public bool TryParseArgs<T>(out T model, string[] arguments)
+    where T : class;
+}
+
+/// <summary>
+/// Provides the functionality to parse the user provided arguments into a concrete class instance.
+/// </summary>
+public sealed class CliParser(
+    IArgumentRegistration registration,
+    IHelp help,
+    IArgumentValueMatcher matcher,
+    ICliValidator validator,
+    IInitializer initializer) : ICliParser
+{
+    private Exception? lastError;
+
+    /// <inheritdoc/>
+    public Exception? LastError { get => lastError; }
+
+    /// <inheritdoc/>
+    public T ParseArgs<T>(string[] arguments)
+    where T : class => ParseArgs(arguments, initializer.Initialize<T>());
+
+    /// <inheritdoc/>
+    public bool TryParseArgs<T>(out T model, string[] arguments)
     where T : class
     {
-        T instance = Initializer.Initialize<T>();
+        T instance = initializer.Initialize<T>();
         try
         {
             model = ParseArgs(arguments, instance);
@@ -57,19 +79,22 @@ public sealed class CliParser
         }
     }
 
-    private static T ParseArgs<T>(string[] arguments, T instance)
+    private static bool WasHelpRequested(string[] arguments)
+        => arguments.Contains("--help") || arguments.Contains("-h");
+
+    private T ParseArgs<T>(string[] arguments, T instance)
     where T : class
     {
-        ImmutableArray<RegisteredArgument> registeredArguments = ArgumentRegistration
+        ImmutableArray<RegisteredArgument> registeredArguments = registration
             .FindAttributedArguments(typeof(T));
 
         if (WasHelpRequested(arguments))
         {
-            Help.PrintHelp(typeof(T), instance, registeredArguments);
+            help.PrintHelp(typeof(T), instance, registeredArguments);
             Environment.Exit(0);
         }
 
-        foreach (MatchResult match in ArgumentValueMatcher.Match(arguments, registeredArguments))
+        foreach (MatchResult match in matcher.Match(arguments, registeredArguments))
         {
             try
             {
@@ -82,11 +107,8 @@ public sealed class CliParser
             }
         }
 
-        CliValidator.Validate(instance);
+        validator.Validate(instance);
 
         return instance;
     }
-
-    private static bool WasHelpRequested(string[] arguments)
-        => arguments.Contains("--help") || arguments.Contains("-h");
 }

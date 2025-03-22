@@ -7,16 +7,11 @@ using SteganographyApp.Common.Injection.Proxies;
 /// Stream encapsulating class that decodes binary data and writes it
 /// to an output file.
 /// </summary>
-public sealed class ContentWriter : AbstractContentIO
+public sealed class ContentWriter(
+    IInputArguments arguments,
+    IDataEncoderUtil dataEncoderUtil,
+    IFileIOProxy fileIOProxy) : AbstractContentIO(arguments, dataEncoderUtil, fileIOProxy)
 {
-#pragma warning disable CS1591, SA1600
-    public ContentWriter(
-        IInputArguments arguments,
-        IDataEncoderUtil dataEncoderUtil,
-        IFileIOProxy fileIOProxy)
-    : base(arguments, dataEncoderUtil, fileIOProxy) { }
-#pragma warning restore CS1591, SA1600
-
     /// <summary>
     /// Takes in an encrypted binary string, decyrypts it using the DataEncoderUtil
     /// and writes the resulting bytes to the output file.

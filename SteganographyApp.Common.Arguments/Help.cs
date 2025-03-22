@@ -9,13 +9,10 @@ using System.Text;
 using SteganographyApp.Common.Arguments.Matching;
 
 /// <summary>
-/// A static utility class to print help related information about the program being executed and its attributes.
+/// A static utility to print help related information about the program being executed and its attributes.
 /// </summary>
-public static class Help
+public interface IHelp
 {
-    private const int MaxDescriptionWidth = 80;
-    private const char Space = ' ';
-
     /// <summary>
     /// Returns the HelpText property of the ProgramDescriptor attribute on the input
     /// type. If there is no ProgramDescriptor attribute on the input type then this
@@ -23,11 +20,7 @@ public static class Help
     /// </summary>
     /// <param name="commandType">The type from which the ProgramDescriptor attribute will be pulled.</param>
     /// <returns>The HelpText property of the ProgramDescriptor attribute or null if no attribute is available.</returns>
-    public static string GetCommandDescription(Type commandType)
-    {
-        string helpText = GetDescriptorAttribute(commandType)?.HelpText ?? string.Empty;
-        return SplitHelpText(helpText);
-    }
+    public string GetCommandDescription(Type commandType);
 
     /// <summary>
     /// Logs all the help related information to the console.
@@ -37,7 +30,26 @@ public static class Help
     /// in the instanceType parameter.</param>
     /// <param name="registeredArguments">The list of all the arguments specified within the instanceType that have been previously
     /// identified.</param>
-    internal static void PrintHelp(Type instanceType, object instance, ImmutableArray<RegisteredArgument> registeredArguments)
+    public void PrintHelp(Type instanceType, object instance, ImmutableArray<RegisteredArgument> registeredArguments);
+}
+
+/// <summary>
+/// A static utility to print help related information about the program being executed and its attributes.
+/// </summary>
+public sealed class Help : IHelp
+{
+    private const int MaxDescriptionWidth = 80;
+    private const char Space = ' ';
+
+    /// <inheritdoc/>
+    public string GetCommandDescription(Type commandType)
+    {
+        string helpText = GetDescriptorAttribute(commandType)?.HelpText ?? string.Empty;
+        return SplitHelpText(helpText);
+    }
+
+    /// <inheritdoc/>
+    public void PrintHelp(Type instanceType, object instance, ImmutableArray<RegisteredArgument> registeredArguments)
     {
         var positionalArguments = registeredArguments.Where(argument => argument.Attribute.Position > 0)
             .OrderBy(argument => argument.Attribute.Position)

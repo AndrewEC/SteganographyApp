@@ -7,14 +7,32 @@ using System.Linq;
 using System.Reflection;
 
 /// <summary>
-/// Utility class to help lookup a parser for a specified argument.
+/// Utility to help lookup a parser for a specified argument.
 /// </summary>
-/// <remarks>
-/// Initializes the parser matcher with an option parser provider.
-/// </remarks>
-internal static class ParserFunctionLookup
+public interface IParserFunctionLookup
 {
-    private static readonly ImmutableDictionary<Type, Func<object, string, object>> DefaultParsers = new Dictionary<Type, Func<object, string, object>>()
+    /// <summary>
+    /// Attempts to find and return a parser function for the specified argument. This will first attempt to look for a custom
+    /// parser from the parser provider provided during initialization. If no parser is found then it will look for a default
+    /// parser function for the type.
+    /// </summary>
+    /// <param name="modelType">The type of the model from which the parser may be loaded.</param>
+    /// <param name="argumentAttribute">The attribute on top of the property we are searching for a parser for.</param>
+    /// <param name="memberInfo">The underlying member whose type will be used to lookup a parser function.</param>
+    /// <returns>The parser function that can parsed the specified argument. If no parser is found this will throw an exception.</returns>
+    Func<object, string, object> FindParser(
+        Type modelType,
+        ArgumentAttribute argumentAttribute,
+        MemberInfo memberInfo);
+}
+
+/// <summary>
+/// Utility to help lookup a parser for a specified argument.
+/// </summary>
+public sealed class ParserFunctionLookup : IParserFunctionLookup
+{
+    private static readonly ImmutableDictionary<Type, Func<object, string, object>> DefaultParsers
+    = new Dictionary<Type, Func<object, string, object>>()
     {
         { typeof(byte), (instance, value) => Convert.ToByte(value) },
         { typeof(short), (instance, value) => Convert.ToInt16(value) },
@@ -26,16 +44,8 @@ internal static class ParserFunctionLookup
         { typeof(string), (instance, value) => value },
     }.ToImmutableDictionary();
 
-    /// <summary>
-    /// Attempts to find and return a parser function for the specified argument. This will first attempt to look for a custom
-    /// parser from the parser provider provided during initialization. If no parser is found then it will look for a default
-    /// parser function for the type.
-    /// </summary>
-    /// <param name="modelType">The type of the model from which the parser may be loaded.</param>
-    /// <param name="argumentAttribute">The attribute on top of the property we are searching for a parser for.</param>
-    /// <param name="memberInfo">The underlying member whose type will be used to lookup a parser function.</param>
-    /// <returns>The parser function that can parsed the specified argument. If no parser is found this will throw an exception.</returns>
-    public static Func<object, string, object> FindParser(
+    /// <inheritdoc/>
+    public Func<object, string, object> FindParser(
         Type modelType,
         ArgumentAttribute argumentAttribute,
         MemberInfo memberInfo)
@@ -46,8 +56,7 @@ internal static class ParserFunctionLookup
         }
 
         return DefaultParserFor(TypeHelper.GetDeclaredType(memberInfo))
-            ?? throw new ParseException($"No parser available to parse argument: [{argumentAttribute.Name}]. "
-                + "There is no registered parser supporting type: [{fieldType}]");
+            ?? throw new ParseException($"No parser available to parse argument: [{argumentAttribute.Name}].");
     }
 
     private static Func<object, string, object>? DefaultParserFor(Type fieldType)
@@ -67,7 +76,7 @@ internal static class ParserFunctionLookup
     private static Func<object, string, object> CreateParserFromMethod(Type modelType, string methodName)
     {
         MethodInfo method = modelType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
-            .Where(info => info.Name == methodName && info.IsStatic)
+            .Where(info => info.Name == methodName)
             .FirstOrDefault()
             ?? throw new ParseException("Could not locate parser. No public static method with "
                 + $"the name [{methodName}] could be found on type [{modelType.FullName}].");

@@ -53,34 +53,22 @@ public interface IDataEncoderUtil
 /// Utility class to encode a file to encrypted binary data or decode the encrypted binary string to the
 /// original file bytes.
 /// </summary>
-public sealed class DataEncoderUtil : IDataEncoderUtil
+public sealed class DataEncoderUtil(
+    IKeyUtil keyUtil,
+    IEncryptionUtil encryptionUtil,
+    IDummyUtil dummyUtil,
+    IRandomizeUtil randomizeUtil,
+    ICompressionUtil compressionUtil,
+    IBinaryUtil binaryUtil) : IDataEncoderUtil
 {
     private readonly ILogger log = new LazyLogger<DataEncoderUtil>();
 
-    private readonly IKeyUtil keyUtil;
-    private readonly IEncryptionUtil encryptionUtil;
-    private readonly IDummyUtil dummyUtil;
-    private readonly IRandomizeUtil randomizeUtil;
-    private readonly ICompressionUtil compressionUtil;
-    private readonly IBinaryUtil binaryUtil;
-
-#pragma warning disable CS1591, SA1600
-    public DataEncoderUtil(
-        IKeyUtil keyUtil,
-        IEncryptionUtil encryptionUtil,
-        IDummyUtil dummyUtil,
-        IRandomizeUtil randomizeUtil,
-        ICompressionUtil compressionUtil,
-        IBinaryUtil binaryUtil)
-    {
-        this.keyUtil = keyUtil;
-        this.encryptionUtil = encryptionUtil;
-        this.dummyUtil = dummyUtil;
-        this.randomizeUtil = randomizeUtil;
-        this.compressionUtil = compressionUtil;
-        this.binaryUtil = binaryUtil;
-    }
-#pragma warning restore CS1591, SA1600
+    private readonly IKeyUtil keyUtil = keyUtil;
+    private readonly IEncryptionUtil encryptionUtil = encryptionUtil;
+    private readonly IDummyUtil dummyUtil = dummyUtil;
+    private readonly IRandomizeUtil randomizeUtil = randomizeUtil;
+    private readonly ICompressionUtil compressionUtil = compressionUtil;
+    private readonly IBinaryUtil binaryUtil = binaryUtil;
 
     /// <inheritdoc/>
     public string Encode(

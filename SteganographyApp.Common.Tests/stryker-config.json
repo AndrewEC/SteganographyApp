@@ -18,7 +18,13 @@
 
         "mutate": [
             "!**/Help.cs",
-            "!**/RootLogger.cs"
+            "!**/RootLogger.cs",
+            "!**/BasicImageInfo.cs",
+            "!**/ConsoleProxy.cs",
+            "!**/FileProxy.cs",
+            "!**/ImageProxy.cs",
+            "!**/ReadWriteStream.cs",
+            "!**/ServiceContainer.cs"
         ]
     }
 }

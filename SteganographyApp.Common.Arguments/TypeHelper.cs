@@ -5,7 +5,8 @@ using System.Collections.Immutable;
 using System.Reflection;
 
 /// <summary>
-/// Assists in retrieving or applying information in a reflective manner to a MemberInfo instance.
+/// Assists in retrieving or applying information in a reflective manner
+/// to a <see cref="MemberInfo"/> instance.
 /// </summary>
 public static class TypeHelper
 {
@@ -13,7 +14,7 @@ public static class TypeHelper
 
     /// <summary>
     /// Gets the underlying type of the member. This only works on fields and properties. Attempting to use this with
-    /// any other type will result in a TypeException.
+    /// any other type will result in a <see cref="TypeException"/>.
     /// </summary>
     /// <param name="memberInfo">The member info from which we want to extract the underlying field type or property type.</param>
     /// <returns>The underlying type of the member.</returns>
@@ -26,7 +27,7 @@ public static class TypeHelper
 
     /// <summary>
     /// Attempts to reflectively set the value of a field or property. This only works on fields and properties. Attempting to use this with
-    /// any other type will result in a TypeException.
+    /// any other type will result in a <see cref="TypeException"/>.
     /// </summary>
     /// <param name="instance">The instance containing the member we are trying to set.</param>
     /// <param name="memberInfo">The field or property declared by the instance to set.</param>
@@ -49,7 +50,7 @@ public static class TypeHelper
 
     /// <summary>
     /// Attempts to reflectively get the value of a field or property. This only works on fields and properties. Attempting to use this with
-    /// any other type will result in a TypeException.
+    /// any other type will result in a <see cref="TypeException"/>.
     /// </summary>
     /// <param name="instance">The instance declaring the member whose value we want to retrieve.</param>
     /// <param name="memberInfo">The field or property whose value we want to retrieve.</param>
@@ -76,7 +77,7 @@ public static class TypeHelper
     /// </summary>
     /// <param name="attribute">The argument attribute. Required to get the position of the
     /// argument.</param>
-    /// <param name="member">The reflective member that has the argument attribute.</param>
+    /// <param name="member">The underlying member being attributed.</param>
     /// <returns>True if the argument is positional or if the member has the Required
     /// attribute. Otherwise, false.</returns>
     public static bool IsArgumentRequired(ArgumentAttribute attribute, MemberInfo member)

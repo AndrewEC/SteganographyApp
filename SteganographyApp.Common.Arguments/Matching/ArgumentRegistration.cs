@@ -10,7 +10,7 @@ using System.Reflection;
 /// Static class to help identify all the field and properties of a given type that are attributed
 /// with the argument attribute.
 /// </summary>
-internal static class ArgumentRegistration
+public interface IArgumentRegistration
 {
     /// <summary>
     /// Finds all the attributed argument fields and properties of the input type and returns an array of the attributed members,
@@ -18,7 +18,17 @@ internal static class ArgumentRegistration
     /// </summary>
     /// <param name="modelType">The type of the class from which the attribute argument fields will be pulled from.</param>
     /// <returns>An array of the attributed members, the associated parsers, and the attribute info.</returns>
-    public static ImmutableArray<RegisteredArgument> FindAttributedArguments(Type modelType)
+    public ImmutableArray<RegisteredArgument> FindAttributedArguments(Type modelType);
+}
+
+/// <summary>
+/// Static class to help identify all the field and properties of a given type that are attributed
+/// with the argument attribute.
+/// </summary>
+public sealed class ArgumentRegistration(IParserFunctionLookup lookup) : IArgumentRegistration
+{
+    /// <inheritdoc/>
+    public ImmutableArray<RegisteredArgument> FindAttributedArguments(Type modelType)
     {
         var names = new HashSet<string>();
         var registered = new List<RegisteredArgument>();
@@ -39,15 +49,13 @@ internal static class ArgumentRegistration
 
             if (!names.Add(name))
             {
-                throw new ParseException("An invalid configuration was provided. "
-                    + $"Two or more arguments on type [{modelType.FullName}] have the same name of: [{attribute.Name}]");
+                throw new ParseException($"Two or more arguments on type [{modelType.FullName}] have the same name of: [{attribute.Name}]");
             }
 
             string shortName = attribute.ShortName?.Trim() ?? string.Empty;
             if (!string.IsNullOrEmpty(shortName) && !names.Add(shortName))
             {
-                throw new ParseException("An invalid configuration was provided. Two or "
-                    + $"more arguments have the same short name of: [{shortName}]");
+                throw new ParseException($"Two or more arguments have the same short name of: [{shortName}]");
             }
 
             if (TypeHelper.GetDeclaredType(member) == typeof(bool) && attribute.Position > 0)
@@ -56,7 +64,7 @@ internal static class ArgumentRegistration
                     + "An argument cannot be a boolean and have a position.");
             }
 
-            registered.Add(new RegisteredArgument(attribute, member, ParserFunctionLookup
+            registered.Add(new RegisteredArgument(attribute, member, lookup
                 .FindParser(modelType, attribute, member)));
         }
 

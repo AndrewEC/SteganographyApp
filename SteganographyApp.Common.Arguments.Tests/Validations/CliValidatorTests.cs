@@ -6,18 +6,22 @@ using SteganographyApp.Common.Arguments.Validation;
 [TestFixture]
 public class CliValidatorTests
 {
+    private readonly CliValidator cliValidator = new();
+
     [Test]
     public void TestValidate()
     {
         var toValidate = new Valid();
-        CliValidator.Validate(toValidate);
+        cliValidator.Validate(toValidate);
     }
 
     [Test]
     public void TestValidateWithInvalidValuesThrowsValidationFailedException()
     {
         var toValidate = new Invalid();
-        Assert.Throws(typeof(ValidationFailedException), () => CliValidator.Validate(toValidate));
+        Assert.Throws(
+            typeof(ValidationFailedException),
+            () => cliValidator.Validate(toValidate));
     }
 }
 

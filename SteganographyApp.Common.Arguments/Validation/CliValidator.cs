@@ -7,14 +7,11 @@ using System.Linq;
 using System.Reflection;
 
 /// <summary>
-/// Static utility class to assist in validating a given <see cref="CliParser"/>
+/// A utility to assist in validating a given <see cref="CliParser"/>
 /// initialized model.
 /// </summary>
-public static class CliValidator
+public interface ICliValidator
 {
-    private static readonly string ArgumentIdentifierTemplate = "{0}|{1}";
-    private static readonly string ValidationFailedTemlate = "Validation failed on field: {0}. {1}";
-
     /// <summary>
     /// Validates the <see cref="CliParser"/> initialized model. This will identify all fields and properties
     /// on the model that have been annotated with both <see cref="ArgumentAttribute"/> and
@@ -26,7 +23,20 @@ public static class CliValidator
     /// <param name="instance">The instance of the model to validate.</param>
     /// <exception cref="ValidationFailedException">Thrown if any of the validators applied to any field or property
     /// on the model failed validation.</exception>
-    public static void Validate(object instance)
+    public void Validate(object instance);
+}
+
+/// <summary>
+/// A utility to assist in validating a given <see cref="CliParser"/>
+/// initialized model.
+/// </summary>
+public sealed class CliValidator : ICliValidator
+{
+    private static readonly string ArgumentIdentifierTemplate = "{0}|{1}";
+    private static readonly string ValidationFailedTemlate = "Validation failed on field: {0}. {1}";
+
+    /// <inheritdoc/>
+    public void Validate(object instance)
     {
         ImmutableArray<ValidatableInfo> validatableMembers = FindValidatableMembers(instance);
         if (validatableMembers.Length == 0)

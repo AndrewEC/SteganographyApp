@@ -23,7 +23,7 @@ public class ImageStoreTests
 
     private static readonly IInputArguments Arguments = new CommonArguments
     {
-        CoverImages = ImmutableArray.Create(new string[] { ImagePath }),
+        CoverImages = [ImagePath],
     };
 
     private readonly Mock<IImageProxy> mockImageProxy = new(MockBehavior.Strict);

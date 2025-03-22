@@ -64,11 +64,14 @@ Invoke-UnitTest "SteganographyApp.Common.Tests" {
         --targetargs "test ./SteganographyApp.Common.Tests --no-build" `
         --exclude-by-file "**/RootLogger.cs" `
         --exclude-by-file "**/Logger.cs" `
+        --exclude-by-file "**/LazyLogger.cs" `
+        --exclude-by-file "**/LoggerFactory.cs" `
         --exclude-by-file "**/BasicImageInfo.cs" `
         --exclude-by-file "**/ConsoleProxy.cs" `
         --exclude-by-file "**/FileProxy.cs" `
         --exclude-by-file "**/ImageProxy.cs" `
         --exclude-by-file "**/ReadWriteStream.cs" `
+        --exclude-by-file "**/ServiceContainer.cs" `
         --threshold 70 `
         --threshold-type line `
         --threshold-type branch `
@@ -82,7 +85,8 @@ Invoke-UnitTest "SteganographyApp.Common.Arguments.Tests" {
         --target "dotnet" `
         --targetargs "test ./SteganographyApp.Common.Arguments.Tests --no-build" `
         --exclude-by-file "**/Help.cs" `
-        --threshold 70 `
+        --exclude-by-file "**/ArgumentsServiceContainer.cs" `
+        --threshold 80 `
         --threshold-type line `
         --threshold-type branch `
         --threshold-stat total `

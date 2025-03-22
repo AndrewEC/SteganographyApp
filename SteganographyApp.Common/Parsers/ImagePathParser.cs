@@ -54,30 +54,17 @@ public static class ImagePathParser
             throw new ArgumentValueException($"No images could be found.");
         }
 
-        VerifyAllImagesExist(imagePaths);
-
-        VerifyAllImagesAreUnique(imagePaths);
-    }
-
-    private static void VerifyAllImagesExist(ImmutableArray<string> imagePaths)
-    {
         var fileProxy = ServiceContainer.GetService<IFileIOProxy>();
 
-        string? missingImagePath = imagePaths.Where(path => !fileProxy.IsExistingFile(path))
-            .FirstOrDefault();
-
-        if (missingImagePath != null)
-        {
-            throw new ArgumentValueException($"The file specified could not be read: [{missingImagePath}]");
-        }
-    }
-
-    private static void VerifyAllImagesAreUnique(ImmutableArray<string> imagePaths)
-    {
-        var uniqueImages = new HashSet<string>();
+        HashSet<string> existingPaths = [];
         foreach (string imagePath in imagePaths)
         {
-            if (!uniqueImages.Add(imagePath))
+            if (!fileProxy.IsExistingFile(imagePath))
+            {
+            throw new ArgumentValueException($"The file specified could not be read: [{imagePath}]");
+            }
+
+            if (!existingPaths.Add(imagePath))
             {
                 throw new ArgumentValueException($"Two or more paths point to the same image of: [{imagePath}]");
             }

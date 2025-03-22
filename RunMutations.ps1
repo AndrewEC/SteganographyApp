@@ -55,9 +55,9 @@ function Invoke-Stryker {
 
     $Output = Join-Path -Path $Project -ChildPath "StrykerOutput"
 
-    Remove-Folder $Output
-
     Write-Divider "Running $Project mutation tests"
+
+    Remove-Folder $Output
 
     Set-Location $Project
     try {

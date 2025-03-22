@@ -5,19 +5,34 @@ using System.Collections.Immutable;
 using System.Linq;
 
 /// <summary>
-/// Matches the arguments attributed on the target class with the values specified by the user's input.
+/// Matches the arguments attributed on the target class with the
+/// values specified by the user's input.
 /// </summary>
-internal static class ArgumentValueMatcher
+public interface IArgumentValueMatcher
 {
-    private const string TrueString = "true";
-
     /// <summary>
     /// Pairs all the input cli arguments with the registered arguments.
     /// </summary>
     /// <param name="arguments">The array of user provided arguments to be paired with the registered arguments.</param>
     /// <param name="registeredArguments">The array of attributed arguments from the class being parsed into.</param>
     /// <returns>An array of arguments matched with their respective cli values to parse.</returns>
-    public static ImmutableArray<MatchResult> Match(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
+    public ImmutableArray<MatchResult> Match(
+        string[] arguments,
+        ImmutableArray<RegisteredArgument> registeredArguments);
+}
+
+/// <summary>
+/// Matches the arguments attributed on the target class with the
+/// values specified by the user's input.
+/// </summary>
+public sealed class ArgumentValueMatcher : IArgumentValueMatcher
+{
+    private const string TrueString = "true";
+
+    /// <inheritdoc/>
+    public ImmutableArray<MatchResult> Match(
+        string[] arguments,
+        ImmutableArray<RegisteredArgument> registeredArguments)
     {
         ImmutableArray<MatchResult> matchedArguments = PairRegisteredArgumentsWithValues(arguments, registeredArguments);
         VerifyNoRequiredArgumentsAreMissing(registeredArguments, matchedArguments);
@@ -42,12 +57,12 @@ internal static class ArgumentValueMatcher
         }
     }
 
-    private static RegisteredArgument? FindArgumentMatchingName(string input, ImmutableArray<RegisteredArgument> registeredArguments)
+    private static RegisteredArgument FindArgumentMatchingName(string input, ImmutableArray<RegisteredArgument> registeredArguments)
         => registeredArguments
             .Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input)
             .FirstOrDefault();
 
-    private static RegisteredArgument? FindArgumentWithPosition(int position, ImmutableArray<RegisteredArgument> registeredArguments)
+    private static RegisteredArgument FindArgumentWithPosition(int position, ImmutableArray<RegisteredArgument> registeredArguments)
         => registeredArguments.Where(registered => registered.Attribute.Position == position)
             .FirstOrDefault();
 
@@ -58,11 +73,11 @@ internal static class ArgumentValueMatcher
         for (int i = 0; i < arguments.Length; i++)
         {
             var input = arguments[i];
-            RegisteredArgument? registered = FindArgumentMatchingName(input, registeredArguments);
-            if (registered == null)
+            RegisteredArgument registered = FindArgumentMatchingName(input, registeredArguments);
+            if (registered == default)
             {
                 registered = FindArgumentWithPosition(currentPosition, registeredArguments);
-                if (registered == null)
+                if (registered == default)
                 {
                     throw new ParseException($"Received an unrecognized argument: [{input}]");
                 }
@@ -80,7 +95,7 @@ internal static class ArgumentValueMatcher
             }
             else
             {
-                if (i + 1 > arguments.Length)
+                if (i + 1 >= arguments.Length)
                 {
                     throw new ParseException($"Received an invalid number of arguments. No value could be found corresponding to argument: [{input}]");
                 }

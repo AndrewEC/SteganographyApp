@@ -11,10 +11,9 @@ where T : class
     /// Parses the user provided arguments into an object of type T and passes it to the abstract
     /// Execute function.
     /// </summary>
-    /// <param name="program">The CliProgram being executed.</param>
     /// <param name="args">The array of user provided command line arguments.</param>
-    public void Execute(CliProgram program, string[] args)
-        => Execute(CliParser.ParseArgs<T>(args));
+    public void Execute(string[] args)
+        => Execute(ArgumentsServiceContainer.GetService<ICliParser>().ParseArgs<T>(args));
 
     /// <summary>
     /// Execute the command providing some parsed argument object as input.
@@ -33,5 +32,6 @@ where T : class
     /// CLI model specified in the generic type argument T.
     /// </summary>
     /// <returns>The help text pulled from the ProgramDescriptor.</returns>
-    public virtual string GetHelpDescription() => Help.GetCommandDescription(typeof(T));
+    public virtual string GetHelpDescription() => ArgumentsServiceContainer
+        .GetService<IHelp>().GetCommandDescription(typeof(T));
 }

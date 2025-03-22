@@ -25,7 +25,7 @@ public sealed class CliProgram
     /// Executes the CliProgram.
     /// </summary>
     /// <param name="args">The array of user provided command line arguments.</param>
-    public void Execute(string[] args) => root.Execute(this, args);
+    public void Execute(string[] args) => root.Execute(args);
 
     /// <summary>
     /// Executes the CliProgram. This will catch and return any exception thrown during the execution of the program.

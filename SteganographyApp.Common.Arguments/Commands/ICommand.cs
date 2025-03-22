@@ -8,10 +8,8 @@ public interface ICommand
     /// <summary>
     /// Execute the current command.
     /// </summary>
-    /// <param name="program">The CliProgram instance being executed. Using this allows a command to access
-    /// additional parsers if they have been made available.</param>
     /// <param name="args">The list of user provided command line arguments to execute.</param>
-    public void Execute(CliProgram program, string[] args);
+    public void Execute(string[] args);
 
     /// <summary>
     /// The name of the command. The name specified the input the user must provide to trigger the command.

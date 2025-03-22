@@ -108,7 +108,7 @@ public sealed class DummyUtil : IDummyUtil
                 valueList.RemoveRange(positions[i], lengths[i]);
             }
 
-            result = valueList.ToArray();
+            result = [.. valueList];
         }
         catch (ArgumentOutOfRangeException e)
         {
@@ -120,18 +120,20 @@ public sealed class DummyUtil : IDummyUtil
     }
 
     private static int ComputeActualNumberOfDummies(Xor128Prng generator, int numDummies)
-    => generator.Next(numDummies - (numDummies / 3)) + (numDummies / 3);
+        => generator.Next(numDummies - (numDummies / 3)) + (numDummies / 3);
 
-    private static int[] GenerateLengthsOfDummies(int numDummies, Xor128Prng generator) => Enumerable.Range(0, numDummies)
-        .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
-        .ToArray();
+    private static int[] GenerateLengthsOfDummies(int numDummies, Xor128Prng generator)
+        => Enumerable.Range(0, numDummies)
+            .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
+            .ToArray();
 
-    private static byte[] GenerateDummyBytes(Xor128Prng generator, int length) => Enumerable.Range(0, length)
-        .Select(i => (byte)generator.Next(byte.MaxValue))
-        .ToArray();
+    private static byte[] GenerateDummyBytes(Xor128Prng generator, int length)
+        => Enumerable.Range(0, length)
+            .Select(i => (byte)generator.Next(byte.MaxValue))
+            .ToArray();
 
     private static int[] GeneratePositions(Xor128Prng generator, int numberOfDummies, int maxPosition)
-    => Enumerable.Range(0, numberOfDummies)
-        .Select(i => generator.Next(maxPosition))
-        .ToArray();
+        => Enumerable.Range(0, numberOfDummies)
+            .Select(i => generator.Next(maxPosition))
+            .ToArray();
 }

@@ -24,9 +24,8 @@ where T : ICommand
     /// <summary>
     /// Proxies the call to the underlying command instance.
     /// </summary>
-    /// <param name="program">The CliProgram instance being executed.</param>
     /// <param name="args">The array of user provided command line arguments.</param>
-    public void Execute(CliProgram program, string[] args) => Actual.Execute(program, args);
+    public void Execute(string[] args) => Actual.Execute(args);
 
     /// <summary>
     /// Returns the name from the underlying command being proxies.

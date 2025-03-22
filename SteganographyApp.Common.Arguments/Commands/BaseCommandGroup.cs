@@ -36,9 +36,8 @@ public abstract class BaseCommandGroup : ICommandGroup
     /// Executes the command group. This will effectively lookup the SubCommands, determing which command needs to
     /// be executed, and provide the appropriate parameters to the command.
     /// </summary>
-    /// <param name="program">The CliProgram being executed.</param>
     /// <param name="args">The array of user provided command line arguments.</param>
-    public void Execute(CliProgram program, string[] args)
+    public void Execute(string[] args)
     {
         if (args.Length == 0)
         {
@@ -50,7 +49,7 @@ public abstract class BaseCommandGroup : ICommandGroup
 
         string[] nextArgs = args.Skip(1).ToArray();
 
-        nextCommand.Execute(program, nextArgs);
+        nextCommand.Execute(nextArgs);
     }
 
     /// <summary>
@@ -67,10 +66,13 @@ public abstract class BaseCommandGroup : ICommandGroup
         => string.Format("Run one of the following commands: {0}", FormExpectedCommandNameList(subCommands));
 
     private static string FormExpectedCommandNameList(ICommand[] subCommands)
-        => string.Join(", ", subCommands.Select(command => command.GetName().ToLowerInvariant()));
+        => string.Join(", ", subCommands.Select(GetCommandName));
 
     private static bool WasHelpRequested(string nextCommandName)
         => nextCommandName == "-h" || nextCommandName == "--help";
+
+    private static string GetCommandName(ICommand command)
+        => command.GetName().Trim().ToLowerInvariant();
 
     private ICommand GetNextCommand(string[] args)
     {
@@ -81,7 +83,7 @@ public abstract class BaseCommandGroup : ICommandGroup
         }
 
         ICommand? nextCommand = subCommands
-            .Where(command => command.GetName().Equals(nextCommandName, StringComparison.InvariantCultureIgnoreCase))
+            .Where(command => GetCommandName(command).Equals(nextCommandName))
             .FirstOrDefault();
         if (nextCommand == null)
         {
@@ -100,11 +102,11 @@ public abstract class BaseCommandGroup : ICommandGroup
             string helpText = command.GetHelpDescription();
             if (helpText == string.Empty)
             {
-                Console.WriteLine($"  {command.GetName()}");
+                Console.WriteLine($"  {GetCommandName(command)}");
             }
             else
             {
-                Console.WriteLine($"  {command.GetName()} - {command.GetHelpDescription()}");
+                Console.WriteLine($"  {GetCommandName(command)} - {command.GetHelpDescription()}");
             }
         }
 
@@ -121,7 +123,7 @@ public abstract class BaseCommandGroup : ICommandGroup
         HashSet<string> names = [];
         foreach (ICommand command in commands)
         {
-            string name = command.GetName().ToLowerInvariant();
+            string name = GetCommandName(command);
             if (!names.Add(name))
             {
                 throw new CommandException($"All commands in a group must have a unique name. Group [{GetName()}] has multiple commands named: [{name}].");

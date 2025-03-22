@@ -37,7 +37,7 @@ public interface IEncryptionUtil
 /// <summary>
 /// Utility class for encrypting and decrypting content.
 /// </summary>
-public sealed class EncryptionUtil : IEncryptionUtil
+public sealed class EncryptionUtil(IKeyUtil keyUtil) : IEncryptionUtil
 {
     /// <summary>The default number of iterations that should be used when hashing a key.</summary>
     public static readonly int DefaultIterations = 150_000;
@@ -46,15 +46,7 @@ public sealed class EncryptionUtil : IEncryptionUtil
 
     private readonly ILogger log = new LazyLogger<EncryptionUtil>();
 
-    private readonly IKeyUtil keyUtil;
-
-#pragma warning disable CS1591, SA1600
-    public EncryptionUtil(IKeyUtil keyUtil)
-    {
-        this.keyUtil = keyUtil;
-    }
-
-#pragma warning restore CS1591, SA1600
+    private readonly IKeyUtil keyUtil = keyUtil;
 
     /// <inheritdoc/>
     public byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations)

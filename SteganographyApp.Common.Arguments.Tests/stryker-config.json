@@ -11,9 +11,14 @@
         "additional-timeout": 30000,
 
         "thresholds": {
-            "high": 35,
-            "low": 35,
-            "break": 35
-        }
+            "high": 65,
+            "low": 65,
+            "break": 65
+        },
+
+        "mutate": [
+            "!**/Help.*",
+            "!**/ArgumentsServiceContainer.*"
+        ]
     }
 }

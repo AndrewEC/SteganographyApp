@@ -8,16 +8,11 @@ using SteganographyApp.Common.Injection.Proxies;
 /// Stream encapsulation class that reads and encodes data
 /// from the input file.
 /// </summary>
-public sealed class ContentReader : AbstractContentIO
+public sealed class ContentReader(
+    IInputArguments args,
+    IDataEncoderUtil dataEncoderUtil,
+    IFileIOProxy fileIOProxy) : AbstractContentIO(args, dataEncoderUtil, fileIOProxy)
 {
-#pragma warning disable CS1591, SA1600
-    public ContentReader(
-        IInputArguments args,
-        IDataEncoderUtil dataEncoderUtil,
-        IFileIOProxy fileIOProxy)
-    : base(args, dataEncoderUtil, fileIOProxy) { }
-#pragma warning restore CS1591, SA1600
-
     /// <summary>
     /// Reads in the next unread chunk of data from the input file, encodes it,
     /// and returns the encoded value.

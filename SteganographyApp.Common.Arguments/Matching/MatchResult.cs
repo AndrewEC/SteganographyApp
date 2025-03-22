@@ -11,7 +11,7 @@ using System.Reflection;
 /// </remarks>
 /// <param name="registeredArgument">The registered argument containing the attribute, member, and parser information.</param>
 /// <param name="input">The user provided input to be parsed and set based on the info from the registered argumetn.</param>
-internal readonly struct MatchResult(RegisteredArgument registeredArgument, string input)
+public readonly struct MatchResult(RegisteredArgument registeredArgument, string input)
 {
     /// <summary>
     /// Gets the argument attribute.
