@@ -37,10 +37,7 @@ function Invoke-UnitTest {
 
     $RunCommand.Invoke()
 
-    if ($LastExitCode -ne 0) {
-        Write-Host "'coverlet' $ProjectName command failed with status: [$LastExitCode]"
-        exit
-    }
+    $CoverletExitCode = $LastExitCode
 
     $ReportDir = Join-Path ./reports/unit-tests $ProjectName
 
@@ -51,6 +48,11 @@ function Invoke-UnitTest {
     dotnet tool run reportgenerator "-reports:coverage.opencover.xml" "-targetDir:$ReportDir"
     if ($LastExitCode -ne 0) {
         Write-Host "'reportgenerator' command failed with status: [$LastExitCode]"
+        exit
+    }
+
+    if ($CoverletExitCode -ne 0) {
+        Write-Host "'coverlet' $ProjectName command failed with status: [$CoverletExitCode]"
         exit
     }
 
@@ -72,7 +74,7 @@ Invoke-UnitTest "SteganographyApp.Common.Tests" {
         --exclude-by-file "**/ImageProxy.cs" `
         --exclude-by-file "**/ReadWriteStream.cs" `
         --exclude-by-file "**/ServiceContainer.cs" `
-        --threshold 70 `
+        --threshold 75 `
         --threshold-type line `
         --threshold-type branch `
         --threshold-stat total `

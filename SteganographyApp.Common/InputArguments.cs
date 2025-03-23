@@ -101,7 +101,7 @@ public sealed class CommonArguments : IInputArguments
     public string DecodedOutputFile { get; set; } = string.Empty;
 
     /// <inheritdoc/>
-    public ImmutableArray<string> CoverImages { get; set; }
+    public ImmutableArray<string> CoverImages { get; set; } = [];
 
     /// <inheritdoc/>
     public bool UseCompression { get; set; } = false;

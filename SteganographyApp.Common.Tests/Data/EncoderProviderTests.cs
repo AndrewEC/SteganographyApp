@@ -1,11 +1,11 @@
 namespace SteganographyApp.Common.Tests;
 
 using System;
-
+using System.Security.Cryptography;
 using Moq;
 
 using NUnit.Framework;
-
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
 
@@ -29,7 +29,15 @@ public class EncoderProviderTests
     [TestCase(ImageFormat.Webp, typeof(WebpEncoder))]
     public void TestProvideEncoder(ImageFormat imageFormat, Type encoderType)
     {
-        Assert.That(encoderProvider.GetEncoder(imageFormat), Is.AssignableFrom(encoderType));
+        IImageEncoder provider = encoderProvider.GetEncoder(imageFormat);
+        if (encoderType == typeof(PngEncoder))
+        {
+            AssertPngEncoder(provider);
+        }
+        else
+        {
+            AssertWebpEncoder(provider);
+        }
     }
 
     [TestCase("image/png", typeof(PngEncoder))]
@@ -40,5 +48,34 @@ public class EncoderProviderTests
         mockImageProxy.Setup(imageProxy => imageProxy.GetImageMimeType(path)).Returns(format);
 
         Assert.That(encoderProvider.GetEncoder(path), Is.AssignableFrom(encoder));
+    }
+
+    private static void AssertPngEncoder(IImageEncoder encoder)
+    {
+        Assert.That(encoder, Is.AssignableFrom(typeof(PngEncoder)));
+
+        PngEncoder pngEncoder = (PngEncoder)encoder;
+
+        Assert.That(pngEncoder.CompressionLevel, Is.EqualTo(PngCompressionLevel.Level5));
+    }
+
+    private static void AssertWebpEncoder(IImageEncoder encoder)
+    {
+        Assert.That(encoder, Is.AssignableFrom(typeof(WebpEncoder)));
+
+        WebpEncoder webpEncoder = (WebpEncoder)encoder;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(webpEncoder.FileFormat, Is.EqualTo(WebpFileFormatType.Lossless));
+            Assert.That(webpEncoder.Method, Is.EqualTo(WebpEncodingMethod.BestQuality));
+            Assert.That(webpEncoder.UseAlphaCompression, Is.False);
+            Assert.That(webpEncoder.EntropyPasses, Is.EqualTo(0));
+            Assert.That(webpEncoder.SpatialNoiseShaping, Is.EqualTo(0));
+            Assert.That(webpEncoder.FilterStrength, Is.EqualTo(0));
+            Assert.That(webpEncoder.TransparentColorMode, Is.EqualTo(WebpTransparentColorMode.Preserve));
+            Assert.That(webpEncoder.Quality, Is.EqualTo(100));
+            Assert.That(webpEncoder.NearLossless, Is.False);
+        });
     }
 }

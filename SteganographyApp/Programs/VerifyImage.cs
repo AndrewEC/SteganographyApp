@@ -46,7 +46,8 @@ internal sealed class TempFileBackup : AbstractDisposable
         this.originalFilePath = sourcePath;
     }
 
-    protected override void DoDispose() => RunIfNotDisposed(() => {
+    protected override void DoDispose() => RunIfNotDisposed(() =>
+    {
         logger.Debug("Deleting modified file: [{0}]", originalFilePath);
         File.Delete(originalFilePath);
         logger.Debug("Restoring file [{0}] from [{1}]", originalFilePath, backupPath);

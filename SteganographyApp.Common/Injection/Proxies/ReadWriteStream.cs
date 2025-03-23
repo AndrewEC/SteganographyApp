@@ -6,6 +6,8 @@ using System.IO;
 /// <summary>
 /// Provides an interface wrapper for some of the basic
 /// read/write stream operations.
+/// <para>Inteneded to make it easier to test some of the built-in
+/// static methods by making them mockable.</para>
 /// </summary>
 public interface IReadWriteStream : IDisposable
 {

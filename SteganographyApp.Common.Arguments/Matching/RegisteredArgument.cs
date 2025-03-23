@@ -13,7 +13,7 @@ using System.Reflection;
 /// <param name="Attribute">The attribute.</param>
 /// <param name="Member">The field or property of the argument class that has been attributed.</param>
 /// <param name="Parser">The parser function that will parse a value from the user's input and set the member value.</param>
-public readonly record struct RegisteredArgument(
+public record class RegisteredArgument(
     ArgumentAttribute Attribute,
     MemberInfo Member,
     Func<object, string, object> Parser);

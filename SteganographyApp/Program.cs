@@ -3,7 +3,6 @@
 using System;
 
 using SteganographyApp.Common.Arguments.Commands;
-using SteganographyApp.Common.Parsers;
 using SteganographyApp.Programs;
 
 #pragma warning disable SA1600, SA1402, SA1009
@@ -33,12 +32,6 @@ public class Program
         )
         .Execute(args);
     }
-
-    private static Func<object, string, object> CreateSecureParser(string prompt)
-        => (target, value) => SecureParser.ReadUserInput(prompt, value);
-
-    private static Func<object, string, object> CreateSecureIntParser(string prompt)
-        => (target, value) => Convert.ToInt32(SecureParser.ReadUserInput(prompt, value));
 }
 
 #pragma warning restore SA1600, SA1402, SA1009

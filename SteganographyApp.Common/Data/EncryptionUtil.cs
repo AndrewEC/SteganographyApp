@@ -13,24 +13,25 @@ using SteganographyApp.Common.Logging;
 public interface IEncryptionUtil
 {
     /// <summary>
-    /// Encrypts the provided base64 encoded string using the input password.
+    /// Encrypts the value byte array using AES. This method should not be invoked
+    /// if the password is an empty string.
     /// </summary>
-    /// <param name="value">The base64 encoded string to encrypt.</param>
-    /// <param name="password">The password to use in the AES cypher.</param>
-    /// <param name="additionalPasswordHashIterations">The additional number of times the password should be hashed before being encrypting or decrypting content.
-    /// Has no effect if no password has been provided.</param>
-    /// <returns>An encrypted base64 encoded string.</returns>
+    /// <param name="value">The byte data to be encrypted.</param>
+    /// <param name="password">The password. Must not be an empty string.</param>
+    /// <param name="additionalPasswordHashIterations">The additional number of
+    /// times the password should be hashed.</param>
+    /// <returns>The byte representation of the AES encrypted value.</returns>
     byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations);
 
     /// <summary>
-    /// Decrypts the provided base64 encoded string using the input password.
+    /// Decrypts the input value byte array using standard AES encryption. This method
+    /// should not be invoked if the password is an empty string.
     /// </summary>
-    /// <param name="value">The base64 encoded string to decrypt.</param>
-    /// <param name="password">The password to use in the AES cypher.</param>
+    /// <param name="value">The bytes to be decrypted.</param>
+    /// <param name="password">The password. Must not be empty.</param>
     /// <param name="additionalPasswordHashIterations">
-    /// The additional number of times the password should be hashed before being encrypting or decrypting content.
-    /// Has no effect if no password has been provided.</param>
-    /// <returns>A decrypted base64 encoded string.</returns>
+    /// The additional number of times the password should be hashed.</param>
+    /// <returns>The unencrypted bytes.</returns>
     byte[] Decrypt(byte[] value, string password, int additionalPasswordHashIterations);
 }
 
@@ -39,9 +40,9 @@ public interface IEncryptionUtil
 /// </summary>
 public sealed class EncryptionUtil(IKeyUtil keyUtil) : IEncryptionUtil
 {
-    /// <summary>The default number of iterations that should be used when hashing a key.</summary>
-    public static readonly int DefaultIterations = 150_000;
-
+    /// <summary>
+    /// The size, in bytes of the initialization vector (iv).
+    /// </summary>
     private const int IvSize = 16;
 
     private readonly ILogger log = new LazyLogger<EncryptionUtil>();
@@ -51,8 +52,13 @@ public sealed class EncryptionUtil(IKeyUtil keyUtil) : IEncryptionUtil
     /// <inheritdoc/>
     public byte[] Encrypt(byte[] value, string password, int additionalPasswordHashIterations)
     {
-        byte[] keyBytes = ServiceContainer.GetService<IKeyUtil>().GenerateKey(password, additionalPasswordHashIterations);
-        log.Debug("Encrypting value using key: [{0}]/[{1}]", () => [password, Convert.ToBase64String(keyBytes)]);
+        byte[] keyBytes = ServiceContainer.GetService<IKeyUtil>()
+            .GenerateKey(password, additionalPasswordHashIterations);
+
+        log.Debug(
+            "Encrypting value using key: [{0}]/[{1}]",
+            () => [password, Convert.ToBase64String(keyBytes)]);
+
         log.Trace("Encrypting value: [{0}]", () => [Convert.ToBase64String(value)]);
 
         byte[] iv = GenerateRandomBytes(IvSize);

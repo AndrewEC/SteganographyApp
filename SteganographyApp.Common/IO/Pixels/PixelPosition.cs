@@ -3,7 +3,8 @@ namespace SteganographyApp.Common.IO.Pixels;
 using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
-/// Handles the current pixel position for the currently loaded image in the ImageStore.
+/// Tracks the position of the current pixel to be read from, written to,
+/// in the currently loaded image.
 /// </summary>
 internal sealed class PixelPosition
 {
@@ -18,8 +19,7 @@ internal sealed class PixelPosition
     public int Y { get; private set; }
 
     /// <summary>
-    /// Gets or sets the image currently being tracked and updated. This width and height of this
-    /// image is used to determine if there is a pixel to move to when CanMoveToNext is invoked.
+    /// Gets or sets the image currently being tracked and updated.
     /// </summary>
     private IBasicImageInfo? TrackedImage { get; set; }
 
@@ -35,7 +35,8 @@ internal sealed class PixelPosition
     }
 
     /// <summary>
-    /// Attempts to move to the next available position.
+    /// Attempts to move to the next available pixel in the currently
+    /// tracked image. If no more pixels are available this will return false.
     /// </summary>
     /// <returns>False if there is no further pixel to move to, otherwise true.</returns>
     public bool TryMoveToNext()
@@ -55,17 +56,14 @@ internal sealed class PixelPosition
     }
 
     /// <summary>
-    /// Resets the X and Y positions to 0.
-    /// </summary>
-    public void Reset()
-    {
-        X = 0;
-        Y = 0;
-    }
-
-    /// <summary>
     /// Stringifies the pixel position in the format (X: {0}, Y: {1}).
     /// </summary>
     /// <returns>The position of the pixel in the format (X: {0}, Y: {1}).</returns>
     public override string ToString() => string.Format("(X: {0}, Y: {1})", X, Y);
+
+    private void Reset()
+    {
+        X = 0;
+        Y = 0;
+    }
 }

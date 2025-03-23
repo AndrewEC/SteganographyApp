@@ -19,7 +19,7 @@ public interface IBinaryUtil
 
     /// <summary>
     /// Converts a byte array into a binary string representation. This expects each byte in the array to
-    /// have a decimal value of 0 or 1. Each by will thus be added to the binary string using their
+    /// have a decimal value of 0 or 1. Each will thus be added to the binary string using their
     /// direct decimal representation.
     /// </summary>
     /// <param name="bytes">The array of bytes to be converted into a binary string.</param>
@@ -90,7 +90,9 @@ public sealed class BinaryUtil : IBinaryUtil
     }
 
     /// <inheritdoc/>
-    public byte[] ToBytesDirect(string binary) => binary.Select(c => (byte)char.GetNumericValue(c)).ToArray();
+    public byte[] ToBytesDirect(string binary)
+     => [.. binary.Select(c => (byte)char.GetNumericValue(c))];
 
-    private static string To8BitBinaryString(byte input) => Convert.ToString(input, 2).PadLeft(BitsPerByte, '0');
+    private static string To8BitBinaryString(byte input)
+        => Convert.ToString(input, 2).PadLeft(BitsPerByte, '0');
 }

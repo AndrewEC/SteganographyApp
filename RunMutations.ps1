@@ -35,7 +35,8 @@ function Copy-Report {
     }
 
     $StrykerHtmlReport = $StrykerReport | Get-ChildItem `
-        | Select-Object -First 1 | Get-ChildItem `
+        | Select-Object -First 1 `
+        | Get-ChildItem `
         | Select-Object -First 1
 
     $OutputPath = Join-Path reports/mutation-tests $Project

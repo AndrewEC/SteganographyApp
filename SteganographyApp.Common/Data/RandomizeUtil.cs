@@ -4,31 +4,33 @@ using System;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
-/// The contract for interacting with the RandomizeUtil instance.
+/// Provides functionality to randomize and reorder a byte array based on an
+/// input seed.
 /// </summary>
 public interface IRandomizeUtil
 {
     /// <summary>
-    /// Randomizes the already encrypted array of bytes.
+    /// Randomizes, in place, the elements of the input value array using a seeded
+    /// pseudo-random number generator. This will produce consistent results across
+    /// multiple instances of this application.
     /// </summary>
     /// <param name="value">The bytes to be randomized.</param>
-    /// <param name="randomSeed">The user provided random seed that will be used to initialize the random number generator.</param>
-    /// <returns>A randomized binary string.</returns>
+    /// <param name="randomSeed">The seed to initialize the pseudo-random number generator.</param>
+    /// <returns>A randomize byte array.</returns>
     byte[] Randomize(byte[] value, string randomSeed);
 
     /// <summary>
-    /// Reverses the effect of the Randomize method when writing to file.
+    /// Reverses the effect of the <see cref="Randomize(byte[], string)"/> method.
     /// </summary>
-    /// <param name="value">The encrypted and randomized bytes to be re-ordered.</param>
-    /// <param name="randomSeed">The user provided randoom seed that will be used to initialize the random number generator.</param>
-    /// <returns>A non-randomized array of bytes matching the original input file.</returns>
+    /// <param name="value">The bytes to be reordered.</param>
+    /// <param name="randomSeed">Used to initialize the pseudo-random number generator.
+    /// In order for this method to proper reorder the byte array this seed must
+    /// match the seed used in the initial <see cref="Randomize(byte[], string)"/> call.</param>
+    /// <returns>A reordered array of bytes.</returns>
     byte[] Reorder(byte[] value, string randomSeed);
 }
 
-/// <summary>
-/// The injectable utility class to randomize and re-order a binary string during the encode
-/// and decode process.
-/// </summary>
+/// <inheritdoc/>
 public sealed class RandomizeUtil : IRandomizeUtil
 {
     private const int IterationMultiplier = 5;

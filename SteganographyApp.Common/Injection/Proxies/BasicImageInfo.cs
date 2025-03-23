@@ -25,7 +25,7 @@ public interface IBasicImageInfo : IDisposable
     /// </summary>
     /// <param name="x">The x position of the pixel.</param>
     /// <param name="y">The y position of the pixel.</param>
-    /// <returns>The <see cref="Rgba32"/> pixel at the specified position</returns>
+    /// <returns>The <see cref="Rgba32"/> pixel at the specified position.</returns>
     Rgba32 this[int x, int y]
     {
         get;

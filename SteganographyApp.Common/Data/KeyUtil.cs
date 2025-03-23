@@ -7,7 +7,8 @@ using System.Text;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
-/// A contract for interacting with the KeyUtil.
+/// Provides logic for generating hashed keys for use in places like the
+/// <see cref="IEncryptionUtil"/> and <see cref="IDummyUtil"/>.
 /// </summary>
 public interface IKeyUtil
 {
@@ -15,16 +16,15 @@ public interface IKeyUtil
     /// Generates a salted and hashed key from the input value.
     /// </summary>
     /// <param name="password">The value to be salted and hashed.</param>
-    /// <param name="additionalIterations">The additional number of times the password will be hashed.
-    /// This is in addition to the default number of iterations of 450,000.</param>
-    /// <returns>A byte representation of the salted and hashed key derived from the value param.</returns>
+    /// <param name="additionalIterations">The additional number of times the password
+    ///  will be hashed. This is in addition to the default number of iterations
+    /// of 450,000.</param>
+    /// <returns>A byte representation of the salted and hashed key derived from
+    /// the value param.</returns>
     byte[] GenerateKey(string password, int additionalIterations);
 }
 
-/// <summary>
-/// The IKeyUtil implementation. This implements the logic for generating and caching
-/// various salted keys.
-/// </summary>
+/// <inheritdoc/>
 public class KeyUtil : IKeyUtil
 {
     private const int DefaultIterations = 450_000;

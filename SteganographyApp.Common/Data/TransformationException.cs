@@ -3,8 +3,8 @@ namespace SteganographyApp.Common.Data;
 using System;
 
 /// <summary>
-/// A case class inheriting from Exception that specifies an error occured
-/// when an IFileCoder instance attempted to transform input data.
+/// Indicates there was likely an error decrypting previously encrypted
+/// data in the <see cref="IDataEncoderUtil"/>.
 /// </summary>
 public class TransformationException : Exception
 {

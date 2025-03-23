@@ -13,7 +13,6 @@ public interface IDummyUtil
 {
     /// <summary>
     /// Inserts the specified number of dummy entries into the current byte array.
-    /// This will result in the creation of a new byte array.
     /// </summary>
     /// <param name="numDummies">The number of dummy entries to insert into the byte array.</param>
     /// <param name="value">The original byte array to be modified with the dummy entries.</param>
@@ -23,7 +22,6 @@ public interface IDummyUtil
 
     /// <summary>
     /// Attempts to remove dummy entries from the byte array equal to the number of entries specified in the numDummies parameter.
-    /// This will create and return a new byte array.
     /// </summary>
     /// <param name="numDummies">The number of dummy entries to remove from the byte array.</param>
     /// <param name="value">The byte array to remove the dummy entries from.</param>
@@ -54,10 +52,12 @@ public sealed class DummyUtil : IDummyUtil
         log.Debug("Inserting [{0}] dummies using seed [{1}]", actualNumDummies, randomSeed);
         log.Debug("Byte count before inserting dummies: [{0}]", value.Length);
 
-        // generate an array in which each element represents the length that an inserted dummy entry will have.
+        // Generates an array in which each element represents the length that an
+        // inserted dummy entry will have.
         int[] lengths = GenerateLengthsOfDummies(actualNumDummies, generator);
 
-        // generate an array in which each element represents the index the dummy entry will be inserted at.
+        // Generates an array in which each element represents the index the dummy
+        // entry will be inserted at.
         int[] positions = GeneratePositions(generator, actualNumDummies, value.Length);
 
         var endValue = new List<byte>(value.Length + lengths.Sum());
@@ -90,8 +90,8 @@ public sealed class DummyUtil : IDummyUtil
         Array.Reverse(lengths);
         int totalLength = lengths.Sum();
 
-        // Calculate the length of the byte array before the dummies were added so we can
-        // determine the original position where the dummy entries were inserted.
+        // Calculate the length of the original byte array before the dummies were added
+        // so we can determine the original position where the dummy entries were inserted.
         int lengthWithoutDummies = value.Length - totalLength;
 
         // generate the positions in which the dummy entries were inserted into the original string

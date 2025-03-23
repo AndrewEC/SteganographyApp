@@ -52,13 +52,17 @@ public class FileIOProxy : IFileIOProxy
     public long GetFileSizeBytes(string pathToFile) => new FileInfo(pathToFile).Length;
 
     /// <inheritdoc/>
-    public bool IsExistingFile(string pathToFile) => File.Exists(pathToFile) && !File.GetAttributes(pathToFile).HasFlag(FileAttributes.Directory);
+    public bool IsExistingFile(string pathToFile)
+        => File.Exists(pathToFile)
+            && !File.GetAttributes(pathToFile).HasFlag(FileAttributes.Directory);
 
     /// <inheritdoc/>
-    public IReadWriteStream OpenFileForRead(string pathToFile) => ReadWriteStream.CreateStreamForRead(pathToFile);
+    public IReadWriteStream OpenFileForRead(string pathToFile)
+        => ReadWriteStream.CreateStreamForRead(pathToFile);
 
     /// <inheritdoc/>
-    public IReadWriteStream OpenFileForWrite(string pathToFile) => ReadWriteStream.CreateStreamForWrite(pathToFile);
+    public IReadWriteStream OpenFileForWrite(string pathToFile)
+        => ReadWriteStream.CreateStreamForWrite(pathToFile);
 
     /// <inheritdoc/>
     public void Delete(string pathToFile) => File.Delete(pathToFile);

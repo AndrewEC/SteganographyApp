@@ -17,8 +17,8 @@
         },
 
         "mutate": [
-            "!**/Help.*",
-            "!**/ArgumentsServiceContainer.*"
+            "!**/Help.cs",
+            "!**/ArgumentsServiceContainer.cs"
         ]
     }
 }

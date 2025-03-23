@@ -4,55 +4,57 @@ using System;
 
 using SteganographyApp.Common.Logging;
 
-#pragma warning disable SA1402
-
 /// <summary>
-/// The contract for interacting with the DataEncoderUtil instance.
+/// The facade component that handle transforming the input data
+/// through the various configured steps.
 /// </summary>
 public interface IDataEncoderUtil
 {
     /// <summary>
-    /// Takes in a raw byte array, compresses, encodes base64, encrypts, and then
-    /// returns as a binary string.
+    /// Takes in a raw byte array read from the input file and converts it to an encoded
+    /// binary string.
     /// </summary>
-    /// <param name="bytes">The array of bytes to be encoded as a binary string.</param>
+    /// <param name="bytes">The array of bytes to be encoded to a binary string.</param>
     /// <param name="password">The password used to encrypt the contents of the file.</param>
-    /// <param name="useCompression">Tells the encoder whether or not to compress the input byte array.
-    /// If an empty string is provided then no encryption will be performed.</param>
-    /// <param name="dummyCount">The number of dummies to insert into the binary string being encoded. No dummies will be
-    /// inserted if the dummy count is 0.</param>
-    /// <param name="randomSeed">The random seed used to randomize the binary string being encoded. If the random seed is blank
-    /// or null then no randmization will be done.</param>
-    /// <param name="additionalHashIterations">
-    /// The additional number of times the passwordor random seed should be hashed before being encrypting or
-    /// decrypting content. Has no effect if neither of these values have been provided.
+    /// <param name="useCompression">Indicates if the byte array should be gzip
+    /// compressed before converting it to the final binary string.</param>
+    /// <param name="dummyCount">The number of dummies entries to insert into the
+    /// input byte array. Requires the <paramref name="randomSeed"/> to be set.</param>
+    /// <param name="randomSeed">Used to initialize the pseudo-random number generator
+    /// when inserting dummies and randomizing the byte array.</param>
+    /// <param name="additionalHashIterations">The additional number of times the password
+    /// and random seed should be hashed before being used as a key in any step in this process.
     /// </param>
-    /// <returns>An binary string made up of the base64 bytes read from the file and possibly passed through an AES cipher.</returns>
-    /// <exception cref="TransformationException">Thrown if there was an issue trying to pass the base64 encoded string through the AES cipher.</exception>
-    string Encode(byte[] bytes, string password, bool useCompression, int dummyCount, string randomSeed, int additionalHashIterations);
+    /// <returns>A binary string representing the final encoded byte data.</returns>
+    string Encode(
+        byte[] bytes,
+        string password,
+        bool useCompression,
+        int dummyCount,
+        string randomSeed,
+        int additionalHashIterations);
 
     /// <summary>
-    /// Takes an encrypted binary string and returns a byte array that is the original bytes
-    /// that made up the original input file.
+    /// Takes in the binary data read from the LSBs of one or more cover image,
+    /// converts it to it's byte representation, and decodes it into it's original
+    /// byte array provided when encoding.
     /// </summary>
-    /// <param name="binary">The encrypted binary string.</param>
-    /// <param name="password">The password used to decrypt the base64 string. If no password is provided then no decryption will be done to the string.</param>
-    /// <param name="useCompression">Tells the encoder whether or not to uncompress the encoded binary string.</param>
-    /// <param name="dummyCount">The number of dummies to remove from the binary string being decoded. If the dummy count is zero then no dummies will
-    /// be removed.</param>
-    /// <param name="randomSeed">The random seed to use in de-randomizing the binary string being decoded. If the random seed is null or blank then
-    /// no randomization will be done.</param>
-    /// <param name="additionalHashIterations">The additional number of times the passwordor random seed should be hashed before being encrypting or
-    /// decrypting content. Has no effect if neither of these values have been provided.</param>
-    /// <returns>A byte array containing the original decoded bytes of the file inputted during encoding.</returns>
-    /// <exception cref="TransformationException">Thrown if an error occured while decrypting the base64 string or when decompressing the byte stream.</exception>
+    /// <param name="binary">The binary data read from the cover images to be decoded.</param>
+    /// <param name="password">The password used to decrypt the input data.</param>
+    /// <param name="useCompression">Indicates if the input data has been gzip compressed
+    /// and needs to be decompressed.</param>
+    /// <param name="dummyCount">The number of dummies entries to removed from the
+    /// byte data. Requires the <paramref name="randomSeed"/> to be set.</param>
+    /// <param name="randomSeed">Used to initialize the pseudo-random number generator
+    /// when removing dummies and reordering the byte array.</param>
+    /// <param name="additionalHashIterations">The additional number of times the password
+    /// and random seed should be hashed before being used as a key in any step in this process.
+    /// </param>
+    /// <returns>The byte representation of the fully decoded binary string.</returns>
     byte[] Decode(string binary, string password, bool useCompression, int dummyCount, string randomSeed, int additionalHashIterations);
 }
 
-/// <summary>
-/// Utility class to encode a file to encrypted binary data or decode the encrypted binary string to the
-/// original file bytes.
-/// </summary>
+/// <inheritdoc/>
 public sealed class DataEncoderUtil(
     IKeyUtil keyUtil,
     IEncryptionUtil encryptionUtil,
@@ -183,5 +185,3 @@ public sealed class DataEncoderUtil(
         return bytes;
     }
 }
-
-#pragma warning restore SA1402

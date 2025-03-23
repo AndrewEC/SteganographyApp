@@ -5,22 +5,20 @@ using System;
 #pragma warning disable SA1402
 
 /// <summary>
-/// A wrapper that exposes the IO related methods of an ImageStore instance while implementing
-/// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
-/// more error prone IO operations.
+/// A disposable wrapper for accessing the underlying <see cref="ImageStore"/> methods
+/// for reading and writing data to the cover images.
 /// </summary>
 public interface IImageStoreStream : IDisposable
 {
     /// <summary>
-    /// Invokes the wrapped image store WriteBinaryString method passing in the provided
-    /// <paramref name="binary"/> argument.
+    /// The the binary chunk to the cover images.
     /// </summary>
     /// <param name="binary">The binary chunk to write to the cover images.</param>
     /// <returns>A count of the number of bits that were written to the image.</returns>
     int WriteContentChunkToImage(string binary);
 
     /// <summary>
-    /// Invokes the wrapped image store ReadBinaryString methods passing in the provided <paramref name="length"/> argument.
+    /// Reads a binary chunk of the specified length from the cover images.
     /// </summary>
     /// <param name="length">The number of bits to read from the cover images.</param>
     /// <returns>A binary string read from the cover images whose length is, at most,
@@ -28,24 +26,20 @@ public interface IImageStoreStream : IDisposable
     string ReadContentChunkFromImage(int length);
 
     /// <summary>
-    /// Invokes the wrapped image store SeekToPixel method passing in the provided <paramref name="bitsToSkip"/> argument.
-    /// This will first move to the first pixel in the currently loaded image before skipping to the specified pixel.
+    /// Skip over N pixels in the available cover images where N is either equal to the
+    /// bit count / 2 or bit count / 3 dependending on the user provided arguments.
     /// </summary>
-    /// <param name="bitsToSkip">The number of bigs to seek past.</param>
+    /// <param name="bitsToSkip">The number of bits to seek past.</param>
     void SeekToPixel(int bitsToSkip);
 
     /// <summary>
-    /// Invokes the wrapped image store ResetToImage method passing in the provided <paramref name="index"/> argument.
+    /// Loads the cover image available at the specified index.
     /// </summary>
-    /// <param name="index">The index of the cover image to start reading and writing from.</param>
+    /// <param name="index">The index of the cover image to load.</param>
     void SeekToImage(int index);
 }
 
-/// <summary>
-/// A wrapper class that exposes the IO related methods of an ImageStore instance while implementing
-/// the IDisposable interface to safely close out any images loaded by the ImageStore while performing
-/// more error prone IO operations.
-/// </summary>
+/// <inheritdoc/>
 public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
 {
     private readonly ImageStore store;
@@ -89,10 +83,12 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
     });
 
     /// <inheritdoc/>
-    public void SeekToPixel(int bitsToSkip) => RunIfNotDisposed(() => store.SeekToPixel(bitsToSkip));
+    public void SeekToPixel(int bitsToSkip)
+        => RunIfNotDisposed(() => store.SeekToPixel(bitsToSkip));
 
     /// <inheritdoc/>
-    public void SeekToImage(int index) => RunIfNotDisposed(() => store.SeekToImage(index));
+    public void SeekToImage(int index)
+        => RunIfNotDisposed(() => store.SeekToImage(index));
 
     /// <summary>
     /// Disposes of the current instance. Any implementation of this method should check if disposing is true and,

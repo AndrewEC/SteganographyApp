@@ -16,10 +16,11 @@ public sealed class ContentReader(
     /// <summary>
     /// Reads in the next unread chunk of data from the input file, encodes it,
     /// and returns the encoded value.
-    /// <para>The byte array to encode will be trimmed if the number of bytes remaining in the file is less
-    /// than the ChunkByteSize.</para>
+    /// <para>The byte array to encode will be trimmed if the number of bytes remaining
+    /// in the file is less than the <see cref="IInputArguments.ChunkByteSize"/> value
+    /// of the input arguments.</para>
     /// </summary>
-    /// <returns>A binary string representation of the next availabe ChunkByteSize from the input file.</returns>
+    /// <returns>A binary string representation of the next chunk from the input file.</returns>
     public string? ReadContentChunkFromFile() => RunIfNotDisposedWithResult(() =>
     {
         byte[] buffer = new byte[Arguments.ChunkByteSize];

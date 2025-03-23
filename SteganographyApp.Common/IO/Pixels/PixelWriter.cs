@@ -1,37 +1,57 @@
 namespace SteganographyApp.Common.IO.Pixels;
 
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using SixLabors.ImageSharp.PixelFormats;
 
 /// <summary>
-/// Utility class to take data from a bit queue and use it to update the colour of a series of pixels
-/// represented by the Rgba32 struct.
+/// Handles reading bit data from the input queue and using said bits to update the
+/// least, or second least, significant bits of the RGB channels of each input pixel.
 /// </summary>
-/// <remarks>
-/// Constructs an instance of the pixel writer.
-/// </remarks>
-/// <param name="bitQueue">The queue to read the bits from.</param>
-/// <param name="writableBitsPerPixel">The number of bits to read, starting from the LSB, from a given input pixels
-/// RGB colours.</param>
+/// <param name="bitQueue">The queue containing the bits used to modify each pixel's
+/// RGB values.</param>
+/// <param name="writableBitsPerPixel">The number of bits to write to each colour
+/// channel in each pixel.</param>
 internal sealed class PixelWriter(ReadBitQueue bitQueue, int writableBitsPerPixel)
 {
     private readonly ReadBitQueue bitQueue = bitQueue;
-    private readonly IColourChannelUpdateStrategy strategy = (writableBitsPerPixel == 2)
-        ? new TwoBitColourChannelUpdateStrategy()
-        : new SingleBitColourChannelUpdateStrategy();
+
+    private static ImmutableDictionary<int, Func<byte, ReadBitQueue, byte>> UpdateFunctions
+    = new Dictionary<int, Func<byte, ReadBitQueue, byte>>()
+    {
+        { 1, UpdateSingleBit },
+        { 2, UpdateTwoBits },
+    }.ToImmutableDictionary();
+
+    private readonly Func<byte, ReadBitQueue, byte> updateFunction
+        = UpdateFunctions[writableBitsPerPixel];
 
     /// <summary>
-    /// Takes a source pixel and creates a new pixel in which the new pixel will have the least or least and second least
-    /// bits updated depending on the number of pixels to update specified during the PixelWriter's initialization.
-    /// The bits used to update each of the RGB values will be pulled from the bigQueue provided during initialization.
+    /// Takes in a source pixel and returns a net new pixel with the RGB values
+    /// updated with data pulled from the <see cref="ReadBitQueue"/>. This will
+    /// make no changes to the alpha channel. Instead the alpha will be copied to the
+    /// new pixel struct as is.
     /// </summary>
     /// <param name="source">The input pixel.</param>
-    /// <returns>A new pixel with each RGB value being an RGB valued pulled from the source pixel that
-    /// has been subsequently updated by pulling a bit from the ReadBitQueue instance provided during initialization.</returns>
+    /// <returns>A new pixel with the updated RGB values.</returns>
     public Rgba32 UpdatePixel(Rgba32 source) => new()
     {
-        R = strategy.GetNewPixelColour(source.R, bitQueue),
-        G = strategy.GetNewPixelColour(source.G, bitQueue),
-        B = strategy.GetNewPixelColour(source.B, bitQueue),
+        R = updateFunction.Invoke(source.R, bitQueue),
+        G = updateFunction.Invoke(source.G, bitQueue),
+        B = updateFunction.Invoke(source.B, bitQueue),
         A = source.A,
     };
+
+    private static byte UpdateSingleBit(byte sourceColour, ReadBitQueue bitQueue)
+    {
+        return Bitwise.SwapLeastSigificantBit(sourceColour, bitQueue.Next('0'));
+    }
+
+    private static byte UpdateTwoBits(byte sourceColour, ReadBitQueue bitQueue)
+    {
+        byte destinationColour = Bitwise.SwapSecondLeastSignificantBit(sourceColour, bitQueue.Next('0'));
+        destinationColour = Bitwise.SwapLeastSigificantBit(destinationColour, bitQueue.Next('0'));
+        return destinationColour;
+    }
 }

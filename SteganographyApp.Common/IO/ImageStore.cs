@@ -27,7 +27,7 @@ public interface IImageStore
     /// <summary>
     /// Creates an <see cref="IImageStoreStream"/> instance to access the read and write
     /// methods of this <see cref="ImageStore"/>.
-    /// <para>Additionally the returned stream is disposable and must be disposed of
+    /// <para>Additionally, the returned stream is disposable and must be disposed of
     /// to ensure that all data is fully written and read and that the underlying images
     /// are properly disposed of.</para>
     /// </summary>
@@ -37,11 +37,7 @@ public interface IImageStore
     IImageStoreStream OpenStream(StreamMode mode);
 }
 
-/// <summary>
-/// Handles the act of reading and writing from a series of images. The internal methods of this
-/// instance should not be directly invoked. Instead, they should be accessed via the interface
-/// return by the <see cref="OpenStream(StreamMode)"/> method.
-/// </summary>
+/// <inheritdoc/>
 public sealed class ImageStore(
     IInputArguments args,
     IEncoderProvider encoderProvider,
@@ -57,16 +53,16 @@ public sealed class ImageStore(
     private ImageStoreStream? currentStream;
 
     /// <summary>
-    /// Event handler that's invoked whenever the WriteContentChunkToImage method completes.
-    /// The main argument of the event will indicate the total number of bits written to the
-    /// image(s).
+    /// Event handler that's invoked whenever the <see cref="WriteBinaryString(string)"/>
+    /// method completes. The main argument of the event will indicate the total
+    /// number of bits written to the image(s).
     /// </summary>
     public event EventHandler<ChunkWrittenArgs>? OnChunkWritten;
 
     /// <summary>
-    /// Event handler that's invoked whenever the internal Next method is called.
-    /// In the Next method another image will be loaded so it can be read/written to.
-    /// The path of the file will be the main argument passed to the event handler.
+    /// Event handler that's invoked whenever a new image is loaded. It's possible
+    /// for this to emit multiple events that reference the same image if the image
+    /// has been loaded multiple times.
     /// </summary>
     public event EventHandler<NextImageLoadedEventArgs>? OnNextImageLoaded;
 
@@ -86,11 +82,10 @@ public sealed class ImageStore(
     }
 
     /// <summary>
-    /// Moves the current index back to the index before the specified image
-    /// then calls the Next method to advance to the specified image.
+    /// Attempts to load the cover image that is loacated at the specified index.
     /// </summary>
     /// <param name="coverImageIndex">The index of the image to start reading and writing from.</param>
-    /// <exception cref="ImageStoreException">Rethrown from the Next method call.</exception>
+    /// <exception cref="ImageStoreException">Thrown if the index is invalid.</exception>
     internal void SeekToImage(int coverImageIndex)
     {
         if (coverImageIndex < 0 || coverImageIndex >= args.CoverImages.Length)
@@ -112,7 +107,7 @@ public sealed class ImageStore(
     }
 
     /// <summary>
-    /// Method to help close off any open images.
+    /// Disposes of, and optionally saves changes to, the currently open image.
     /// </summary>
     /// <param name="saveImageChanges">If true this method will attempt to save any changes
     /// made to the current image.</param>
@@ -136,15 +131,12 @@ public sealed class ImageStore(
 
     /// <summary>
     /// Writes a binary string value to the current image, starting
-    /// at the last write index, by replacing the LSB of each RGB value in each pixel.
+    /// at the last write position, by replacing the LSB of each RGB value in each pixel.
     /// <para>If the current image does not have enough storage space to store the binary
-    /// string in full then the Next method will be invoked and it will continue to write
-    /// on the next available image.</para>
+    /// string in full then the next available image will be loaded and written to.</para>
     /// </summary>
-    /// <param name="binary">The encypted binary string to write to the image.</param>
-    /// <returns>The number of bits written to the image. This is mostly important when
-    /// writing the content chunk table to the start of the leading image.</returns>
-    /// <exception cref="ImageStoreException">Rethrown from the Next method call.</exception>
+    /// <param name="binary">The binary string to be written to the image.</param>
+    /// <returns>The number of bits written to the image.</returns>
     internal int WriteBinaryString(string binary)
     {
         if (CurrentImage == null)
@@ -173,14 +165,15 @@ public sealed class ImageStore(
 
     /// <summary>
     /// Attempts to read the specified number of bits from the current image starting
-    /// at the last read/write position.
+    /// at the last read position.
     /// <para>If there is not enough available space in the current image then it will
     /// load the next cover image and continue to read from the next available image.</para>
     /// </summary>
     /// <param name="bitsToRead">Specifies the number of bits to be read from the current image.</param>
     /// <returns>A binary string whose length is equal to the length specified in the length
     /// parameter.</returns>
-    /// <exception cref="ImageStoreException">Rethrown from the Next method call.</exception>
+    /// <exception cref="ImageStoreException">Thrown if there are no more images
+    /// to load.</exception>
     internal string ReadBinaryString(int bitsToRead)
     {
         if (CurrentImage == null)
@@ -206,7 +199,7 @@ public sealed class ImageStore(
 
     /// <summary>
     /// Attempts to save then dispose of the currently opened image, if the currentImage property
-    /// is not null, resets the read/write x and y positions to 0, increments the current image index,
+    /// is not null, resets the read/write positions, increments the current image index,
     /// loads the new image, and invokes the OnNextImageLoaded event.
     /// </summary>
     /// <param name="saveImageChanges">If true it will attempt to save any changes made to the currently open
@@ -244,8 +237,6 @@ public sealed class ImageStore(
         {
             return;
         }
-
-        pixelPosition.Reset();
 
         int pixelIndex = (int)Math.Ceiling((double)bitsToSkip / (Calculator.MinimumBitsPerPixel * args.BitsToUse));
         log.Debug("Seeking past [{0}] bits in image [{1}] to pixel index [{2}]", bitsToSkip, CurrentImage.Path, pixelIndex);

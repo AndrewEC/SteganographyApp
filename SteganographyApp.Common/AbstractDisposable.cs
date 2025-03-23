@@ -58,7 +58,7 @@ public abstract class AbstractDisposable : IDisposable
     {
         if (wasDisposed)
         {
-            throw new ObjectDisposedException(GetType().Name);
+            throw new ObjectDisposedException(GetType().FullName);
         }
 
         function();
@@ -76,7 +76,7 @@ public abstract class AbstractDisposable : IDisposable
     {
         if (wasDisposed)
         {
-            throw new ObjectDisposedException(GetType().Name);
+            throw new ObjectDisposedException(GetType().FullName);
         }
 
         return function();

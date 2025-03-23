@@ -72,6 +72,10 @@ public sealed class RootLogger
             {
                 logLevel = LogLevel.None;
             }
+            else
+            {
+                logLevel = level;
+            }
         }
     }
 

@@ -5,22 +5,21 @@ using System;
 using SixLabors.ImageSharp.PixelFormats;
 
 /// <summary>
-/// Utility class to assist in the process of reading a specified number of bits
-/// from each colour channel within a given input pixel.
+/// Handles reading in N, <paramref name="readableBitsPerPixel"/>, bits per colour channel
+/// per pixel and storing them in a binary string.
 /// </summary>
-/// <remarks>
-/// Initializes a new pixel reader instance.
-/// </remarks>
-/// <param name="bitAggregator">The aggregator which the bits pulled from each pixel will be added to.</param>
-/// <param name="readableBitsPerPixel">Specifies the number of bits to reach from each pixel colour.</param>
+/// <param name="bitAggregator">The aggregator which the bits pulled from each pixel
+/// will be added to.</param>
+/// <param name="readableBitsPerPixel">Specifies the number of bits to read from
+/// each pixel colour.</param>
 internal sealed class PixelReader(BinaryStringBuilder bitAggregator, int readableBitsPerPixel)
 {
     private readonly BinaryStringBuilder bitAggregator = bitAggregator;
     private readonly int readableBitsPerPixel = readableBitsPerPixel;
 
     /// <summary>
-    /// Reads the appropriate number of bits from the input pixel and writes them to the
-    /// <see cref="BinaryStringBuilder"/> providing during initialization of this reader.
+    /// Reads the appropriate number of bits from the input pixel's RGB channels and writes
+    /// them to the <see cref="BinaryStringBuilder"/>.
     /// </summary>
     /// <param name="source">The input pixel to read the binary from.</param>
     public void ReadBinaryFromPixel(Rgba32 source)

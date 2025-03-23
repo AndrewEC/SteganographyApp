@@ -39,10 +39,11 @@ public sealed class ArgumentValueMatcher : IArgumentValueMatcher
         return matchedArguments;
     }
 
-    private static void VerifyNoRequiredArgumentsAreMissing(ImmutableArray<RegisteredArgument> registeredArguments, ImmutableArray<MatchResult> matchedArguments)
+    private static void VerifyNoRequiredArgumentsAreMissing(
+        ImmutableArray<RegisteredArgument> registeredArguments,
+        ImmutableArray<MatchResult> matchedArguments)
     {
-        ImmutableArray<string> matchedArgumentNames = matchedArguments.Select(argument => argument.Attribute.Name)
-            .ToImmutableArray();
+        ImmutableArray<string> matchedArgumentNames = [.. matchedArguments.Select(argument => argument.Attribute.Name)];
 
         ImmutableArray<string> missingRequired = registeredArguments
             .Where(registered => TypeHelper.IsArgumentRequired(registered.Attribute, registered.Member))
@@ -57,27 +58,33 @@ public sealed class ArgumentValueMatcher : IArgumentValueMatcher
         }
     }
 
-    private static RegisteredArgument FindArgumentMatchingName(string input, ImmutableArray<RegisteredArgument> registeredArguments)
+    private static RegisteredArgument? FindArgumentMatchingName(
+        string input,
+        ImmutableArray<RegisteredArgument> registeredArguments)
         => registeredArguments
             .Where(registered => registered.Attribute.Name == input || registered.Attribute.ShortName == input)
             .FirstOrDefault();
 
-    private static RegisteredArgument FindArgumentWithPosition(int position, ImmutableArray<RegisteredArgument> registeredArguments)
+    private static RegisteredArgument? FindArgumentWithPosition(
+        int position,
+        ImmutableArray<RegisteredArgument> registeredArguments)
         => registeredArguments.Where(registered => registered.Attribute.Position == position)
             .FirstOrDefault();
 
-    private static ImmutableArray<MatchResult> PairRegisteredArgumentsWithValues(string[] arguments, ImmutableArray<RegisteredArgument> registeredArguments)
+    private static ImmutableArray<MatchResult> PairRegisteredArgumentsWithValues(
+        string[] arguments,
+        ImmutableArray<RegisteredArgument> registeredArguments)
     {
         var paired = new List<MatchResult>();
         int currentPosition = 1;
         for (int i = 0; i < arguments.Length; i++)
         {
             var input = arguments[i];
-            RegisteredArgument registered = FindArgumentMatchingName(input, registeredArguments);
-            if (registered == default)
+            RegisteredArgument? registered = FindArgumentMatchingName(input, registeredArguments);
+            if (registered == null)
             {
                 registered = FindArgumentWithPosition(currentPosition, registeredArguments);
-                if (registered == default)
+                if (registered == null)
                 {
                     throw new ParseException($"Received an unrecognized argument: [{input}]");
                 }
@@ -105,6 +112,6 @@ public sealed class ArgumentValueMatcher : IArgumentValueMatcher
             }
         }
 
-        return paired.ToImmutableArray();
+        return [.. paired];
     }
 }

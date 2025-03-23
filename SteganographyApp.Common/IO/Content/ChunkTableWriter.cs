@@ -17,9 +17,15 @@ public sealed class ChunkTableWriter(IImageStore store) : AbstractDisposable
     private readonly IImageStoreStream stream = store.OpenStream(StreamMode.Write);
 
     /// <summary>
-    /// Writes the content chunk table to the cover images starting from the first.
+    /// Writes the content chunk table to the cover images. This will start from the
+    /// first pixel in the first image and will overwrite any data that might already
+    /// be present. Hence, the first N bits of image space should be reserved for
+    /// the content table. See <see cref="ICalculator.CalculateRequiredBitsForContentTable(int)"/>
+    /// or <see cref="ICalculator.CalculateRequiredBitsForContentTable(string, int)"/>
+    /// for calculating the required number of bits the table will need.
     /// </summary>
-    /// <param name="chunkLengths">The list of chunks lengths to be written to the cover images.</param>
+    /// <param name="chunkLengths">The list of chunks lengths, length referring to the number
+    /// of bytes in each chunk, to be written to the cover images.</param>
     public void WriteContentChunkTable(ImmutableArray<int> chunkLengths) => RunIfNotDisposed(() =>
     {
         log.Debug("Saving content chunk table with [{0}] chunks", chunkLengths.Length);

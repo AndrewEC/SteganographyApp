@@ -61,7 +61,7 @@ public static class ImagePathParser
         {
             if (!fileProxy.IsExistingFile(imagePath))
             {
-            throw new ArgumentValueException($"The file specified could not be read: [{imagePath}]");
+                throw new ArgumentValueException($"The file specified could not be read: [{imagePath}]");
             }
 
             if (!existingPaths.Add(imagePath))

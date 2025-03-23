@@ -12,16 +12,16 @@ using SteganographyApp.Common.Logging;
 public static class ChunkTableReader
 {
     /// <summary>
-    /// Reads in and returns an array in which each element represents the number of bits in a chunk. This will
-    /// advance the <see cref="ImageStoreStream"/> by the number of pixels required to read in the full
-    /// content chunk table.
+    /// Reads in and returns an array in which each element represents the number
+    /// of bits in a chunk. This will advance the <see cref="ImageStoreStream"/>
+    /// by the number of pixels required to read in the full content chunk table.
     /// </summary>
     /// <param name="stream">The <see cref="IImageStoreStream"/> open in read mode to the images
     /// from which the content chunk table will be read. The stream passed should not have been
-    /// read from by this point. It should be pointing to the first pixe of the first image
+    /// read from by this point. It should be pointing to the first pixel of the first image
     /// as this is the location where the content chunk table starts.</param>
-    /// <returns>An immutable array in whcih each element specifies the number of bits per chunk saved in the
-    /// cover images.</returns>
+    /// <returns>An immutable array in whcih each element specifies the number of bits per
+    /// chunk saved in the cover images.</returns>
     public static ImmutableArray<int> ReadContentChunkTable(IImageStoreStream stream)
     {
         var log = ServiceContainer.GetLogger(typeof(ChunkTableReader));

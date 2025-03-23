@@ -33,8 +33,10 @@ public interface IImageProxy
 public class ImageProxy : IImageProxy
 {
     /// <inheritdoc/>
-    public IBasicImageInfo LoadImage(string pathToImage) => new BasicImageInfo(pathToImage, Image.Load<Rgba32>(pathToImage));
+    public IBasicImageInfo LoadImage(string pathToImage)
+        => new BasicImageInfo(pathToImage, Image.Load<Rgba32>(pathToImage));
 
     /// <inheritdoc/>
-    public string GetImageMimeType(string pathToImage) => Image.DetectFormat(pathToImage).DefaultMimeType;
+    public string GetImageMimeType(string pathToImage)
+        => Image.DetectFormat(pathToImage).DefaultMimeType;
 }

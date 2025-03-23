@@ -11,20 +11,27 @@
         "additional-timeout": 30000,
 
         "thresholds": {
-            "high": 40,
-            "low": 40,
-            "break": 40
+            "high": 60,
+            "low": 60,
+            "break": 60
         },
 
         "mutate": [
             "!**/Help.cs",
             "!**/RootLogger.cs",
+            "!**/LazyLogger.cs",
+            "!**/LoggerFactory.cs",
             "!**/BasicImageInfo.cs",
             "!**/ConsoleProxy.cs",
             "!**/FileProxy.cs",
             "!**/ImageProxy.cs",
             "!**/ReadWriteStream.cs",
             "!**/ServiceContainer.cs"
+        ],
+        "ignore-methods": [
+            "*Debug",
+            "*Trace",
+            "*Error"
         ]
     }
 }

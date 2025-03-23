@@ -64,7 +64,6 @@ public class EncoderProvider(IImageProxy imageProxy) : IEncoderProvider
             TransparentColorMode = WebpTransparentColorMode.Preserve,
             Quality = 100,
             NearLossless = false,
-            NearLosslessQuality = 100,
         },
         _ => throw new ArgumentValueException($"Invalid image format provided. Could not find encoder for image format of: [{imageFormat}]"),
     };

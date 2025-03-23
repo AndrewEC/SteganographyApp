@@ -79,6 +79,15 @@ public sealed class ServiceContainer : AbstractDisposable
             };
         });
 
+        services.AddTransient<Func<IInputArguments, IImageStore, ImageCleaner>>((provider) =>
+        {
+            return (inputArguments, imageStore) =>
+            {
+                ICalculator calculator = provider.GetRequiredService<ICalculator>();
+                return new ImageCleaner(inputArguments, imageStore, calculator);
+            };
+        });
+
         serviceProvider = services.BuildServiceProvider();
     }
 
@@ -108,6 +117,16 @@ public sealed class ServiceContainer : AbstractDisposable
     /// <returns>A new instance of the ImageStore.</returns>
     public static ImageStore CreateImageStore(IInputArguments args)
         => Instance.DoGetService<Func<IInputArguments, ImageStore>>().Invoke(args);
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="ImageCleaner"/> with the required
+    /// dependencies injected.
+    /// </summary>
+    /// <param name="args">The dynamic arguments required by the image cleaner.</param>
+    /// <param name="store">The image referencing the images to be cleaned.</param>
+    /// <returns>A new instance of the <see cref="ImageCleaner"/>.</returns>
+    public static ImageCleaner CreateImageCleaner(IInputArguments args, IImageStore store)
+        => Instance.DoGetService<Func<IInputArguments, IImageStore, ImageCleaner>>().Invoke(args, store);
 
     /// <summary>
     /// Creates a new <see cref="ProgressTracker"/> instance with the required

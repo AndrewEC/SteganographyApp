@@ -2,6 +2,7 @@ namespace SteganographyApp.Common.Tests;
 
 using Moq;
 using NUnit.Framework;
+using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.IO;
 
@@ -28,7 +29,7 @@ public class ImageCleanerTests
 
         mockStream.Setup(stream => stream.Dispose()).Verifiable();
 
-        new ImageCleaner(arguments, mockStore.Object).CleanImages();
+        new ImageCleaner(arguments, mockStore.Object, ServiceContainer.GetService<ICalculator>()).CleanImages();
 
         mockStream.Verify(stream => stream.WriteContentChunkToImage(It.IsAny<string>()), Times.Exactly(2));
         mockStream.Verify(stream => stream.Dispose(), Times.Exactly(2));

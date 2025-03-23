@@ -51,7 +51,7 @@ internal sealed class CleanCoverImagesCommand : Command<CleanArguments>
         {
             tracker.UpdateAndDisplayProgress();
         };
-        new ImageCleaner(arguments, store).CleanImages();
+        ServiceContainer.CreateImageCleaner(arguments, store).CleanImages();
     }
 
     public override string GetName() => "clean";

@@ -2,38 +2,21 @@ namespace SteganographyApp.Common.IO.Pixels;
 
 /// <summary>
 /// A queue like structure to provide a sequential set of bits from an input binary string.
-/// Internally this keeps track of the position of the last character taken. This will not
-/// remove a character from the provided binary string each time a character is taken.
 /// </summary>
-/// <remarks>
-/// Initializes the queue.
-/// </remarks>
-/// <param name="binaryString">The binary string from which a character will be pulled each time
-/// the Next method is invoked.</param>
+/// <param name="binaryString">The binary string from which a character will be pulled from.</param>
 internal sealed class ReadBitQueue(string binaryString)
 {
     private readonly string binaryString = binaryString;
     private int position = 0;
 
     /// <summary>
-    /// Returns a bit from the binary string then increments the current position.
-    /// This method does not provide any safeguards to ensure the current position does not
-    /// exceed the length of the array.
+    /// Returns the binary character at the queues current position. If there are no more
+    /// bits left to return the the <paramref name="defaultTo"/> value will be returned.
     /// </summary>
-    /// <returns>A character representing a bit at the current position within the binary string.</returns>
-    public char Next() => binaryString[position++];
-
-    /// <summary>
-    /// Returns a bit from the binary string then increments the current position.
-    /// This provides a safety check to ensure the position is not yet greater than the length of the binary
-    /// string before attempting to return a character from the string.
-    /// If the current position exceeds the length of the string then the defaultTo value will be return.
-    /// </summary>
-    /// <param name="defaultTo">The default character to return if teh internal position is greater than
-    /// the length of the binary string.</param>
-    /// <returns>A character representing a bit at the current position within the binary string.
-    /// If the current position exceeds the length of the binary string then the defaultTo value will
-    /// be returned instead.</returns>
+    /// <param name="defaultTo">The default value to return if there are no more
+    /// bits left in the queue to read.</param>
+    /// <returns>The next available bit in the queue or the <paramref name="defaultTo"/>
+    /// value if no more bits are available.</returns>
     public char Next(char defaultTo)
     {
         if (!HasNext())
@@ -41,12 +24,13 @@ internal sealed class ReadBitQueue(string binaryString)
             return defaultTo;
         }
 
-        return Next();
+        return binaryString[position++];
     }
 
     /// <summary>
-    /// Checks to see if the current position is less than the length of the binary string.
+    /// Checks if the queue has more bits that can be returned via the
+    /// <see cref="Next(char)"/> method call.
     /// </summary>
-    /// <returns>True if the current position is less than the length of the binary string, otherwise false.</returns>
+    /// <returns>True if there are more bits remaining.</returns>
     public bool HasNext() => position < binaryString.Length;
 }

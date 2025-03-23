@@ -3,13 +3,12 @@ namespace SteganographyApp.Common.IO.Pixels;
 using System.Text;
 
 /// <summary>
-/// A structure for taking in a series of bits and aggregating the bits into a continuous string.
+/// A <see cref="StringBuilder"/> wrapper made to specifically handle strings
+/// representing binary data. This will store up to N characters in which each
+/// character is a '0' or '1'.
 /// </summary>
-/// <remarks>
-/// Initializes the binary string builder with the specified maximum capacity.
-/// </remarks>
 /// <param name="capacity">The total number of bits the binary string builder can house.
-/// Any bit one attempts to add beyond the capacity will be silently rejected.</param>
+/// Any bit "added" beyond the capacity will be silently rejected.</param>
 internal sealed class BinaryStringBuilder(int capacity)
 {
     private readonly int capacity = capacity;
@@ -44,10 +43,10 @@ internal sealed class BinaryStringBuilder(int capacity)
     }
 
     /// <summary>
-    /// Checks if the number of bits in the aggregated binary string is equal to the capacity of the aggregator.
+    /// Checks if this builder has space for more bits.
     /// </summary>
-    /// <returns>True if the number of currently aggregated bits is greater than or equal to the capacity
-    /// of the aggregator, otherwise false.</returns>
+    /// <returns>True if the number of currently aggregated bits is greater
+    /// than or equal to the capacity of the aggregator, otherwise false.</returns>
     public bool IsFull() => bitsCurrentlyStored >= capacity;
 
     /// <summary>
