@@ -47,7 +47,7 @@ public abstract class BaseCommandGroup : ICommandGroup
 
         ICommand nextCommand = GetNextCommand(args);
 
-        string[] nextArgs = args.Skip(1).ToArray();
+        string[] nextArgs = [.. args.Skip(1)];
 
         nextCommand.Execute(nextArgs);
     }
@@ -124,7 +124,11 @@ public abstract class BaseCommandGroup : ICommandGroup
         foreach (ICommand command in commands)
         {
             string name = GetCommandName(command);
-            if (!names.Add(name))
+            if (name == string.Empty)
+            {
+                throw new CommandException("Command has no name. All command in a subgroup must have a non-blank name.");
+            }
+            else if (!names.Add(name))
             {
                 throw new CommandException($"All commands in a group must have a unique name. Group [{GetName()}] has multiple commands named: [{name}].");
             }

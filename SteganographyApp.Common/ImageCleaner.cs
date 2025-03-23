@@ -91,8 +91,7 @@ public sealed class ImageCleaner(
     /// <param name="image">The image that is currently being written to. The path of this image
     /// will be compared to the last path specified in the <see cref="IInputArguments.CoverImages"/>.
     /// </param>
-    /// <returns>0 if this is not the last image or the number of bits needed to subtract from the total
-    /// bits the image can store to ensure the last pixel in the image is not writtent to.</returns>
+    /// <returns>1 if the input image is the last available cover image to clean. Otherwise, 0.</returns>
     private int ComputeModifier(IBasicImageInfo image)
     {
         if (!IsLastImage(image))

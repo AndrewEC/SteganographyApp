@@ -1,7 +1,6 @@
 namespace SteganographyApp.Common.Tests;
 
 using System;
-using System.Collections.Immutable;
 using System.Text;
 
 using Moq;

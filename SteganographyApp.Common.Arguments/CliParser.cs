@@ -13,31 +13,38 @@ using SteganographyApp.Common.Arguments.Validation;
 public interface ICliParser
 {
     /// <summary>
-    /// Gets the last error that occurred while trying to parse the user's command line arguments.
-    /// If TryParseArgs was invoked on an instance of the CliParser, which resulted in a failure, then this will
-    /// be initialized to the exception that was raised.
+    /// Gets the last error that occurred while trying to parse the user's
+    /// command line arguments. This will be null if no error ocurred or if
+    /// <see cref="TryParseArgs{T}(out T, string[])"/> has not been invoked.
     /// </summary>
     public Exception? LastError { get; }
 
     /// <summary>
-    /// Attempts to parse the user provided arguments into the specified class model. If an exception is thrown during the parsing process
-    /// this will allow the exception to propogate up.
+    /// Attempts to parse the user provided arguments into the specified
+    /// class model. If an exception is thrown during the parsing process this will
+    /// allow the exception to propogate up.
     /// </summary>
     /// <param name="arguments">The list of user provided arguments to be parsed.</param>
-    /// <typeparam name="T">The class containing the argument attributes from which the arguments to parsed will be derived from.</typeparam>
+    /// <typeparam name="T">The class containing the argument attributes from
+    /// which the arguments to parsed will be derived from.</typeparam>
     /// <returns>An instance of T.</returns>
     public T ParseArgs<T>(string[] arguments)
     where T : class;
 
     /// <summary>
-    /// Attempts to parse the user provided arguments into the specified class model. If an exception occurs during the parsing process
-    /// this will return false but will not directly re-throw the original exception. The actual exception causing the failure can
-    /// be accessed through the LastError property.
+    /// Attempts to parse the user provided arguments into the specified class
+    /// model. If an exception occurs during the parsing process this will
+    /// return false but will not directly re-throw the original exception.
+    /// The actual exception causing the failure can be accessed through the LastError property.
     /// </summary>
-    /// <param name="model">The model, whose type matches the type of type parameter T, to be initialized.</param>
-    /// <param name="arguments">The list of user provided arguments to be parsed.</param>
-    /// <typeparam name="T">The class containing the argument attributes from which the arguments to parsed will be derived from.</typeparam>
-    /// <returns>True if this was successful in parsing out the user provided arguments, otherwise returns false.</returns>
+    /// <param name="model">The model, whose type matches the type of type
+    /// parameter T, to be initialized.</param>
+    /// <param name="arguments">The list of user provided arguments to be
+    /// parsed.</param>
+    /// <typeparam name="T">The class containing the argument attributes from
+    /// which the arguments to parsed will be derived from.</typeparam>
+    /// <returns>True if this was successful in parsing out the user provided
+    /// arguments, otherwise returns false.</returns>
     public bool TryParseArgs<T>(out T model, string[] arguments)
     where T : class;
 }

@@ -16,12 +16,11 @@ public interface IInitializer
     where T : class;
 }
 
-/// <summary>
-/// Utility to help initialize an instance of a class with a default constructor.
-/// </summary>
+/// <inheritdoc/>
 public sealed class Initializer : IInitializer
 {
-    private const string ErrorTemplate = "Could not instantiate type [{0}]. Make sure type is a class and has a default constructor.";
+    private const string ErrorTemplate = "Could not instantiate type [{0}]. "
+        + "Make sure type is a class and has a default constructor.";
 
     /// <inheritdoc/>
     public T Initialize<T>()
@@ -31,7 +30,8 @@ public sealed class Initializer : IInitializer
         try
         {
             T? instance = Activator.CreateInstance(typeToInitialize) as T;
-            return instance ?? throw new ParseException(FormErrorMessage(typeToInitialize.FullName));
+            return instance
+                ?? throw new ParseException(FormErrorMessage(typeToInitialize.FullName));
         }
         catch (Exception e) when (e is not ParseException)
         {
@@ -39,5 +39,6 @@ public sealed class Initializer : IInitializer
         }
     }
 
-    private static string FormErrorMessage(string? typeName) => string.Format(ErrorTemplate, typeName ?? "Unknown Type");
+    private static string FormErrorMessage(string? typeName)
+        => string.Format(ErrorTemplate, typeName ?? "Unknown Type");
 }

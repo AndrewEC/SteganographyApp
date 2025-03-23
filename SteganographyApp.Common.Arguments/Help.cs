@@ -9,7 +9,8 @@ using System.Text;
 using SteganographyApp.Common.Arguments.Matching;
 
 /// <summary>
-/// A static utility to print help related information about the program being executed and its attributes.
+/// A static utility to print help related information about the program being
+/// executed and its attributes.
 /// </summary>
 public interface IHelp
 {
@@ -18,23 +19,29 @@ public interface IHelp
     /// type. If there is no ProgramDescriptor attribute on the input type then this
     /// will return an empty string.
     /// </summary>
-    /// <param name="commandType">The type from which the ProgramDescriptor attribute will be pulled.</param>
-    /// <returns>The HelpText property of the ProgramDescriptor attribute or null if no attribute is available.</returns>
+    /// <param name="commandType">The type from which the ProgramDescriptor attribute
+    /// will be pulled.</param>
+    /// <returns>The HelpText property of the ProgramDescriptor attribute or null if
+    /// no attribute is available.</returns>
     public string GetCommandDescription(Type commandType);
 
     /// <summary>
-    /// Logs all the help related information to the console.
+    /// Logs all help related information for the input type to the console.
     /// </summary>
-    /// <param name="instanceType">The type of the class containing the arugments to be parsed.</param>
-    /// <param name="instance">An instance of the the argument class. The type of this objects needs to match the type specified
+    /// <param name="instanceType">The type of the class containing the arugments to
+    /// be parsed.</param>
+    /// <param name="instance">An instance of the the argument class. The type of
+    /// this objects needs to match the type specified
     /// in the instanceType parameter.</param>
-    /// <param name="registeredArguments">The list of all the arguments specified within the instanceType that have been previously
+    /// <param name="registeredArguments">The list of all the arguments specified
+    /// within the instanceType that have been previously
     /// identified.</param>
     public void PrintHelp(Type instanceType, object instance, ImmutableArray<RegisteredArgument> registeredArguments);
 }
 
 /// <summary>
-/// A static utility to print help related information about the program being executed and its attributes.
+/// A static utility to print help related information about the program being
+/// executed and its attributes.
 /// </summary>
 public sealed class Help : IHelp
 {

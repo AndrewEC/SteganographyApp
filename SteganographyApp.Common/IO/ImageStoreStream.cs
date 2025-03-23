@@ -2,8 +2,6 @@ namespace SteganographyApp.Common.IO;
 
 using System;
 
-#pragma warning disable SA1402
-
 /// <summary>
 /// A disposable wrapper for accessing the underlying <see cref="ImageStore"/> methods
 /// for reading and writing data to the cover images.
@@ -11,7 +9,9 @@ using System;
 public interface IImageStoreStream : IDisposable
 {
     /// <summary>
-    /// The the binary chunk to the cover images.
+    /// Write a binary chunk to the cover images. Once data has been written to any image
+    /// this <see cref="IImageStoreStream"/> instance must be disposed of for the changes
+    /// to be persisted.
     /// </summary>
     /// <param name="binary">The binary chunk to write to the cover images.</param>
     /// <returns>A count of the number of bits that were written to the image.</returns>
@@ -27,13 +27,16 @@ public interface IImageStoreStream : IDisposable
 
     /// <summary>
     /// Skip over N pixels in the available cover images where N is either equal to the
-    /// bit count / 2 or bit count / 3 dependending on the user provided arguments.
+    /// bit count / 2, if we are only modifying the LSB of each RGB value, or bit
+    /// count / 3 if this is to modify two bits per RGB value.
     /// </summary>
     /// <param name="bitsToSkip">The number of bits to seek past.</param>
     void SeekToPixel(int bitsToSkip);
 
     /// <summary>
-    /// Loads the cover image available at the specified index.
+    /// Loads the cover image available at the specified index. This will close the currently
+    /// open image without saving. If changes have been made to the active image this should
+    /// not be invoked.
     /// </summary>
     /// <param name="index">The index of the cover image to load.</param>
     void SeekToImage(int index);
@@ -100,5 +103,3 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
         store.StreamClosed();
     });
 }
-
-#pragma warning restore SA1402
