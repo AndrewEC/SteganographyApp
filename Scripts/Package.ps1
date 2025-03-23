@@ -1,6 +1,4 @@
-. ./_Common.ps1
-
-Write-Divider "Packaging Libraries"
+. ./Scripts/_Common.ps1
 
 function Copy-NugetPackages {
     param(
@@ -25,16 +23,20 @@ function Copy-NugetPackages {
     }
 }
 
-dotnet pack
+function Invoke-PackageScript {
+    Write-Divider "Packaging Libraries"
 
-Write-Divider "Copying Packages"
+    dotnet pack
 
-Remove-Folder ./packages
-New-Item packages -ItemType Directory | Out-Null
+    Write-Divider "Copying Packages"
 
-@(
-    "SteganographyApp.Common",
-    "SteganographyApp.Common.Arguments"
-) | Copy-NugetPackages
+    Remove-Folder ./packages
+    New-Item packages -ItemType Directory | Out-Null
 
-Write-Host ""
+    @(
+        "SteganographyApp.Common",
+        "SteganographyApp.Common.Arguments"
+    ) | Copy-NugetPackages
+
+    Write-Host "Packages available in ./packages directory.`n"
+}

@@ -5,8 +5,6 @@ using System.Text;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
 
-#pragma warning disable SA1402
-
 /// <summary>
 /// The singleon logger that all ILogger instances will invoke.
 /// </summary>
@@ -26,24 +24,7 @@ public sealed class RootLogger
 
     private RootLogger()
     {
-    }
-
-    /// <summary>
-    /// Cleanup code to try and close an open stream to the log file upon application exit.
-    /// </summary>
-    ~RootLogger()
-    {
-        if (writeLogStream != null)
-        {
-            try
-            {
-                writeLogStream.Dispose();
-                writeLogStream = null;
-            }
-            catch
-            {
-            }
-        }
+        AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
     }
 
     /// <summary>
@@ -155,6 +136,19 @@ public sealed class RootLogger
             writeLogStream.Flush();
         }
     }
-}
 
-#pragma warning restore SA1402
+    private void OnProcessExit(object? sender, EventArgs e)
+    {
+        if (writeLogStream != null)
+        {
+            try
+            {
+                writeLogStream.Dispose();
+                writeLogStream = null;
+            }
+            catch
+            {
+            }
+        }
+    }
+}

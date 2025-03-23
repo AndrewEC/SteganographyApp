@@ -1,17 +1,6 @@
-. ./_Common.ps1
-$ProgressPreference = "SilentlyContinue"
-$ErrorActionPreference = "Stop"
+. ./Scripts/_Common.ps1
 
-$Projects = @(
-    "SteganographyApp.Common.Tests",
-    "SteganographyApp.Common.Arguments.Tests"
-)
-
-Write-Divider "Executing mutation tests"
-
-Remove-Folder ./reports/mutation-tests
-
-function Copy-Report {
+function Copy-MutationReport {
     param(
         [Parameter(Mandatory)]
         [string]$Project
@@ -65,14 +54,25 @@ function Invoke-Stryker {
         dotnet tool run dotnet-stryker --config-file stryker-config.json
         if ($LastExitCode -ne 0) {
             Write-Host("'stryker' failed with status: $LastExitCode")
-            Exit
+            exit
         }
         Write-Host "Report available at $Output"
     } finally {
         Set-Location ..
     }
 
-    Copy-Report $Project
+    Copy-MutationReport $Project
 }
 
-$Projects | ForEach-Object { Invoke-Stryker $_ }
+function Invoke-MutationsScript {
+    $Projects = @(
+        "SteganographyApp.Common.Tests",
+        "SteganographyApp.Common.Arguments.Tests"
+    )
+
+    Write-Divider "Executing mutation tests"
+
+    Remove-Folder ./reports/mutation-tests
+
+    $Projects | ForEach-Object { Invoke-Stryker $_ }
+}

@@ -1,7 +1,5 @@
 ﻿namespace SteganographyApp;
 
-using System;
-
 using SteganographyApp.Common.Arguments.Commands;
 using SteganographyApp.Programs;
 

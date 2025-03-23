@@ -1,6 +1,5 @@
 namespace SteganographyApp.Common.Data;
 
-using System;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
@@ -49,10 +48,7 @@ public sealed class RandomizeUtil : IRandomizeUtil
         {
             int first = generator.Next(value.Length);
             int second = generator.Next(value.Length);
-            if (first != second)
-            {
-                (value[second], value[first]) = (value[first], value[second]);
-            }
+            (value[second], value[first]) = (value[first], value[second]);
         }
 
         return value;
@@ -67,19 +63,21 @@ public sealed class RandomizeUtil : IRandomizeUtil
 
         log.Debug("Reordering byte array using seed [{0}] over [{1}] iterations", randomSeed, iterations);
 
-        var pairs = new ValueTuple<int, int>[iterations];
+        var pairs = new SwapIndexes[iterations];
         for (int i = iterations - 1; i >= 0; i--)
         {
             int first = generator.Next(value.Length);
             int second = generator.Next(value.Length);
-            pairs[i] = (first, second);
+            pairs[i] = new(first, second);
         }
 
-        foreach ((int first, int second) in pairs)
+        foreach (SwapIndexes indexes in pairs)
         {
-            (value[second], value[first]) = (value[first], value[second]);
+            (value[indexes.Second], value[indexes.First]) = (value[indexes.First], value[indexes.Second]);
         }
 
         return value;
     }
+
+    private readonly record struct SwapIndexes(int First, int Second);
 }
