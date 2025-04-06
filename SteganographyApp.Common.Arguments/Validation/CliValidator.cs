@@ -3,8 +3,10 @@ namespace SteganographyApp.Common.Arguments.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 /// <summary>
 /// A utility to assist in validating a given <see cref="CliParser"/>
@@ -32,8 +34,11 @@ public interface ICliValidator
 /// </summary>
 public sealed class CliValidator : ICliValidator
 {
-    private static readonly string ArgumentIdentifierTemplate = "{0}|{1}";
-    private static readonly string ValidationFailedTemlate = "Validation failed on field: {0}. {1}";
+    private static readonly CompositeFormat ArgumentIdentifierFormat = CompositeFormat.Parse(
+        "{0}|{1}");
+
+    private static readonly CompositeFormat ValidationFailedFormat = CompositeFormat.Parse(
+        "Validation failed on field: {0}. {1}");
 
     /// <inheritdoc/>
     public void Validate(object instance)
@@ -57,7 +62,8 @@ public sealed class CliValidator : ICliValidator
             catch (Exception e)
             {
                 string argumentName = FormName(validatable.Argument);
-                throw new ValidationFailedException(string.Format(ValidationFailedTemlate, argumentName, e.Message), e);
+                throw new ValidationFailedException(
+                    string.Format(CultureInfo.InvariantCulture, ValidationFailedFormat, argumentName, e.Message), e);
             }
         }
     }
@@ -69,7 +75,8 @@ public sealed class CliValidator : ICliValidator
             return argument.Name;
         }
 
-        return string.Format(ArgumentIdentifierTemplate, argument.Name, argument.ShortName);
+        return string.Format(
+            CultureInfo.InvariantCulture, ArgumentIdentifierFormat, argument.Name, argument.ShortName);
     }
 
     private static ImmutableArray<ValidatableInfo> FindValidatableMembers(object instance)

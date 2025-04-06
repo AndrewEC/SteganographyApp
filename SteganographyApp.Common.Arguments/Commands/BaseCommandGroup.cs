@@ -2,6 +2,7 @@ namespace SteganographyApp.Common.Arguments.Commands;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 /// <summary>
@@ -63,7 +64,7 @@ public abstract class BaseCommandGroup : ICommandGroup
     /// </summary>
     /// <returns>An empty string.</returns>
     public virtual string GetHelpDescription()
-        => string.Format("Run one of the following commands: {0}", FormExpectedCommandNameList(subCommands));
+        => string.Format(CultureInfo.InvariantCulture, "Run one of the following commands: {0}", FormExpectedCommandNameList(subCommands));
 
     private static string FormExpectedCommandNameList(ICommand[] subCommands)
         => string.Join(", ", subCommands.Select(GetCommandName));
@@ -83,7 +84,7 @@ public abstract class BaseCommandGroup : ICommandGroup
         }
 
         ICommand? nextCommand = subCommands
-            .Where(command => GetCommandName(command).Equals(nextCommandName))
+            .Where(command => GetCommandName(command).Equals(nextCommandName, StringComparison.OrdinalIgnoreCase))
             .FirstOrDefault();
         if (nextCommand == null)
         {

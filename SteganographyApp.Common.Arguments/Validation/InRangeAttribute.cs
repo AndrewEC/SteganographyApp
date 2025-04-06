@@ -3,7 +3,9 @@ namespace SteganographyApp.Common.Arguments.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 
 /// <summary>
 /// A validation attribute used to validate that a given numerical field or property
@@ -16,7 +18,8 @@ using System.Linq;
 /// if multiple InRangeAttributes are being used in a single program.</param>
 public class InRangeAttribute(double min, double max, string? name = null) : ValidationAttribute(name, AllNumberTypes)
 {
-    private const string ValidationFailedMessage = "Expected value to be between [{0}] and [{1}] but instead was [{2}].";
+    private static readonly CompositeFormat ValidationFailedFormat = CompositeFormat.Parse(
+        "Expected value to be between [{0}] and [{1}] but instead was [{2}].");
 
     private static readonly ImmutableArray<Type> WholeNumberTypes = [
         typeof(byte),
@@ -48,7 +51,8 @@ public class InRangeAttribute(double min, double max, string? name = null) : Val
     {
         if (!IsInRange(value))
         {
-            throw new ValidationFailedException(string.Format(ValidationFailedMessage, min, max, value));
+            throw new ValidationFailedException(
+                string.Format(CultureInfo.InvariantCulture, ValidationFailedFormat, min, max, value));
         }
     }
 
@@ -56,11 +60,11 @@ public class InRangeAttribute(double min, double max, string? name = null) : Val
     {
         if (WholeNumberTypes.Contains(value.GetType()))
         {
-            long longValue = Convert.ToInt64(value);
+            long longValue = Convert.ToInt64(value, CultureInfo.InvariantCulture);
             return longValue >= min && longValue <= max;
         }
 
-        double doubleValue = Convert.ToDouble(value);
+        double doubleValue = Convert.ToDouble(value, CultureInfo.InvariantCulture);
         return doubleValue >= min && doubleValue <= max;
     }
 }

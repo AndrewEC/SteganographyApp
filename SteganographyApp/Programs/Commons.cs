@@ -2,6 +2,7 @@ namespace SteganographyApp.Programs;
 
 using System;
 using System.Collections.Immutable;
+using System.Globalization;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Arguments.Validation;
 using SteganographyApp.Common.Logging;
@@ -81,10 +82,10 @@ internal abstract class CryptFields : ImageFields
         => SecureParser.ReadUserInput("Password: ", value);
 
     public static object ParseAdditionalPasswordHashIterations(object target, string value)
-        => Convert.ToInt32(SecureParser.ReadUserInput("Additional Hash Iterations: ", value));
+        => Convert.ToInt32(SecureParser.ReadUserInput("Additional Hash Iterations: ", value), CultureInfo.InvariantCulture);
 
     public static object ParseDummyCount(object target, string value)
-        => Convert.ToInt32(SecureParser.ReadUserInput("Dummy Count: ", value));
+        => Convert.ToInt32(SecureParser.ReadUserInput("Dummy Count: ", value), CultureInfo.InvariantCulture);
 }
 
 #pragma warning restore SA1600, SA1402

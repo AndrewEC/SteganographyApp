@@ -8,8 +8,8 @@ function Invoke-CreateTestbedScript {
 
     Write-Divider "Publishing release build"
     dotnet publish -c release
-    if ($LastExitCode -ne 0) {
-        Write-Host "publish failed with status: [$LastExitCode]"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "publish failed with status: [$LASTEXITCODE]"
         Exit
     }
 

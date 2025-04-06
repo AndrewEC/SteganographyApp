@@ -63,7 +63,7 @@ public sealed class DataEncoderUtil(
     ICompressionUtil compressionUtil,
     IBinaryUtil binaryUtil) : IDataEncoderUtil
 {
-    private readonly ILogger log = new LazyLogger<DataEncoderUtil>();
+    private readonly LazyLogger<DataEncoderUtil> log = new();
 
     private readonly IKeyUtil keyUtil = keyUtil;
     private readonly IEncryptionUtil encryptionUtil = encryptionUtil;

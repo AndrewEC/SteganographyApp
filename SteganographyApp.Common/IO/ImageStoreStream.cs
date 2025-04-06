@@ -2,6 +2,8 @@ namespace SteganographyApp.Common.IO;
 
 using System;
 
+#pragma warning disable CA1711
+
 /// <summary>
 /// A disposable wrapper for accessing the underlying <see cref="ImageStore"/> methods
 /// for reading and writing data to the cover images.
@@ -47,7 +49,7 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
 {
     private readonly ImageStore store;
     private readonly StreamMode mode;
-    private bool save = false;
+    private bool save;
 
     /// <summary>
     /// Initialize the wrapper using the image store that the IO method calls will be proxied to.
@@ -103,3 +105,5 @@ public sealed class ImageStoreStream : AbstractDisposable, IImageStoreStream
         store.StreamClosed();
     });
 }
+
+#pragma warning restore CA1711

@@ -3,7 +3,7 @@ namespace SteganographyApp.Common.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Runtime.CompilerServices;
 using SteganographyApp.Common.Logging;
 
 /// <summary>
@@ -40,7 +40,7 @@ public sealed class DummyUtil : IDummyUtil
     private const int MaxLengthPerDummy = 2500;
     private const int MinLengthPerDummy = 25;
 
-    private readonly ILogger log = new LazyLogger<DummyUtil>();
+    private readonly LazyLogger<DummyUtil> log = new();
 
     /// <inheritdoc/>
     public byte[] InsertDummies(int numDummies, byte[] value, string randomSeed)
@@ -60,19 +60,20 @@ public sealed class DummyUtil : IDummyUtil
         // entry will be inserted at.
         int[] positions = GeneratePositions(generator, actualNumDummies, value.Length);
 
-        var endValue = new List<byte>(value.Length + lengths.Sum());
-        endValue.InsertRange(0, value);
-        for (int i = 0; i < positions.Length; i++)
+        byte[] endValue = new byte[value.Length + lengths.Sum()];
+        for (int i = 0; i < value.Length; i++)
         {
-            var nextDummy = GenerateDummyBytes(generator, lengths[i]);
-            var nextDummyPosition = positions[i];
-            log.Trace("Inserting dummy at position [{0}] with length [{1}]", nextDummyPosition, nextDummy.Length);
-            endValue.InsertRange(positions[i], nextDummy);
+            endValue[i] = value[i];
         }
 
-        var result = endValue.ToArray();
-        log.Debug("Byte count after inserting dummies: [{0}]", result.Length);
-        return result;
+        for (int i = 0; i < positions.Length; i++)
+        {
+            log.Trace("Inserting dummy at position [{0}] with length [{1}]", positions[i], lengths[i]);
+            InsertRandomBytes(endValue, positions[i], lengths[i], generator);
+        }
+
+        log.Debug("Byte count after inserting dummies: [{0}]", endValue.Length);
+        return endValue;
     }
 
     /// <inheritdoc/>
@@ -115,8 +116,24 @@ public sealed class DummyUtil : IDummyUtil
             throw new TransformationException("Unable to remove all dummy entries from chunk.", e);
         }
 
-        log.Debug("Bit count after removing dummies: [{0}]", result.Length);
+        log.Debug("Byte count after removing dummies: [{0}]", result.Length);
         return result;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void InsertRandomBytes(byte[] value, int position, int length, Xor128Prng generator)
+    {
+        // Shift the existing values over to the right.
+        for (int i = value.Length - 1 - length; i >= position; i--)
+        {
+            value[i + length] = value[i];
+        }
+
+        // Insert the new values.
+        for (int i = 0; i < length; i++)
+        {
+            value[position + i] = (byte)generator.Next(byte.MaxValue);
+        }
     }
 
     private static int ComputeActualNumberOfDummies(Xor128Prng generator, int numDummies)
@@ -125,11 +142,6 @@ public sealed class DummyUtil : IDummyUtil
     private static int[] GenerateLengthsOfDummies(int numDummies, Xor128Prng generator)
         => Enumerable.Range(0, numDummies)
             .Select(i => generator.Next(MaxLengthPerDummy - MinLengthPerDummy) + MinLengthPerDummy)
-            .ToArray();
-
-    private static byte[] GenerateDummyBytes(Xor128Prng generator, int length)
-        => Enumerable.Range(0, length)
-            .Select(i => (byte)generator.Next(byte.MaxValue))
             .ToArray();
 
     private static int[] GeneratePositions(Xor128Prng generator, int numberOfDummies, int maxPosition)

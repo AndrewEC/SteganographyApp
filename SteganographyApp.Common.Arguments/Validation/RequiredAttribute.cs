@@ -1,3 +1,5 @@
+namespace SteganographyApp.Common.Arguments.Validation;
+
 using System;
 
 /// <summary>

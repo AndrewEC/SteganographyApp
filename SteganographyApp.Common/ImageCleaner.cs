@@ -36,7 +36,7 @@ public sealed class ImageCleaner(
     private readonly IInputArguments arguments = arguments;
     private readonly IImageStore imageStore = imageStore;
 
-    private readonly ILogger log = new LazyLogger<ImageCleaner>();
+    private readonly LazyLogger<ImageCleaner> log = new();
 
     /// <inheritdoc/>
     public void CleanImages()

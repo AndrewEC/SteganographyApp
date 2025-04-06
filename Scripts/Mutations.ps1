@@ -52,8 +52,8 @@ function Invoke-Stryker {
     Set-Location $Project
     try {
         dotnet tool run dotnet-stryker --config-file stryker-config.json
-        if ($LastExitCode -ne 0) {
-            Write-Host("'stryker' failed with status: $LastExitCode")
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host("'stryker' failed with status: $LASTEXITCODE")
             exit
         }
         Write-Host "Report available at $Output"

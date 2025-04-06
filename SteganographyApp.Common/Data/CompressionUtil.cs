@@ -31,7 +31,7 @@ public interface ICompressionUtil
 /// </summary>
 public sealed class CompressionUtil : ICompressionUtil
 {
-    private readonly ILogger log = new LazyLogger<CompressionUtil>();
+    private readonly LazyLogger<CompressionUtil> log = new();
 
     /// <inheritdoc/>
     public byte[] Compress(byte[] fileBytes)

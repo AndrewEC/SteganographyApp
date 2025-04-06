@@ -12,7 +12,7 @@ using SteganographyApp.Common.Logging;
 /// <param name="store">The image store instance.</param>
 public sealed class ChunkTableWriter(IImageStore store) : AbstractDisposable
 {
-    private readonly ILogger log = new LazyLogger<ChunkTableWriter>();
+    private readonly LazyLogger<ChunkTableWriter> log = new();
 
     private readonly IImageStoreStream stream = store.OpenStream(StreamMode.Write);
 

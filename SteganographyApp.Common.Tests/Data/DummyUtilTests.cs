@@ -33,16 +33,21 @@ public class DummyUtilTests
         Assert.That(inserted, Is.Not.EqualTo(originalBytes));
 
         byte[] removed = util.RemoveDummies(IncorrectNumberOfDummies, inserted, RandomSeed);
-        Assert.That(removed, Is.Not.EqualTo(originalBytes));
-        Assert.That(removed, Is.Not.EqualTo(inserted));
+        Assert.Multiple(() =>
+        {
+            Assert.That(removed, Is.Not.EqualTo(originalBytes));
+            Assert.That(removed, Is.Not.EqualTo(inserted));
+        });
     }
 
     [Test]
     public void TestInsertAndRemoveWithIncorrectRandomSeedReturnsBadResult()
     {
         byte[] inserted = util.InsertDummies(NumberOfDummies, originalBytes, RandomSeed);
-        Assert.That(inserted, Is.Not.EqualTo(originalBytes));
-
-        Assert.That(util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed), Is.Not.EqualTo(originalBytes));
+        Assert.Multiple(() =>
+        {
+            Assert.That(inserted, Is.Not.EqualTo(originalBytes));
+            Assert.That(util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed), Is.Not.EqualTo(originalBytes));
+        });
     }
 }

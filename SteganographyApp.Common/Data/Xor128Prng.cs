@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Based on the existing implementation by David Blackman and Sebastiano Vigna:
@@ -66,5 +67,6 @@ public sealed class Xor128Prng
     /// <returns>An integer whose value is between 0 and the exclusive value less one.</returns>
     public int Next(int exclusive) => Math.Abs(Next()) % exclusive;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Rotl(ulong x, int k) => (x << k) | (x >> (64 - k));
 }

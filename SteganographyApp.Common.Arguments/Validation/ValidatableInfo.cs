@@ -10,6 +10,6 @@ using System.Reflection;
 /// <param name="Argument">Attribute info used to help log validation errors.</param>
 /// <param name="Validations">Validation attributes indicating what validations
 /// need to be run on the field.</param>
-internal record class ValidatableInfo(MemberInfo Info,
+internal sealed record class ValidatableInfo(MemberInfo Info,
     ArgumentAttribute Argument,
     ImmutableArray<ValidationAttribute> Validations) { }

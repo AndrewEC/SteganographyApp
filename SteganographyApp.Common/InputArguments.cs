@@ -104,16 +104,16 @@ public sealed class CommonArguments : IInputArguments
     public ImmutableArray<string> CoverImages { get; set; } = [];
 
     /// <inheritdoc/>
-    public bool UseCompression { get; set; } = false;
+    public bool UseCompression { get; set; }
 
     /// <inheritdoc/>
     public string RandomSeed { get; set; } = string.Empty;
 
     /// <inheritdoc/>
-    public int DummyCount { get; set; } = 0;
+    public int DummyCount { get; set; }
 
     /// <inheritdoc/>
-    public bool DeleteAfterConversion { get; set; } = false;
+    public bool DeleteAfterConversion { get; set; }
 
     /// <inheritdoc/>
     public int ChunkByteSize { get; set; } = 131_072;
@@ -122,7 +122,7 @@ public sealed class CommonArguments : IInputArguments
     public ImageFormat ImageFormat { get; set; } = ImageFormat.Png;
 
     /// <inheritdoc/>
-    public int AdditionalPasswordHashIterations { get; set; } = 0;
+    public int AdditionalPasswordHashIterations { get; set; }
 
     /// <inheritdoc/>
     public int BitsToUse { get; set; } = 1;

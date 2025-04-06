@@ -34,7 +34,7 @@ internal sealed class VerifyImagesArguments : ImageFields
 
 internal sealed class TempFileBackup : AbstractDisposable
 {
-    private readonly ILogger logger = new LazyLogger<TempFileBackup>();
+    private readonly LazyLogger<TempFileBackup> logger = new();
     private readonly string backupPath;
     private readonly string originalFilePath;
 
@@ -54,7 +54,7 @@ internal sealed class TempFileBackup : AbstractDisposable
         File.Move(backupPath, originalFilePath);
     });
 
-    private string DetermineCopyPath(string sourcePath)
+    private static string DetermineCopyPath(string sourcePath)
     {
         string absolutePath = Path.GetFullPath(sourcePath);
         string extension = Path.GetExtension(absolutePath);
@@ -64,7 +64,7 @@ internal sealed class TempFileBackup : AbstractDisposable
 
 internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
 {
-    private ILogger logger = new LazyLogger<VerifyImagesCommand>();
+    private LazyLogger<VerifyImagesCommand> logger = new();
 
     public override string GetName() => "verify";
 
@@ -113,21 +113,6 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
         }
     }
 
-    private void PrintFailed(List<string> failedValidation)
-    {
-        if (failedValidation.Count == 0)
-        {
-            Console.WriteLine("Successfully validated all images.");
-            return;
-        }
-
-        Console.WriteLine("The following images failed validation:");
-        foreach (var failed in failedValidation)
-        {
-            Console.WriteLine($"\t[{failed}]");
-        }
-    }
-
     private string GenerateBinaryString(string path)
     {
         using (var image = ServiceContainer.GetService<IImageProxy>().LoadImage(path))
@@ -147,7 +132,22 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
         }
     }
 
-    private void WriteToImage(string binaryData, IInputArguments arguments)
+    private static void PrintFailed(List<string> failedValidation)
+    {
+        if (failedValidation.Count == 0)
+        {
+            Console.WriteLine("Successfully validated all images.");
+            return;
+        }
+
+        Console.WriteLine("The following images failed validation:");
+        foreach (var failed in failedValidation)
+        {
+            Console.WriteLine($"\t[{failed}]");
+        }
+    }
+
+    private static void WriteToImage(string binaryData, IInputArguments arguments)
     {
         using (var stream = ServiceContainer.CreateImageStore(arguments).OpenStream(StreamMode.Write))
         {
@@ -155,7 +155,7 @@ internal sealed class VerifyImagesCommand : Command<VerifyImagesArguments>
         }
     }
 
-    private string ReadFromImage(string expectedData, IInputArguments arguments)
+    private static string ReadFromImage(string expectedData, IInputArguments arguments)
     {
         using (var stream = ServiceContainer.CreateImageStore(arguments).OpenStream(StreamMode.Read))
         {

@@ -1,6 +1,7 @@
 namespace SteganographyApp.Common.Logging;
 
 using System;
+using System.Globalization;
 using System.Text;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.Injection.Proxies;
@@ -16,7 +17,7 @@ public sealed class RootLogger
     public static readonly RootLogger Instance = new();
 
     private const string LogFileName = "steganography.logs.txt";
-    private const string LogMessageTemplate = "[{0}] [{1}] => {2}\n";
+    private static readonly CompositeFormat LogMessageFormat = CompositeFormat.Parse("[{0}] [{1}] => {2}\n");
     private static readonly object SyncLock = new();
 
     private LogLevel logLevel = LogLevel.None;
@@ -121,8 +122,8 @@ public sealed class RootLogger
 
     private static string FormLogMessage(string typeName, LogLevel level, string message, params object[] arguments)
     {
-        string subMessage = string.Format(message, arguments);
-        return string.Format(LogMessageTemplate, level.ToString(), typeName, subMessage);
+        string subMessage = string.Format(CultureInfo.InvariantCulture, message, arguments);
+        return string.Format(CultureInfo.InvariantCulture, LogMessageFormat, level.ToString(), typeName, subMessage);
     }
 
     private bool CanLog(LogLevel requestedLevel) => (int)requestedLevel >= (int)logLevel;

@@ -12,7 +12,7 @@ function Invoke-UnitTest {
 
     $RunCommand.Invoke()
 
-    $CoverletExitCode = $LastExitCode
+    $CoverletExitCode = $LASTEXITCODE
 
     $ReportDir = Join-Path ./reports/unit-tests $ProjectName
 
@@ -21,8 +21,8 @@ function Invoke-UnitTest {
     }
 
     dotnet tool run reportgenerator "-reports:coverage.opencover.xml" "-targetDir:$ReportDir"
-    if ($LastExitCode -ne 0) {
-        Write-Host "'reportgenerator' command failed with status: [$LastExitCode]"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "'reportgenerator' command failed with status: [$LASTEXITCODE]"
         exit
     }
 
@@ -52,8 +52,8 @@ function Invoke-TestScript {
     Write-Divider "Rebuilding Project"
 
     dotnet build SteganographyApp.sln --no-incremental
-    if ($LastExitCode -ne 0) {
-        Write-Host "Build failed with status code: [$LastExitCode]"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Build failed with status code: [$LASTEXITCODE]"
         exit
     }
 
@@ -99,8 +99,8 @@ function Invoke-TestScript {
 
     Write-Divider "Running SteganographyApp.Common.Integration.Tests tests"
     dotnet test ./SteganographyApp.Common.Integration.Tests
-    if ($LastExitCode -ne 0) {
-        Write-Host "dotnet test ./SteganographyApp.Common.Integration.Tests command failed with status: [$LastExitCode]"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "dotnet test ./SteganographyApp.Common.Integration.Tests command failed with status: [$LASTEXITCODE]"
         exit
     }
 }

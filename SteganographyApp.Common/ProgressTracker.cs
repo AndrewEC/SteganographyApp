@@ -27,7 +27,7 @@ public sealed class ProgressTracker(
     private readonly string completeMessage = completeMessage;
     private readonly IConsoleWriter outputWriter = consoleWriter ?? ServiceContainer.GetService<IConsoleWriter>();
     private double currentProgress;
-    private bool hasCompleted = false;
+    private bool hasCompleted;
 
     /// <summary>
     /// Displays the progress message with a progress of 0.

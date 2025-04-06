@@ -3,6 +3,7 @@ namespace SteganographyApp.Programs;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.IO;
 
 using SixLabors.ImageSharp;
@@ -120,7 +121,7 @@ internal sealed class ConvertImagesCommand : Command<ConvertArguments>
     }
 
     private static string ReplaceFileExtension(string image, IInputArguments arguments)
-        => Path.ChangeExtension(image, ".converted." + arguments.ImageFormat.ToString().ToLower());
+        => Path.ChangeExtension(image, ".converted." + arguments.ImageFormat.ToString().ToLower(CultureInfo.InvariantCulture));
 
     private static void RenameFile(string path)
     {

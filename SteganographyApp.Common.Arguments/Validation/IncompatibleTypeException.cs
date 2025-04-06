@@ -2,6 +2,8 @@ namespace SteganographyApp.Common.Arguments.Validation;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 
 /// <summary>
 /// An exception thrown to identify that the underlying type being attributed
@@ -14,7 +16,8 @@ using System.Collections.Generic;
 /// <param name="validTypes">The collection of types the validation attribute supports.</param>
 /// <param name="actualType">The type of the value being passed to the validation attribute.</param>
 public class IncompatibleTypeException(ValidationAttribute attribute, IEnumerable<Type> validTypes, Type actualType)
-: Exception(string.Format(MessageTemplate, attribute.Name, string.Join(", ", validTypes), actualType))
+: Exception(string.Format(CultureInfo.InvariantCulture, MessageFormat, attribute.Name, string.Join(", ", validTypes), actualType))
 {
-    private const string MessageTemplate = "Incompatible type provided to validator [{0}]. Valid types are [{1}] but instead received [{2}].";
+    private static readonly CompositeFormat MessageFormat = CompositeFormat.Parse(
+        "Incompatible type provided to validator [{0}]. Valid types are [{1}] but instead received [{2}].");
 }

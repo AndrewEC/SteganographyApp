@@ -15,7 +15,7 @@ public class TableChunkTracker
 {
     private readonly LinkedList<int> contentChunks = new();
 
-    private LinkedListNode<int>? lastNode = null;
+    private LinkedListNode<int>? lastNode;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TableChunkTracker"/> class.

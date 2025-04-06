@@ -9,7 +9,7 @@ using NUnit.Framework;
 using SteganographyApp.Common.Data;
 
 [TestFixture]
-public class IndexGeneratorTest
+public class Xor128PrngTests
 {
     [Test]
     public void TestDifferentSeedsDontMatch()
@@ -20,9 +20,12 @@ public class IndexGeneratorTest
         generator = new Xor128Prng(101, 5);
         int[] nums2 = Generate(generator, 20, 20);
 
-        Assert.That(AreInRange(nums, 0, 20), Is.True);
-        Assert.That(AreInRange(nums2, 0, 20), Is.True);
-        Assert.That(HaveSameElements(nums, nums2), Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(AreInRange(nums, 0, 20), Is.True);
+            Assert.That(AreInRange(nums2, 0, 20), Is.True);
+            Assert.That(HaveSameElements(nums, nums2), Is.False);
+        });
     }
 
     [Test]
@@ -34,9 +37,12 @@ public class IndexGeneratorTest
         generator = new Xor128Prng(101, 5);
         int[] nums2 = Generate(generator, 20, 20);
 
-        Assert.That(AreInRange(nums, 0, 20), Is.True);
-        Assert.That(AreInRange(nums2, 0, 20), Is.True);
-        Assert.That(HaveSameElements(nums, nums2), Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(AreInRange(nums, 0, 20), Is.True);
+            Assert.That(AreInRange(nums2, 0, 20), Is.True);
+            Assert.That(HaveSameElements(nums, nums2), Is.False);
+        });
     }
 
     [Test]
@@ -48,9 +54,12 @@ public class IndexGeneratorTest
         generator = new Xor128Prng(100, 5);
         int[] nums2 = Generate(generator, 20, 20);
 
-        Assert.That(AreInRange(nums, 0, 20), Is.True);
-        Assert.That(AreInRange(nums2, 0, 20), Is.True);
-        Assert.That(HaveSameElements(nums, nums2), Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(AreInRange(nums, 0, 20), Is.True);
+            Assert.That(AreInRange(nums2, 0, 20), Is.True);
+            Assert.That(HaveSameElements(nums, nums2), Is.True);
+        });
     }
 
     [Test]
@@ -71,8 +80,8 @@ public class IndexGeneratorTest
         }
     }
 
-    private static int[] Generate(Xor128Prng generator, int length, int max) => Enumerable.Range(0, length)
-        .Select(i => generator.Next(max)).ToArray();
+    private static int[] Generate(Xor128Prng generator, int length, int max)
+        => [.. Enumerable.Range(0, length).Select(i => generator.Next(max))];
 
     private static bool HaveSameElements(int[] first, int[] second)
     {

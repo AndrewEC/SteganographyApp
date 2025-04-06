@@ -7,7 +7,7 @@ namespace SteganographyApp.Common.IO.Pixels;
 internal sealed class ReadBitQueue(string binaryString)
 {
     private readonly string binaryString = binaryString;
-    private int position = 0;
+    private int position;
 
     /// <summary>
     /// Returns the binary character at the queues current position. If there are no more

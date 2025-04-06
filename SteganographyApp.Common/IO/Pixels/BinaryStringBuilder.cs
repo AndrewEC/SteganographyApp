@@ -13,7 +13,7 @@ internal sealed class BinaryStringBuilder(int capacity)
 {
     private readonly int capacity = capacity;
     private readonly StringBuilder binary = new();
-    private int bitsCurrentlyStored = 0;
+    private int bitsCurrentlyStored;
 
     /// <summary>
     /// Adds a set of bits to the currently aggregated set of bits. If the number of input

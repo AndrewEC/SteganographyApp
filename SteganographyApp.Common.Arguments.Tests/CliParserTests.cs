@@ -51,7 +51,7 @@ public class CliParserTests
         mockInitializer.Setup(initializer => initializer.Initialize<TestClass>())
             .Returns(initializedObject);
 
-        ImmutableArray<RegisteredArgument> registeredArguments = [default];
+        ImmutableArray<RegisteredArgument> registeredArguments = [];
         mockRegistration.Setup(registration => registration.FindAttributedArguments(typeof(TestClass)))
             .Returns(registeredArguments);
 
@@ -61,8 +61,11 @@ public class CliParserTests
 
         TestClass actual = cliParser.ParseArgs<TestClass>(arguments);
 
-        Assert.That(actual, Is.EqualTo(initializedObject));
-        Assert.That(actual.Message, Is.EqualTo("expected_value"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(actual, Is.EqualTo(initializedObject));
+            Assert.That(actual.Message, Is.EqualTo("expected_value"));
+        });
 
         mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Once());
     }
@@ -79,7 +82,7 @@ public class CliParserTests
         mockInitializer.Setup(initializer => initializer.Initialize<TestClass>())
             .Returns(initializedObject);
 
-        ImmutableArray<RegisteredArgument> registeredArguments = [default];
+        ImmutableArray<RegisteredArgument> registeredArguments = [];
         mockRegistration.Setup(registration => registration.FindAttributedArguments(typeof(TestClass)))
             .Returns(registeredArguments);
 
@@ -107,7 +110,7 @@ public class CliParserTests
         mockInitializer.Setup(initializer => initializer.Initialize<TestClass>())
             .Returns(initializedObject);
 
-        ImmutableArray<RegisteredArgument> registeredArguments = [default];
+        ImmutableArray<RegisteredArgument> registeredArguments = [];
         mockRegistration.Setup(registration => registration.FindAttributedArguments(typeof(TestClass)))
             .Returns(registeredArguments);
 
@@ -117,10 +120,12 @@ public class CliParserTests
 
         bool result = cliParser.TryParseArgs(out TestClass actual, arguments);
 
-        Assert.That(result, Is.True);
-
-        Assert.That(actual, Is.EqualTo(initializedObject));
-        Assert.That(actual.Message, Is.EqualTo("expected_value"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.True);
+            Assert.That(actual, Is.EqualTo(initializedObject));
+            Assert.That(actual.Message, Is.EqualTo("expected_value"));
+        });
 
         mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Once());
     }
@@ -137,7 +142,7 @@ public class CliParserTests
         mockInitializer.Setup(initializer => initializer.Initialize<TestClass>())
             .Returns(initializedObject);
 
-        ImmutableArray<RegisteredArgument> registeredArguments = [default];
+        ImmutableArray<RegisteredArgument> registeredArguments = [];
         mockRegistration.Setup(registration => registration.FindAttributedArguments(typeof(TestClass)))
             .Returns(registeredArguments);
 
@@ -147,12 +152,13 @@ public class CliParserTests
 
         bool result = cliParser.TryParseArgs(out TestClass instance, arguments);
 
-        Assert.That(result, Is.False);
-
-        Assert.That(instance, Is.EqualTo(initializedObject));
-
-        Assert.That(cliParser.LastError, Is.Not.Null);
-        Assert.That(cliParser.LastError.Message, Contains.Substring("Could not read in argument [argument_name]"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.False);
+            Assert.That(instance, Is.EqualTo(initializedObject));
+            Assert.That(cliParser.LastError, Is.Not.Null);
+            Assert.That(cliParser.LastError?.Message, Contains.Substring("Could not read in argument [argument_name]"));
+        });
 
         mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Never());
     }

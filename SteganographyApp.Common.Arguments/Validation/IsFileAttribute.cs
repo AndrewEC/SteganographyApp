@@ -1,6 +1,8 @@
 namespace SteganographyApp.Common.Arguments.Validation;
 
+using System.Globalization;
 using System.IO;
+using System.Text;
 
 /// <summary>
 /// Validates that an underlying property or field is a string value that points to
@@ -11,7 +13,8 @@ using System.IO;
 /// if multiple InRangeAttributes are being used in a single program.</param>
 public class IsFileAttribute(string? name = null) : ValidationAttribute(name, [typeof(string)])
 {
-    private const string Message = "Path {0} does not point to a file.";
+    private static readonly CompositeFormat MessageFormat = CompositeFormat.Parse(
+        "Path {0} does not point to a file.");
 
     /// <summary>
     /// Performs validation on the value of the attributed field or property to ensure the value
@@ -25,7 +28,7 @@ public class IsFileAttribute(string? name = null) : ValidationAttribute(name, [t
     {
         if (!File.Exists((string)value))
         {
-            throw new ValidationFailedException(string.Format(Message, value));
+            throw new ValidationFailedException(string.Format(CultureInfo.InvariantCulture, MessageFormat, value));
         }
     }
 }

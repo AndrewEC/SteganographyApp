@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Reflection;
 using Moq;
 using NUnit.Framework;
+using SteganographyApp.Common.Arguments.Validation;
 
 [TestFixture]
 public class ArgumentValueMatcherTests

@@ -52,7 +52,7 @@ internal sealed class ImageTracker
         }
     }
 
-    private void RecordLoadedImage(object? sender, NextImageLoadedEventArgs args)
+    private void RecordLoadedImage(object? sender, NextImageLoadedArgs args)
     {
         imagesUsed.Add(args.Path);
     }

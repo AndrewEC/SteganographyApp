@@ -9,8 +9,6 @@ using SteganographyApp.Common.Injection.Proxies;
 using SteganographyApp.Common.IO.Pixels;
 using SteganographyApp.Common.Logging;
 
-#pragma warning disable SA1402
-
 /// <summary>
 /// Handles the act of reading and writing from a series of images. The internal methods of this
 /// instance should not be directly invoked. Instead, they should be accessed via the interface
@@ -43,7 +41,7 @@ public sealed class ImageStore(
     IEncoderProvider encoderProvider,
     IImageProxy imageProxy) : IImageStore
 {
-    private readonly ILogger log = new LazyLogger<ImageStore>();
+    private readonly LazyLogger<ImageStore> log = new();
 
     private readonly IEncoderProvider encoderProvider = encoderProvider;
     private readonly IImageProxy imageProxy = imageProxy;
@@ -64,7 +62,7 @@ public sealed class ImageStore(
     /// for this to emit multiple events that reference the same image if the image
     /// has been loaded multiple times.
     /// </summary>
-    public event EventHandler<NextImageLoadedEventArgs>? OnNextImageLoaded;
+    public event EventHandler<NextImageLoadedArgs>? OnNextImageLoaded;
 
     /// <inheritdoc/>
     public IBasicImageInfo? CurrentImage { get; private set; }
@@ -221,7 +219,7 @@ public sealed class ImageStore(
         pixelPosition.TrackImage(CurrentImage);
         log.Debug("Loaded image [{0}]", CurrentImage.Path);
 
-        OnNextImageLoaded?.Invoke(this, new NextImageLoadedEventArgs(CurrentImage.Path, currentImageIndex));
+        OnNextImageLoaded?.Invoke(this, new NextImageLoadedArgs(CurrentImage.Path, currentImageIndex));
     }
 
     /// <summary>
@@ -249,5 +247,3 @@ public sealed class ImageStore(
         }
     }
 }
-
-#pragma warning restore SA1402

@@ -15,14 +15,14 @@ using SixLabors.ImageSharp.PixelFormats;
 /// channel in each pixel.</param>
 internal sealed class PixelWriter(ReadBitQueue bitQueue, int writableBitsPerPixel)
 {
-    private readonly ReadBitQueue bitQueue = bitQueue;
-
-    private static ImmutableDictionary<int, Func<byte, ReadBitQueue, byte>> UpdateFunctions
+    private static readonly ImmutableDictionary<int, Func<byte, ReadBitQueue, byte>> UpdateFunctions
     = new Dictionary<int, Func<byte, ReadBitQueue, byte>>()
     {
         { 1, UpdateSingleBit },
         { 2, UpdateTwoBits },
     }.ToImmutableDictionary();
+
+    private readonly ReadBitQueue bitQueue = bitQueue;
 
     private readonly Func<byte, ReadBitQueue, byte> updateFunction
         = UpdateFunctions[writableBitsPerPixel];
@@ -44,9 +44,7 @@ internal sealed class PixelWriter(ReadBitQueue bitQueue, int writableBitsPerPixe
     };
 
     private static byte UpdateSingleBit(byte sourceColour, ReadBitQueue bitQueue)
-    {
-        return Bitwise.SwapLeastSigificantBit(sourceColour, bitQueue.Next('0'));
-    }
+        => Bitwise.SwapLeastSigificantBit(sourceColour, bitQueue.Next('0'));
 
     private static byte UpdateTwoBits(byte sourceColour, ReadBitQueue bitQueue)
     {

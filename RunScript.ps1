@@ -18,6 +18,7 @@ param(
 . ./Scripts/Publish.ps1
 . ./Scripts/Testbed.ps1
 . ./Scripts/Tests.ps1
+. ./Scripts/Vulnerable.ps1
 
 $ProgressPreference = "SilentlyContinue"
 $global:ProgressPreference = "SilentlyContinue"
@@ -28,6 +29,7 @@ switch ($ScriptAction) {
     "AllTests" {
         Invoke-TestScript
         Invoke-MutationsScript
+        Invoke-ListVulnerable
     }
     "Benchmarks" { Invoke-BenchmarksScript }
     "Mutations" { Invoke-MutationsScript }
@@ -35,4 +37,5 @@ switch ($ScriptAction) {
     "Publish" { Invoke-PublishScript }
     "Testbed" { Invoke-CreateTestbedScript }
     "Tests" { Invoke-TestScript }
+    "Vulnerable" { Invoke-ListVulnerable }
 }

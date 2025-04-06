@@ -7,6 +7,7 @@ using System.Text.Json;
 using SteganographyApp.Common;
 using SteganographyApp.Common.Arguments;
 using SteganographyApp.Common.Arguments.Commands;
+using SteganographyApp.Common.Arguments.Validation;
 using SteganographyApp.Common.Injection;
 using SteganographyApp.Common.IO;
 using SteganographyApp.Common.IO.Content;
@@ -61,7 +62,7 @@ internal sealed class DecodeArguments : CryptFields
 
 internal sealed class DecodeCommand : Command<DecodeArguments>
 {
-    private readonly ILogger log = new LazyLogger<DecodeCommand>();
+    private readonly LazyLogger<DecodeCommand> log = new();
 
     public override void Execute(DecodeArguments args)
     {

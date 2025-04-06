@@ -68,7 +68,7 @@ internal sealed class EncodeArguments : CryptFields
 
 internal sealed class EncodeCommand : Command<EncodeArguments>
 {
-    private readonly ILogger log = new LazyLogger<EncodeCommand>();
+    private readonly LazyLogger<EncodeCommand> log = new();
 
     public override string GetName() => "encode";
 

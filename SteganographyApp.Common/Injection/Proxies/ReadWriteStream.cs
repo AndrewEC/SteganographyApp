@@ -3,6 +3,8 @@ namespace SteganographyApp.Common.Injection.Proxies;
 using System;
 using System.IO;
 
+#pragma warning disable CA1711
+
 /// <summary>
 /// Provides an interface wrapper for some of the basic
 /// read/write stream operations.
@@ -79,3 +81,5 @@ public class ReadWriteStream : AbstractDisposable, IReadWriteStream
     /// </summary>
     protected override void DoDispose() => RunIfNotDisposed(() => stream.Dispose());
 }
+
+#pragma warning restore CA1711

@@ -23,7 +23,7 @@ public delegate T UnmanagedResourceFunctionWithResult<T>();
 /// </summary>
 public abstract class AbstractDisposable : IDisposable
 {
-    private bool wasDisposed = false;
+    private bool wasDisposed;
 
     /// <summary>
     /// Disposes of the current instance. This can only be executed once as once the first execution completes it will set the
@@ -56,10 +56,7 @@ public abstract class AbstractDisposable : IDisposable
     /// <exception cref="ObjectDisposedException">Thrown if the Dispose method has already completed execution.</exception>
     protected void RunIfNotDisposed(UnmanagedResourceFunction function)
     {
-        if (wasDisposed)
-        {
-            throw new ObjectDisposedException(GetType().FullName);
-        }
+        ObjectDisposedException.ThrowIf(wasDisposed, this);
 
         function();
     }
@@ -74,10 +71,7 @@ public abstract class AbstractDisposable : IDisposable
     /// <exception cref="ObjectDisposedException">Thrown if the Dispose method has already completed execution.</exception>
     protected T RunIfNotDisposedWithResult<T>(UnmanagedResourceFunctionWithResult<T> function)
     {
-        if (wasDisposed)
-        {
-            throw new ObjectDisposedException(GetType().FullName);
-        }
+        ObjectDisposedException.ThrowIf(wasDisposed, this);
 
         return function();
     }

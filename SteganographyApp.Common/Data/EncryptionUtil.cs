@@ -45,7 +45,7 @@ public sealed class EncryptionUtil(IKeyUtil keyUtil) : IEncryptionUtil
     /// </summary>
     private const int IvSize = 16;
 
-    private readonly ILogger log = new LazyLogger<EncryptionUtil>();
+    private readonly LazyLogger<EncryptionUtil> log = new();
 
     private readonly IKeyUtil keyUtil = keyUtil;
 

@@ -33,7 +33,7 @@ public interface IRandomizeUtil
 public sealed class RandomizeUtil : IRandomizeUtil
 {
     private const int IterationMultiplier = 5;
-    private readonly ILogger log = new LazyLogger<RandomizeUtil>();
+    private readonly LazyLogger<RandomizeUtil> log = new();
 
     /// <inheritdoc/>
     public byte[] Randomize(byte[] value, string randomSeed)

@@ -1,5 +1,7 @@
 namespace SteganographyApp.Common.IO.Pixels;
 
+using System.Globalization;
+using System.Text;
 using SteganographyApp.Common.Injection.Proxies;
 
 /// <summary>
@@ -8,6 +10,8 @@ using SteganographyApp.Common.Injection.Proxies;
 /// </summary>
 internal sealed class PixelPosition
 {
+    private static readonly CompositeFormat ToStringFormat = CompositeFormat.Parse("(X: {0}, Y: {1})");
+
     /// <summary>
     /// Gets the current pixel X position.
     /// </summary>
@@ -59,7 +63,7 @@ internal sealed class PixelPosition
     /// Stringifies the pixel position in the format (X: {0}, Y: {1}).
     /// </summary>
     /// <returns>The position of the pixel in the format (X: {0}, Y: {1}).</returns>
-    public override string ToString() => string.Format("(X: {0}, Y: {1})", X, Y);
+    public override string ToString() => string.Format(CultureInfo.InvariantCulture, ToStringFormat, X, Y);
 
     private void Reset()
     {

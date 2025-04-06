@@ -3,6 +3,7 @@ namespace SteganographyApp.Common.Arguments.Matching;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -34,13 +35,13 @@ public sealed class ParserFunctionLookup : IParserFunctionLookup
     private static readonly ImmutableDictionary<Type, Func<object, string, object>> DefaultParsers
     = new Dictionary<Type, Func<object, string, object>>()
     {
-        { typeof(byte), (instance, value) => Convert.ToByte(value) },
-        { typeof(short), (instance, value) => Convert.ToInt16(value) },
-        { typeof(int), (instance, value) => Convert.ToInt32(value) },
-        { typeof(long), (instance, value) => Convert.ToInt64(value) },
-        { typeof(float), (instance, value) => float.Parse(value) },
-        { typeof(double), (instance, value) => Convert.ToDouble(value) },
-        { typeof(bool), (instance, value) => Convert.ToBoolean(value) },
+        { typeof(byte), (instance, value) => Convert.ToByte(value, CultureInfo.InvariantCulture) },
+        { typeof(short), (instance, value) => Convert.ToInt16(value, CultureInfo.InvariantCulture) },
+        { typeof(int), (instance, value) => Convert.ToInt32(value, CultureInfo.InvariantCulture) },
+        { typeof(long), (instance, value) => Convert.ToInt64(value, CultureInfo.InvariantCulture) },
+        { typeof(float), (instance, value) => float.Parse(value, CultureInfo.InvariantCulture) },
+        { typeof(double), (instance, value) => Convert.ToDouble(value, CultureInfo.InvariantCulture) },
+        { typeof(bool), (instance, value) => Convert.ToBoolean(value, CultureInfo.InvariantCulture) },
         { typeof(string), (instance, value) => value },
     }.ToImmutableDictionary();
 

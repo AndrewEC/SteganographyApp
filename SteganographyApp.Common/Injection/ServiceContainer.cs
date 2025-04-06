@@ -138,10 +138,8 @@ public sealed class ServiceContainer : AbstractDisposable
     /// <returns>A new progress tracker instance.</returns>
     public static ProgressTracker CreateProgressTracker(
         double maxProgress, string progressMessage, string completeMessage)
-    {
-        return Instance.DoGetService<Func<double, string, string, ProgressTracker>>()
+        => Instance.DoGetService<Func<double, string, string, ProgressTracker>>()
             .Invoke(maxProgress, progressMessage, completeMessage);
-    }
 
     /// <summary>
     /// Retrieves a service of type T from the underlying service provider.
@@ -170,7 +168,8 @@ public sealed class ServiceContainer : AbstractDisposable
     /// <summary>
     /// Invokes the <see cref="ServiceProvider"/>'s dispose method.
     /// </summary>
-    protected override void DoDispose() => RunIfNotDisposed(() => serviceProvider.Dispose());
+    protected override void DoDispose()
+        => RunIfNotDisposed(() => serviceProvider.Dispose());
 
     private T DoGetService<T>()
         => RunIfNotDisposedWithResult(() => serviceProvider.GetService<T>()!);

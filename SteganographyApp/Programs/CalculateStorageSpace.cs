@@ -72,7 +72,9 @@ internal sealed class CalculateStorageSpaceCommand : Command<CalculateStorageSpa
             }
             catch (Exception e)
             {
+#pragma warning disable CA2201
                 throw new Exception($"Could not get the width and height for image: {imagePath}", e);
+#pragma warning restore CA2201
             }
 
             progressTracker.UpdateAndDisplayProgress();

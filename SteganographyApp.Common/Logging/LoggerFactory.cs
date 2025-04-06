@@ -2,6 +2,8 @@ namespace SteganographyApp.Common.Logging;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 
 /// <summary>
 /// The contract for interacting with the LoggerFactory instance.
@@ -22,7 +24,7 @@ public interface ILoggerFactory
 /// </summary>
 public class LoggerFactory : ILoggerFactory
 {
-    private const string TypeNameTemplate = "{0}.{1}";
+    private static readonly CompositeFormat TypeNameFormat = CompositeFormat.Parse("{0}.{1}");
 
     private readonly Dictionary<string, ILogger> loggerCache = [];
 
@@ -34,7 +36,7 @@ public class LoggerFactory : ILoggerFactory
     /// <returns>A new ILogger instance configured for the specified type.</returns>
     public ILogger LoggerFor(Type type)
     {
-        string name = string.Format(TypeNameTemplate, type.Namespace, type.Name);
+        string name = string.Format(CultureInfo.InvariantCulture, TypeNameFormat, type.Namespace, type.Name);
         if (loggerCache.TryGetValue(name, out ILogger? value))
         {
             return value;

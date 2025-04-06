@@ -6,4 +6,4 @@ namespace SteganographyApp.Common.IO;
 /// </summary>
 /// <param name="Path">The path of the image file that was loaded into memory.</param>
 /// <param name="Index">The index of the cover image that was just loaded.</param>
-public readonly record struct NextImageLoadedEventArgs(string Path, int Index);
+public readonly record struct NextImageLoadedArgs(string Path, int Index);

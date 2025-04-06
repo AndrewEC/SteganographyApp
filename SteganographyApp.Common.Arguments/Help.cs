@@ -179,7 +179,9 @@ public sealed class Help : IHelp
         if (memberType.IsEnum)
         {
             var possibleValues = string.Join(", ", Enum.GetNames(memberType));
+#pragma warning disable CA1305
             builder.Append("\n\t[Allowed Values]: ").Append($"[{possibleValues}]");
+#pragma warning restore CA1305
         }
 
         if (argument.Position == -1)

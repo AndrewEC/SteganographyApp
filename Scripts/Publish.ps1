@@ -11,8 +11,8 @@ function Invoke-PublishScript {
 
     Write-Divider "Publishing $BuildType build"
     dotnet publish -c $BuildType
-    if ($LastExitCode -ne 0) {
-        Write-Host "publish failed with status: $LastExitCode"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "publish failed with status: $LASTEXITCODE"
         Exit
     }
 }

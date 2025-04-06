@@ -1,6 +1,8 @@
 namespace SteganographyApp.Common.Arguments;
 
 using System;
+using System.Globalization;
+using System.Text;
 
 /// <summary>
 /// Utility to help initialize an instance of a class with a default constructor.
@@ -19,8 +21,8 @@ public interface IInitializer
 /// <inheritdoc/>
 public sealed class Initializer : IInitializer
 {
-    private const string ErrorTemplate = "Could not instantiate type [{0}]. "
-        + "Make sure type is a class and has a default constructor.";
+    private static readonly CompositeFormat ErrorFormat = CompositeFormat.Parse(
+        "Could not instantiate type [{0}]. Make sure type is a class and has a default constructor.");
 
     /// <inheritdoc/>
     public T Initialize<T>()
@@ -40,5 +42,5 @@ public sealed class Initializer : IInitializer
     }
 
     private static string FormErrorMessage(string? typeName)
-        => string.Format(ErrorTemplate, typeName ?? "Unknown Type");
+        => string.Format(CultureInfo.InvariantCulture, ErrorFormat, typeName ?? "Unknown Type");
 }

@@ -64,8 +64,11 @@ public class ImageStoreTests
                 Is.EqualTo("Cannot load next image because there are no remaining cover images left to load."));
         }
 
-        Assert.That(mockImage.DisposeCalled, Is.True);
-        Assert.That(mockImage.SaveCalledWith, Is.EqualTo(Arguments.CoverImages[0]));
+        Assert.Multiple(() =>
+        {
+            Assert.That(mockImage.DisposeCalled, Is.True);
+            Assert.That(mockImage.SaveCalledWith, Is.EqualTo(Arguments.CoverImages[0]));
+        });
     }
 
     [Test]
@@ -94,8 +97,11 @@ public class ImageStoreTests
         using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
             stream.SeekToImage(0);
-            Assert.Throws<ImageStoreException>(() => stream.SeekToImage(2));
-            Assert.Throws<ImageStoreException>(() => stream.SeekToImage(-1));
+            Assert.Multiple(() =>
+            {
+                Assert.Throws<ImageStoreException>(() => stream.SeekToImage(2));
+                Assert.Throws<ImageStoreException>(() => stream.SeekToImage(-1));
+            });
         }
     }
 

@@ -30,8 +30,11 @@ public class ProgressTrackerTests
     {
         ExecuteUpdates(tracker);
 
-        Assert.That(mockWriter.WriteValues, Has.Count.EqualTo(DesiredWriteCount));
-        Assert.That(mockWriter.WriteLineValues, Has.Count.EqualTo(DesiredWriteLineCount));
+        Assert.Multiple(() =>
+        {
+            Assert.That(mockWriter.WriteValues, Has.Count.EqualTo(DesiredWriteCount));
+            Assert.That(mockWriter.WriteLineValues, Has.Count.EqualTo(DesiredWriteLineCount));
+        });
     }
 
     [Test]

@@ -1,6 +1,7 @@
 namespace SteganographyApp.Common.Data;
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -28,16 +29,16 @@ public interface IKeyUtil
 public class KeyUtil : IKeyUtil
 {
     private const int DefaultIterations = 450_000;
-    private const string CacheKeyTemplate = "{0}-{1}";
     private const int KeySize = 256;
+    private static readonly CompositeFormat CacheKeyFormat = CompositeFormat.Parse("{0}-{1}");
 
     private readonly Dictionary<string, byte[]> generatedKeys = [];
-    private readonly ILogger log = new LazyLogger<KeyUtil>();
+    private readonly LazyLogger<KeyUtil> log = new();
 
     /// <inheritdoc/>
     public byte[] GenerateKey(string password, int additionalIterations)
     {
-        string cacheKeyName = string.Format(CacheKeyTemplate, password, additionalIterations);
+        string cacheKeyName = string.Format(CultureInfo.InvariantCulture, CacheKeyFormat, password, additionalIterations);
         if (generatedKeys.TryGetValue(cacheKeyName, out byte[]? cachedKey))
         {
             return cachedKey;
