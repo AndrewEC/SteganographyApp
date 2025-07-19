@@ -7,7 +7,8 @@ param(
         "Package",
         "Publish",
         "Testbed",
-        "Tests"
+        "Tests",
+        "Vulnerable"
     )]
     [string]$ScriptAction
 )
