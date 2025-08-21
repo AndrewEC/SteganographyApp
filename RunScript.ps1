@@ -3,6 +3,7 @@ param(
     [ValidateSet(
         "AllTests",
         "Benchmarks",
+        "Install",
         "Mutations",
         "Package",
         "Publish",
@@ -14,6 +15,7 @@ param(
 )
 
 . ./Scripts/Benchmarks.ps1
+. ./Scripts/Install.ps1
 . ./Scripts/Mutations.ps1
 . ./Scripts/Package.ps1
 . ./Scripts/Publish.ps1
@@ -28,11 +30,13 @@ $global:ErrorActionPreference = "Stop"
 
 switch ($ScriptAction) {
     "AllTests" {
+        Invoke-Install
         Invoke-TestScript
         Invoke-MutationsScript
         Invoke-ListVulnerable
     }
     "Benchmarks" { Invoke-BenchmarksScript }
+    "Install" { Invoke-Install }
     "Mutations" { Invoke-MutationsScript }
     "Package" { Invoke-PackageScript }
     "Publish" { Invoke-PublishScript }
