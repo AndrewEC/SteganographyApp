@@ -18,7 +18,7 @@ function Invoke-CreateTestbedScript {
 
     Write-Divider "Copying publish output"
     Write-Host "Copying output from SteganographyApp publish"
-    Get-ChildItem ./SteganographyApp/bin/release/netcoreapp8.0/publish `
+    Get-ChildItem ./SteganographyApp/bin/release/net10.0/publish `
         | Copy-Item -Recurse -Destination ./testbed
 
 

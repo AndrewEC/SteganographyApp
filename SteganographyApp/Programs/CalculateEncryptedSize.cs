@@ -109,7 +109,7 @@ internal sealed class CalculateEncryptedSizeCommand : Command<CalculateEncrypted
 
     private void PrintComparison(double size, int bitsToUse)
     {
-        foreach (CommonResolutions resolution in Enum.GetValues(typeof(CommonResolutions)))
+        foreach (CommonResolutions resolution in Enum.GetValues<CommonResolutions>())
         {
             string name = Resolution.ToDisplayName(resolution);
             (int width, int height) = Resolution.Dimensions[resolution];

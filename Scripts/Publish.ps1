@@ -5,9 +5,9 @@ function Invoke-PublishScript {
 
     Write-Divider "Removing old publish directories"
 
-    Remove-Folder ./SteganographyApp/bin/$BuildType/netcoreapp8.0/publish
-    Remove-Folder ./SteganographyApp.Common/bin/$BuildType/netcoreapp8.0/publish
-    Remove-Folder ./SteganographyApp.Common.Arguments/bin/$BuildType/netcoreapp8.0/publish
+    Remove-Folder ./SteganographyApp/bin/$BuildType/net10.0/publish
+    Remove-Folder ./SteganographyApp.Common/bin/$BuildType/net10.0/publish
+    Remove-Folder ./SteganographyApp.Common.Arguments/bin/$BuildType/net10.0/publish
 
     Write-Divider "Publishing $BuildType build"
     dotnet publish -c $BuildType

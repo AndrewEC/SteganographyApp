@@ -90,20 +90,20 @@ public sealed class CliValidator : ICliValidator
         List<ValidatableInfo> validatable = [];
         foreach (MemberInfo member in instanceMembers)
         {
-            if (member.GetCustomAttribute(typeof(ArgumentAttribute)) is not ArgumentAttribute argumentAttribute)
+            ArgumentAttribute? argumentAttribute = member.GetCustomAttribute<ArgumentAttribute>();
+            if (argumentAttribute == null)
             {
                 continue;
             }
 
-            ImmutableArray<ValidationAttribute> validationAttributes = member.GetCustomAttributes(typeof(ValidationAttribute))
-                .Select(attribute => (ValidationAttribute)attribute)
+            ImmutableArray<ValidationAttribute> validationAttributes = member.GetCustomAttributes<ValidationAttribute>()
                 .ToImmutableArray();
             if (validationAttributes.Length == 0)
             {
                 continue;
             }
 
-            validatable.Add(new(member, argumentAttribute, validationAttributes));
+            validatable.Add(new ValidatableInfo(member, argumentAttribute, validationAttributes));
         }
 
         return validatable.ToImmutableArray();

@@ -35,7 +35,8 @@ public sealed class ArgumentRegistration(IParserFunctionLookup lookup) : IArgume
 
         foreach (MemberInfo member in TypeHelper.GetAllFieldsAndProperties(modelType))
         {
-            if (member.GetCustomAttribute(typeof(ArgumentAttribute)) is not ArgumentAttribute attribute)
+            ArgumentAttribute? attribute = member.GetCustomAttribute<ArgumentAttribute>();
+            if (attribute == null)
             {
                 continue;
             }

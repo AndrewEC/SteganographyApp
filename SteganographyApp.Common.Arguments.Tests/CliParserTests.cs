@@ -61,11 +61,11 @@ public class CliParserTests
 
         TestClass actual = cliParser.ParseArgs<TestClass>(arguments);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual, Is.EqualTo(initializedObject));
             Assert.That(actual.Message, Is.EqualTo("expected_value"));
-        });
+        }
 
         mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Once());
     }
@@ -118,14 +118,15 @@ public class CliParserTests
         mockMatcher.Setup(matcher => matcher.Match(arguments, registeredArguments))
             .Returns(matchResults);
 
-        bool result = cliParser.TryParseArgs(out TestClass actual, arguments);
+        bool result = cliParser.TryParseArgs(out TestClass? actual, arguments);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
+            Assert.That(actual, Is.Not.Null);
             Assert.That(result, Is.True);
             Assert.That(actual, Is.EqualTo(initializedObject));
             Assert.That(actual.Message, Is.EqualTo("expected_value"));
-        });
+        }
 
         mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Once());
     }
@@ -150,37 +151,36 @@ public class CliParserTests
         mockMatcher.Setup(matcher => matcher.Match(arguments, registeredArguments))
             .Returns(matchResults);
 
-        bool result = cliParser.TryParseArgs(out TestClass instance, arguments);
+        bool result = cliParser.TryParseArgs(out TestClass? instance, arguments);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
+            Assert.That(instance, Is.Null);
             Assert.That(result, Is.False);
-            Assert.That(instance, Is.EqualTo(initializedObject));
             Assert.That(cliParser.LastError, Is.Not.Null);
             Assert.That(cliParser.LastError?.Message, Contains.Substring("Could not read in argument [argument_name]"));
-        });
+        }
 
         mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Never());
     }
 
-    private MatchResult BuildMatchResult(TestClass instance)
+    private static MatchResult BuildMatchResult(TestClass instance)
     {
         RegisteredArgument argument = new(
             new("argument_name"), GetMessageMember(instance), (_, value) => value);
         return new(argument, "expected_value");
     }
 
-    private MatchResult BuildErrorMatchResult(TestClass instance)
+    private static MatchResult BuildErrorMatchResult(TestClass instance)
     {
         RegisteredArgument argument = new(
             new("argument_name"), GetMessageMember(instance), (_, value) => throw new Exception());
         return new(argument, "expected_value");
     }
 
-    private MemberInfo GetMessageMember(TestClass instance)
+    private static MemberInfo GetMessageMember(TestClass instance)
         => instance.GetType().GetMembers()
-            .Where(member => member.Name == nameof(TestClass.Message))
-            .First();
+            .First(member => member.Name == nameof(TestClass.Message));
 
     internal class TestClass()
     {

@@ -16,7 +16,7 @@ where T : ICommand
     // Stryker disable all
     private ICommand Actual
     {
-        get => (actual ??= Activator.CreateInstance(typeof(T)) as ICommand)!;
+        get => actual ??= Activator.CreateInstance<T>();
     }
 
     // Stryker restore all

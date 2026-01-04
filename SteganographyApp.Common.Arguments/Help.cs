@@ -51,7 +51,7 @@ public sealed class Help : IHelp
     /// <inheritdoc/>
     public string GetCommandDescription(Type commandType)
     {
-        string helpText = GetDescriptorAttribute(commandType)?.HelpText ?? string.Empty;
+        string helpText = commandType.GetCustomAttribute<ProgramDescriptorAttribute>()?.HelpText ?? string.Empty;
         return SplitHelpText(helpText);
     }
 
@@ -92,7 +92,7 @@ public sealed class Help : IHelp
         ImmutableArray<RegisteredArgument> optionalArguments)
     {
         var builder = new StringBuilder();
-        ProgramDescriptorAttribute? descriptor = GetDescriptorAttribute(instanceType);
+        ProgramDescriptorAttribute? descriptor = instanceType.GetCustomAttribute<ProgramDescriptorAttribute>();
         if (descriptor != null)
         {
             builder.Append(SplitHelpText(descriptor.HelpText)).Append('\n');
@@ -148,9 +148,6 @@ public sealed class Help : IHelp
 
         return entireDescription.ToString();
     }
-
-    private static ProgramDescriptorAttribute? GetDescriptorAttribute(Type instanceType) => instanceType
-        .GetCustomAttribute(typeof(ProgramDescriptorAttribute)) as ProgramDescriptorAttribute;
 
     private static string FormArgumentHelpText(ArgumentAttribute argument, MemberInfo member, object instance)
     {

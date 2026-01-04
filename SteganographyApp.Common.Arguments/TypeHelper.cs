@@ -82,5 +82,5 @@ public static class TypeHelper
     /// <returns>True if the argument is positional or if the member has the Required
     /// attribute. Otherwise, false.</returns>
     public static bool IsArgumentRequired(ArgumentAttribute attribute, MemberInfo member)
-        => attribute.Position > -1 || member.GetCustomAttribute(typeof(RequiredAttribute)) != null;
+        => attribute.Position > -1 || member.GetCustomAttribute<RequiredAttribute>() != null;
 }

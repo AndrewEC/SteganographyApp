@@ -45,7 +45,7 @@ public interface ICliParser
     /// which the arguments to parsed will be derived from.</typeparam>
     /// <returns>True if this was successful in parsing out the user provided
     /// arguments, otherwise returns false.</returns>
-    public bool TryParseArgs<T>(out T model, string[] arguments)
+    public bool TryParseArgs<T>(out T? model, string[] arguments)
     where T : class;
 }
 
@@ -69,18 +69,18 @@ public sealed class CliParser(
     where T : class => ParseArgs(arguments, initializer.Initialize<T>());
 
     /// <inheritdoc/>
-    public bool TryParseArgs<T>(out T model, string[] arguments)
+    public bool TryParseArgs<T>(out T? model, string[] arguments)
     where T : class
     {
-        T instance = initializer.Initialize<T>();
         try
         {
+            T instance = initializer.Initialize<T>();
             model = ParseArgs(arguments, instance);
             return true;
         }
         catch (Exception e)
         {
-            model = instance;
+            model = null;
             lastError = e;
             return false;
         }
