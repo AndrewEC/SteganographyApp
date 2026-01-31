@@ -17,7 +17,7 @@ When you are hiding data inside in image it is important that the image uses a l
 
 Using the Tools
 ---
-This project provides a Powershell script called `create_testbed.ps1` that will build the project and copy the resulting binaries and some image
+This project provides a Powershell script called `RunScript.ps1 Testbed` that will build the project and copy the resulting binaries and some image
 files to the testbed directory.
 
 From the testbed directory you will be able to find the main `SteganographyApp.dll`. You can run the help command, `dotnet SteganographyApp.dll -h`,
