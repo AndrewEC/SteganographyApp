@@ -14,14 +14,16 @@ param(
     [string]$ScriptAction
 )
 
-. ./Scripts/Benchmarks.ps1
-. ./Scripts/Install.ps1
-. ./Scripts/Mutations.ps1
-. ./Scripts/Package.ps1
-. ./Scripts/Publish.ps1
-. ./Scripts/Testbed.ps1
-. ./Scripts/Tests.ps1
-. ./Scripts/Vulnerable.ps1
+Set-StrictMode -Version Latest
+
+. ./Scripts/Invoke-Benchmarks.ps1
+. ./Scripts/Invoke-Install.ps1
+. ./Scripts/Invoke-Mutations.ps1
+. ./Scripts/Invoke-Package.ps1
+. ./Scripts/Invoke-Publish.ps1
+. ./Scripts/Invoke-Testbed.ps1
+. ./Scripts/Invoke-Tests.ps1
+. ./Scripts/Invoke-Vulnerable.ps1
 
 $ProgressPreference = "SilentlyContinue"
 $global:ProgressPreference = "SilentlyContinue"
