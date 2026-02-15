@@ -16,8 +16,6 @@ public class RandomizeUtilTests
     private const string BadRandomSeed = "badRandomSeed";
     private readonly byte[] originalBytes = [1, 34, 57, 31, 4, 7, 53, 78, 21, 9, 31];
 
-    private readonly Mock<IKeyUtil> mockKeyUtil = new(MockBehavior.Strict);
-
     private RandomizeUtil util;
 
     [SetUp]
@@ -29,8 +27,6 @@ public class RandomizeUtilTests
     [Test]
     public void TestRandomizeTwiceWithSameSeedProducesSameResult()
     {
-        mockKeyUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
-
         byte[] first = (byte[])originalBytes.Clone();
         byte[] randomizedFirst = util.Randomize(first, RandomSeed);
 
@@ -43,8 +39,6 @@ public class RandomizeUtilTests
     [Test]
     public void TestRandomizeAndReorder()
     {
-        mockKeyUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey("randomSeed422005", 422005)).Returns(Encoding.UTF8.GetBytes("random_key"));
-
         byte[] copy = (byte[])originalBytes.Clone();
         byte[] randomized = util.Randomize(copy, RandomSeed);
         Assert.That(randomized, Is.Not.EqualTo(originalBytes));
@@ -56,10 +50,6 @@ public class RandomizeUtilTests
     [Test]
     public void TestRandomizeWithIncorrectRandomSeedReturnsBadResult()
     {
-        var keyByteQueue = new Queue<byte[]>([Encoding.UTF8.GetBytes("random_key"), Encoding.UTF8.GetBytes("encoding_key")]);
-        mockKeyUtil.Setup(encryptionUtil => encryptionUtil.GenerateKey(It.IsAny<string>(), It.IsAny<int>()))
-            .Returns(() => keyByteQueue.Dequeue());
-
         byte[] copy = (byte[])originalBytes.Clone();
         byte[] randomized = util.Randomize(copy, RandomSeed);
         Assert.That(randomized, Is.Not.EqualTo(originalBytes));

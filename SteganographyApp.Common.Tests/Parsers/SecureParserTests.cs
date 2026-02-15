@@ -14,6 +14,13 @@ public class SecureParserTests
     private readonly Mock<IConsoleReader> mockConsoleReader = new(MockBehavior.Strict);
     private readonly Mock<IConsoleWriter> mockConsoleWriter = new(MockBehavior.Strict);
 
+    [TearDown]
+    public void TearDown()
+    {
+        mockConsoleReader.Reset();
+        mockConsoleWriter.Reset();
+    }
+
     [Test]
     public void ReadUserInput()
     {

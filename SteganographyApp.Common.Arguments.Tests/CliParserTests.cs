@@ -25,18 +25,22 @@ public class CliParserTests
     [SetUp]
     public void SetUp()
     {
-        mockRegistration.Reset();
-        mockHelp.Reset();
-        mockMatcher.Reset();
-        mockValidator.Reset();
-        mockInitializer.Reset();
-
         cliParser = new(
             mockRegistration.Object,
             mockHelp.Object,
             mockMatcher.Object,
             mockValidator.Object,
             mockInitializer.Object);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        mockRegistration.Reset();
+        mockHelp.Reset();
+        mockMatcher.Reset();
+        mockValidator.Reset();
+        mockInitializer.Reset();
     }
 
     [Test]
@@ -49,15 +53,18 @@ public class CliParserTests
 
         TestClass initializedObject = new();
         mockInitializer.Setup(initializer => initializer.Initialize<TestClass>())
-            .Returns(initializedObject);
+            .Returns(initializedObject)
+            .Verifiable();
 
         ImmutableArray<RegisteredArgument> registeredArguments = [];
         mockRegistration.Setup(registration => registration.FindAttributedArguments(typeof(TestClass)))
-            .Returns(registeredArguments);
+            .Returns(registeredArguments)
+            .Verifiable();
 
         ImmutableArray<MatchResult> matchResults = [BuildMatchResult(initializedObject)];
         mockMatcher.Setup(matcher => matcher.Match(arguments, registeredArguments))
-            .Returns(matchResults);
+            .Returns(matchResults)
+            .Verifiable();
 
         TestClass actual = cliParser.ParseArgs<TestClass>(arguments);
 
@@ -67,79 +74,97 @@ public class CliParserTests
             Assert.That(actual.Message, Is.EqualTo("expected_value"));
         }
 
-        mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Once());
+        mockValidator.VerifyAll();
+        mockInitializer.VerifyAll();
+        mockRegistration.VerifyAll();
+        mockMatcher.VerifyAll();
     }
 
     [Test]
     public void TestParseArgsWithErrorInParser()
     {
-        mockValidator.Setup(validator => validator.Validate(It.IsAny<TestClass>()))
+        TestClass initializedObject = new();
+
+        mockValidator.Setup(validator => validator.Validate(initializedObject))
             .Verifiable();
 
         string[] arguments = [];
 
-        TestClass initializedObject = new();
         mockInitializer.Setup(initializer => initializer.Initialize<TestClass>())
-            .Returns(initializedObject);
+            .Returns(initializedObject)
+            .Verifiable();
 
         ImmutableArray<RegisteredArgument> registeredArguments = [];
         mockRegistration.Setup(registration => registration.FindAttributedArguments(typeof(TestClass)))
-            .Returns(registeredArguments);
+            .Returns(registeredArguments)
+            .Verifiable();
 
         ImmutableArray<MatchResult> matchResults = [BuildErrorMatchResult(initializedObject)];
         mockMatcher.Setup(matcher => matcher.Match(arguments, registeredArguments))
-            .Returns(matchResults);
+            .Returns(matchResults)
+            .Verifiable();
 
         ParseException actual = Assert.Throws<ParseException>(
             () => cliParser.ParseArgs<TestClass>(arguments));
 
         Assert.That(actual.Message, Contains.Substring("Could not read in argument [argument_name]"));
 
-        mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Never());
+        mockValidator.VerifyNoOtherCalls();
+        mockInitializer.VerifyAll();
+        mockRegistration.VerifyAll();
+        mockMatcher.VerifyAll();
     }
 
     [Test]
     public void TestTryParseArgs()
     {
-        mockValidator.Setup(validator => validator.Validate(It.IsAny<TestClass>()))
+        TestClass initializedObject = new();
+
+        mockValidator.Setup(validator => validator.Validate(initializedObject))
             .Verifiable();
 
         string[] arguments = [];
 
-        TestClass initializedObject = new();
         mockInitializer.Setup(initializer => initializer.Initialize<TestClass>())
-            .Returns(initializedObject);
+            .Returns(initializedObject)
+            .Verifiable();
 
         ImmutableArray<RegisteredArgument> registeredArguments = [];
         mockRegistration.Setup(registration => registration.FindAttributedArguments(typeof(TestClass)))
-            .Returns(registeredArguments);
+            .Returns(registeredArguments)
+            .Verifiable();
 
         ImmutableArray<MatchResult> matchResults = [BuildMatchResult(initializedObject)];
         mockMatcher.Setup(matcher => matcher.Match(arguments, registeredArguments))
-            .Returns(matchResults);
+            .Returns(matchResults)
+            .Verifiable();
 
         bool result = cliParser.TryParseArgs(out TestClass? actual, arguments);
 
+        Assert.That(actual, Is.Not.Null);
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(actual, Is.Not.Null);
             Assert.That(result, Is.True);
             Assert.That(actual, Is.EqualTo(initializedObject));
             Assert.That(actual.Message, Is.EqualTo("expected_value"));
         }
 
-        mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Once());
+        mockValidator.VerifyAll();
+        mockInitializer.VerifyAll();
+        mockRegistration.VerifyAll();
+        mockMatcher.VerifyAll();
     }
 
     [Test]
     public void TestTryParseArgsWithErrorInParser()
     {
-        mockValidator.Setup(validator => validator.Validate(It.IsAny<TestClass>()))
+        TestClass initializedObject = new();
+
+        mockValidator.Setup(validator => validator.Validate(initializedObject))
             .Verifiable();
 
         string[] arguments = [];
 
-        TestClass initializedObject = new();
         mockInitializer.Setup(initializer => initializer.Initialize<TestClass>())
             .Returns(initializedObject);
 
@@ -161,7 +186,10 @@ public class CliParserTests
             Assert.That(cliParser.LastError?.Message, Contains.Substring("Could not read in argument [argument_name]"));
         }
 
-        mockValidator.Verify(validator => validator.Validate(initializedObject), Times.Never());
+        mockValidator.VerifyNoOtherCalls();
+        mockInitializer.VerifyAll();
+        mockRegistration.VerifyAll();
+        mockMatcher.VerifyAll();
     }
 
     private static MatchResult BuildMatchResult(TestClass instance)

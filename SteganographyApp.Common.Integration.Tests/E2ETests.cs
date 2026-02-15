@@ -27,7 +27,7 @@ public class E2ETests
         {
             FileToEncode = "TestAssets/test.zip",
             DecodedOutputFile = "TestAssets/testing.zip",
-            CoverImages = ImmutableArray.Create(new string[] { "TestAssets/CoverImage.png" }),
+            CoverImages = ["TestAssets/CoverImage.png"],
             Password = "testing",
             UseCompression = true,
             DummyCount = 3,
@@ -68,7 +68,7 @@ public class E2ETests
         // Write the content chunk table to support the read operation.
         using (var writer = new ChunkTableWriter(imageStore))
         {
-            writer.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
+            writer.WriteContentChunkTable([contentChunkSize]);
         }
 
         // Read the content previously written to the image and verify it matches the original input value.
@@ -116,7 +116,7 @@ public class E2ETests
 
         using (var tableWriter = new ChunkTableWriter(imageStore))
         {
-            tableWriter.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
+            tableWriter.WriteContentChunkTable([contentChunkSize]);
         }
 
         // reading file content from image
@@ -153,7 +153,7 @@ public class E2ETests
 
         using (var tableWriter = new ChunkTableWriter(imageStore))
         {
-            tableWriter.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
+            tableWriter.WriteContentChunkTable([contentChunkSize]);
         }
 
         // reading file content from image
@@ -192,7 +192,7 @@ public class E2ETests
 
         using (var tableWriter = new ChunkTableWriter(imageStore))
         {
-            tableWriter.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
+            tableWriter.WriteContentChunkTable([contentChunkSize]);
         }
 
         // reading file content from image
@@ -204,7 +204,7 @@ public class E2ETests
             {
                 string binary = stream.ReadContentChunkFromImage(readTable[0]);
                 Assert.That(binary, Is.EqualTo(content));
-                Assert.Throws(typeof(TransformationException), () => writer.WriteContentChunkToFile(binary));
+                Assert.Throws<TransformationException>(() => writer.WriteContentChunkToFile(binary));
             }
         }
     }
@@ -230,7 +230,7 @@ public class E2ETests
 
         using (var tableWriter = new ChunkTableWriter(imageStore))
         {
-            tableWriter.WriteContentChunkTable(ImmutableArray.Create(new int[] { contentChunkSize }));
+            tableWriter.WriteContentChunkTable([contentChunkSize]);
         }
 
         // reading file content from image

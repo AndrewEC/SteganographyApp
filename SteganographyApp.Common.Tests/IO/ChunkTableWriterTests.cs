@@ -18,10 +18,12 @@ public class ChunkTableWriterTests
         Mock<IImageStoreStream> mockStream = new(MockBehavior.Strict);
 
         mockStore.Setup(store => store.OpenStream(StreamMode.Write))
-            .Returns(mockStream.Object);
+            .Returns(mockStream.Object)
+            .Verifiable();
 
         mockStream.Setup(stream => stream.WriteContentChunkToImage(ChunkTableBinary))
-            .Returns(51);
+            .Returns(51)
+            .Verifiable();
 
         mockStream.Setup(stream => stream.Dispose()).Verifiable();
 
@@ -30,6 +32,7 @@ public class ChunkTableWriterTests
             writer.WriteContentChunkTable([2]);
         }
 
-        mockStream.Verify(stream => stream.Dispose(), Times.Exactly(1));
+        mockStore.VerifyAll();
+        mockStream.VerifyAll();
     }
 }

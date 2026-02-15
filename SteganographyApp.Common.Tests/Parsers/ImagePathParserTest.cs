@@ -15,12 +15,12 @@ public class ImagePathParserTests
 
         ImmutableArray<string> actual = ImagePathParser.ParseImages(globs);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual, Has.Length.EqualTo(2));
             Assert.That(actual[0], Contains.Substring("CoverImage.png"));
             Assert.That(actual[1], Contains.Substring("Test.png"));
-        });
+        }
     }
 
     [Test]

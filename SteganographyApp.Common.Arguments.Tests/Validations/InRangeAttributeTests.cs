@@ -30,7 +30,7 @@ public class InRangeAttributeTests
     public void TestWholeNumberOutOfRange()
     {
         mockFieldInfo.Setup(info => info.FieldType).Returns(typeof(int));
-        Assert.Throws(typeof(ValidationFailedException), () => inRangeAttribute.Validate(mockFieldInfo.Object, 21));
+        Assert.Throws<ValidationFailedException>(() => inRangeAttribute.Validate(mockFieldInfo.Object, 21));
     }
 
     [Test]
@@ -46,13 +46,13 @@ public class InRangeAttributeTests
     public void TestDecimalNumberOutOfRange()
     {
         mockFieldInfo.Setup(info => info.FieldType).Returns(typeof(float));
-        Assert.Throws(typeof(ValidationFailedException), () => inRangeAttribute.Validate(mockFieldInfo.Object, 30));
+        Assert.Throws<ValidationFailedException>(() => inRangeAttribute.Validate(mockFieldInfo.Object, 30));
     }
 
     [Test]
     public void TestIncompatibleType()
     {
         mockFieldInfo.Setup(info => info.FieldType).Returns(typeof(string));
-        Assert.Throws(typeof(IncompatibleTypeException), () => inRangeAttribute.Validate(mockFieldInfo.Object, "testing"));
+        Assert.Throws<IncompatibleTypeException>(() => inRangeAttribute.Validate(mockFieldInfo.Object, "testing"));
     }
 }

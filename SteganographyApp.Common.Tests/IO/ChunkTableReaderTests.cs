@@ -19,17 +19,21 @@ public class ChunkTableReaderTests
         Mock<IImageStoreStream> mockStream = new(MockBehavior.Strict);
 
         mockStream.Setup(stream => stream.ReadContentChunkFromImage(18))
-            .Returns(HeaderBinary);
+            .Returns(HeaderBinary)
+            .Verifiable();
 
         mockStream.Setup(stream => stream.ReadContentChunkFromImage(33))
-            .Returns(HeaderBinaryChunk);
+            .Returns(HeaderBinaryChunk)
+            .Verifiable();
 
         ImmutableArray<int> actual = ChunkTableReader.ReadContentChunkTable(mockStream.Object);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual, Has.Length.EqualTo(1));
             Assert.That(actual, Has.ItemAt(0).EqualTo(2));
-        });
+        }
+
+        mockStream.VerifyAll();
     }
 }

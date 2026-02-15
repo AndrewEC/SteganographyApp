@@ -24,13 +24,13 @@ public class ArgumentValueMatcherTests
 
         MatchResult actual = actualResults[0];
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual.Attribute, Is.EqualTo(registeredArguments[0].Attribute));
             Assert.That(actual.Member, Is.EqualTo(registeredArguments[0].Member));
             Assert.That(actual.Parser, Is.EqualTo(registeredArguments[0].Parser));
             Assert.That(actual.Input, Is.EqualTo(arguments[1]));
-        });
+        }
     }
 
     [Test]
@@ -45,13 +45,13 @@ public class ArgumentValueMatcherTests
 
         MatchResult actual = actualResults[0];
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual.Attribute, Is.EqualTo(registeredArguments[0].Attribute));
             Assert.That(actual.Member, Is.EqualTo(registeredArguments[0].Member));
             Assert.That(actual.Parser, Is.EqualTo(registeredArguments[0].Parser));
             Assert.That(actual.Input, Is.EqualTo(arguments[0]));
-        });
+        }
     }
 
     [TestCase(new string[] { "--message", "messageValue", "oneTooMany" }, "Received an unrecognized argument: [oneTooMany]")]
@@ -59,7 +59,6 @@ public class ArgumentValueMatcherTests
     [TestCase(new string[] { }, "Missing the following required arguments: [--message]")]
     public void TestMatchProducesException(string[] arguments, string expectedMessage)
     {
-        Console.WriteLine(string.Join(",", arguments));
         ImmutableArray<RegisteredArgument> registeredArguments = BuildNamedArguments();
 
         ParseException actual = Assert.Throws<ParseException>(

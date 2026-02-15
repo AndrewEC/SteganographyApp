@@ -25,6 +25,12 @@ public class EncoderProviderTests
         encoderProvider = new(mockImageProxy.Object);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        mockImageProxy.Reset();
+    }
+
     [TestCase(ImageFormat.Png, typeof(PngEncoder))]
     [TestCase(ImageFormat.Webp, typeof(WebpEncoder))]
     public void TestProvideEncoder(ImageFormat imageFormat, Type encoderType)
@@ -45,14 +51,16 @@ public class EncoderProviderTests
     public void TestGetEncoderByPath(string format, Type encoder)
     {
         string path = "/image/path";
-        mockImageProxy.Setup(imageProxy => imageProxy.GetImageMimeType(path)).Returns(format);
+        mockImageProxy.Setup(imageProxy => imageProxy.GetImageMimeType(path)).Returns(format).Verifiable();
 
         Assert.That(encoderProvider.GetEncoder(path), Is.AssignableFrom(encoder));
+
+        mockImageProxy.VerifyAll();
     }
 
     private static void AssertPngEncoder(IImageEncoder encoder)
     {
-        Assert.That(encoder, Is.AssignableFrom(typeof(PngEncoder)));
+        Assert.That(encoder, Is.AssignableFrom<PngEncoder>());
 
         PngEncoder pngEncoder = (PngEncoder)encoder;
 
@@ -61,11 +69,11 @@ public class EncoderProviderTests
 
     private static void AssertWebpEncoder(IImageEncoder encoder)
     {
-        Assert.That(encoder, Is.AssignableFrom(typeof(WebpEncoder)));
+        Assert.That(encoder, Is.AssignableFrom<WebpEncoder>());
 
         WebpEncoder webpEncoder = (WebpEncoder)encoder;
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(webpEncoder.FileFormat, Is.EqualTo(WebpFileFormatType.Lossless));
             Assert.That(webpEncoder.Method, Is.EqualTo(WebpEncodingMethod.BestQuality));
@@ -76,6 +84,6 @@ public class EncoderProviderTests
             Assert.That(webpEncoder.TransparentColorMode, Is.EqualTo(WebpTransparentColorMode.Preserve));
             Assert.That(webpEncoder.Quality, Is.EqualTo(100));
             Assert.That(webpEncoder.NearLossless, Is.False);
-        });
+        }
     }
 }

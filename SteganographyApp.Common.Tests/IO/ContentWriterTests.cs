@@ -41,55 +41,74 @@ public class ContentWriterTests
     [SetUp]
     public void SetUp()
     {
+        mockFileIOProxy.Setup(fileProxy => fileProxy.OpenFileForWrite(DecodedOutputFile))
+            .Returns(mockReadWriteStream.Object)
+            .Verifiable();
+
+        mockReadWriteStream.Setup(stream => stream.Flush()).Verifiable();
+        mockReadWriteStream.Setup(stream => stream.Dispose()).Verifiable();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        mockFileIOProxy.VerifyAll();
+        mockReadWriteStream.VerifyAll();
+        mockDataEncoderUtil.VerifyAll();
+
         mockFileIOProxy.Reset();
         mockReadWriteStream.Reset();
         mockDataEncoderUtil.Reset();
-
-        mockFileIOProxy.Setup(fileProxy => fileProxy.OpenFileForWrite(DecodedOutputFile)).Returns(mockReadWriteStream.Object);
-        mockReadWriteStream.Setup(stream => stream.Flush()).Verifiable();
-        mockReadWriteStream.Setup(stream => stream.Dispose()).Verifiable();
     }
 
     [Test]
     public void TestWriteContentChunkToFile()
     {
         byte[] bytes = new byte[1024];
-        mockFileIOProxy.Setup(fileProxy => fileProxy.IsExistingFile(IsAny<string>())).Returns(false);
+
+        mockFileIOProxy.Setup(fileProxy => fileProxy.IsExistingFile(DecodedOutputFile))
+            .Returns(false)
+            .Verifiable();
+
         mockDataEncoderUtil.Setup(encoder => encoder.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
-            .Returns(bytes);
-        mockReadWriteStream.Setup(stream => stream.Write(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Verifiable();
+            .Returns(bytes)
+            .Verifiable();
+
+        mockReadWriteStream.Setup(stream => stream.Write(bytes, 0, bytes.Length)).Verifiable();
 
         using (ContentWriter writer = new(Arguments, mockDataEncoderUtil.Object, mockFileIOProxy.Object))
         {
             writer.WriteContentChunkToFile(BinaryString);
         }
 
-        mockFileIOProxy.Verify(fileProxy => fileProxy.IsExistingFile(DecodedOutputFile), Once());
-        mockFileIOProxy.Verify(fileProxy => fileProxy.Delete(IsAny<string>()), Never());
-        mockFileIOProxy.Verify(fileProxy => fileProxy.OpenFileForWrite(DecodedOutputFile), Once());
+        mockFileIOProxy.VerifyAll();
+        mockFileIOProxy.VerifyNoOtherCalls();
 
-        mockDataEncoderUtil.Verify(encoderUtil => encoderUtil.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations), Once());
+        mockDataEncoderUtil.Verify(encoderUtil => encoderUtil
+            .Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations), Once());
 
         mockReadWriteStream.Verify(stream => stream.Flush(), AtLeastOnce());
-        mockReadWriteStream.Verify(stream => stream.Dispose(), Once());
-        mockReadWriteStream.Verify(stream => stream.Write(bytes, 0, bytes.Length), Once());
     }
 
     [Test]
     public void TestWriteContentChunkToFileWhenOutputFileExistsTriesToDeleteFileFirst()
     {
-        mockFileIOProxy.Setup(fileProxy => fileProxy.IsExistingFile(DecodedOutputFile)).Returns(true);
-        mockDataEncoderUtil.Setup(encoderUtil => encoderUtil.Decode(IsAny<string>(), IsAny<string>(), IsAny<bool>(), IsAny<int>(), IsAny<string>(), IsAny<int>()))
-            .Returns(new byte[1024]);
+        mockFileIOProxy.Setup(fileProxy => fileProxy.IsExistingFile(DecodedOutputFile))
+            .Returns(true)
+            .Verifiable();
+
+        mockDataEncoderUtil.Setup(encoderUtil => encoderUtil.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations))
+            .Returns(new byte[1024])
+            .Verifiable();
+
         mockFileIOProxy.Setup(fileProxy => fileProxy.Delete(DecodedOutputFile)).Verifiable();
-        mockReadWriteStream.Setup(stream => stream.Write(IsAny<byte[]>(), IsAny<int>(), IsAny<int>())).Verifiable();
+
+        mockReadWriteStream.Setup(stream => stream.Write(IsAny<byte[]>(), IsAny<int>(), IsAny<int>()))
+            .Verifiable();
 
         using (ContentWriter writer = new(Arguments, mockDataEncoderUtil.Object, mockFileIOProxy.Object))
         {
             writer.WriteContentChunkToFile(BinaryString);
         }
-
-        mockFileIOProxy.Verify(provider => provider.Delete(DecodedOutputFile), Once());
-        mockDataEncoderUtil.Verify(encoder => encoder.Decode(BinaryString, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations), Once());
     }
 }

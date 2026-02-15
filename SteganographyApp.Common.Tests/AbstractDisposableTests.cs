@@ -19,12 +19,12 @@ public class AbstractDisposableTest
         ObjectDisposedException actual = Assert.Throws<ObjectDisposedException>(
             () => instance.DoWork());
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual.Message, Contains.Substring(instance.GetType().FullName!));
             Assert.That(instance.DisposeCallCount, Is.EqualTo(1));
             Assert.That(instance.DoWorkCallCount, Is.EqualTo(1));
-        });
+        }
     }
 
     internal sealed class TestClass : AbstractDisposable

@@ -13,13 +13,15 @@ public class CommandGroupTests
         string[] arguments = ["command_name", "command_argument"];
 
         Mock<ICommand> mockCommand = new(MockBehavior.Strict);
-        mockCommand.Setup(command => command.GetName()).Returns("command_name");
+        mockCommand.Setup(command => command.GetName()).Returns("command_name").Verifiable();
         mockCommand.Setup(command => command.Execute(It.Is<string[]>(str => str.Length == 1 && str[0] == arguments[1])))
             .Verifiable();
 
         ICommand group = Commands.Group([mockCommand.Object]);
 
         group.Execute(arguments);
+
+        mockCommand.VerifyAll();
     }
 
     [Test]

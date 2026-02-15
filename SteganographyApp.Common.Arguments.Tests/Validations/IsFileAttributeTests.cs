@@ -21,13 +21,13 @@ public class IsFileAttributeTests
     public void TestIsFile()
     {
         mockFieldInfo.Setup(info => info.FieldType).Returns(typeof(string));
-        Assert.Throws(typeof(ValidationFailedException), () => isFileAttribute.Validate(mockFieldInfo.Object, string.Empty));
+        Assert.Throws<ValidationFailedException>(() => isFileAttribute.Validate(mockFieldInfo.Object, string.Empty));
     }
 
     [Test]
     public void TestIsFileWithIncomatibleType()
     {
         mockFieldInfo.Setup(info => info.FieldType).Returns(typeof(int));
-        Assert.Throws(typeof(IncompatibleTypeException), () => isFileAttribute.Validate(mockFieldInfo.Object, 1));
+        Assert.Throws<IncompatibleTypeException>(() => isFileAttribute.Validate(mockFieldInfo.Object, 1));
     }
 }

@@ -20,12 +20,12 @@ public class Xor128PrngTests
         generator = new Xor128Prng(101, 5);
         int[] nums2 = Generate(generator, 20, 20);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(AreInRange(nums, 0, 20), Is.True);
             Assert.That(AreInRange(nums2, 0, 20), Is.True);
             Assert.That(HaveSameElements(nums, nums2), Is.False);
-        });
+        }
     }
 
     [Test]
@@ -37,12 +37,12 @@ public class Xor128PrngTests
         generator = new Xor128Prng(101, 5);
         int[] nums2 = Generate(generator, 20, 20);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(AreInRange(nums, 0, 20), Is.True);
             Assert.That(AreInRange(nums2, 0, 20), Is.True);
             Assert.That(HaveSameElements(nums, nums2), Is.False);
-        });
+        }
     }
 
     [Test]
@@ -54,12 +54,12 @@ public class Xor128PrngTests
         generator = new Xor128Prng(100, 5);
         int[] nums2 = Generate(generator, 20, 20);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(AreInRange(nums, 0, 20), Is.True);
             Assert.That(AreInRange(nums2, 0, 20), Is.True);
             Assert.That(HaveSameElements(nums, nums2), Is.True);
-        });
+        }
     }
 
     [Test]

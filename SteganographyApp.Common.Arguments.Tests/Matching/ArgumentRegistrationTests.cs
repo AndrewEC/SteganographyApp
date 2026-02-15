@@ -17,8 +17,13 @@ public class ArgumentRegistrationTests
     [SetUp]
     public void SetUp()
     {
-        lookup.Reset();
         argumentRegistration = new(lookup.Object);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        lookup.Reset();        
     }
 
     [Test]
@@ -28,7 +33,8 @@ public class ArgumentRegistrationTests
 
         lookup.Setup(look => look.FindParser(
             It.IsAny<Type>(), It.IsAny<ArgumentAttribute>(), It.IsAny<MemberInfo>()))
-            .Returns(parser);
+            .Returns(parser)
+            .Verifiable();
 
         ImmutableArray<RegisteredArgument> arguments = argumentRegistration
             .FindAttributedArguments(typeof(TestValidAttributes));
@@ -37,25 +43,27 @@ public class ArgumentRegistrationTests
 
         RegisteredArgument actual = arguments[0];
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual.Attribute, Is.Not.Null);
             Assert.That(actual.Attribute.Name, Is.EqualTo("--hasAtt"));
             Assert.That(actual.Member, Is.Not.Null);
             Assert.That(actual.Member.Name, Is.EqualTo(nameof(TestValidAttributes.HasAttribute)));
             Assert.That(actual.Parser, Is.EqualTo(parser));
-        });
+        }
 
         RegisteredArgument actual2 = arguments[1];
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(actual2.Attribute, Is.Not.Null);
             Assert.That(actual2.Attribute.Name, Is.EqualTo("--hasSecondAtt"));
             Assert.That(actual2.Member, Is.Not.Null);
             Assert.That(actual2.Member.Name, Is.EqualTo(nameof(TestValidAttributes.HasSecondAttribute)));
             Assert.That(actual2.Parser, Is.EqualTo(parser));
-        });
+        }
+
+        lookup.VerifyAll();
     }
 
     [Test]
@@ -66,9 +74,7 @@ public class ArgumentRegistrationTests
 
         Assert.That(actual.Message, Contains.Substring(nameof(TestMissingName.MissingName)));
 
-        lookup.Verify(
-            look => look.FindParser(It.IsAny<Type>(), It.IsAny<ArgumentAttribute>(), It.IsAny<MemberInfo>()),
-            Times.Never());
+        lookup.VerifyNoOtherCalls();
     }
 
     [Test]
@@ -78,16 +84,15 @@ public class ArgumentRegistrationTests
 
         lookup.Setup(look => look.FindParser(
             It.IsAny<Type>(), It.IsAny<ArgumentAttribute>(), It.IsAny<MemberInfo>()))
-            .Returns(parser);
+            .Returns(parser)
+            .Verifiable();
 
         ParseException actual = Assert.Throws<ParseException>(
             () => argumentRegistration.FindAttributedArguments(typeof(TestDuplicateNames)));
 
         Assert.That(actual.Message, Contains.Substring("duplicateName"));
 
-        lookup.Verify(
-            look => look.FindParser(It.IsAny<Type>(), It.IsAny<ArgumentAttribute>(), It.IsAny<MemberInfo>()),
-            Times.Once());
+        lookup.VerifyAll();
     }
 
     [Test]
@@ -97,16 +102,15 @@ public class ArgumentRegistrationTests
 
         lookup.Setup(look => look.FindParser(
             It.IsAny<Type>(), It.IsAny<ArgumentAttribute>(), It.IsAny<MemberInfo>()))
-            .Returns(parser);
+            .Returns(parser)
+            .Verifiable();
 
         ParseException actual = Assert.Throws<ParseException>(
             () => argumentRegistration.FindAttributedArguments(typeof(TestDuplicateShortNames)));
 
         Assert.That(actual.Message, Contains.Substring("duplicateShortName"));
 
-        lookup.Verify(
-            look => look.FindParser(It.IsAny<Type>(), It.IsAny<ArgumentAttribute>(), It.IsAny<MemberInfo>()),
-            Times.Once());
+        lookup.VerifyAll();
     }
 
     [Test]
@@ -117,9 +121,7 @@ public class ArgumentRegistrationTests
 
         Assert.That(actual.Message, Contains.Substring("invalidFlag"));
 
-        lookup.Verify(
-            look => look.FindParser(It.IsAny<Type>(), It.IsAny<ArgumentAttribute>(), It.IsAny<MemberInfo>()),
-            Times.Never());
+        lookup.VerifyNoOtherCalls();
     }
 
     [Test]
@@ -130,9 +132,7 @@ public class ArgumentRegistrationTests
 
         Assert.That(actual.Message, Contains.Substring(nameof(TestNoArguments)));
 
-        lookup.Verify(
-            look => look.FindParser(It.IsAny<Type>(), It.IsAny<ArgumentAttribute>(), It.IsAny<MemberInfo>()),
-            Times.Never());
+        lookup.VerifyNoOtherCalls();
     }
 
     [Test]
@@ -143,9 +143,7 @@ public class ArgumentRegistrationTests
 
         Assert.That(actual.Message, Contains.Substring(nameof(TestNoArguments)));
 
-        lookup.Verify(
-            look => look.FindParser(It.IsAny<Type>(), It.IsAny<ArgumentAttribute>(), It.IsAny<MemberInfo>()),
-            Times.Never());
+        lookup.VerifyNoOtherCalls();
     }
 
     internal class TestValidAttributes

@@ -34,23 +34,23 @@ public class TypeHelperTests
     [Test]
     public void TestDeclaredType()
     {
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(TypeHelperAlias.GetDeclaredType(stringFieldMember), Is.EqualTo(typeof(string)));
             Assert.That(TypeHelperAlias.GetDeclaredType(longPropertyMember), Is.EqualTo(typeof(long)));
-        });
-        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.GetDeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
+            Assert.Throws<TypeException>(() => TypeHelperAlias.GetDeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
+        }
     }
 
     [Test]
     public void TestGetValue()
     {
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(TypeHelperAlias.GetValue(subject, stringFieldMember), Is.EqualTo(subject.StringField));
             Assert.That(TypeHelperAlias.GetValue(subject, longPropertyMember), Is.EqualTo(subject.LongProperty));
-        });
-        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.GetDeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
+            Assert.Throws<TypeException>(() => TypeHelperAlias.GetDeclaredType(GetVoidMethod(subject, nameof(TestSubject.VoidMethod))));
+        }
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class TypeHelperTests
         TypeHelperAlias.SetValue(subject, longPropertyMember, newLongValue);
         Assert.That(newLongValue, Is.EqualTo(subject.LongProperty));
 
-        Assert.Throws(typeof(TypeException), () => TypeHelperAlias.SetValue(subject, GetVoidMethod(subject, nameof(TestSubject.VoidMethod)), newLongValue));
+        Assert.Throws<TypeException>(() => TypeHelperAlias.SetValue(subject, GetVoidMethod(subject, nameof(TestSubject.VoidMethod)), newLongValue));
     }
 
     private static MemberInfo GetVoidMethod(TestSubject subject, string methodName)

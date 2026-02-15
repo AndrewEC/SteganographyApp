@@ -19,12 +19,19 @@ public class CalculatorTests
     [SetUp]
     public void SetUp()
     {
-        mockFileIOProxy.Reset();
-
         mockFileIOProxy.Setup(fileProxy => fileProxy.GetFileSizeBytes(TestFile))
-            .Returns(ChunkSize * RequiredNumberOfWrites);
+            .Returns(ChunkSize * RequiredNumberOfWrites)
+            .Verifiable();
 
         calculator = new(mockFileIOProxy.Object);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        mockFileIOProxy.VerifyAll();
+
+        mockFileIOProxy.Reset();
     }
 
     [Test]
@@ -33,7 +40,6 @@ public class CalculatorTests
         int requiredBitsForTable = calculator.CalculateRequiredBitsForContentTable(TestFile, ChunkSize);
 
         Assert.That(requiredBitsForTable, Is.EqualTo(183));
-        mockFileIOProxy.Verify(fileProxy => fileProxy.GetFileSizeBytes(TestFile), Times.Once());
     }
 
     [Test]
@@ -42,6 +48,5 @@ public class CalculatorTests
         int requiredNumberOfWrites = calculator.CalculateRequiredNumberOfWrites(TestFile, ChunkSize);
 
         Assert.That(requiredNumberOfWrites, Is.EqualTo(RequiredNumberOfWrites));
-        mockFileIOProxy.Verify(fileProxy => fileProxy.GetFileSizeBytes(TestFile), Times.Once());
     }
 }

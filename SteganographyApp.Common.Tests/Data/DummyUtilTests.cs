@@ -33,21 +33,21 @@ public class DummyUtilTests
         Assert.That(inserted, Is.Not.EqualTo(originalBytes));
 
         byte[] removed = util.RemoveDummies(IncorrectNumberOfDummies, inserted, RandomSeed);
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(removed, Is.Not.EqualTo(originalBytes));
             Assert.That(removed, Is.Not.EqualTo(inserted));
-        });
+        }
     }
 
     [Test]
     public void TestInsertAndRemoveWithIncorrectRandomSeedReturnsBadResult()
     {
         byte[] inserted = util.InsertDummies(NumberOfDummies, originalBytes, RandomSeed);
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(inserted, Is.Not.EqualTo(originalBytes));
             Assert.That(util.RemoveDummies(NumberOfDummies, inserted, IncorrectRandomSeed), Is.Not.EqualTo(originalBytes));
-        });
+        }
     }
 }

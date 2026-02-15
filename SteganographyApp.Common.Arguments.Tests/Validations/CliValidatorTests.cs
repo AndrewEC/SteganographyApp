@@ -19,9 +19,7 @@ public class CliValidatorTests
     public void TestValidateWithInvalidValuesThrowsValidationFailedException()
     {
         var toValidate = new Invalid();
-        Assert.Throws(
-            typeof(ValidationFailedException),
-            () => cliValidator.Validate(toValidate));
+        Assert.Throws<ValidationFailedException>(() => cliValidator.Validate(toValidate));
     }
 }
 

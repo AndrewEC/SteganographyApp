@@ -15,12 +15,12 @@ public class LazyCommandTest
 
         command.Execute(arguments);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(command.GetName(), Is.EqualTo(StubCommand.Name));
             Assert.That(command.GetHelpDescription(), Is.EqualTo(StubCommand.HelpDescription));
             Assert.That(StubCommand.ExecutedCalledWith, Is.EqualTo(arguments));
-        });
+        }
     }
 
     internal sealed class StubCommand : ICommand

@@ -36,11 +36,21 @@ public class ImageStoreTests
         imageStore = new(Arguments, mockEncoderProvider.Object, mockImageProxy.Object);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        mockImageProxy.VerifyAll();
+        mockEncoderProvider.VerifyAll();
+
+        mockImageProxy.Reset();
+        mockEncoderProvider.Reset();
+    }
+
     [Test]
     public void TestOpenMultipleStreamsThrowsException()
     {
         var mockImage = GenerateMockImage(100, 100);
-        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage).Verifiable();
 
         imageStore.OpenStream(StreamMode.Read);
         Assert.Throws<ImageStoreException>(() => imageStore.OpenStream(StreamMode.Read));
@@ -50,9 +60,9 @@ public class ImageStoreTests
     public void TestWriteToImageWhenNotEnoughImageSpaceAvailableThrowsImageStoreException()
     {
         var mockImage = GenerateMockImage(100, 100);
-        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage).Verifiable();
 
-        mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImagePath)).Returns(new PngEncoder());
+        mockEncoderProvider.Setup(encoderProvider => encoderProvider.GetEncoder(ImagePath)).Returns(new PngEncoder()).Verifiable();
 
         string binaryString = GenerateBinaryString(BinaryStringLength);
 
@@ -64,18 +74,18 @@ public class ImageStoreTests
                 Is.EqualTo("Cannot load next image because there are no remaining cover images left to load."));
         }
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(mockImage.DisposeCalled, Is.True);
             Assert.That(mockImage.SaveCalledWith, Is.EqualTo(Arguments.CoverImages[0]));
-        });
+        }
     }
 
     [Test]
     public void TestReadFromImageWhenNotEnoughImageSpaceAvailableThrowsImageStoreException()
     {
         var mockImage = GenerateMockImage(1, 1);
-        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage).Verifiable();
 
         using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
@@ -92,16 +102,16 @@ public class ImageStoreTests
     public void TestSeekToImage()
     {
         var mockImage = GenerateMockImage(100, 100);
-        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage).Verifiable();
 
         using (var stream = imageStore.OpenStream(StreamMode.Read))
         {
             stream.SeekToImage(0);
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.Throws<ImageStoreException>(() => stream.SeekToImage(2));
                 Assert.Throws<ImageStoreException>(() => stream.SeekToImage(-1));
-            });
+            }
         }
     }
 
@@ -109,7 +119,7 @@ public class ImageStoreTests
     public void TestSeekToPixelOutsideAvailablePixelRangeThrowsException()
     {
         var mockImage = GenerateMockImage(1, 1);
-        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage);
+        mockImageProxy.Setup(imageProxy => imageProxy.LoadImage(ImagePath)).Returns(mockImage).Verifiable();
 
         using (var stream = imageStore.OpenStream(StreamMode.Read))
         {

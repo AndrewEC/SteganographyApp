@@ -30,11 +30,11 @@ public class ProgressTrackerTests
     {
         ExecuteUpdates(tracker);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(mockWriter.WriteValues, Has.Count.EqualTo(DesiredWriteCount));
             Assert.That(mockWriter.WriteLineValues, Has.Count.EqualTo(DesiredWriteLineCount));
-        });
+        }
     }
 
     [Test]

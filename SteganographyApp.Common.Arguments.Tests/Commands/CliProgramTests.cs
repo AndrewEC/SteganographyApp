@@ -19,7 +19,7 @@ public class CliProgramTests
 
         CliProgram.Create(mockCommand.Object).Execute(arguments);
 
-        mockCommand.Verify(command => command.Execute(arguments), Times.Once());
+        mockCommand.VerifyAll();
     }
 
     [Test]
@@ -32,7 +32,7 @@ public class CliProgramTests
 
         CliProgram.Create(mockCommand.Object).TryExecute(arguments);
 
-        mockCommand.Verify(command => command.Execute(arguments), Times.Once());
+        mockCommand.VerifyAll();
     }
 
     [Test]
@@ -42,10 +42,12 @@ public class CliProgramTests
 
         Exception expected = new();
         Mock<ICommand> mockCommand = new(MockBehavior.Strict);
-        mockCommand.Setup(command => command.Execute(arguments)).Throws(expected);
+        mockCommand.Setup(command => command.Execute(arguments)).Throws(expected).Verifiable();
 
         Exception? actual = CliProgram.Create(mockCommand.Object).TryExecute(arguments);
 
         Assert.That(actual, Is.EqualTo(expected));
+
+        mockCommand.VerifyAll();
     }
 }

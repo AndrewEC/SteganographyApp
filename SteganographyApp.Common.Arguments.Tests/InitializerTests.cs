@@ -12,11 +12,8 @@ public class InitializerTests
     {
         CanInitialize actual = initializer.Initialize<CanInitialize>();
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(actual, Is.Not.Null);
-            Assert.That(actual, Is.InstanceOf(typeof(CanInitialize)));
-        });
+        Assert.That(actual, Is.Not.Null);
+        Assert.That(actual, Is.InstanceOf<CanInitialize>());
     }
 
     [Test]

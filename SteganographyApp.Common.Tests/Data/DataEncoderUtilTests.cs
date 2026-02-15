@@ -41,6 +41,24 @@ public class DataEncoderUtilTests
             mockBinaryUtil.Object);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        mockKeyUtil.VerifyAll();
+        mockEncryptionProxy.VerifyAll();
+        mockBinaryUtil.VerifyAll();
+        mockDummyUtil.VerifyAll();
+        mockRandomUtil.VerifyAll();
+        mockCompressionUtil.VerifyAll();
+
+        mockKeyUtil.Reset();
+        mockEncryptionProxy.Reset();
+        mockBinaryUtil.Reset();
+        mockDummyUtil.Reset();
+        mockRandomUtil.Reset();
+        mockCompressionUtil.Reset();
+    }
+
     [Test]
     public void TestEncode()
     {
@@ -49,19 +67,19 @@ public class DataEncoderUtilTests
         string randomKeyString = Convert.ToBase64String(randomKey);
 
         byte[] encryptedBytes = [1];
-        mockEncryptionProxy.Setup(encryptionProxy => encryptionProxy.Encrypt(InputBytes, Password, AdditionalHashIterations)).Returns(encryptedBytes);
+        mockEncryptionProxy.Setup(encryptionProxy => encryptionProxy.Encrypt(InputBytes, Password, AdditionalHashIterations)).Returns(encryptedBytes).Verifiable();
 
         byte[] dummyBytes = [2];
-        mockDummyUtil.Setup(dummyUtil => dummyUtil.InsertDummies(DummyCount, encryptedBytes, randomKeyString)).Returns(dummyBytes);
+        mockDummyUtil.Setup(dummyUtil => dummyUtil.InsertDummies(DummyCount, encryptedBytes, randomKeyString)).Returns(dummyBytes).Verifiable();
 
         byte[] randomizedBytes = [3];
-        mockRandomUtil.Setup(randomUtil => randomUtil.Randomize(dummyBytes, randomKeyString)).Returns(randomizedBytes);
+        mockRandomUtil.Setup(randomUtil => randomUtil.Randomize(dummyBytes, randomKeyString)).Returns(randomizedBytes).Verifiable();
 
         byte[] compressedBytes = [4];
-        mockCompressionUtil.Setup(compressionUtil => compressionUtil.Compress(randomizedBytes)).Returns(compressedBytes);
+        mockCompressionUtil.Setup(compressionUtil => compressionUtil.Compress(randomizedBytes)).Returns(compressedBytes).Verifiable();
 
         string binaryString = "binary_string";
-        mockBinaryUtil.Setup(binaryUtil => binaryUtil.ToBinaryString(compressedBytes)).Returns(binaryString);
+        mockBinaryUtil.Setup(binaryUtil => binaryUtil.ToBinaryString(compressedBytes)).Returns(binaryString).Verifiable();
 
         string result = dataEncoderUtil.Encode(InputBytes, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations);
 
@@ -72,23 +90,23 @@ public class DataEncoderUtilTests
     public void TestDecode()
     {
         byte[] stringToDecodeBytes = [11];
-        mockBinaryUtil.Setup(binaryUtil => binaryUtil.ToBytes(StringToDecode)).Returns(stringToDecodeBytes);
+        mockBinaryUtil.Setup(binaryUtil => binaryUtil.ToBytes(StringToDecode)).Returns(stringToDecodeBytes).Verifiable();
 
         byte[] randomKey = Encoding.UTF8.GetBytes("random_key");
-        mockKeyUtil.Setup(keyUtil => keyUtil.GenerateKey(RandomSeed, AdditionalHashIterations)).Returns(randomKey);
+        mockKeyUtil.Setup(keyUtil => keyUtil.GenerateKey(RandomSeed, AdditionalHashIterations)).Returns(randomKey).Verifiable();
         string randomKeyString = Convert.ToBase64String(randomKey);
 
         byte[] decompressBytes = [1];
-        mockCompressionUtil.Setup(compressionUtil => compressionUtil.Decompress(stringToDecodeBytes)).Returns(decompressBytes);
+        mockCompressionUtil.Setup(compressionUtil => compressionUtil.Decompress(stringToDecodeBytes)).Returns(decompressBytes).Verifiable();
 
         byte[] orderedBytes = [2];
-        mockRandomUtil.Setup(randomUtil => randomUtil.Reorder(decompressBytes, randomKeyString)).Returns(orderedBytes);
+        mockRandomUtil.Setup(randomUtil => randomUtil.Reorder(decompressBytes, randomKeyString)).Returns(orderedBytes).Verifiable();
 
         byte[] undummiedBytes = [3];
-        mockDummyUtil.Setup(dummyUtil => dummyUtil.RemoveDummies(DummyCount, orderedBytes, randomKeyString)).Returns(undummiedBytes);
+        mockDummyUtil.Setup(dummyUtil => dummyUtil.RemoveDummies(DummyCount, orderedBytes, randomKeyString)).Returns(undummiedBytes).Verifiable();
 
         byte[] decryptedBytes = [4];
-        mockEncryptionProxy.Setup(encryption => encryption.Decrypt(undummiedBytes, Password, AdditionalHashIterations)).Returns(decryptedBytes);
+        mockEncryptionProxy.Setup(encryption => encryption.Decrypt(undummiedBytes, Password, AdditionalHashIterations)).Returns(decryptedBytes).Verifiable();
 
         byte[] result = dataEncoderUtil.Decode(StringToDecode, Password, UseCompression, DummyCount, RandomSeed, AdditionalHashIterations);
 
