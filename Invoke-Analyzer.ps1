@@ -15,7 +15,7 @@ Write-Host "Running PSScriptAnalyzer..."
 
 pwsh -c Invoke-ScriptAnalyzer `
     -EnableExit `
-    -Path C:\Stuff\Programming\NetFramework\SteganographyApp `
+    -Path . `
     -Recurse
 
 if ($LASTEXITCODE -eq 0) {
